@@ -1,0 +1,87 @@
+:root {
+    --bg: #121212; /* Fondo oscuro */
+    --panel: #1e1e1e; /* Panel de contenido */
+    --text: #ffffff; /* Texto blanco */
+    --muted: #b0b0b0; /* Texto atenuado */
+    --accent: #ff4081; /* Color de acento */
+    --border: #333333; /* Color de borde */
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+#app {
+    max-width: 1100px;
+    width: 100%;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: var(--panel);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+h1, h2, h3 {
+    color: var(--accent);
+}
+
+input, select, button {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    margin: 5px 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input:focus, select:focus, button:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+tr:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+label {
+    display: block;
+    margin: 5px 0;
+}
+
+button {
+    background-color: var(--accent);
+    color: var(--text);
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: darken(var(--accent), 10%);
+}
+
+.error {
+    color: red;
+    font-size: 0.9em;
+}

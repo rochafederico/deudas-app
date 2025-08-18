@@ -1,0 +1,44 @@
+# Node.js
+node_modules/
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Logs
+*.log
+
+# Env files
+.env
+
+# Build output
+/dist/
+/build/
+
+# Database (if any local db files)
+*.sqlite
+*.db
+
+# System files
+Thumbs.db
+
+# Others
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage
+coverage/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+
+# IDE
+.idea/
+
+# Test snapshots
+__snapshots__/

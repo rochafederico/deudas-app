@@ -1,0 +1,171 @@
+import { el, appendCells } from '../utils/dom.js';
+
+export class DebtList extends HTMLElement {
+    constructor() {
+        super();
+        this.attachShadow({ mode: 'open' });
+        this.debts = [];
+        this.mes = new Date().toISOString().slice(0, 7); // mes actual por defecto
+    }
+
+    connectedCallback() {
+        this.render();
+        this.loadDebts();
+        this.addEventListeners();
+    }
+
+    addEventListeners() {
+        window.addEventListener('ui:month', (event) => {
+            this.mes = event.detail.mes;
+            this.loadDebts();
+        });
+
+        window.addEventListener('deuda:added', () => this.loadDebts());
+        window.addEventListener('deuda:updated', () => this.loadDebts());
+        window.addEventListener('deuda:deleted', () => this.loadDebts());
+    }
+
+    async loadDebts() {
+        if (!this.mes) this.mes = new Date().toISOString().slice(0, 7);
+        const debts = await this.listByMes(this.mes);
+        this.debts = debts;
+        console.log('[DebtList] Deudas cargadas:', debts); // Debug: muestra las deudas recuperadas
+        this.renderTable();
+    }
+
+    async listByMes(mes) {
+        // Usa montoRepository para consultar montos por periodo 'YYYY-MM' y agrupar por deuda
+        const { listMontos } = await import('../repository/montoRepository.js');
+        const { getDeuda } = await import('../repository/deudaRepository.js');
+        const montos = await listMontos({ mes }); // mes es 'YYYY-MM'
+        const deudaIds = [...new Set(montos.map(m => m.deudaId))];
+        const deudas = [];
+        for (const id of deudaIds) {
+            const deuda = await getDeuda(id);
+            deuda.montos = montos.filter(m => m.deudaId === id);
+            deudas.push(deuda);
+        }
+        return deudas;
+    }
+
+    renderTable() {
+        const tableBody = this.shadowRoot.querySelector('tbody');
+        tableBody.innerHTML = '';
+
+        if (this.debts.length === 0) {
+            tableBody.appendChild(el('tr', {
+                children: [el('td', { text: 'No hay deudas para el mes seleccionado.', attrs: { colspan: 7 }, className: '', })]
+            }));
+            return;
+        }
+
+        // Renderiza cada deuda y sus montos
+        this.debts.forEach(deuda => {
+            deuda.montos.forEach(monto => {
+                const row = document.createElement('tr');
+                appendCells(row, [
+                    { text: deuda.acreedor },
+                    { text: deuda.tipoDeuda || '-' },
+                    { text: monto.moneda },
+                    { text: this.fmtMoneda(monto.moneda, monto.monto) },
+                    { text: monto.vencimiento },
+                    { text: monto.periodo },
+                    {
+                        children: [
+                            el('button', {
+                                className: 'btn-edit',
+                                text: 'Editar',
+                                on: {
+                                    click: async () => {
+                                        let modal = null;
+                                        const appShell = document.querySelector('app-shell');
+                                        if (appShell && appShell.shadowRoot) {
+                                            modal = appShell.shadowRoot.getElementById('debtModal');
+                                        }
+                                        if (!modal) {
+                                            modal = document.getElementById('debtModal');
+                                        }
+                                        if (modal) {
+                                            // Consulta la deuda y sus montos actualizados desde la base de datos
+                                            const { getDeuda } = await import('../repository/deudaRepository.js');
+                                            const deudaActualizada = await getDeuda(deuda.id);
+                                            modal.openEdit(deudaActualizada);
+                                            modal.attachOpener(row.querySelector('.btn-edit'));
+                                        }
+                                    }
+                                }
+                            }),
+                            el('button', {
+                                text: 'Borrar',
+                                on: { click: () => this.deleteDebt(monto.id, deuda.acreedor, monto.monto, monto.vencimiento, monto.periodo, monto.moneda) }
+                            })
+                        ]
+                    }
+                ]);
+                tableBody.appendChild(row);
+            });
+        });
+    }
+
+    toggleEstado(id) {
+        const debt = this.debts.find(d => d.id === id);
+        debt.estadoPagada = !debt.estadoPagada;
+        window.db.updateDeuda(debt);
+        this.renderTable();
+    }
+
+    editDebt(id) {
+        const debt = this.debts.find(d => d.id === id);
+        // Logic to populate the form with debt data for editing
+        // Emit an event to open the form with debt data
+    }
+
+    deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
+        const montoFmt = this.fmtMoneda(moneda, monto);
+        if (!confirm(`¿Seguro que quieres borrar los ${montoFmt} que le debes a "${acreedor}"?\nVencimiento: ${vencimiento} | Periodo: ${periodo}`)) return;
+        import('../repository/montoRepository.js').then(({ deleteMonto }) => {
+            deleteMonto(id).then(() => {
+                this.loadDebts(); // Actualiza la tabla tras borrar
+            });
+        });
+    }
+
+    fmtMoneda(moneda, n) {
+        return new Intl.NumberFormat('es-AR', { style: 'currency', currency: moneda }).format(n);
+    }
+
+    render() {
+        this.shadowRoot.innerHTML = `
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid #ddd;
+                }
+                tr:hover {
+                    background-color: #f1f1f1;
+                }
+            </style>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Acreedor</th>
+                        <th>Tipo</th>
+                        <th>Moneda</th>
+                        <th>Monto</th>
+                        <th>Vencimiento</th>
+                        <th>Periodo</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        `;
+    }
+}
+
+customElements.define('debt-list', DebtList);
