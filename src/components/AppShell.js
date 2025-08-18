@@ -39,7 +39,7 @@ export class AppShell extends HTMLElement {
                 el('div', {
                     className: 'month-nav',
                     children: [
-                        el('button', {
+                        el('app-button', {
                             className: 'month-btn',
                             text: '<',
                             attrs: { id: 'prev-month', title: 'Mes anterior', type: 'button' }
@@ -47,7 +47,7 @@ export class AppShell extends HTMLElement {
                         el('input', {
                             attrs: { type: 'month', id: 'month-filter', value: this.month }
                         }),
-                        el('button', {
+                        el('app-button', {
                             className: 'month-btn',
                             text: '>',
                             attrs: { id: 'next-month', title: 'Mes siguiente', type: 'button' }
@@ -56,9 +56,10 @@ export class AppShell extends HTMLElement {
                 }),
                 el('div', {
                     children: [
-                        el('button', {
+                        el('app-button', {
                             attrs: { 'data-add-debt': '', id: 'add-debt', type: 'button' },
-                            text: 'Agregar deuda'
+                            text: 'Agregar deuda',
+                            variant: 'success'
                         })
                     ]
                 })

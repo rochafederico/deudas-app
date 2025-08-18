@@ -1,4 +1,5 @@
 import { DeudaModel } from '../models/DeudaModel.js';
+import './AppButton.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -60,7 +61,7 @@ export class DebtForm extends HTMLElement {
                 <div class="montos-list">
                     <div style="display:flex;align-items:center;justify-content:space-between;">
                         <strong>Montos</strong>
-                        <button type="button" id="add-monto" class="btn-monto">Agregar monto</button>
+                        <app-button id="add-monto">Agregar monto</app-button>
                     </div>
                     <table>
                         <thead>
@@ -74,7 +75,7 @@ export class DebtForm extends HTMLElement {
                         <tbody id="montos-tbody"></tbody>
                     </table>
                 </div>
-                <button type="submit">Guardar</button>
+                <app-button type="submit" variant="success">Guardar</app-button>
             </form>
             <ui-modal id="montoModal"></ui-modal>
         `;
@@ -103,8 +104,8 @@ export class DebtForm extends HTMLElement {
                 </label>
                 <label>Vencimiento:<input type="date" name="vencimiento" required value="${monto?.vencimiento ?? ''}" /></label>
                 <div style="display:flex;justify-content:flex-end;gap:8px;">
-                    <button type="button" id="cancelMonto">Cancelar</button>
-                    <button type="submit">Guardar</button>
+                    <app-button type="button" id="cancelMonto">Cancelar</app-button>
+                    <app-button type="submit" variant="success">Guardar</app-button>
                 </div>
             </form>
         `;
@@ -138,8 +139,8 @@ export class DebtForm extends HTMLElement {
                 <td>${monto.moneda}</td>
                 <td>${monto.vencimiento}</td>
                 <td>
-                    <button type="button" class="edit-monto">Editar</button>
-                    <button type="button" class="delete-monto">Eliminar</button>
+                    <app-button class="edit-monto">Editar</app-button>
+                    <app-button class="delete-monto" variant="delete">Eliminar</app-button>
                 </td>
             `;
             tr.querySelector('.edit-monto').addEventListener('click', () => this.openMontoModal(monto, idx));

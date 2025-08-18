@@ -103,7 +103,7 @@ export class UiModal extends HTMLElement {
         <dialog role="dialog" aria-modal="true" aria-labelledby="modal-title" part="dialog">
             <div class="header" part="header">
                 <h2 id="modal-title"></h2>
-                <button class="btn-close" aria-label="Cerrar">×</button>
+                <app-button class="btn-close" aria-label="Cerrar" variant="delete" style="font-size:20px;padding:2px 10px;">×</app-button>
             </div>
             <slot></slot>
         </dialog>

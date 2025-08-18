@@ -1,4 +1,5 @@
 import { el, appendCells } from '../utils/dom.js';
+import './AppButton.js';
 
 export class DebtList extends HTMLElement {
     constructor() {
@@ -77,8 +78,7 @@ export class DebtList extends HTMLElement {
                     { text: monto.periodo },
                     {
                         children: [
-                            el('button', {
-                                className: 'btn-edit',
+                            el('app-button', {
                                 text: 'Editar',
                                 on: {
                                     click: async () => {
@@ -95,12 +95,13 @@ export class DebtList extends HTMLElement {
                                             const { getDeuda } = await import('../repository/deudaRepository.js');
                                             const deudaActualizada = await getDeuda(deuda.id);
                                             modal.openEdit(deudaActualizada);
-                                            modal.attachOpener(row.querySelector('.btn-edit'));
+                                            modal.attachOpener(row.querySelector('app-button'));
                                         }
                                     }
                                 }
                             }),
-                            el('button', {
+                            el('app-button', {
+                                variant: 'delete',
                                 text: 'Borrar',
                                 on: { click: () => this.deleteDebt(monto.id, deuda.acreedor, monto.monto, monto.vencimiento, monto.periodo, monto.moneda) }
                             })
