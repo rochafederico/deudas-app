@@ -52,16 +52,21 @@ export class DebtList extends HTMLElement {
         const tableBody = this.shadowRoot.querySelector('tbody');
         tableBody.innerHTML = '';
 
+        // Totales por moneda
+        const totales = {};
+
         if (this.debts.length === 0) {
             tableBody.appendChild(el('tr', {
                 children: [el('td', { text: 'No hay deudas para el mes seleccionado.', attrs: { colspan: 7 }, className: '', })]
             }));
+            this.renderTotales(totales);
             return;
         }
 
         // Renderiza cada deuda y sus montos
         this.debts.forEach(deuda => {
             deuda.montos.forEach(monto => {
+                totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
                 const row = document.createElement('tr');
                 appendCells(row, [
                     { text: deuda.acreedor },
@@ -105,6 +110,35 @@ export class DebtList extends HTMLElement {
                 tableBody.appendChild(row);
             });
         });
+        // Muestra los totales por moneda al final de la tabla
+        this.renderTotales(totales);
+    }
+
+    renderTotales(totales) {
+        let totalRow = this.shadowRoot.getElementById('total-row');
+        let leyenda = '💰 Totales a pagar este mes: ';
+        if (Object.keys(totales).length === 0) {
+            leyenda += '🟢 Sin deudas registradas.';
+        } else {
+            leyenda += Object.entries(totales)
+                .map(([moneda, total]) => {
+                    let emoji = '';
+                    if (moneda === 'ARS') emoji = '🇦🇷';
+                    else if (moneda === 'USD') emoji = '🇺🇸';
+                    else if (moneda === 'EUR') emoji = '🇪🇺';
+                    else emoji = '💱';
+                    return `${emoji} ${this.fmtMoneda(moneda, total)}`;
+                })
+                .join(' | ');
+        }
+        if (!totalRow) {
+            totalRow = document.createElement('tr');
+            totalRow.id = 'total-row';
+            totalRow.innerHTML = `<td colspan="7" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
+            this.shadowRoot.querySelector('tbody').appendChild(totalRow);
+        } else {
+            totalRow.innerHTML = `<td colspan="7" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
+        }
     }
 
     toggleEstado(id) {
