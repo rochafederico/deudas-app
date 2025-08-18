@@ -184,6 +184,10 @@ export class DebtList extends HTMLElement {
                 tr:hover {
                     background-color: #f1f1f1;
                 }
+                /* Dark mode row hover */
+                :host-context(body.dark-mode) tr:hover {
+                    background-color: #222a3a;
+                }
             </style>
             <table>
                 <thead>

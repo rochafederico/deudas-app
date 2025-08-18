@@ -75,45 +75,13 @@ input:focus, select:focus {
     border-color: var(--accent);
 }
 
-.btn-delete, .delete-monto {
-    background-color: var(--error);
-}
-.btn-delete:hover, .delete-monto:hover {
-    background-color: #b52a1a;
-}
-
 .table-wrapper {
     margin-top: 24px;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 0 1px 8px rgba(0,0,0,0.04);
 }
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: transparent;
-}
-th, td {
-    padding: 12px 10px;
-    text-align: left;
-    border-bottom: 1px solid var(--border-light);
-    font-size: 1em;
-}
-body.dark-mode th, body.dark-mode td {
-    border-bottom: 1px solid var(--border-dark);
-}
-tr:nth-child(even) {
-    background-color: #f2f4f8;
-}
-body.dark-mode tr:nth-child(even) {
-    background-color: #22252a;
-}
-tr:hover {
-    background-color: #e9ecf2;
-}
-body.dark-mode tr:hover {
-    background-color: #2a2d33;
-}
+
 label {
     display: block;
     margin: 6px 0 2px 0;
