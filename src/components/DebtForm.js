@@ -1,5 +1,6 @@
 import { DeudaModel } from '../models/DeudaModel.js';
 import './AppButton.js';
+import './AppInput.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -42,22 +43,10 @@ export class DebtForm extends HTMLElement {
                 }
             </style>
             <form>
-                <label>
-                    Acreedor:
-                    <input type="text" name="acreedor" required />
-                </label>
-                <label>
-                    Tipo de Deuda:
-                    <input type="text" name="tipoDeuda" />
-                </label>
-                <label>
-                    Número Externo:
-                    <input type="text" name="numeroExterno" />
-                </label>
-                <label>
-                    Notas:
-                    <textarea name="notas"></textarea>
-                </label>
+                <app-input type="text" name="acreedor" label="Acreedor:" required></app-input>
+                <app-input type="text" name="tipoDeuda" label="Tipo de Deuda:"></app-input>
+                <app-input type="text" name="numeroExterno" label="Número Externo:"></app-input>
+                <app-input type="textarea" name="notas" label="Notas:"></app-input>
                 <div class="montos-list">
                     <div style="display:flex;align-items:center;justify-content:space-between;">
                         <strong>Montos</strong>
@@ -95,14 +84,12 @@ export class DebtForm extends HTMLElement {
         this.montoModal.setTitle(monto ? 'Editar monto' : 'Agregar monto');
         this.montoModal.innerHTML = `
             <form id="formMonto" style="display:flex;flex-direction:column;gap:10px;min-width:220px;">
-                <label>Monto:<input type="number" name="monto" required value="${monto?.monto ?? ''}" /></label>
-                <label>Moneda:
-                    <select name="moneda">
-                        <option value="ARS" ${monto?.moneda === 'ARS' ? 'selected' : ''}>ARS</option>
-                        <option value="USD" ${monto?.moneda === 'USD' ? 'selected' : ''}>USD</option>
-                    </select>
-                </label>
-                <label>Vencimiento:<input type="date" name="vencimiento" required value="${monto?.vencimiento ?? ''}" /></label>
+                <app-input type="number" name="monto" label="Monto:" required value="${monto?.monto ?? ''}"></app-input>
+                <app-input type="select" name="moneda" label="Moneda:">
+                    <option value="ARS" ${monto?.moneda === 'ARS' ? 'selected' : ''}>ARS</option>
+                    <option value="USD" ${monto?.moneda === 'USD' ? 'selected' : ''}>USD</option>
+                </app-input>
+                <app-input type="date" name="vencimiento" label="Vencimiento:" required value="${monto?.vencimiento ?? ''}"></app-input>
                 <div style="display:flex;justify-content:flex-end;gap:8px;">
                     <app-button type="button" id="cancelMonto">Cancelar</app-button>
                     <app-button type="submit" variant="success">Guardar</app-button>
@@ -158,10 +145,12 @@ export class DebtForm extends HTMLElement {
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.renderMontosList();
+        // Precarga los valores en los <app-input>
         for (const key in deuda) {
             if (key === 'montos') continue;
-            if (this.form.elements[key] && deuda[key] !== undefined && deuda[key] !== null) {
-                this.form.elements[key].value = deuda[key];
+            const input = this.form.querySelector(`app-input[name="${key}"]`);
+            if (input && deuda[key] !== undefined && deuda[key] !== null) {
+                input.value = deuda[key];
             }
         }
     }
@@ -170,12 +159,13 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
-        this.form.reset();
+        // Resetea los <app-input>
+        this.form.querySelectorAll('app-input').forEach(input => input.value = '');
         this.renderMontosList();
     }
 
     _buildDeudaFromForm() {
-        const get = name => this.form.elements[name]?.value;
+        const get = name => this.form.querySelector(`app-input[name="${name}"]`)?.value;
         return new DeudaModel({
             acreedor: get('acreedor'),
             tipoDeuda: get('tipoDeuda'),

@@ -1,4 +1,5 @@
 import './DebtModal.js';
+import './AppInput.js';
 
 export class AppShell extends HTMLElement {
     constructor() {
@@ -10,7 +11,7 @@ export class AppShell extends HTMLElement {
     }
 
     connectedCallback() {
-        this.shadowRoot.querySelector('input[type="month"]').value = this.month;
+        this.shadowRoot.querySelector('app-input[type="month"]').value = this.month;
         const opener = this.shadowRoot.querySelector('[data-add-debt]');
         opener.addEventListener('click', () => {
             const modal = this.shadowRoot.querySelector('#debtModal');
@@ -44,8 +45,8 @@ export class AppShell extends HTMLElement {
                             text: '<',
                             attrs: { id: 'prev-month', title: 'Mes anterior', type: 'button' }
                         }),
-                        el('input', {
-                            attrs: { type: 'month', id: 'month-filter', value: this.month }
+                        el('app-input', {
+                            attrs: { type: 'month', name: 'month-filter', id: 'month-filter', value: this.month, label: '' }
                         }),
                         el('app-button', {
                             className: 'month-btn',
