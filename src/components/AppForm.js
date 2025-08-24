@@ -68,13 +68,16 @@ export class AppForm extends HTMLElement {
             if (this._initialValues[field.name] !== undefined) attrs.value = this._initialValues[field.name];
             let children = [];
             if (field.type === 'select' && field.options) {
-                children = field.options.map(opt => el('option', {
-                    attrs: {
-                        value: opt,
-                        selected: attrs.value === opt ? '' : undefined
-                    },
-                    text: opt
-                }));
+                children = field.options.map(opt => {
+                    const attrsOpt = {
+                        valuee: opt
+                    }
+                    if (attrs.value === opt) attrsOpt.selected = '';
+                    return el('option', {
+                        attrs: attrsOpt,
+                        text: opt
+                    })
+                });
             }
             return el('app-input', { attrs, children });
         });
