@@ -47,7 +47,7 @@ export class AppShell extends HTMLElement {
                     children: [
                         el('app-button', {
                             className: 'month-btn',
-                            text: '<',
+                            text: '‹',
                             attrs: { id: 'prev-month', title: 'Mes anterior', type: 'button' }
                         }),
                         el('app-input', {
@@ -55,7 +55,7 @@ export class AppShell extends HTMLElement {
                         }),
                         el('app-button', {
                             className: 'month-btn',
-                            text: '>',
+                            text: '›',
                             attrs: { id: 'next-month', title: 'Mes siguiente', type: 'button' }
                         })
                     ]
@@ -63,14 +63,15 @@ export class AppShell extends HTMLElement {
                 el('div', {
                     children: [
                         el('app-button', {
-                            attrs: { 'data-add-debt': '', id: 'add-debt', type: 'button' },
-                            text: 'Agregar deuda',
-                            variant: 'success'
+                            attrs: {
+                                'data-add-debt': '', id: 'add-debt', type: 'button',
+                                variant: 'success', title: 'Agregar deuda'
+                            },
+                            text: '+',
                         }),
                         el('app-button', {
-                            attrs: { 'data-export': '', id: 'export-data', type: 'button' },
-                            text: 'Exportar',
-                            variant: 'success'
+                            attrs: { 'data-export': '', id: 'export-data', type: 'button', title: 'Exportar datos' },
+                            text: '↓'
                         })
                     ]
                 })
@@ -85,7 +86,7 @@ export class AppShell extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <style>
                 .month-nav { display: flex; align-items: center; gap: 8px; }
-                .month-btn { background: none; border: none; font-size: 1.5em; color: var(--accent, #ff4081); cursor: pointer; padding: 0 8px; }
+                .month-btn { background: none; border: none; color: var(--accent, #ff4081); cursor: pointer; padding: 0 8px; }
                 header { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--panel); }
                 .panel { margin-top: 20px; }
             </style>

@@ -174,15 +174,16 @@ export class DebtForm extends HTMLElement {
                     children: [
                         el('app-button', {
                             className: 'edit-monto',
-                            text: 'Editar',
+                            text: '✎',
+                            attrs: { title: 'Editar' },
                             on: {
                                 click: () => this.openMontoModal(monto, idx)
                             }
                         }),
                         el('app-button', {
                             className: 'delete-monto',
-                            text: 'Eliminar',
-                            attrs: { variant: 'delete' },
+                            text: '×',
+                            attrs: { variant: 'delete', title: 'Eliminar' },
                             on: {
                                 click: () => {
                                     this.montos.splice(idx, 1);
@@ -192,8 +193,8 @@ export class DebtForm extends HTMLElement {
                         }),
                         el('app-button', {
                             className: 'duplicate-monto',
-                            text: 'Duplicar',
-                            attrs: { variant: 'success' },
+                            text: '⧉',
+                            attrs: { variant: 'success', title: 'Duplicar' },
                             on: {
                                 click: () => this.openDuplicateMontoModal(monto, idx)
                             }

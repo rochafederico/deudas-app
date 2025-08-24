@@ -89,7 +89,8 @@ export class DebtList extends HTMLElement {
                 {
                     children: [
                         el('app-button', {
-                            text: 'Editar',
+                            text: '✎',
+                            attrs: { title: 'Editar deuda' },
                             on: {
                                 click: async () => {
                                     let modal = null;
@@ -108,11 +109,6 @@ export class DebtList extends HTMLElement {
                                     }
                                 }
                             }
-                        }),
-                        el('app-button', {
-                            variant: 'delete',
-                            text: 'Borrar',
-                            on: { click: () => this.deleteDebt(monto.id, monto.acreedor, monto.monto, monto.vencimiento, monto.periodo, monto.moneda) }
                         })
                     ]
                 }
