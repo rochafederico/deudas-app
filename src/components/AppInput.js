@@ -19,8 +19,40 @@ export class AppInput extends HTMLElement {
         this.render();
         const input = this.input;
         if (input) {
-            input.addEventListener('input', e => this._emit(e));
-            input.addEventListener('change', e => this._emit(e));
+            input.addEventListener('input', e => {
+                this._emit(e);
+                // Validación rápida: limpiar error si el campo ya es válido
+                if (this._errorMsg && this.hasAttribute('required') && input.value !== '') {
+                    this.clearError();
+                }
+                if (this._errorMsg && this.getAttribute('type') === 'number' && input.value !== '' && !isNaN(Number(input.value))) {
+                    this.clearError();
+                }
+            });
+            input.addEventListener('change', e => {
+                this._emit(e);
+                // Igual que en input
+                if (this._errorMsg && this.hasAttribute('required') && input.value !== '') {
+                    this.clearError();
+                }
+                if (this._errorMsg && this.getAttribute('type') === 'number' && input.value !== '' && !isNaN(Number(input.value))) {
+                    this.clearError();
+                }
+            });
+            // Workaround para submit en Shadow DOM al presionar Enter
+            input.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+                    const form = this.closest('form');
+                    if (form && input.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        if (typeof form.requestSubmit === 'function') {
+                            form.requestSubmit();
+                        } else {
+                            form.submit();
+                        }
+                    }
+                }
+            });
         }
     }
     _emit(e) {
@@ -32,6 +64,29 @@ export class AppInput extends HTMLElement {
     }
     set value(val) {
         if (this.input) this.input.value = val;
+    }
+    showError(msg) {
+        this._errorMsg = msg;
+        this._renderError();
+    }
+    clearError() {
+        this._errorMsg = '';
+        this._renderError();
+    }
+    _renderError() {
+        let errDiv = this.shadowRoot.querySelector('.input-error');
+        if (!this._errorMsg) {
+            if (errDiv) errDiv.remove();
+            return;
+        }
+        if (!errDiv) {
+            errDiv = document.createElement('div');
+            errDiv.className = 'input-error';
+            errDiv.style.color = 'red';
+            errDiv.style.fontSize = '0.95em';
+            this.shadowRoot.appendChild(errDiv);
+        }
+        errDiv.textContent = this._errorMsg;
     }
     render() {
         const type = this.getAttribute('type') || 'text';
@@ -78,6 +133,7 @@ export class AppInput extends HTMLElement {
             ${label ? `<label>${label}</label>` : ''}
             ${inputHtml}
         `;
+        this._renderError();
     }
 }
 customElements.define('app-input', AppInput);

@@ -14,6 +14,7 @@ export class AppButton extends HTMLElement {
     render() {
         const variant = this.getAttribute('variant') || '';
         const disabled = this.hasAttribute('disabled');
+        const type = this.getAttribute('type') || 'button';
         this.shadowRoot.innerHTML = `
             <style>
                 button {
@@ -82,8 +83,23 @@ export class AppButton extends HTMLElement {
                     background-color: #5cb85c;
                 }
             </style>
-            <button type="button" ${disabled ? 'disabled' : ''}><slot></slot></button>
+            <button type="${type}" ${disabled ? 'disabled' : ''}><slot></slot></button>
         `;
+        // Workaround para submit en Shadow DOM
+        const btn = this.shadowRoot.querySelector('button');
+        if (type === 'submit') {
+            btn.addEventListener('click', (e) => {
+                const form = this.closest('form');
+                if (form) {
+                    e.preventDefault();
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                    } else {
+                        form.submit();
+                    }
+                }
+            });
+        }
     }
 }
 customElements.define('app-button', AppButton);

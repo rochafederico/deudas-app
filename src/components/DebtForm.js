@@ -1,6 +1,8 @@
 import { DeudaModel } from '../models/DeudaModel.js';
+import { el, getFormValuesAndValidate } from '../utils/dom.js';
 import './AppButton.js';
 import './AppInput.js';
+import './MontoForm.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -14,60 +16,86 @@ export class DebtForm extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-            <style>
-                form {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 10px;
-                }
-                .montos-list {
-                    margin: 10px 0;
-                    background: var(--panel);
-                    border-radius: 6px;
-                    padding: 10px;
-                }
-                .montos-list table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                .montos-list th, .montos-list td {
-                    padding: 6px;
-                    border-bottom: 1px solid var(--border);
-                }
-                .montos-list tr:last-child td {
-                    border-bottom: none;
-                }
-                .btn-monto {
-                    margin-left: 5px;
-                }
-            </style>
-            <form>
-                <app-input type="text" name="acreedor" label="Acreedor:" required></app-input>
-                <app-input type="text" name="tipoDeuda" label="Tipo de Deuda:"></app-input>
-                <app-input type="text" name="numeroExterno" label="Número Externo:"></app-input>
-                <app-input type="textarea" name="notas" label="Notas:"></app-input>
-                <div class="montos-list">
-                    <div style="display:flex;align-items:center;justify-content:space-between;">
-                        <strong>Montos</strong>
-                        <app-button id="add-monto">Agregar monto</app-button>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Monto</th>
-                                <th>Moneda</th>
-                                <th>Vencimiento</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="montos-tbody"></tbody>
-                    </table>
-                </div>
-                <app-button type="submit" variant="success">Guardar</app-button>
-            </form>
-            <ui-modal id="montoModal"></ui-modal>
+        // Usar el utilitario 'el' para crear el formulario y sus elementos
+        const style = document.createElement('style');
+        style.textContent = `
+            form {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            .montos-list {
+                margin: 10px 0;
+                background: var(--panel);
+                border-radius: 6px;
+                padding: 10px;
+            }
+            .montos-list table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            .montos-list th, .montos-list td {
+                padding: 6px;
+                border-bottom: 1px solid var(--border);
+            }
+            .montos-list tr:last-child td {
+                border-bottom: none;
+            }
+            .btn-monto {
+                margin-left: 5px;
+            }
         `;
+        const form = el('form', {
+            children: [
+                el('app-input', {
+                    attrs: { type: 'text', name: 'acreedor', label: 'Acreedor:', required: '' }
+                }),
+                el('app-input', {
+                    attrs: { type: 'text', name: 'tipoDeuda', label: 'Tipo de Deuda:' }
+                }),
+                el('app-input', {
+                    attrs: { type: 'text', name: 'numeroExterno', label: 'Número Externo:' }
+                }),
+                el('app-input', {
+                    attrs: { type: 'textarea', name: 'notas', label: 'Notas:' }
+                }),
+                el('div', {
+                    className: 'montos-list',
+                    children: [
+                        el('div', {
+                            attrs: { style: 'display:flex;align-items:center;justify-content:space-between;' },
+                            children: [
+                                el('strong', { text: 'Montos' }),
+                                el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
+                            ]
+                        }),
+                        el('table', {
+                            children: [
+                                el('thead', {
+                                    children: [
+                                        el('tr', {
+                                            children: [
+                                                el('th', { text: 'Monto' }),
+                                                el('th', { text: 'Moneda' }),
+                                                el('th', { text: 'Vencimiento' }),
+                                                el('th', { text: 'Acciones' })
+                                            ]
+                                        })
+                                    ]
+                                }),
+                                el('tbody', { attrs: { id: 'montos-tbody' } })
+                            ]
+                        })
+                    ]
+                }),
+                el('app-button', { attrs: { type: 'submit', variant: 'success' }, text: 'Guardar' })
+            ]
+        });
+        const modal = el('ui-modal', { attrs: { id: 'montoModal' } });
+        this.shadowRoot.innerHTML = '';
+        this.shadowRoot.appendChild(style);
+        this.shadowRoot.appendChild(form);
+        this.shadowRoot.appendChild(modal);
     }
 
     connectedCallback() {
@@ -82,30 +110,11 @@ export class DebtForm extends HTMLElement {
     openMontoModal(monto = null, index = null) {
         this.montoEditIndex = index;
         this.montoModal.setTitle(monto ? 'Editar monto' : 'Agregar monto');
-        this.montoModal.innerHTML = `
-            <form id="formMonto" style="display:flex;flex-direction:column;gap:10px;min-width:220px;">
-                <app-input type="number" name="monto" label="Monto:" required value="${monto?.monto ?? ''}"></app-input>
-                <app-input type="select" name="moneda" label="Moneda:">
-                    <option value="ARS" ${monto?.moneda === 'ARS' ? 'selected' : ''}>ARS</option>
-                    <option value="USD" ${monto?.moneda === 'USD' ? 'selected' : ''}>USD</option>
-                </app-input>
-                <app-input type="date" name="vencimiento" label="Vencimiento:" required value="${monto?.vencimiento ?? ''}"></app-input>
-                <div style="display:flex;justify-content:flex-end;gap:8px;">
-                    <app-button type="button" id="cancelMonto">Cancelar</app-button>
-                    <app-button type="submit" variant="success">Guardar</app-button>
-                </div>
-            </form>
-        `;
-        this.montoModal.open();
-        const formMonto = this.montoModal.querySelector('#formMonto');
-        formMonto.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const data = new FormData(formMonto);
-            const nuevoMonto = {
-                monto: data.get('monto'),
-                moneda: data.get('moneda'),
-                vencimiento: data.get('vencimiento')
-            };
+        this.montoModal.innerHTML = '';
+        const montoForm = document.createElement('monto-form');
+        if (monto) montoForm.monto = monto;
+        montoForm.addEventListener('monto:save', (e) => {
+            const nuevoMonto = e.detail;
             if (index !== null) {
                 this.montos[index] = nuevoMonto;
             } else {
@@ -114,27 +123,43 @@ export class DebtForm extends HTMLElement {
             this.renderMontosList();
             this.montoModal.close();
         });
-        this.montoModal.querySelector('#cancelMonto').addEventListener('click', () => this.montoModal.close());
+        montoForm.addEventListener('monto:cancel', () => this.montoModal.close());
+        this.montoModal.appendChild(montoForm);
+        this.montoModal.open();
     }
 
     renderMontosList() {
         this.montosTbody.innerHTML = '';
         this.montos.forEach((monto, idx) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${monto.monto}</td>
-                <td>${monto.moneda}</td>
-                <td>${monto.vencimiento}</td>
-                <td>
-                    <app-button class="edit-monto">Editar</app-button>
-                    <app-button class="delete-monto" variant="delete">Eliminar</app-button>
-                </td>
-            `;
-            tr.querySelector('.edit-monto').addEventListener('click', () => this.openMontoModal(monto, idx));
-            tr.querySelector('.delete-monto').addEventListener('click', () => {
-                this.montos.splice(idx, 1);
-                this.renderMontosList();
-            });
+            const tr = el('tr');
+            const cells = [
+                { text: monto.monto },
+                { text: monto.moneda },
+                { text: monto.vencimiento },
+                {
+                    children: [
+                        el('app-button', {
+                            className: 'edit-monto',
+                            text: 'Editar',
+                            on: {
+                                click: () => this.openMontoModal(monto, idx)
+                            }
+                        }),
+                        el('app-button', {
+                            className: 'delete-monto',
+                            text: 'Eliminar',
+                            attrs: { variant: 'delete' },
+                            on: {
+                                click: () => {
+                                    this.montos.splice(idx, 1);
+                                    this.renderMontosList();
+                                }
+                            }
+                        })
+                    ]
+                }
+            ];
+            cells.forEach(cellOpts => tr.appendChild(el('td', cellOpts)));
             this.montosTbody.appendChild(tr);
         });
     }
@@ -176,13 +201,30 @@ export class DebtForm extends HTMLElement {
 
     async handleSubmit(event) {
         event.preventDefault();
-        // Validation: require at least one monto
+        // Validación de los campos del formulario principal
+        const { values, valid, errors } = getFormValuesAndValidate(this.form);
+        // Limpiar errores previos
+        this.form.querySelectorAll('app-input').forEach(input => input.clearError());
+        if (!valid) {
+            Object.entries(errors).forEach(([name, msg]) => {
+                const input = this.form.querySelector(`app-input[name="${name}"]`);
+                if (input) input.showError(msg);
+            });
+            return;
+        }
+        // Validación: requiere al menos un monto
         if (!this.montos || this.montos.length === 0) {
             this.showFormError('Debe agregar al menos un monto antes de guardar.');
             return;
         }
         this.clearFormError();
-        const deuda = this._buildDeudaFromForm();
+        const deuda = new DeudaModel({
+            acreedor: values.acreedor,
+            tipoDeuda: values.tipoDeuda,
+            numeroExterno: values.numeroExterno,
+            notas: values.notas,
+            montos: this.montos
+        });
         if (this.editing && this.deudaId) {
             const { updateDeuda } = await import('../repository/deudaRepository.js');
             await updateDeuda(deuda);
@@ -198,10 +240,10 @@ export class DebtForm extends HTMLElement {
     showFormError(msg) {
         let err = this.shadowRoot.getElementById('form-error');
         if (!err) {
-            err = document.createElement('div');
-            err.id = 'form-error';
-            err.style.color = 'red';
-            err.style.margin = '8px 0';
+            err = el('div', {
+                attrs: { id: 'form-error' },
+                style: 'color:red;margin:8px 0;'
+            });
             this.form.parentNode.insertBefore(err, this.form);
         }
         err.textContent = msg;

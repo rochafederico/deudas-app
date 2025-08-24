@@ -32,3 +32,32 @@ export function el(tag, opts = {}) {
 export function appendCells(row, cells) {
     cells.forEach(cellOpts => row.appendChild(el('td', cellOpts)));
 }
+
+/**
+ * Obtiene los valores de todos los <app-input> hijos de un formulario y valida los campos requeridos.
+ * @param {HTMLElement} form - El formulario o contenedor padre
+ * @returns {{ values: Object, valid: boolean, errors: Object }}
+ */
+export function getFormValuesAndValidate(form) {
+    const inputs = Array.from(form.querySelectorAll('app-input'));
+    const values = {};
+    const errors = {};
+    let valid = true;
+    inputs.forEach(input => {
+        const name = input.getAttribute('name');
+        const value = input.value;
+        values[name] = value;
+        // Validación de campos requeridos
+        if (input.hasAttribute('required') && (value === '' || value == null)) {
+            valid = false;
+            errors[name] = 'Este campo es requerido';
+        }
+        // Validación de tipo number
+        if (input.getAttribute('type') === 'number' && value !== '' && isNaN(Number(value))) {
+            valid = false;
+            errors[name] = 'Debe ser un número válido';
+        }
+        // Puedes agregar más validaciones aquí (ej: min, max, pattern)
+    });
+    return { values, valid, errors };
+}
