@@ -4,6 +4,7 @@ import './AppButton.js';
 import './AppInput.js';
 import './AppForm.js';
 import './MontoForm.js';
+import './DuplicateMontoModal.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -17,6 +18,7 @@ export class DebtForm extends HTMLElement {
     connectedCallback() {
         this.render();
         this.montoModal = this.shadowRoot.getElementById('montoModal');
+        this.duplicateModal = this.shadowRoot.getElementById('duplicateMontoModal');
         this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
         this.shadowRoot.getElementById('add-monto').addEventListener('click', (event) => {
             event.stopPropagation();
@@ -108,11 +110,13 @@ export class DebtForm extends HTMLElement {
             ]
         });
         const modal = el('ui-modal', { attrs: { id: 'montoModal' } });
+        const duplicateModal = el('ui-modal', { attrs: { id: 'duplicateMontoModal' } });
         this.shadowRoot.innerHTML = '';
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(form);
         this.shadowRoot.appendChild(montosList);
         this.shadowRoot.appendChild(modal);
+        this.shadowRoot.appendChild(duplicateModal);
     }
 
     openMontoModal(monto = null, index = null) {
@@ -134,6 +138,27 @@ export class DebtForm extends HTMLElement {
         montoForm.addEventListener('monto:cancel', () => this.montoModal.close(), { once: true });
         this.montoModal.appendChild(montoForm);
         this.montoModal.open();
+    }
+
+    openDuplicateMontoModal(monto, idx) {
+        this.duplicateMontoIndex = idx;
+        this.duplicateModal.setTitle('Duplicar monto');
+        this.duplicateModal.innerHTML = '';
+        const duplicateForm = document.createElement('duplicate-monto-modal');
+        duplicateForm.monto = monto;
+        duplicateForm.addEventListener('duplicate:save', (e) => {
+            const nuevaFecha = e.detail.vencimiento;
+            // Calcular periodo a partir de la nueva fecha
+            const nuevoPeriodo = nuevaFecha ? nuevaFecha.slice(0, 7) : '';
+            // Duplicar el monto con la nueva fecha y periodo
+            const nuevoMonto = { ...monto, vencimiento: nuevaFecha, periodo: nuevoPeriodo, id: undefined };
+            this.montos.push(nuevoMonto);
+            this.renderMontosList();
+            this.duplicateModal.close();
+        }, { once: true });
+        duplicateForm.addEventListener('duplicate:cancel', () => this.duplicateModal.close(), { once: true });
+        this.duplicateModal.appendChild(duplicateForm);
+        this.duplicateModal.open();
     }
 
     renderMontosList() {
@@ -162,6 +187,14 @@ export class DebtForm extends HTMLElement {
                                     this.montos.splice(idx, 1);
                                     this.renderMontosList();
                                 }
+                            }
+                        }),
+                        el('app-button', {
+                            className: 'duplicate-monto',
+                            text: 'Duplicar',
+                            attrs: { variant: 'success' },
+                            on: {
+                                click: () => this.openDuplicateMontoModal(monto, idx)
                             }
                         })
                     ]
