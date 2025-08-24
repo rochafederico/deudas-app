@@ -161,6 +161,8 @@ export class DebtForm extends HTMLElement {
     }
 
     renderMontosList() {
+        // Ordenar montos por fecha de vencimiento ascendente
+        this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
         this.montos.forEach((monto, idx) => {
             const tr = el('tr');

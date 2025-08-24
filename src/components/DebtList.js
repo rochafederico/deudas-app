@@ -64,53 +64,62 @@ export class DebtList extends HTMLElement {
             return;
         }
 
-        // Renderiza cada deuda y sus montos
-        this.debts.forEach(deuda => {
+        // Unificar todos los montos en un solo array con referencia a la deuda
+        const allMontos = this.debts.reduce((arr, deuda) => {
             deuda.montos.forEach(monto => {
-                totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
-                const row = document.createElement('tr');
-                appendCells(row, [
-                    { text: deuda.acreedor },
-                    { text: deuda.tipoDeuda || '-' },
-                    { text: monto.moneda },
-                    { text: this.fmtMoneda(monto.moneda, monto.monto) },
-                    { text: monto.vencimiento },
-                    { text: monto.periodo },
-                    {
-                        children: [
-                            el('app-button', {
-                                text: 'Editar',
-                                on: {
-                                    click: async () => {
-                                        let modal = null;
-                                        const appShell = document.querySelector('app-shell');
-                                        if (appShell && appShell.shadowRoot) {
-                                            modal = appShell.shadowRoot.getElementById('debtModal');
-                                        }
-                                        if (!modal) {
-                                            modal = document.getElementById('debtModal');
-                                        }
-                                        if (modal) {
-                                            // Consulta la deuda y sus montos actualizados desde la base de datos
-                                            const { getDeuda } = await import('../repository/deudaRepository.js');
-                                            const deudaActualizada = await getDeuda(deuda.id);
-                                            modal.openEdit(deudaActualizada);
-                                            modal.attachOpener(row.querySelector('app-button'));
-                                        }
+                arr.push({ ...monto, acreedor: deuda.acreedor, tipoDeuda: deuda.tipoDeuda });
+            });
+            return arr;
+        }, []);
+
+        // Ordenar por fecha de vencimiento ascendente
+        allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
+
+        // Renderizar cada monto
+        allMontos.forEach(monto => {
+            totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
+            const row = document.createElement('tr');
+            appendCells(row, [
+                { text: monto.acreedor },
+                { text: monto.tipoDeuda || '-' },
+                { text: monto.moneda },
+                { text: this.fmtMoneda(monto.moneda, monto.monto) },
+                { text: monto.vencimiento },
+                { text: monto.periodo },
+                {
+                    children: [
+                        el('app-button', {
+                            text: 'Editar',
+                            on: {
+                                click: async () => {
+                                    let modal = null;
+                                    const appShell = document.querySelector('app-shell');
+                                    if (appShell && appShell.shadowRoot) {
+                                        modal = appShell.shadowRoot.getElementById('debtModal');
+                                    }
+                                    if (!modal) {
+                                        modal = document.getElementById('debtModal');
+                                    }
+                                    if (modal) {
+                                        const { getDeuda } = await import('../repository/deudaRepository.js');
+                                        const deudaActualizada = await getDeuda(monto.deudaId);
+                                        modal.openEdit(deudaActualizada);
+                                        modal.attachOpener(row.querySelector('app-button'));
                                     }
                                 }
-                            }),
-                            el('app-button', {
-                                variant: 'delete',
-                                text: 'Borrar',
-                                on: { click: () => this.deleteDebt(monto.id, deuda.acreedor, monto.monto, monto.vencimiento, monto.periodo, monto.moneda) }
-                            })
-                        ]
-                    }
-                ]);
-                tableBody.appendChild(row);
-            });
+                            }
+                        }),
+                        el('app-button', {
+                            variant: 'delete',
+                            text: 'Borrar',
+                            on: { click: () => this.deleteDebt(monto.id, monto.acreedor, monto.monto, monto.vencimiento, monto.periodo, monto.moneda) }
+                        })
+                    ]
+                }
+            ]);
+            tableBody.appendChild(row);
         });
+
         // Muestra los totales por moneda al final de la tabla
         this.renderTotales(totales);
     }
