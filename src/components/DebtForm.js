@@ -197,6 +197,7 @@ export class DebtForm extends HTMLElement {
                 }
                 this.clearFormError();
                 const deuda = new DeudaModel({
+                    id: this.editing ? this.deudaId : undefined,
                     acreedor: e.detail.acreedor,
                     tipoDeuda: e.detail.tipoDeuda,
                     numeroExterno: e.detail.numeroExterno,
@@ -224,6 +225,7 @@ export class DebtForm extends HTMLElement {
         }
         this.clearFormError();
         const deuda = new DeudaModel({
+            id: this.editing ? this.deudaId : undefined,
             acreedor: values.acreedor,
             tipoDeuda: values.tipoDeuda,
             numeroExterno: values.numeroExterno,

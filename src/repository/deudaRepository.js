@@ -41,6 +41,10 @@ export function addDeuda(deudaModel) {
 }
 
 export function updateDeuda(deudaModel) {
+    // Validación: el id debe existir
+    if (!deudaModel.id) {
+        throw new Error('updateDeuda: El id de la deuda es requerido');
+    }
     const db = getDB();
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
@@ -54,22 +58,36 @@ export function updateDeuda(deudaModel) {
         });
         const deudaRequest = deudasStore.put(deudaEntity);
         deudaRequest.onsuccess = () => {
+            // Obtener todos los montos actuales de la deuda
             const index = montosStore.index('by_deudaId');
-            const getMontos = index.getAllKeys(deudaModel.id);
+            const getMontos = index.getAll(deudaModel.id);
             getMontos.onsuccess = () => {
-                const keys = getMontos.result;
-                keys.forEach(key => montosStore.delete(key));
-                if (deudaModel.montos && deudaModel.montos.length > 0) {
-                    deudaModel.montos.forEach(monto => {
-                        const montoEntity = new MontoEntity({
-                            deudaId: deudaModel.id,
-                            monto: monto.monto,
-                            moneda: monto.moneda,
-                            vencimiento: monto.vencimiento
-                        });
-                        montosStore.add(montoEntity);
+                const montosActuales = getMontos.result || [];
+                const nuevosMontos = deudaModel.montos || [];
+                // Montos a eliminar: los que están en la BD pero no en la nueva lista
+                const nuevosIds = nuevosMontos.filter(m => m.id).map(m => m.id);
+                montosActuales.forEach(montoBD => {
+                    if (!nuevosIds.includes(montoBD.id)) {
+                        montosStore.delete(montoBD.id);
+                    }
+                });
+                // Montos a agregar o actualizar
+                nuevosMontos.forEach(monto => {
+                    // Si tiene id, actualizar; si no, agregar
+                    const montoEntity = new MontoEntity({
+                        deudaId: deudaModel.id,
+                        monto: monto.monto,
+                        moneda: monto.moneda,
+                        vencimiento: monto.vencimiento,
+                        periodo: monto.periodo
                     });
-                }
+                    if (monto.id) {
+                        montoEntity.id = monto.id;
+                        montosStore.put(montoEntity);
+                    } else {
+                        montosStore.add(montoEntity);
+                    }
+                });
                 resolve();
             };
             getMontos.onerror = (event) => {
