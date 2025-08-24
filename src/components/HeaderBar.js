@@ -81,9 +81,6 @@ export class HeaderBar extends HTMLElement {
                     <app-button id="add-debt" type="button" variant="success" title="Agregar deuda">
                         <img src="./src/components/icons/AddIcon.svg" alt="Agregar" width="15" height="15" style="vertical-align:middle;" />
                     </app-button>
-                    <app-button id="dashboard-btn" type="button" title="Ver dashboard" style="font-size:1em;padding:0 8px;">
-                        <img src="./src/components/icons/LineChartIcon.svg" alt="Dashboard" width="15" height="15" style="vertical-align:middle;" />
-                    </app-button>
                     <app-button id="export-data" type="button" title="Exportar datos">
                         <img src="./src/components/icons/ExportIcon.svg" alt="Exportar" width="15" height="15" style="vertical-align:middle;" />
                     </app-button>
