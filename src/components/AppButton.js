@@ -44,6 +44,10 @@ export class AppButton extends HTMLElement {
                     cursor: not-allowed;
                     opacity: 0.7;
                 }
+                button:focus {
+                    outline: 2px solid var(--accent);
+                    outline-offset: 2px;
+                }
                 :host([variant="delete"]) button {
                     background-color: var(--error);
                 }
@@ -83,7 +87,7 @@ export class AppButton extends HTMLElement {
                     background-color: #5cb85c;
                 }
             </style>
-            <button type="${type}" ${disabled ? 'disabled' : ''}><slot></slot></button>
+            <button type="${type}" ${disabled ? 'disabled' : ''} aria-label="${this.getAttribute('aria-label') || this.textContent}" tabindex="0"><slot></slot></button>
         `;
         // Workaround para submit en Shadow DOM
         const btn = this.shadowRoot.querySelector('button');

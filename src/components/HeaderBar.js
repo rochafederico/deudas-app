@@ -78,7 +78,7 @@ export class HeaderBar extends HTMLElement {
                     <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
                 </div>
                 <div class="actions">
-                    <app-button id="add-debt" type="button" variant="success" title="Agregar deuda">
+                    <app-button id="add-debt" type="button" variant="success" title="Agregar deuda" aria-label="Agregar deuda">
                         <img src="./src/components/icons/AddIcon.svg" alt="Agregar" width="15" height="15" style="vertical-align:middle;" />
                     </app-button>
                     <app-button id="export-data" type="button" title="Exportar datos">

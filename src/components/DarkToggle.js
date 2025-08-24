@@ -42,7 +42,7 @@ class DarkToggle extends HTMLElement {
           border: 1px solid var(--border-dark);
         }
       </style>
-      <button type="button"></button>
+      <button type="button" aria-label="Alternar modo oscuro"></button>
     `;
   }
 }

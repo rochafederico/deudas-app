@@ -89,11 +89,11 @@ export class AppForm extends HTMLElement {
                     attrs: { style: 'display:flex;justify-content:flex-end;gap:8px;' },
                     children: [
                         el('app-button', {
-                            attrs: { type: 'button', id: 'cancelBtn' },
+                            attrs: { type: 'button', id: 'cancelBtn', 'aria-label': 'Cancelar formulario' },
                             text: this._cancelText
                         }),
                         el('app-button', {
-                            attrs: { type: 'submit', variant: 'success' },
+                            attrs: { type: 'submit', variant: 'success', 'aria-label': 'Guardar formulario' },
                             text: this._submitText
                         })
                     ]

@@ -98,14 +98,14 @@ export class AppInput extends HTMLElement {
         const placeholder = this.getAttribute('placeholder') || '';
         let inputHtml = '';
         if (type === 'textarea') {
-            inputHtml = `<textarea name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}">${value}</textarea>`;
+            inputHtml = `<textarea id="${name}" name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}">${value}</textarea>`;
         } else if (type === 'select') {
             // Para select, espera que el usuario agregue <option> como children
-            inputHtml = `<select name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${this.innerHTML}</select>`;
+            inputHtml = `<select id="${name}" name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${this.innerHTML}</select>`;
         } else {
             // Si es number, agrega step="0.01"
             const stepAttr = type === 'number' ? 'step="0.01" ' : '';
-            inputHtml = `<input type="${type}" name="${name}" value="${value}" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
+            inputHtml = `<input id="${name}" type="${type}" name="${name}" value="${value}" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
         }
         this.shadowRoot.innerHTML = `
             <style>
@@ -132,7 +132,7 @@ export class AppInput extends HTMLElement {
                     cursor: not-allowed;
                 }
             </style>
-            ${label ? `<label>${label}</label>` : ''}
+            ${label ? `<label for="${name}">${label}</label>` : ''}
             ${inputHtml}
         `;
         this._renderError();

@@ -32,21 +32,8 @@ function renderRoute(path) {
   root.appendChild(node);
 }
 
-function navigateTo(path) {
-  window.history.pushState({}, '', path);
-  renderRoute(path);
-}
-
 window.addEventListener('popstate', () => {
   renderRoute(window.location.pathname);
-});
-
-document.addEventListener('click', function(e) {
-  const link = e.target.closest('[app-link]');
-  if (link) {
-    e.preventDefault();
-    navigateTo(link.getAttribute('href'));
-  }
 });
 
 // Inicialización

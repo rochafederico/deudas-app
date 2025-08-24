@@ -7,10 +7,15 @@
     <link rel="stylesheet" href="styles/base.css">
 </head>
 <body>
-    <script type="module" src="src/components/AppShell.js"></script>
-    <script type="module" src="src/components/DebtForm.js"></script>
-    <script type="module" src="src/components/DebtList.js"></script>
-    <script type="module" src="src/main.js"></script>
-    <script type="module" src="./src/components/AppLink.js"></script>
+    <nav aria-label="Navegación principal">
+        <!-- El menú se renderiza por Web Component -->
+    </nav>
+    <main id="main-content" tabindex="-1">
+        <script type="module" src="src/components/AppShell.js"></script>
+        <script type="module" src="src/components/DebtForm.js"></script>
+        <script type="module" src="src/components/DebtList.js"></script>
+        <script type="module" src="src/main.js"></script>
+        <script type="module" src="./src/components/AppLink.js"></script>
+    </main>
 </body>
 </html>
