@@ -1,35 +1,20 @@
 // src/main.js
 import initDB from './db.js';
-import { on } from './events.js';
-
-// Toggle dark mode button
-const darkToggle = document.createElement('button');
-darkToggle.id = 'dark-toggle';
-darkToggle.textContent = '🌙 Modo oscuro';
-darkToggle.onclick = () => {
-    document.body.classList.toggle('dark-mode');
-    darkToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️ Modo claro' : '🌙 Modo oscuro';
-};
-
-// Banner superior demo
-const banner = document.createElement('div');
-banner.id = 'demo-banner';
-banner.style.cssText = '';
-banner.innerHTML = `
-    <span style="font-size:1.5em;">💡 DEMO local</span><br>
-    <span style="font-size:1em;font-weight:normal;">Tus datos quedan solo en este navegador.<br>Creado para ayudar a organizar deudas. 🙌</span>
-`;
+import routes from './routes.js';
+import DemoBanner from './components/DemoBanner.js';
 
 // Wrapper para el contenido principal
+document.body.appendChild(DemoBanner());
+
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
 wrapper.style.cssText = '';
-const appShell = document.createElement('app-shell');
-wrapper.appendChild(appShell);
 
-// Estructura ordenada: banner arriba, toggle dentro del banner, luego contenido
-document.body.appendChild(banner);
-document.body.appendChild(darkToggle);
+// Contenedor para rutas dinámicas
+const app = document.createElement('div');
+app.id = 'app';
+wrapper.appendChild(app);
+
 document.body.appendChild(wrapper);
 
 // Initialize the IndexedDB
@@ -37,19 +22,32 @@ initDB().then((db) => {
     window.db = db;
 });
 
-// Event listeners for custom events
-on('db:ready', () => {
-    console.log('Database is ready');
+function renderRoute(path) {
+  const root = document.getElementById('app');
+  if (!root) return;
+  root.innerHTML = '';
+  const route = routes.find(r => r.path === path) || routes[0];
+  const Component = route.component;
+  const node = typeof Component === 'function' ? Component() : Component;
+  root.appendChild(node);
+}
+
+function navigateTo(path) {
+  window.history.pushState({}, '', path);
+  renderRoute(path);
+}
+
+window.addEventListener('popstate', () => {
+  renderRoute(window.location.pathname);
 });
 
-on('deuda:added', () => {
-    console.log('Debt added');
+document.addEventListener('click', function(e) {
+  const link = e.target.closest('[app-link]');
+  if (link) {
+    e.preventDefault();
+    navigateTo(link.getAttribute('href'));
+  }
 });
 
-on('deuda:updated', () => {
-    console.log('Debt updated');
-});
-
-on('deuda:deleted', () => {
-    console.log('Debt deleted');
-});
+// Inicialización
+renderRoute(window.location.pathname);
