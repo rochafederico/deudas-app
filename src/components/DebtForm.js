@@ -12,15 +12,29 @@ export class DebtForm extends HTMLElement {
         this.montos = [];
         this.editing = false;
         this.deudaId = null;
-        this.render();
     }
 
     connectedCallback() {
+        this.render();
         this.montoModal = this.shadowRoot.getElementById('montoModal');
         this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
-        this.shadowRoot.getElementById('add-monto').addEventListener('click', () => this.openMontoModal());
+        this.shadowRoot.getElementById('add-monto').addEventListener('click', (event) => {
+            event.stopPropagation();
+            this.openMontoModal();
+        });
         this.form = this.shadowRoot.querySelector('app-form');
+        this._onSubmit = this.handleSubmit.bind(this);
+        this._onCancel = () => this.reset();
+        this.form.addEventListener('deuda:submit', this._onSubmit);
+        this.form.addEventListener('form:cancel', this._onCancel);
         this.renderMontosList();
+    }
+
+    disconnectedCallback() {
+        if (this.form) {
+            this.form.removeEventListener('deuda:submit', this._onSubmit);
+            this.form.removeEventListener('form:cancel', this._onCancel);
+        }
     }
 
     render() {
@@ -57,9 +71,12 @@ export class DebtForm extends HTMLElement {
         ];
         form.submitText = 'Guardar';
         form.cancelText = 'Cancelar';
-        // Listeners agregados aquí, no en connectedCallback
-        form.addEventListener('form:submit', this.handleSubmit.bind(this), { once: true });
-        form.addEventListener('form:cancel', () => this.reset(), { once: true });
+        // Usar evento personalizado para submit SOLO una vez
+        form.addEventListener('form:submit', e => {
+            form.dispatchEvent(new CustomEvent('deuda:submit', { detail: e.detail, bubbles: true, composed: true }));
+        });
+        // Restaurar el listener para cancelar
+        form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
             className: 'montos-list',
@@ -179,46 +196,17 @@ export class DebtForm extends HTMLElement {
         const form = this.shadowRoot.querySelector('app-form');
         if (form) form.initialValues = {};
         this.renderMontosList();
+        // Cerrar el modal de deuda si está abierto
+        if (this.parentNode && this.parentNode.tagName === 'UI-MODAL' && typeof this.parentNode.close === 'function') {
+            this.parentNode.close();
+        }
     }
 
     async handleSubmit(e) {
         e.preventDefault();
-        const form = this.shadowRoot.querySelector('app-form');
-        // Usar el evento detail para obtener los valores y validación
-        const { values, valid, errors } = form ? form.lastSubmitResult || {} : {};
-        // Si no hay resultado, usar el evento directamente
-        if (!values) {
-            // fallback: usar e.detail si viene del evento 'form:submit'
-            if (e.detail) {
-                // No hay validación, solo valores
-                if (!this.montos || this.montos.length === 0) {
-                    this.showFormError('Debe agregar al menos un monto antes de guardar.');
-                    return;
-                }
-                this.clearFormError();
-                const deuda = new DeudaModel({
-                    id: this.editing ? this.deudaId : undefined,
-                    acreedor: e.detail.acreedor,
-                    tipoDeuda: e.detail.tipoDeuda,
-                    numeroExterno: e.detail.numeroExterno,
-                    notas: e.detail.notas,
-                    montos: this.montos
-                });
-                if (this.editing && this.deudaId) {
-                    const { updateDeuda } = await import('../repository/deudaRepository.js');
-                    await updateDeuda(deuda);
-                    this.dispatchEvent(new CustomEvent('deuda:updated', { detail: deuda, bubbles: true, composed: true }));
-                } else {
-                    const { addDeuda } = await import('../repository/deudaRepository.js');
-                    await addDeuda(deuda);
-                    this.dispatchEvent(new CustomEvent('deuda:saved', { detail: deuda, bubbles: true, composed: true }));
-                }
-                this.reset();
-                return;
-            }
-            return;
-        }
-        // Validación: requiere al menos un monto
+        // Los datos del formulario ya están validados por AppForm
+        const values = e.detail;
+        // Validar que haya al menos un monto
         if (!this.montos || this.montos.length === 0) {
             this.showFormError('Debe agregar al menos un monto antes de guardar.');
             return;

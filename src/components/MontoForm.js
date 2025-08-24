@@ -21,7 +21,7 @@ export class MontoForm extends HTMLElement {
     connectedCallback() {
         this.form = this.shadowRoot.querySelector('app-form');
         if (this.form) {
-            this.form.addEventListener('form:submit', e => {
+            this.form.addEventListener('monto:submit', e => {
                 this.dispatchEvent(new CustomEvent('monto:save', {
                     detail: e.detail,
                     bubbles: true,
@@ -45,6 +45,10 @@ export class MontoForm extends HTMLElement {
         form.initialValues = this._monto || {};
         form.submitText = 'Guardar';
         form.cancelText = 'Cancelar';
+        // Usar evento personalizado para submit
+        form.addEventListener('form:submit', e => {
+            form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
+        });
         this.shadowRoot.appendChild(form);
     }
 }
