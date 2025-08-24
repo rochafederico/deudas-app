@@ -13,28 +13,34 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - **Demo data:** Se generan datos de ejemplo realistas al iniciar.
 - **Estilo oscuro:** UI moderna y responsiva.
 
-## Estructura del Proyecto
-```
-index.html                # Entrada principal
-styles/base.css            # Estilos globales
-src/
-  main.js                 # Inicialización principal
-  components/             # Web Components
-    AppShell.js           # Layout y navegación
-    DebtForm.js           # Formulario de alta/edición
-    DebtList.js           # Tabla de deudas y montos
-    DebtModal.js, UiModal.js # Modales
-  models/                 # Modelos de datos
-    DeudaModel.js, MontoModel.js
-  entity/                 # Entidades para IndexedDB
-    DeudaEntity.js, MontoEntity.js
-  database/               # Lógica de base de datos
-    initDB.js, schema.js, seedDemo.js
-  repository/             # Repositorios (acceso a datos)
-    deudaRepository.js, montoRepository.js
-  utils/                  # Utilidades
-    dom.js                # Helpers para DOM
-```
+## Funcionalidades
+
+- [x] Alta, edición y borrado de deudas
+- [x] Cada deuda puede tener múltiples montos/cuotas, con moneda (ARS/USD) y fecha de vencimiento
+- [x] Edición y eliminación de montos/cuotas
+- [x] Navegación y filtrado por mes
+- [x] Resumen mensual: muestra totales a pagar por moneda en el mes seleccionado
+- [x] Confirmación contextual al borrar montos
+- [x] Persistencia local en IndexedDB (los datos no salen del navegador)
+- [x] Demo de datos realistas al iniciar
+- [ ] Exportar e importar datos
+- [ ] Agregar ingresos (sueldo o ingresos sueltos) para calcular balance mensual
+- [ ] Marcar montos como pagados
+- [ ] Dashboard con gráficos y cálculos para ayudar en la toma de decisiones
+- [ ] Mejoras en validaciones de formularios
+- [ ] Onboarding/tour para nuevos usuarios
+
+## Arquitectura y estructura
+El proyecto está organizado en carpetas según responsabilidad:
+- **components/**: Web Components para UI y lógica de interacción.
+- **models/**: Modelos de datos para deudas y montos.
+- **entity/**: Entidades para la persistencia en IndexedDB.
+- **database/**: Inicialización, esquema y datos demo de la base de datos.
+- **repository/**: Acceso y operaciones sobre los datos.
+- **utils/**: Utilidades para DOM y validaciones.
+- **styles/**: Estilos globales.
+
+Cada componente y módulo está pensado para ser reutilizable y fácil de mantener.
 
 ## Cómo usar
 1. Clona el repositorio.
