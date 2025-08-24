@@ -103,7 +103,9 @@ export class AppInput extends HTMLElement {
             // Para select, espera que el usuario agregue <option> como children
             inputHtml = `<select name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${this.innerHTML}</select>`;
         } else {
-            inputHtml = `<input type="${type}" name="${name}" value="${value}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
+            // Si es number, agrega step="0.01"
+            const stepAttr = type === 'number' ? 'step="0.01" ' : '';
+            inputHtml = `<input type="${type}" name="${name}" value="${value}" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
         }
         this.shadowRoot.innerHTML = `
             <style>
