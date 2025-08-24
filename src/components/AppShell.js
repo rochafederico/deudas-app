@@ -1,5 +1,6 @@
 import './DebtModal.js';
 import './AppInput.js';
+import './ExportDataModal.js';
 
 export class AppShell extends HTMLElement {
     constructor() {
@@ -65,6 +66,11 @@ export class AppShell extends HTMLElement {
                             attrs: { 'data-add-debt': '', id: 'add-debt', type: 'button' },
                             text: 'Agregar deuda',
                             variant: 'success'
+                        }),
+                        el('app-button', {
+                            attrs: { 'data-export': '', id: 'export-data', type: 'button' },
+                            text: 'Exportar',
+                            variant: 'success'
                         })
                     ]
                 })
@@ -92,6 +98,7 @@ export class AppShell extends HTMLElement {
         const prevBtn = this.shadowRoot.getElementById('prev-month');
         const nextBtn = this.shadowRoot.getElementById('next-month');
         const addBtn = this.shadowRoot.getElementById('add-debt');
+        const exportBtn = this.shadowRoot.getElementById('export-data');
         input.addEventListener('change', e => {
             this.onMonthChange(e);
         });
@@ -114,6 +121,19 @@ export class AppShell extends HTMLElement {
             modal.openCreate();
             modal.attachOpener(addBtn);
         });
+        exportBtn.addEventListener('click', () => {
+            this.openExportModal(exportBtn);
+        });
+    }
+
+    async openExportModal(opener) {
+        let modal = this.shadowRoot.getElementById('exportDataModal');
+        if (!modal) {
+            modal = document.createElement('export-data-modal');
+            modal.id = 'exportDataModal';
+            this.shadowRoot.appendChild(modal);
+        }
+        modal.open(opener);
     }
 
     updateFormVisibility() {

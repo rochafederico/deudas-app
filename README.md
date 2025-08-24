@@ -24,7 +24,9 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - [x] Persistencia local en IndexedDB (los datos no salen del navegador)
 - [x] Demo de datos realistas al iniciar
 - [x] Duplicar montos/cuotas: permite copiar una cuota y elegir la nueva fecha de vencimiento fácilmente.
-- [ ] Exportar e importar datos
+- [x] Exportar datos
+- [ ] Importar datos
+- [ ] Encriptar exportación
 - [ ] Agregar ingresos (sueldo o ingresos sueltos) para calcular balance mensual
 - [ ] Marcar montos como pagados
 - [ ] Dashboard con gráficos y cálculos para ayudar en la toma de decisiones
