@@ -68,7 +68,6 @@ export class DebtForm extends HTMLElement {
         form.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
             { name: 'tipoDeuda', type: 'text', label: 'Tipo de Deuda' },
-            { name: 'numeroExterno', type: 'text', label: 'Número Externo' },
             { name: 'notas', type: 'textarea', label: 'Notas' }
         ];
         form.submitText = 'Guardar';
@@ -216,7 +215,6 @@ export class DebtForm extends HTMLElement {
             form.initialValues = {
                 acreedor: deuda.acreedor || '',
                 tipoDeuda: deuda.tipoDeuda || '',
-                numeroExterno: deuda.numeroExterno || '',
                 notas: deuda.notas || ''
             };
         }
@@ -249,7 +247,6 @@ export class DebtForm extends HTMLElement {
             id: this.editing ? this.deudaId : undefined,
             acreedor: values.acreedor,
             tipoDeuda: values.tipoDeuda,
-            numeroExterno: values.numeroExterno,
             notas: values.notas,
             montos: this.montos
         });

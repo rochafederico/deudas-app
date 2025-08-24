@@ -14,7 +14,6 @@ export class ExportDataModal extends HTMLElement {
             acreedor: d.acreedor,
             tipoDeuda: d.tipoDeuda,
             notas: d.notas,
-            numeroExterno: d.numeroExterno || '',
             montos: (d.montos || []).map(m => ({
                 monto: m.monto,
                 moneda: m.moneda,
