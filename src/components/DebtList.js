@@ -186,6 +186,9 @@ export class DebtList extends HTMLElement {
                     text-align: left;
                     border-bottom: 1px solid #ddd;
                 }
+                th:last-child, td:last-child {
+                    text-align: right;
+                }
                 tr:hover {
                     background-color: #f1f1f1;
                 }
