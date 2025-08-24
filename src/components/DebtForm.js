@@ -1,29 +1,31 @@
 import { DeudaModel } from '../models/DeudaModel.js';
-import { el, getFormValuesAndValidate } from '../utils/dom.js';
+import { el } from '../utils/dom.js';
 import './AppButton.js';
 import './AppInput.js';
+import './AppForm.js';
 import './MontoForm.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this.render();
-        this.form = this.shadowRoot.querySelector('form');
-        this.form.addEventListener('submit', this.handleSubmit.bind(this));
+        this.montos = [];
         this.editing = false;
         this.deudaId = null;
+        this.render();
+    }
+
+    connectedCallback() {
+        this.montoModal = this.shadowRoot.getElementById('montoModal');
+        this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
+        this.shadowRoot.getElementById('add-monto').addEventListener('click', () => this.openMontoModal());
+        this.form = this.shadowRoot.querySelector('app-form');
+        this.renderMontosList();
     }
 
     render() {
-        // Usar el utilitario 'el' para crear el formulario y sus elementos
         const style = document.createElement('style');
         style.textContent = `
-            form {
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-            }
             .montos-list {
                 margin: 10px 0;
                 background: var(--panel);
@@ -45,66 +47,55 @@ export class DebtForm extends HTMLElement {
                 margin-left: 5px;
             }
         `;
-        const form = el('form', {
+        // Formulario principal con <app-form>
+        const form = document.createElement('app-form');
+        form.fields = [
+            { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
+            { name: 'tipoDeuda', type: 'text', label: 'Tipo de Deuda' },
+            { name: 'numeroExterno', type: 'text', label: 'Número Externo' },
+            { name: 'notas', type: 'textarea', label: 'Notas' }
+        ];
+        form.submitText = 'Guardar';
+        form.cancelText = 'Cancelar';
+        // Listeners agregados aquí, no en connectedCallback
+        form.addEventListener('form:submit', this.handleSubmit.bind(this), { once: true });
+        form.addEventListener('form:cancel', () => this.reset(), { once: true });
+        // Lista de montos y botón para agregar
+        const montosList = el('div', {
+            className: 'montos-list',
             children: [
-                el('app-input', {
-                    attrs: { type: 'text', name: 'acreedor', label: 'Acreedor:', required: '' }
-                }),
-                el('app-input', {
-                    attrs: { type: 'text', name: 'tipoDeuda', label: 'Tipo de Deuda:' }
-                }),
-                el('app-input', {
-                    attrs: { type: 'text', name: 'numeroExterno', label: 'Número Externo:' }
-                }),
-                el('app-input', {
-                    attrs: { type: 'textarea', name: 'notas', label: 'Notas:' }
-                }),
                 el('div', {
-                    className: 'montos-list',
+                    attrs: { style: 'display:flex;align-items:center;justify-content:space-between;' },
                     children: [
-                        el('div', {
-                            attrs: { style: 'display:flex;align-items:center;justify-content:space-between;' },
-                            children: [
-                                el('strong', { text: 'Montos' }),
-                                el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
-                            ]
-                        }),
-                        el('table', {
-                            children: [
-                                el('thead', {
-                                    children: [
-                                        el('tr', {
-                                            children: [
-                                                el('th', { text: 'Monto' }),
-                                                el('th', { text: 'Moneda' }),
-                                                el('th', { text: 'Vencimiento' }),
-                                                el('th', { text: 'Acciones' })
-                                            ]
-                                        })
-                                    ]
-                                }),
-                                el('tbody', { attrs: { id: 'montos-tbody' } })
-                            ]
-                        })
+                        el('strong', { text: 'Montos' }),
+                        el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
                     ]
                 }),
-                el('app-button', { attrs: { type: 'submit', variant: 'success' }, text: 'Guardar' })
+                el('table', {
+                    children: [
+                        el('thead', {
+                            children: [
+                                el('tr', {
+                                    children: [
+                                        el('th', { text: 'Monto' }),
+                                        el('th', { text: 'Moneda' }),
+                                        el('th', { text: 'Vencimiento' }),
+                                        el('th', { text: 'Acciones' })
+                                    ]
+                                })
+                            ]
+                        }),
+                        el('tbody', { attrs: { id: 'montos-tbody' } })
+                    ]
+                })
             ]
         });
         const modal = el('ui-modal', { attrs: { id: 'montoModal' } });
         this.shadowRoot.innerHTML = '';
         this.shadowRoot.appendChild(style);
         this.shadowRoot.appendChild(form);
+        this.shadowRoot.appendChild(montosList);
         this.shadowRoot.appendChild(modal);
-    }
-
-    connectedCallback() {
-        this.montos = [];
-        this.montoEditIndex = null;
-        this.montoModal = this.shadowRoot.getElementById('montoModal');
-        this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
-        this.shadowRoot.getElementById('add-monto').addEventListener('click', () => this.openMontoModal());
-        this.renderMontosList();
     }
 
     openMontoModal(monto = null, index = null) {
@@ -122,8 +113,8 @@ export class DebtForm extends HTMLElement {
             }
             this.renderMontosList();
             this.montoModal.close();
-        });
-        montoForm.addEventListener('monto:cancel', () => this.montoModal.close());
+        }, { once: true });
+        montoForm.addEventListener('monto:cancel', () => this.montoModal.close(), { once: true });
         this.montoModal.appendChild(montoForm);
         this.montoModal.open();
     }
@@ -165,18 +156,19 @@ export class DebtForm extends HTMLElement {
     }
 
     load(deuda) {
-        // Precarga datos para edición
         this.editing = true;
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.renderMontosList();
-        // Precarga los valores en los <app-input>
-        for (const key in deuda) {
-            if (key === 'montos') continue;
-            const input = this.form.querySelector(`app-input[name="${key}"]`);
-            if (input && deuda[key] !== undefined && deuda[key] !== null) {
-                input.value = deuda[key];
-            }
+        // Precarga los valores en <app-form>
+        const form = this.shadowRoot.querySelector('app-form');
+        if (form) {
+            form.initialValues = {
+                acreedor: deuda.acreedor || '',
+                tipoDeuda: deuda.tipoDeuda || '',
+                numeroExterno: deuda.numeroExterno || '',
+                notas: deuda.notas || ''
+            };
         }
     }
 
@@ -184,32 +176,45 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
-        // Resetea los <app-input>
-        this.form.querySelectorAll('app-input').forEach(input => input.value = '');
+        const form = this.shadowRoot.querySelector('app-form');
+        if (form) form.initialValues = {};
         this.renderMontosList();
     }
 
-    _buildDeudaFromForm() {
-        const get = name => this.form.querySelector(`app-input[name="${name}"]`)?.value;
-        return new DeudaModel({
-            acreedor: get('acreedor'),
-            tipoDeuda: get('tipoDeuda'),
-            notas: get('notas'),
-            montos: this.montos
-        });
-    }
-
-    async handleSubmit(event) {
-        event.preventDefault();
-        // Validación de los campos del formulario principal
-        const { values, valid, errors } = getFormValuesAndValidate(this.form);
-        // Limpiar errores previos
-        this.form.querySelectorAll('app-input').forEach(input => input.clearError());
-        if (!valid) {
-            Object.entries(errors).forEach(([name, msg]) => {
-                const input = this.form.querySelector(`app-input[name="${name}"]`);
-                if (input) input.showError(msg);
-            });
+    async handleSubmit(e) {
+        e.preventDefault();
+        const form = this.shadowRoot.querySelector('app-form');
+        // Usar el evento detail para obtener los valores y validación
+        const { values, valid, errors } = form ? form.lastSubmitResult || {} : {};
+        // Si no hay resultado, usar el evento directamente
+        if (!values) {
+            // fallback: usar e.detail si viene del evento 'form:submit'
+            if (e.detail) {
+                // No hay validación, solo valores
+                if (!this.montos || this.montos.length === 0) {
+                    this.showFormError('Debe agregar al menos un monto antes de guardar.');
+                    return;
+                }
+                this.clearFormError();
+                const deuda = new DeudaModel({
+                    acreedor: e.detail.acreedor,
+                    tipoDeuda: e.detail.tipoDeuda,
+                    numeroExterno: e.detail.numeroExterno,
+                    notas: e.detail.notas,
+                    montos: this.montos
+                });
+                if (this.editing && this.deudaId) {
+                    const { updateDeuda } = await import('../repository/deudaRepository.js');
+                    await updateDeuda(deuda);
+                    this.dispatchEvent(new CustomEvent('deuda:updated', { detail: deuda, bubbles: true, composed: true }));
+                } else {
+                    const { addDeuda } = await import('../repository/deudaRepository.js');
+                    await addDeuda(deuda);
+                    this.dispatchEvent(new CustomEvent('deuda:saved', { detail: deuda, bubbles: true, composed: true }));
+                }
+                this.reset();
+                return;
+            }
             return;
         }
         // Validación: requiere al menos un monto
@@ -244,7 +249,8 @@ export class DebtForm extends HTMLElement {
                 attrs: { id: 'form-error' },
                 style: 'color:red;margin:8px 0;'
             });
-            this.form.parentNode.insertBefore(err, this.form);
+            const form = this.shadowRoot.querySelector('app-form');
+            if (form) form.parentNode.insertBefore(err, form);
         }
         err.textContent = msg;
     }
@@ -253,11 +259,5 @@ export class DebtForm extends HTMLElement {
         const err = this.shadowRoot.getElementById('form-error');
         if (err) err.textContent = '';
     }
-
-    yymm(fecha) {
-        const date = new Date(fecha);
-        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }
 }
-
 customElements.define('debt-form', DebtForm);

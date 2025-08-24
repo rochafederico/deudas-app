@@ -11,13 +11,17 @@ export class AppShell extends HTMLElement {
     }
 
     connectedCallback() {
-        this.shadowRoot.querySelector('app-input[type="month"]').value = this.month;
+        // Usar el id para seleccionar el input correctamente
+        const input = this.shadowRoot.getElementById('month-filter');
+        if (input) input.value = this.month;
         const opener = this.shadowRoot.querySelector('[data-add-debt]');
-        opener.addEventListener('click', () => {
-            const modal = this.shadowRoot.querySelector('#debtModal');
-            modal.openCreate();
-            modal.attachOpener(opener);
-        });
+        if (opener) {
+            opener.addEventListener('click', () => {
+                const modal = this.shadowRoot.querySelector('#debtModal');
+                modal.openCreate();
+                modal.attachOpener(opener);
+            });
+        }
         window.addEventListener('deuda:saved', this.refreshList.bind(this));
         window.addEventListener('deuda:updated', this.refreshList.bind(this));
     }
