@@ -54,9 +54,22 @@ export class HeaderBar extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                .header-bar { display: flex; justify-content: space-between; align-items: center; padding: 10px; background-color: var(--panel-light); border-radius: 12px 12px 0 0; }
+                .header-bar { 
+                    display: flex; 
+                    justify-content: space-between; 
+                    align-items: center; 
+                    padding: 10px; 
+                    background-color: var(--panel-light); 
+                    color: var(--text-light);
+                    border-radius: 12px 12px 0 0; 
+                }
                 .month-nav { display: flex; align-items: center; gap: 8px; }
                 .actions { display: flex; gap: 8px; }
+                /* Modo oscuro */
+                :host-context(body.dark-mode) .header-bar {
+                    background-color: var(--panel-dark);
+                    color: var(--text-dark);
+                }
             </style>
             <div class="header-bar">
                 <div class="month-nav">
