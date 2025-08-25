@@ -46,6 +46,10 @@ export class AppShell extends HTMLElement {
             this.month = e.detail.mes;
             this.onMonthChange({ target: { value: this.month } });
         });
+        header.addEventListener('group-change', (e) => {
+            this.groupBy = e.detail.groupBy;
+            this.onGroupChange(this.groupBy);
+        });
         header.addEventListener('add-debt', () => {
             const modal = this.shadowRoot.querySelector('#debtModal');
             modal.openCreate();
@@ -66,6 +70,10 @@ export class AppShell extends HTMLElement {
         `;
         this.shadowRoot.appendChild(header);
         this.shadowRoot.appendChild(panel);
+    }
+
+    onGroupChange(groupBy) {
+        window.dispatchEvent(new CustomEvent('ui:group', { detail: { groupBy } }));
     }
 
     async openExportModal(opener) {

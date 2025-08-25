@@ -32,6 +32,7 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - [ ] Dashboard con gráficos y cálculos para ayudar en la toma de decisiones
 - [ ] Mejoras en validaciones de formularios
 - [ ] Onboarding/tour para nuevos usuarios
+- [x] Agrupamiento de montos en la lista por acreedor, tipo, moneda o vencimiento
 
 ## Arquitectura y estructura
 El proyecto está organizado en carpetas según responsabilidad:

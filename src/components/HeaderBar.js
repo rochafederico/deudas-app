@@ -1,5 +1,6 @@
 // src/components/HeaderBar.js
 import './AppInput.js';
+import { groupOptions } from '../config/tables/groupOptions.js';
 import './AppButton.js';
 
 export class HeaderBar extends HTMLElement {
@@ -18,6 +19,10 @@ export class HeaderBar extends HTMLElement {
         this.shadowRoot.getElementById('month-filter').addEventListener('change', (e) => {
             this.month = e.target.value;
             this.emitMonthChange();
+        });
+        // Filtro de agrupamiento
+        this.shadowRoot.getElementById('group-filter').addEventListener('change', (e) => {
+            this.emitGroupChange(e.target.value);
         });
         // Acciones
         this.shadowRoot.getElementById('add-debt').addEventListener('click', (e) => {
@@ -51,7 +56,17 @@ export class HeaderBar extends HTMLElement {
         }));
     }
 
+    emitGroupChange(groupBy) {
+        this.dispatchEvent(new CustomEvent('group-change', {
+            detail: { groupBy },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     render() {
+        // Generar las opciones para el select
+        const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
         this.shadowRoot.innerHTML = `
             <style>
                 .header-bar { 
@@ -65,6 +80,7 @@ export class HeaderBar extends HTMLElement {
                 }
                 .month-nav { display: flex; align-items: center; gap: 8px; }
                 .actions { display: flex; gap: 8px; }
+                .group-filter { margin-left: 12px; min-width: 140px; }
                 /* Modo oscuro */
                 :host-context(body.dark-mode) .header-bar {
                     background-color: var(--panel-dark);
@@ -76,6 +92,9 @@ export class HeaderBar extends HTMLElement {
                     <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
                     <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
                     <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
+                    <app-input type="select" id="group-filter" name="group-filter" class="group-filter" title="Agrupar montos">
+                        ${optionsHtml}
+                    </app-input>
                 </div>
                 <div class="actions">
                     <app-button id="add-debt" type="button" variant="success" title="Agregar deuda" aria-label="Agregar deuda">

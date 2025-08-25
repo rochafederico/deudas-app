@@ -9,12 +9,17 @@ export class DebtList extends HTMLElement {
         this.attachShadow({ mode: 'open' });
         this.debts = [];
         this.mes = new Date().toISOString().slice(0, 7); // mes actual por defecto
+        this.groupBy = 'none'; // agrupamiento por defecto
     }
 
     connectedCallback() {
         this.render();
         this.loadDebts();
         this.addEventListeners();
+        window.addEventListener('ui:group', (event) => {
+            this.groupBy = event.detail.groupBy || 'none';
+            this.renderTable();
+        });
     }
 
     addEventListeners() {
@@ -56,12 +61,17 @@ export class DebtList extends HTMLElement {
         const totales = {};
 
         // Unificar todos los montos en un solo array con referencia a la deuda
-        const allMontos = this.debts.reduce((arr, deuda) => {
+        let allMontos = this.debts.reduce((arr, deuda) => {
             deuda.montos.forEach(monto => {
                 arr.push({ ...monto, acreedor: deuda.acreedor, tipoDeuda: deuda.tipoDeuda });
             });
             return arr;
         }, []);
+
+        // Agrupamiento dinámico
+        if (this.groupBy !== 'none') {
+            allMontos = this.groupMontos(allMontos, this.groupBy);
+        }
 
         // Ordenar por fecha de vencimiento ascendente
         allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
@@ -163,6 +173,49 @@ export class DebtList extends HTMLElement {
         this.shadowRoot.innerHTML = `
             <app-table></app-table>
         `;
+    }
+
+    groupMontos(montos, groupBy) {
+        // Devuelve un array agrupado según el criterio, siempre separando por moneda salvo si el filtro es 'moneda'
+        const grouped = {};
+        montos.forEach(monto => {
+            let key = '';
+            switch (groupBy) {
+                case 'acreedor': key = `${monto.acreedor}__${monto.moneda}`; break;
+                case 'tipo': key = `${monto.tipoDeuda}__${monto.moneda}`; break;
+                case 'vencimiento': key = `${monto.vencimiento}__${monto.moneda}`; break;
+                case 'moneda': key = monto.moneda; break;
+                default: key = `Otros__${monto.moneda}`;
+            }
+            if (!grouped[key]) grouped[key] = [];
+            grouped[key].push(monto);
+        });
+        // Devuelve un array donde cada elemento es un resumen del grupo
+        return Object.entries(grouped).map(([group, items]) => {
+            // Sumar montos del grupo
+            const total = items.reduce((sum, m) => sum + (Number(m.monto) || 0), 0);
+            // Agrupar acreedores, tipos y vencimientos si corresponde
+            const acreedores = [...new Set(items.map(m => m.acreedor))].join(', ');
+            const tipos = [...new Set(items.map(m => m.tipoDeuda))].join(', ');
+            const vencimientos = [...new Set(items.map(m => m.vencimiento))].join(', ');
+            // Extraer moneda del key si corresponde
+            const moneda = items[0].moneda;
+            let groupLabel = group;
+            if (group.includes('__')) {
+                const [main, mon] = group.split('__');
+                groupLabel = main;
+            }
+            return {
+                ...items[0],
+                monto: total,
+                groupLabel,
+                items: items, // para posible expansión futura
+                acreedor: (groupBy !== 'acreedor') ? acreedores : groupLabel,
+                tipoDeuda: (groupBy !== 'tipo') ? tipos : groupLabel,
+                vencimiento: (groupBy !== 'vencimiento') ? vencimientos : groupLabel,
+                moneda
+            };
+        });
     }
 }
 
