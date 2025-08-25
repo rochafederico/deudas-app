@@ -27,7 +27,8 @@ class AppLink extends HTMLElement {
   handleClick(e) {
     e.preventDefault();
     const href = this.getAttribute('href');
-    if (href) {
+    const currentPath = window.location.pathname + window.location.search + window.location.hash;
+    if (href && href !== currentPath) {
       window.history.pushState({}, '', href);
       window.dispatchEvent(new PopStateEvent('popstate'));
     }
