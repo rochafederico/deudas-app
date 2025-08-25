@@ -1,5 +1,7 @@
 import { el, appendCells } from '../utils/dom.js';
 import './AppButton.js';
+import './AppTable.js';
+import { debtTableColumns } from '../config/tables/debtTableColumns.js';
 
 export class DebtList extends HTMLElement {
     constructor() {
@@ -50,19 +52,8 @@ export class DebtList extends HTMLElement {
     }
 
     renderTable() {
-        const tableBody = this.shadowRoot.querySelector('tbody');
-        tableBody.innerHTML = '';
-
         // Totales por moneda
         const totales = {};
-
-        if (this.debts.length === 0) {
-            tableBody.appendChild(el('tr', {
-                children: [el('td', { text: 'No hay deudas para el mes seleccionado.', attrs: { colspan: 7 }, className: '', })]
-            }));
-            this.renderTotales(totales);
-            return;
-        }
 
         // Unificar todos los montos en un solo array con referencia a la deuda
         const allMontos = this.debts.reduce((arr, deuda) => {
@@ -75,76 +66,70 @@ export class DebtList extends HTMLElement {
         // Ordenar por fecha de vencimiento ascendente
         allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
 
-        // Renderizar cada monto
+        // Calcular totales por moneda
         allMontos.forEach(monto => {
             totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
-            const row = document.createElement('tr');
-            appendCells(row, [
-                { text: monto.acreedor },
-                { text: monto.tipoDeuda || '-' },
-                { text: monto.moneda },
-                { text: this.fmtMoneda(monto.moneda, monto.monto) },
-                { text: monto.vencimiento },
-                { text: monto.periodo },
-                {
-                    children: [
-                        el('app-button', {
-                            text: '✎',
-                            attrs: { title: 'Editar deuda' },
-                            on: {
-                                click: async () => {
-                                    let modal = null;
-                                    const appShell = document.querySelector('app-shell');
-                                    if (appShell && appShell.shadowRoot) {
-                                        modal = appShell.shadowRoot.getElementById('debtModal');
-                                    }
-                                    if (!modal) {
-                                        modal = document.getElementById('debtModal');
-                                    }
-                                    if (modal) {
-                                        const { getDeuda } = await import('../repository/deudaRepository.js');
-                                        const deudaActualizada = await getDeuda(monto.deudaId);
-                                        modal.openEdit(deudaActualizada);
-                                        modal.attachOpener(row.querySelector('app-button'));
-                                    }
-                                }
-                            }
-                        })
-                    ]
-                }
-            ]);
-            tableBody.appendChild(row);
         });
 
-        // Muestra los totales por moneda al final de la tabla
-        this.renderTotales(totales);
-    }
+        // Definir columnas para AppTable
+        // Clonar y agregar formateador de moneda y handler de edición a cada fila
+        const columns = debtTableColumns;
+        const tableData = allMontos.map(row => ({
+            ...row,
+            _fmtMoneda: this.fmtMoneda.bind(this),
+            _onEdit: async (monto) => {
+                let modal = null;
+                const appShell = document.querySelector('app-shell');
+                if (appShell && appShell.shadowRoot) {
+                    modal = appShell.shadowRoot.getElementById('debtModal');
+                }
+                if (!modal) {
+                    modal = document.getElementById('debtModal');
+                }
+                if (modal) {
+                    const { getDeuda } = await import('../repository/deudaRepository.js');
+                    const deudaActualizada = await getDeuda(monto.deudaId);
+                    modal.openEdit(deudaActualizada);
+                    modal.attachOpener();
+                }
+            }
+        }));
 
-    renderTotales(totales) {
-        let totalRow = this.shadowRoot.getElementById('total-row');
-        let leyenda = '💰 Totales a pagar este mes: ';
-        if (Object.keys(totales).length === 0) {
-            leyenda += '🟢 Sin deudas registradas.';
-        } else {
-            leyenda += Object.entries(totales)
-                .map(([moneda, total]) => {
-                    let emoji = '';
-                    if (moneda === 'ARS') emoji = '🇦🇷';
-                    else if (moneda === 'USD') emoji = '🇺🇸';
-                    else if (moneda === 'EUR') emoji = '🇪🇺';
-                    else emoji = '💱';
-                    return `${emoji} ${this.fmtMoneda(moneda, total)}`;
-                })
-                .join(' | ');
+        // Renderizar AppTable
+        let table = this.shadowRoot.querySelector('app-table');
+        if (!table) {
+            table = document.createElement('app-table');
+            this.shadowRoot.appendChild(table);
         }
-        if (!totalRow) {
-            totalRow = document.createElement('tr');
-            totalRow.id = 'total-row';
-            totalRow.innerHTML = `<td colspan="7" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
-            this.shadowRoot.querySelector('tbody').appendChild(totalRow);
-        } else {
-            totalRow.innerHTML = `<td colspan="7" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
-        }
+        table.columnsConfig = columns;
+        table.tableData = tableData;
+
+        // Pasar función para renderizar el footer
+        table.footerRenderer = (columns, data) => {
+            // Calcular totales por moneda usando los datos
+            const totales = {};
+            data.forEach(row => {
+                totales[row.moneda] = (totales[row.moneda] || 0) + (Number(row.monto) || 0);
+            });
+            let leyenda = '💰 Totales a pagar este mes: ';
+            if (Object.keys(totales).length === 0) {
+                leyenda += '🟢 Sin deudas registradas.';
+            } else {
+                leyenda += Object.entries(totales)
+                    .map(([moneda, total]) => {
+                        let emoji = '';
+                        if (moneda === 'ARS') emoji = '🇦🇷';
+                        else if (moneda === 'USD') emoji = '🇺🇸';
+                        else emoji = '💱';
+                        return `${emoji} ${this.fmtMoneda(moneda, total)}`;
+                    })
+                    .join(' | ');
+            }
+            const columnsCount = columns.length;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="${columnsCount}" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
+            return tr;
+        };
     }
 
     toggleEstado(id) {
@@ -176,41 +161,7 @@ export class DebtList extends HTMLElement {
 
     render() {
         this.shadowRoot.innerHTML = `
-            <style>
-                table {
-                    width: 100%;
-                    border-collapse: collapse;
-                }
-                th, td {
-                    padding: 8px;
-                    text-align: left;
-                    border-bottom: 1px solid #ddd;
-                }
-                th:last-child, td:last-child {
-                    text-align: right;
-                }
-                tr:hover {
-                    background-color: #f1f1f1;
-                }
-                /* Dark mode row hover */
-                :host-context(body.dark-mode) tr:hover {
-                    background-color: #222a3a;
-                }
-            </style>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Acreedor</th>
-                        <th>Tipo</th>
-                        <th>Moneda</th>
-                        <th>Monto</th>
-                        <th>Vencimiento</th>
-                        <th>Periodo</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+            <app-table></app-table>
         `;
     }
 }
