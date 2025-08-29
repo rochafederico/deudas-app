@@ -9,12 +9,13 @@ export class MontoModel {
      * @param {string} [params.periodo]
      * @param {number} [params.deudaId]
      */
-    constructor({ id, monto, moneda, vencimiento, periodo, deudaId }) {
+    constructor({ id, monto, moneda, vencimiento, periodo, deudaId, pagado = false }) {
         this.id = id;
         this.monto = Number(monto);
         this.moneda = moneda || 'ARS';
         this.vencimiento = vencimiento;
         this.periodo = periodo || (vencimiento ? vencimiento.slice(0, 7) : '');
         this.deudaId = deudaId;
+        this.pagado = pagado;
     }
 }

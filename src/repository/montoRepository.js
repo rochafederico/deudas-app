@@ -65,3 +65,21 @@ export function listMontos({ mes } = {}) {
 }
 
 // Add more Monto-specific repository methods here as needed.
+
+export function setPagado(id, pagado) {
+    const db = getDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(MONTOS_STORE, 'readwrite');
+        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const getRequest = montosStore.get(id);
+        getRequest.onsuccess = () => {
+            const monto = getRequest.result;
+            if (!monto) return reject('Monto no encontrado');
+            monto.pagado = pagado;
+            const putRequest = montosStore.put(monto);
+            putRequest.onsuccess = () => resolve(monto);
+            putRequest.onerror = (event) => reject('Error actualizando pagado: ' + event.target.errorCode);
+        };
+        getRequest.onerror = (event) => reject('Error obteniendo monto: ' + event.target.errorCode);
+    });
+}

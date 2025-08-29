@@ -81,9 +81,63 @@ export class DebtList extends HTMLElement {
             totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
         });
 
-        // Definir columnas para AppTable
-        // Clonar y agregar formateador de moneda y handler de edición a cada fila
-        const columns = debtTableColumns;
+        // Definir columnas para AppTable, agregando columna pagado
+        const columns = [
+            ...debtTableColumns,
+            {
+                key: 'pagado',
+                label: 'Pagado',
+                render: row => {
+                    const id = `pagado-checkbox-${row.id}`;
+                    const wrapper = document.createElement('span');
+                    wrapper.style.display = 'inline-block';
+                    wrapper.style.position = 'relative';
+
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = id;
+                    checkbox.checked = !!row.pagado;
+                    checkbox.style.opacity = '0';
+                    checkbox.style.position = 'absolute';
+                    checkbox.style.width = '24px';
+                    checkbox.style.height = '24px';
+                    checkbox.style.cursor = 'pointer';
+
+                    const label = document.createElement('label');
+                    label.htmlFor = id;
+                    label.style.display = 'inline-block';
+                    label.style.width = '24px';
+                    label.style.height = '24px';
+                    label.style.border = '2px solid var(--accent, #007bff)';
+                    label.style.borderRadius = '6px';
+                    label.style.background = checkbox.checked ? 'var(--accent, #007bff)' : '#fff';
+                    label.style.cursor = 'pointer';
+                    label.style.transition = 'background 0.2s';
+                    label.style.position = 'relative';
+
+                    label.innerHTML = checkbox.checked
+                        ? '<span style="color:#fff;font-size:18px;position:absolute;top:2px;left:5px;">✓</span>'
+                        : '';
+
+                    checkbox.addEventListener('change', async () => {
+                        const { setPagado } = await import('../repository/montoRepository.js');
+                        await setPagado(row.id, checkbox.checked);
+                        // Actualiza el label visual
+                        label.style.background = checkbox.checked ? 'var(--accent, #007bff)' : '#fff';
+                        label.innerHTML = checkbox.checked
+                            ? '<span style="color:#fff;font-size:18px;position:absolute;top:2px;left:5px;">✓</span>'
+                            : '';
+                        this.loadDebts();
+                    });
+
+                    wrapper.appendChild(checkbox);
+                    wrapper.appendChild(label);
+                    return wrapper;
+                }
+            }
+        ];
+
+        // Mapear datos de la tabla
         const tableData = allMontos.map(row => ({
             ...row,
             _fmtMoneda: this.fmtMoneda.bind(this),
@@ -114,18 +168,37 @@ export class DebtList extends HTMLElement {
         table.columnsConfig = columns;
         table.tableData = tableData;
 
-        // Pasar función para renderizar el footer
+        // Pasar función para renderizar el footer con totales pagados y pendientes
         table.footerRenderer = (columns, data) => {
-            // Calcular totales por moneda usando los datos
-            const totales = {};
+            // Calcular totales por moneda y estado pagado
+            const totalesPendientes = {};
+            const totalesPagados = {};
             data.forEach(row => {
-                totales[row.moneda] = (totales[row.moneda] || 0) + (Number(row.monto) || 0);
+                if (row.pagado) {
+                    totalesPagados[row.moneda] = (totalesPagados[row.moneda] || 0) + (Number(row.monto) || 0);
+                } else {
+                    totalesPendientes[row.moneda] = (totalesPendientes[row.moneda] || 0) + (Number(row.monto) || 0);
+                }
             });
-            let leyenda = '💰 Totales a pagar este mes: ';
-            if (Object.keys(totales).length === 0) {
-                leyenda += '🟢 Sin deudas registradas.';
+            let leyendaPendiente = '💰 Pendiente: ';
+            let leyendaPagado = '✅ Pagado: ';
+            if (Object.keys(totalesPendientes).length === 0) {
+                leyendaPendiente += '🟢 Sin deudas pendientes.';
             } else {
-                leyenda += Object.entries(totales)
+                leyendaPendiente += Object.entries(totalesPendientes)
+                    .map(([moneda, total]) => {
+                        let emoji = '';
+                        if (moneda === 'ARS') emoji = '🇦🇷';
+                        else if (moneda === 'USD') emoji = '🇺🇸';
+                        else emoji = '💱';
+                        return `${emoji} ${this.fmtMoneda(moneda, total)}`;
+                    })
+                    .join(' | ');
+            }
+            if (Object.keys(totalesPagados).length === 0) {
+                leyendaPagado += '—';
+            } else {
+                leyendaPagado += Object.entries(totalesPagados)
                     .map(([moneda, total]) => {
                         let emoji = '';
                         if (moneda === 'ARS') emoji = '🇦🇷';
@@ -137,7 +210,9 @@ export class DebtList extends HTMLElement {
             }
             const columnsCount = columns.length;
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="${columnsCount}" style="text-align:right;font-weight:bold;color:var(--accent);">${leyenda}</td>`;
+            tr.innerHTML = `<td colspan="${columnsCount}" style="text-align:right;font-weight:bold;color:var(--accent);">
+                ${leyendaPendiente}<br>${leyendaPagado}
+            </td>`;
             return tr;
         };
     }
