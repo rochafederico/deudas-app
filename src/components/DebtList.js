@@ -37,7 +37,23 @@ export class DebtList extends HTMLElement {
         const debts = await this.listByMes(this.mes);
         this.debts = debts;
         console.log('[DebtList] Deudas cargadas:', debts); // Debug: muestra las deudas recuperadas
+        await this.loadTotals();
         this.renderTable();
+    }
+
+    async loadTotals() {
+        // Consulta los montos originales desde el repository y calcula los totales
+        const { listMontos } = await import('../repository/montoRepository.js');
+        const montos = await listMontos({ mes: this.mes });
+        this.totalesPendientes = {};
+        this.totalesPagados = {};
+        montos.forEach(row => {
+            if (row.pagado) {
+                this.totalesPagados[row.moneda] = (this.totalesPagados[row.moneda] || 0) + (Number(row.monto) || 0);
+            } else {
+                this.totalesPendientes[row.moneda] = (this.totalesPendientes[row.moneda] || 0) + (Number(row.monto) || 0);
+            }
+        });
     }
 
     async listByMes(mes) {
@@ -80,26 +96,35 @@ export class DebtList extends HTMLElement {
             totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
         });
 
-        // Definir columnas para AppTable, agregando columna pagado
-        const columns = [
-            ...debtTableColumns,
-            {
-                key: 'pagado',
-                label: 'Pagado',
-                render: row => {
-                    const id = `app-checkbox-${row.id}`;
-                    const appCheckbox = document.createElement('app-checkbox');
-                    appCheckbox.inputId = id;
-                    appCheckbox.checked = !!row.pagado;
-                    appCheckbox.addEventListener('checkbox-change', async (e) => {
-                        const { setPagado } = await import('../repository/montoRepository.js');
-                        await setPagado(row.id, e.detail.checked);
-                        this.loadDebts();
-                    });
-                    return appCheckbox;
-                }
+        // Definir columnas para AppTable, ocultando 'Acciones' y 'Pagado' si hay agrupamiento
+        let columns = [...debtTableColumns];
+        const pagadoColumn = {
+            key: 'pagado',
+            label: 'Pagado',
+            render: row => {
+                const id = `app-checkbox-${row.id}`;
+                const appCheckbox = document.createElement('app-checkbox');
+                appCheckbox.inputId = id;
+                appCheckbox.checked = !!row.pagado;
+                appCheckbox.addEventListener('checkbox-change', async (e) => {
+                    const { setPagado } = await import('../repository/montoRepository.js');
+                    await setPagado(row.id, e.detail.checked);
+                    this.loadDebts();
+                });
+                return appCheckbox;
             }
-    ];
+        };
+        if (this.groupBy === 'none') {
+            columns.push(pagadoColumn);
+        }
+        // Filtrar columnas 'Acciones' y 'vencimiento' si hay agrupamiento, pero mostrar 'vencimiento' solo si el agrupamiento es por 'vencimiento'
+        if (this.groupBy !== 'none') {
+            let hiddenKeys = ['acciones', 'vencimiento'];
+            if (this.groupBy === 'vencimiento') {
+                hiddenKeys = ['acciones'];
+            }
+            columns = columns.filter(col => !hiddenKeys.includes(col.key));
+        }
 
         // Mapear datos de la tabla
         const tableData = allMontos.map(row => ({
@@ -134,18 +159,10 @@ export class DebtList extends HTMLElement {
 
         // Pasar función para renderizar el footer con totales pagados y pendientes
         table.footerRenderer = (columns, data) => {
-            // Calcular totales por moneda y estado pagado
-            const totalesPendientes = {};
-            const totalesPagados = {};
-            data.forEach(row => {
-                if (row.pagado) {
-                    totalesPagados[row.moneda] = (totalesPagados[row.moneda] || 0) + (Number(row.monto) || 0);
-                } else {
-                    totalesPendientes[row.moneda] = (totalesPendientes[row.moneda] || 0) + (Number(row.monto) || 0);
-                }
-            });
             let leyendaPendiente = '💰 Pendiente: ';
             let leyendaPagado = '✅ Pagado: ';
+            const totalesPendientes = this.totalesPendientes || {};
+            const totalesPagados = this.totalesPagados || {};
             if (Object.keys(totalesPendientes).length === 0) {
                 leyendaPendiente += '🟢 Sin deudas pendientes.';
             } else {
@@ -226,33 +243,35 @@ export class DebtList extends HTMLElement {
                 case 'moneda': key = monto.moneda; break;
                 default: key = `Otros__${monto.moneda}`;
             }
+            // Separar por estado pagado
+            key += `__${monto.pagado ? 'pagado' : 'pendiente'}`;
             if (!grouped[key]) grouped[key] = [];
             grouped[key].push(monto);
         });
         // Devuelve un array donde cada elemento es un resumen del grupo
         return Object.entries(grouped).map(([group, items]) => {
-            // Sumar montos del grupo
             const total = items.reduce((sum, m) => sum + (Number(m.monto) || 0), 0);
-            // Agrupar acreedores, tipos y vencimientos si corresponde
             const acreedores = [...new Set(items.map(m => m.acreedor))].join(', ');
             const tipos = [...new Set(items.map(m => m.tipoDeuda))].join(', ');
             const vencimientos = [...new Set(items.map(m => m.vencimiento))].join(', ');
-            // Extraer moneda del key si corresponde
             const moneda = items[0].moneda;
             let groupLabel = group;
+            let pagado = items[0].pagado;
             if (group.includes('__')) {
-                const [main, mon] = group.split('__');
-                groupLabel = main;
+                const parts = group.split('__');
+                groupLabel = parts[0];
+                pagado = parts[parts.length - 1] === 'pagado';
             }
             return {
                 ...items[0],
                 monto: total,
                 groupLabel,
-                items: items, // para posible expansión futura
+                items: items,
                 acreedor: (groupBy !== 'acreedor') ? acreedores : groupLabel,
                 tipoDeuda: (groupBy !== 'tipo') ? tipos : groupLabel,
                 vencimiento: (groupBy !== 'vencimiento') ? vencimientos : groupLabel,
-                moneda
+                moneda,
+                pagado
             };
         });
     }
