@@ -4,11 +4,21 @@ import { getDB } from '../database/initDB.js';
 import { MONTOS_STORE } from '../database/schema.js';
 import { MontoEntity } from '../entity/MontoEntity.js';
 
-export function addMonto(montoModel) {
+function _getMontosStore(mode = 'readonly') {
     const db = getDB();
+    const transaction = db.transaction(MONTOS_STORE, mode);
+    return transaction.objectStore(MONTOS_STORE);
+}
+
+function _withMontosStore(mode, fn) {
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readwrite');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const montosStore = _getMontosStore(mode);
+        fn(montosStore, resolve, reject);
+    });
+}
+
+export function addMonto(montoModel) {
+    return _withMontosStore('readwrite', (montosStore, resolve, reject) => {
         const montoEntity = new MontoEntity(montoModel);
         const request = montosStore.add(montoEntity);
         request.onsuccess = () => resolve(request.result);
@@ -17,10 +27,7 @@ export function addMonto(montoModel) {
 }
 
 export function updateMonto(montoModel) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readwrite');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readwrite', (montosStore, resolve, reject) => {
         const montoEntity = new MontoEntity(montoModel);
         const request = montosStore.put(montoEntity);
         request.onsuccess = () => resolve();
@@ -29,10 +36,7 @@ export function updateMonto(montoModel) {
 }
 
 export function deleteMonto(id) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readwrite');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readwrite', (montosStore, resolve, reject) => {
         const request = montosStore.delete(id);
         request.onsuccess = () => resolve();
         request.onerror = (event) => reject('Error deleting monto: ' + event.target.errorCode);
@@ -40,10 +44,7 @@ export function deleteMonto(id) {
 }
 
 export function getMonto(id) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readonly');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readonly', (montosStore, resolve, reject) => {
         const request = montosStore.get(id);
         request.onsuccess = () => resolve(request.result);
         request.onerror = (event) => reject('Error getting monto: ' + event.target.errorCode);
@@ -51,10 +52,7 @@ export function getMonto(id) {
 }
 
 export function listMontos({ mes } = {}) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readonly');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readonly', (montosStore, resolve, reject) => {
         const index = montosStore.index('by_periodo');
         const request = mes ? index.getAll(mes):index.getAll();
         request.onsuccess = () => {
@@ -64,13 +62,8 @@ export function listMontos({ mes } = {}) {
     });
 }
 
-// Add more Monto-specific repository methods here as needed.
-
 export function setPagado(id, pagado) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readwrite');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readwrite', (montosStore, resolve, reject) => {
         const getRequest = montosStore.get(id);
         getRequest.onsuccess = () => {
             const monto = getRequest.result;
@@ -86,10 +79,7 @@ export function setPagado(id, pagado) {
 
 // Devuelve totales pagados y pendientes por moneda para un mes dado
 export function countMontosByMes({ mes } = {}) {
-    const db = getDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction(MONTOS_STORE, 'readonly');
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+    return _withMontosStore('readonly', (montosStore, resolve, reject) => {
         const index = montosStore.index('by_periodo');
         const request = mes ? index.getAll(mes) : index.getAll();
         request.onsuccess = () => {
