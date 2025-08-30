@@ -43,17 +43,10 @@ export class DebtList extends HTMLElement {
 
     async loadTotals() {
         // Consulta los montos originales desde el repository y calcula los totales
-        const { listMontos } = await import('../repository/montoRepository.js');
-        const montos = await listMontos({ mes: this.mes });
-        this.totalesPendientes = {};
-        this.totalesPagados = {};
-        montos.forEach(row => {
-            if (row.pagado) {
-                this.totalesPagados[row.moneda] = (this.totalesPagados[row.moneda] || 0) + (Number(row.monto) || 0);
-            } else {
-                this.totalesPendientes[row.moneda] = (this.totalesPendientes[row.moneda] || 0) + (Number(row.monto) || 0);
-            }
-        });
+        const { countMontosByMes } = await import('../repository/montoRepository.js');
+        const { totalesPendientes, totalesPagados } = await countMontosByMes({ mes: this.mes });
+        this.totalesPendientes = totalesPendientes;
+        this.totalesPagados = totalesPagados;
     }
 
     async listByMes(mes) {
@@ -98,7 +91,6 @@ export class DebtList extends HTMLElement {
 
         // Definir columnas para AppTable, ocultando 'Acciones' y 'Pagado' si hay agrupamiento
         let columns = [...debtTableColumns];
-    // ...existing code...
         // Filtrar columnas 'Acciones' y 'vencimiento' si hay agrupamiento, pero mostrar 'vencimiento' solo si el agrupamiento es por 'vencimiento'
         if (this.groupBy !== 'none') {
             let hiddenKeys = ['acciones', 'vencimiento'];

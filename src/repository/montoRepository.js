@@ -83,3 +83,28 @@ export function setPagado(id, pagado) {
         getRequest.onerror = (event) => reject('Error obteniendo monto: ' + event.target.errorCode);
     });
 }
+
+// Devuelve totales pagados y pendientes por moneda para un mes dado
+export function countMontosByMes({ mes } = {}) {
+    const db = getDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(MONTOS_STORE, 'readonly');
+        const montosStore = transaction.objectStore(MONTOS_STORE);
+        const index = montosStore.index('by_periodo');
+        const request = mes ? index.getAll(mes) : index.getAll();
+        request.onsuccess = () => {
+            const montos = request.result;
+            const totalesPendientes = {};
+            const totalesPagados = {};
+            montos.forEach(row => {
+                if (row.pagado) {
+                    totalesPagados[row.moneda] = (totalesPagados[row.moneda] || 0) + (Number(row.monto) || 0);
+                } else {
+                    totalesPendientes[row.moneda] = (totalesPendientes[row.moneda] || 0) + (Number(row.monto) || 0);
+                }
+            });
+            resolve({ totalesPendientes, totalesPagados });
+        };
+        request.onerror = (event) => reject('Error contando montos: ' + event.target.errorCode);
+    });
+}
