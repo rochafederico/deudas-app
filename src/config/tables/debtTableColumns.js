@@ -24,8 +24,26 @@ export const debtTableColumns = [
                     click: () => row._onEdit(row)
                 }
             });
-            // Ejemplo: podrías agregar más elementos aquí si lo necesitas
-            return btn;
+            // Checkbox pagado
+            const id = `app-checkbox-${row.id}`;
+            const appCheckbox = document.createElement('app-checkbox');
+            appCheckbox.inputId = id;
+            appCheckbox.checked = !!row.pagado;
+            appCheckbox.title = 'Marcar como pagado';
+            appCheckbox.addEventListener('checkbox-change', async (e) => {
+                const { setPagado } = await import('../../repository/montoRepository.js');
+                await setPagado(row.id, e.detail.checked);
+                if (typeof row._reload === 'function') row._reload();
+            });
+            // Contenedor flex
+            const container = document.createElement('div');
+            container.style.display = 'flex';
+            container.style.alignItems = 'center';
+            container.style.justifyContent = 'flex-end';
+            container.style.gap = '12px';
+            container.appendChild(btn);
+            container.appendChild(appCheckbox);
+            return container;
         }
     }
 ];

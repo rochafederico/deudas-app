@@ -98,25 +98,7 @@ export class DebtList extends HTMLElement {
 
         // Definir columnas para AppTable, ocultando 'Acciones' y 'Pagado' si hay agrupamiento
         let columns = [...debtTableColumns];
-        const pagadoColumn = {
-            key: 'pagado',
-            label: 'Pagado',
-            render: row => {
-                const id = `app-checkbox-${row.id}`;
-                const appCheckbox = document.createElement('app-checkbox');
-                appCheckbox.inputId = id;
-                appCheckbox.checked = !!row.pagado;
-                appCheckbox.addEventListener('checkbox-change', async (e) => {
-                    const { setPagado } = await import('../repository/montoRepository.js');
-                    await setPagado(row.id, e.detail.checked);
-                    this.loadDebts();
-                });
-                return appCheckbox;
-            }
-        };
-        if (this.groupBy === 'none') {
-            columns.push(pagadoColumn);
-        }
+    // ...existing code...
         // Filtrar columnas 'Acciones' y 'vencimiento' si hay agrupamiento, pero mostrar 'vencimiento' solo si el agrupamiento es por 'vencimiento'
         if (this.groupBy !== 'none') {
             let hiddenKeys = ['acciones', 'vencimiento'];
@@ -145,7 +127,8 @@ export class DebtList extends HTMLElement {
                     modal.openEdit(deudaActualizada);
                     modal.attachOpener();
                 }
-            }
+            },
+            _reload: this.loadDebts.bind(this)
         }));
 
         // Renderizar AppTable
