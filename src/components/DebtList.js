@@ -1,4 +1,3 @@
-import { el, appendCells } from '../utils/dom.js';
 import './AppButton.js';
 import './AppTable.js';
 import { debtTableColumns } from '../config/tables/debtTableColumns.js';
@@ -88,54 +87,19 @@ export class DebtList extends HTMLElement {
                 key: 'pagado',
                 label: 'Pagado',
                 render: row => {
-                    const id = `pagado-checkbox-${row.id}`;
-                    const wrapper = document.createElement('span');
-                    wrapper.style.display = 'inline-block';
-                    wrapper.style.position = 'relative';
-
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.id = id;
-                    checkbox.checked = !!row.pagado;
-                    checkbox.style.opacity = '0';
-                    checkbox.style.position = 'absolute';
-                    checkbox.style.width = '24px';
-                    checkbox.style.height = '24px';
-                    checkbox.style.cursor = 'pointer';
-
-                    const label = document.createElement('label');
-                    label.htmlFor = id;
-                    label.style.display = 'inline-block';
-                    label.style.width = '24px';
-                    label.style.height = '24px';
-                    label.style.border = '2px solid var(--accent, #007bff)';
-                    label.style.borderRadius = '6px';
-                    label.style.background = checkbox.checked ? 'var(--accent, #007bff)' : '#fff';
-                    label.style.cursor = 'pointer';
-                    label.style.transition = 'background 0.2s';
-                    label.style.position = 'relative';
-
-                    label.innerHTML = checkbox.checked
-                        ? '<span style="color:#fff;font-size:18px;position:absolute;top:2px;left:5px;">✓</span>'
-                        : '';
-
-                    checkbox.addEventListener('change', async () => {
+                    const id = `app-checkbox-${row.id}`;
+                    const appCheckbox = document.createElement('app-checkbox');
+                    appCheckbox.inputId = id;
+                    appCheckbox.checked = !!row.pagado;
+                    appCheckbox.addEventListener('checkbox-change', async (e) => {
                         const { setPagado } = await import('../repository/montoRepository.js');
-                        await setPagado(row.id, checkbox.checked);
-                        // Actualiza el label visual
-                        label.style.background = checkbox.checked ? 'var(--accent, #007bff)' : '#fff';
-                        label.innerHTML = checkbox.checked
-                            ? '<span style="color:#fff;font-size:18px;position:absolute;top:2px;left:5px;">✓</span>'
-                            : '';
+                        await setPagado(row.id, e.detail.checked);
                         this.loadDebts();
                     });
-
-                    wrapper.appendChild(checkbox);
-                    wrapper.appendChild(label);
-                    return wrapper;
+                    return appCheckbox;
                 }
             }
-        ];
+    ];
 
         // Mapear datos de la tabla
         const tableData = allMontos.map(row => ({
