@@ -1,6 +1,7 @@
 import './DebtModal.js';
 import './AppInput.js';
 import './ExportDataModal.js';
+import './ImportDataModal.js';
 import './HeaderBar.js';
 
 export class AppShell extends HTMLElement {
@@ -58,6 +59,9 @@ export class AppShell extends HTMLElement {
         header.addEventListener('export-data', () => {
             this.openExportModal(header.shadowRoot.getElementById('export-data'));
         });
+        header.addEventListener('import-data', () => {
+            this.openImportModal(header.shadowRoot.getElementById('import-data'));
+        });
 
         const panel = document.createElement('div');
         panel.className = 'panel';
@@ -82,6 +86,48 @@ export class AppShell extends HTMLElement {
             modal = document.createElement('export-data-modal');
             modal.id = 'exportDataModal';
             this.shadowRoot.appendChild(modal);
+        }
+        modal.open(opener);
+    }
+
+    async openImportModal(opener) {
+        let modal = this.shadowRoot.getElementById('importDataModal');
+        if (!modal) {
+            modal = document.createElement('import-data-modal');
+            modal.id = 'importDataModal';
+            this.shadowRoot.appendChild(modal);
+            
+            // Escuchar el evento de datos importados para refrescar la vista
+            window.addEventListener('data-imported', () => {
+                // Refrescar la lista de deudas
+                const debtList = this.shadowRoot.querySelector('debt-list');
+                if (debtList && typeof debtList.refresh === 'function') {
+                    debtList.refresh();
+                }
+                // Emitir evento global para que otros componentes se actualicen
+                window.dispatchEvent(new CustomEvent('ui:refresh'));
+            });
+        }
+        modal.open(opener);
+    }
+
+    async openImportModal(opener) {
+        let modal = this.shadowRoot.getElementById('importDataModal');
+        if (!modal) {
+            modal = document.createElement('import-data-modal');
+            modal.id = 'importDataModal';
+            this.shadowRoot.appendChild(modal);
+            
+            // Escuchar el evento de datos importados para refrescar la vista
+            modal.addEventListener('data-imported', () => {
+                // Refrescar la lista de deudas
+                const debtList = this.shadowRoot.querySelector('debt-list');
+                if (debtList && typeof debtList.refresh === 'function') {
+                    debtList.refresh();
+                }
+                // Emitir evento global para que otros componentes se actualicen
+                window.dispatchEvent(new CustomEvent('ui:refresh'));
+            });
         }
         modal.open(opener);
     }

@@ -33,6 +33,10 @@ export class HeaderBar extends HTMLElement {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('export-data', { bubbles: true, composed: true }));
         });
+        this.shadowRoot.getElementById('import-data').addEventListener('click', (e) => {
+            e.preventDefault();
+            this.dispatchEvent(new CustomEvent('import-data', { bubbles: true, composed: true }));
+        });
         this.shadowRoot.getElementById('dashboard-btn').addEventListener('click', (e) => {
             e.preventDefault();
             window.history.pushState({}, '', '/');
@@ -102,6 +106,9 @@ export class HeaderBar extends HTMLElement {
                     </app-button>
                     <app-button id="export-data" type="button" title="Exportar datos">
                         <img src="./src/components/icons/ExportIcon.svg" alt="Exportar" width="15" height="15" style="vertical-align:middle;" />
+                    </app-button>
+                    <app-button id="import-data" type="button" title="Importar datos">
+                        <img src="./src/components/icons/ImportIcon.svg" alt="Importar" width="15" height="15" style="vertical-align:middle;" />
                     </app-button>
                 </div>
             </div>
