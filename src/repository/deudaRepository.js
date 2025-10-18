@@ -79,7 +79,8 @@ export function updateDeuda(deudaModel) {
                         monto: monto.monto,
                         moneda: monto.moneda,
                         vencimiento: monto.vencimiento,
-                        periodo: monto.periodo
+                        periodo: monto.periodo,
+                        pagado: monto.pagado || false
                     });
                     if (monto.id) {
                         montoEntity.id = monto.id;
