@@ -109,12 +109,7 @@ export class ImportDataModal extends HTMLElement {
                     ${deudas.length > 3 ? `<p>... y ${deudas.length - 3} más</p>` : ''}
                 </div>
                 
-                <div class="import-warning">
-                    <p>⚠️ <strong>Importante:</strong></p>
-                    <p>• La importación agregará estos datos a los existentes</p>
-                    <p>• No se eliminará ningún dato actual</p>
-                    <p>• Pueden crearse duplicados si importas el mismo archivo varias veces</p>
-                </div>
+                
             </div>
         `;
 
@@ -242,36 +237,30 @@ export class ImportDataModal extends HTMLElement {
                     border: 2px dashed #ccc;
                     border-radius: 8px;
                     margin-bottom: 16px;
-                    background-color: #f9f9f9;
                 }
 
                 .file-selection p {
                     margin: 0 0 16px 0;
-                    color: #666;
                 }
 
                 .file-content {
                     margin: 16px 0;
-                    max-height: 300px;
-                    overflow-y: auto;
                 }
 
                 .import-preview {
                     border: 1px solid #ddd;
                     border-radius: 8px;
                     padding: 16px;
-                    background-color: #f8f9fa;
                 }
 
                 .import-preview h3 {
                     margin-top: 0;
-                    color: #333;
+                    color: #ddd;
                 }
 
                 .preview-stats {
                     margin: 12px 0;
                     padding: 12px;
-                    background-color: #e3f2fd;
                     border-radius: 4px;
                 }
 
@@ -286,7 +275,6 @@ export class ImportDataModal extends HTMLElement {
                 .preview-item {
                     padding: 8px;
                     margin: 4px 0;
-                    background-color: white;
                     border-radius: 4px;
                     border-left: 3px solid #4b6cb7;
                 }
@@ -294,9 +282,9 @@ export class ImportDataModal extends HTMLElement {
                 .import-warning {
                     margin: 12px 0;
                     padding: 12px;
-                    background-color: #fff3cd;
                     border: 1px solid #ffeaa7;
                     border-radius: 4px;
+                    max-width: 600px;
                 }
 
                 .import-warning p {
@@ -307,8 +295,7 @@ export class ImportDataModal extends HTMLElement {
                     display: none;
                     gap: 12px;
                     margin-top: 16px;
-                    padding-top: 16px;
-                    border-top: 1px solid #eee;
+                    padding-top: 16px;                }
                 }
 
                 .import-status {
@@ -319,7 +306,6 @@ export class ImportDataModal extends HTMLElement {
                 .success-message {
                     color: green;
                     padding: 12px;
-                    background-color: #f0f8f0;
                     border: 1px solid green;
                     border-radius: 4px;
                 }
@@ -327,7 +313,6 @@ export class ImportDataModal extends HTMLElement {
                 .error-message {
                     color: red;
                     padding: 12px;
-                    background-color: #fdf0f0;
                     border: 1px solid red;
                     border-radius: 4px;
                 }
@@ -335,7 +320,6 @@ export class ImportDataModal extends HTMLElement {
                 .warning-message {
                     color: #856404;
                     padding: 12px;
-                    background-color: #fff3cd;
                     border: 1px solid #ffeaa7;
                     border-radius: 4px;
                 }
@@ -345,7 +329,6 @@ export class ImportDataModal extends HTMLElement {
                     align-items: center;
                     gap: 12px;
                     padding: 12px;
-                    background-color: #e3f2fd;
                     border: 1px solid #2196f3;
                     border-radius: 4px;
                 }
@@ -379,6 +362,38 @@ export class ImportDataModal extends HTMLElement {
                         <app-button id="select-file-btn" variant="primary">
                             Seleccionar archivo
                         </app-button>
+                    </div>
+                    <div class="import-warning">
+                        <p>⚠️ <strong>Importante:</strong></p>
+                        <ul>
+                            <li>La importación añade datos (no elimina):
+                                <ul>
+                                    <li>Por defecto no borra registros existentes.</li>
+                                </ul>
+                            </li>
+                            <li>Fusión por grupo (Acreedor + Tipo de Deuda):
+                                <ul>
+                                    <li>Si existe el mismo Acreedor y Tipo de Deuda (p. ej. <strong>Banco Galicia</strong> + <strong>Préstamo</strong>), las cuotas se agrupan en esa deuda en vez de crear otra.</li>
+                                </ul>
+                            </li>
+                            <li>Detección de montos duplicados:
+                                <ul>
+                                    <li>Se consideran iguales si coinciden: <strong>monto</strong>, <strong>moneda</strong> y <strong>periodo</strong>.</li>
+                                    <li>Fallback: si no hay periodo, se compara <em>vencimiento</em> exacto.</li>
+                                    <li>Mismo monto pero distinta fecha → se importa como monto distinto.</li>
+                                </ul>
+                            </li>
+                            <li>Forzar nuevo grupo:
+                                <ul>
+                                    <li>Cambia el <em>acreedor</em> o el <em>tipoDeuda</em> en el JSON antes de importar.</li>
+                                </ul>
+                            </li>
+                            <li>Nota técnica (breve):
+                                <ul>
+                                    <li>La fusión reutiliza las funciones de creación/actualización; puede ejecutarse en varias transacciones (muy raro que cause duplicados por concurrencia).</li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                     
                     <div class="file-content"></div>
