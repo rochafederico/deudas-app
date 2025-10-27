@@ -40,6 +40,97 @@ export function addDeuda(deudaModel) {
     });
 }
 
+/**
+ * Agrega una deuda o, si existe una deuda con el mismo acreedor+tipoDeuda,
+ * fusiona los montos evitando duplicados.
+ * Retorna el id de la deuda (nuevo o existente).
+ */
+export function addOrMergeDeuda(deudaModel) {
+    const db = getDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const deudasStore = transaction.objectStore(DEUDAS_STORE);
+        const montosStore = transaction.objectStore(MONTOS_STORE);
+
+        // Obtener todas las deudas para buscar coincidencia por acreedor+tipoDeuda
+        const getAllReq = deudasStore.getAll();
+        getAllReq.onsuccess = () => {
+            const existing = (getAllReq.result || []).find(d => {
+                const a = (d.acreedor || '').toString().trim().toLowerCase();
+                const t = (d.tipoDeuda || '').toString().trim().toLowerCase();
+                const a2 = (deudaModel.acreedor || '').toString().trim().toLowerCase();
+                const t2 = (deudaModel.tipoDeuda || '').toString().trim().toLowerCase();
+                return a === a2 && t === t2;
+            });
+
+            if (!existing) {
+                // No existe: delegar a addDeuda para evitar duplicar la lógica de inserción
+                // addDeuda retornará una promesa que resuelve con el id creado
+                addDeuda(deudaModel).then(resolve).catch(reject);
+                return;
+            }
+
+            // Si existe: obtener montos actuales y fusionar usando updateDeuda
+            const existingId = existing.id;
+            const index = montosStore.index('by_deudaId');
+            const getMontosReq = index.getAll(existingId);
+            getMontosReq.onsuccess = () => {
+                const montosActuales = getMontosReq.result || [];
+                const incoming = deudaModel.montos || [];
+
+                // Helper para comparar igualdad de montos (monto, moneda, periodo/vencimiento)
+                const montoEqual = (a, b) => {
+                    const ma = Number(a.monto);
+                    const mb = Number(b.monto);
+                    if (ma !== mb) return false;
+                    if ((a.moneda || 'ARS') !== (b.moneda || 'ARS')) return false;
+                    const pa = a.periodo || (a.vencimiento ? a.vencimiento.slice(0,7) : '');
+                    const pb = b.periodo || (b.vencimiento ? b.vencimiento.slice(0,7) : '');
+                    if (pa && pb) {
+                        if (pa === pb) return true;
+                    }
+                    // Fallback: comparar vencimiento exacto
+                    if (a.vencimiento && b.vencimiento && a.vencimiento === b.vencimiento) return true;
+                    return false;
+                };
+
+                // Filtrar incoming para quedarnos sólo con montos que no están en montosActuales
+                const nuevosMontos = incoming.filter(inc => {
+                    return !montosActuales.some(actual => montoEqual(actual, inc));
+                });
+
+                // Construir la unión: montos actuales (con id) + nuevos montos (sin id)
+                const unionMontos = montosActuales.concat(nuevosMontos.map(m => ({
+                    monto: m.monto,
+                    moneda: m.moneda,
+                    vencimiento: m.vencimiento,
+                    periodo: m.periodo,
+                    pagado: m.pagado || false
+                })));
+
+                // Delegar la lógica de sincronización/actualización a updateDeuda
+                updateDeuda({
+                    id: existingId,
+                    acreedor: deudaModel.acreedor,
+                    tipoDeuda: deudaModel.tipoDeuda,
+                    notas: deudaModel.notas,
+                    montos: unionMontos
+                }).then(() => {
+                    resolve(existingId);
+                }).catch(err => {
+                    reject(err);
+                });
+            };
+            getMontosReq.onerror = (event) => {
+                reject('Error getting montos for merge: ' + event.target.errorCode);
+            };
+        };
+        getAllReq.onerror = (event) => {
+            reject('Error reading deudas: ' + event.target.errorCode);
+        };
+    });
+}
+
 export function updateDeuda(deudaModel) {
     // Validación: el id debe existir
     if (!deudaModel.id) {
