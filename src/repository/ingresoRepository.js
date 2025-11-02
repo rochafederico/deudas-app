@@ -57,20 +57,3 @@ export function sumIngresosByMonth({ mes } = {}) {
     });
 }
 
-export function sumIngresosByYear(year) {
-    return _withIngresosStore('readonly', (store, resolve, reject) => {
-        const index = store.index('by_periodo');
-        const request = index.getAll();
-        request.onsuccess = () => {
-            const rows = request.result || [];
-            const totals = {};
-            rows.forEach(r => {
-                if (r.periodo && r.periodo.slice(0, 4) === String(year)) {
-                    totals[r.moneda] = (totals[r.moneda] || 0) + (Number(r.monto) || 0);
-                }
-            });
-            resolve(totals);
-        };
-        request.onerror = (e) => reject('Error summing ingresos by year: ' + e.target.errorCode);
-    });
-}
