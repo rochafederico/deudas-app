@@ -109,8 +109,8 @@ export class HeaderBar extends HTMLElement {
                     </app-input>
                 </div>
                 <div class="actions">
-                    <app-button id="add-debt" type="button" variant="success" title="Agregar deuda" aria-label="Agregar deuda">
-                        <img src="./src/components/icons/AddIcon.svg" alt="Agregar" width="15" height="15" style="vertical-align:middle;" />
+                    <app-button id="add-debt" type="button" variant="delete" title="Agregar deuda" aria-label="Agregar deuda">
+                        <img src="./src/components/icons/DebtIcon.svg" alt="Agregar deuda" width="15" height="15" style="vertical-align:middle;" />
                     </app-button>
                     <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
                         <img src="./src/components/icons/AddIcon.svg" alt="Agregar ingreso" width="15" height="15" style="vertical-align:middle;transform:rotate(90deg);" />

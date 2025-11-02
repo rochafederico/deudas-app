@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DebtIcon: solo el signo peso '$' como texto blanco, centrado y sin padding -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="24" height="24" role="img" aria-label="Icono deuda">
+  <title>Signo peso</title>
+  <!-- Texto centrado; font-size igual al alto del viewBox para minimizar márgenes -->
+  <text x="8" y="8" text-anchor="middle" font-size="16" fill="#ffffff" style="font-family: Arial, Helvetica, sans-serif; font-weight:900;" dominant-baseline="central">$</text>
+</svg>
