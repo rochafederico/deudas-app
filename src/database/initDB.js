@@ -1,5 +1,5 @@
 // src/database/initDB.js
-import { DEUDAS_STORE, MONTOS_STORE, DB_NAME, VERSION } from './schema.js';
+import { DEUDAS_STORE, MONTOS_STORE, INGRESOS_STORE, DB_NAME, VERSION } from './schema.js';
 
 let db;
 
@@ -19,6 +19,12 @@ export function initDB() {
                 const montosStore = db.createObjectStore(MONTOS_STORE, { keyPath: 'id', autoIncrement: true });
                 montosStore.createIndex('by_deudaId', 'deudaId');
                 montosStore.createIndex('by_periodo', 'periodo');
+            }
+            // Crear store para ingresos
+            if (!db.objectStoreNames.contains(INGRESOS_STORE)) {
+                const ingresosStore = db.createObjectStore(INGRESOS_STORE, { keyPath: 'id', autoIncrement: true });
+                ingresosStore.createIndex('by_periodo', 'periodo');
+                ingresosStore.createIndex('by_fecha', 'fecha');
             }
         };
         request.onsuccess = (event) => {

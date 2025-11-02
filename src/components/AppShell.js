@@ -1,4 +1,5 @@
 import './DebtModal.js';
+import './IngresoModal.js';
 import './AppInput.js';
 import './ExportDataModal.js';
 import './ImportDataModal.js';
@@ -55,6 +56,16 @@ export class AppShell extends HTMLElement {
             const modal = this.shadowRoot.querySelector('#debtModal');
             modal.openCreate();
             modal.attachOpener(header.shadowRoot.getElementById('add-debt'));
+        });
+        header.addEventListener('add-income', () => {
+            let modal = this.shadowRoot.querySelector('#ingresoModal');
+            if (!modal) {
+                modal = document.createElement('ingreso-modal');
+                modal.id = 'ingresoModal';
+                this.shadowRoot.appendChild(modal);
+            }
+            modal.openCreate();
+            modal.attachOpener(header.shadowRoot.getElementById('add-income'));
         });
         header.addEventListener('export-data', () => {
             this.openExportModal(header.shadowRoot.getElementById('export-data'));

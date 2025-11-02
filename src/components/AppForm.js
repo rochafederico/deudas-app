@@ -9,6 +9,11 @@ export class AppForm extends HTMLElement {
         this._initialValues = {};
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
+        // Bind handlers once to avoid adding duplicate listeners on multiple renders
+        this._boundHandleSubmit = this.handleSubmit.bind(this);
+        this._boundCancelClick = () => {
+            this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+        };
         this.render();
     }
 
@@ -45,13 +50,14 @@ export class AppForm extends HTMLElement {
     _setupListeners() {
         this.form = this.shadowRoot.querySelector('form');
         if (this.form) {
-            this.form.addEventListener('submit', this.handleSubmit.bind(this));
+            // Remove previous listener if any, then add the bound handler once
+            try { this.form.removeEventListener('submit', this._boundHandleSubmit); } catch(e) {}
+            this.form.addEventListener('submit', this._boundHandleSubmit);
         }
         const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
         if (cancelBtn) {
-            cancelBtn.addEventListener('click', () => {
-                this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
-            });
+            try { cancelBtn.removeEventListener('click', this._boundCancelClick); } catch(e) {}
+            cancelBtn.addEventListener('click', this._boundCancelClick);
         }
     }
 

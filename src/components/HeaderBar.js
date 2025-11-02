@@ -29,6 +29,14 @@ export class HeaderBar extends HTMLElement {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('add-debt', { bubbles: true, composed: true }));
         });
+        // Botón agregar ingreso
+        const addIncomeBtn = this.shadowRoot.getElementById('add-income');
+        if (addIncomeBtn) {
+            addIncomeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.dispatchEvent(new CustomEvent('add-income', { bubbles: true, composed: true }));
+            });
+        }
         this.shadowRoot.getElementById('export-data').addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('export-data', { bubbles: true, composed: true }));
@@ -103,6 +111,9 @@ export class HeaderBar extends HTMLElement {
                 <div class="actions">
                     <app-button id="add-debt" type="button" variant="success" title="Agregar deuda" aria-label="Agregar deuda">
                         <img src="./src/components/icons/AddIcon.svg" alt="Agregar" width="15" height="15" style="vertical-align:middle;" />
+                    </app-button>
+                    <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
+                        <img src="./src/components/icons/AddIcon.svg" alt="Agregar ingreso" width="15" height="15" style="vertical-align:middle;transform:rotate(90deg);" />
                     </app-button>
                     <app-button id="export-data" type="button" title="Exportar datos">
                         <img src="./src/components/icons/ExportIcon.svg" alt="Exportar" width="15" height="15" style="vertical-align:middle;" />
