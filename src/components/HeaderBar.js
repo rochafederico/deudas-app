@@ -13,39 +13,48 @@ export class HeaderBar extends HTMLElement {
 
     connectedCallback() {
         // Mes actual
-        this.shadowRoot.getElementById('month-filter').value = this.month;
-        this.shadowRoot.getElementById('prev-month').addEventListener('click', () => this.changeMonth(-1));
-        this.shadowRoot.getElementById('next-month').addEventListener('click', () => this.changeMonth(1));
-        this.shadowRoot.getElementById('month-filter').addEventListener('change', (e) => {
+        const monthFilter = this.shadowRoot.querySelector('#month-filter');
+        const prevBtn = this.shadowRoot.querySelector('#prev-month');
+        const nextBtn = this.shadowRoot.querySelector('#next-month');
+        const groupFilter = this.shadowRoot.querySelector('#group-filter');
+        const addDebtBtn = this.shadowRoot.querySelector('#add-debt');
+        const addIncomeBtn = this.shadowRoot.querySelector('#add-income');
+        const exportBtn = this.shadowRoot.querySelector('#export-data');
+        const importBtn = this.shadowRoot.querySelector('#import-data');
+        const dashboardBtn = this.shadowRoot.querySelector('#dashboard-btn');
+
+        if (monthFilter) monthFilter.value = this.month;
+        if (prevBtn) prevBtn.addEventListener('click', () => this.changeMonth(-1));
+        if (nextBtn) nextBtn.addEventListener('click', () => this.changeMonth(1));
+        if (monthFilter) monthFilter.addEventListener('change', (e) => {
             this.month = e.target.value;
             this.emitMonthChange();
         });
         // Filtro de agrupamiento
-        this.shadowRoot.getElementById('group-filter').addEventListener('change', (e) => {
+        if (groupFilter) groupFilter.addEventListener('change', (e) => {
             this.emitGroupChange(e.target.value);
         });
         // Acciones
-        this.shadowRoot.getElementById('add-debt').addEventListener('click', (e) => {
+        if (addDebtBtn) addDebtBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('add-debt', { bubbles: true, composed: true }));
         });
         // Botón agregar ingreso
-        const addIncomeBtn = this.shadowRoot.getElementById('add-income');
         if (addIncomeBtn) {
             addIncomeBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 this.dispatchEvent(new CustomEvent('add-income', { bubbles: true, composed: true }));
             });
         }
-        this.shadowRoot.getElementById('export-data').addEventListener('click', (e) => {
+        if (exportBtn) exportBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('export-data', { bubbles: true, composed: true }));
         });
-        this.shadowRoot.getElementById('import-data').addEventListener('click', (e) => {
+        if (importBtn) importBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('import-data', { bubbles: true, composed: true }));
         });
-        this.shadowRoot.getElementById('dashboard-btn').addEventListener('click', (e) => {
+        if (dashboardBtn) dashboardBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.history.pushState({}, '', '/');
             window.dispatchEvent(new PopStateEvent('popstate'));

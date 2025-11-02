@@ -17,9 +17,19 @@ wrapper.appendChild(app);
 
 document.body.appendChild(wrapper);
 
-// Initialize the IndexedDB
-initDB().then((db) => {
+// Initialize the IndexedDB and only after DB is ready render indicators + initial route
+initDB().then(async (db) => {
     window.db = db;
+    try {
+      const { default: StatsIndicators } = await import('./components/StatsIndicators.js');
+      const indicatorsNode = StatsIndicators();
+      // Insert indicators above the app container
+      wrapper.insertBefore(indicatorsNode, app);
+    } catch (err) {
+      console.warn('No se pudo cargar StatsIndicators:', err);
+    }
+    // Inicialización de rutas después que DB esté lista y los indicadores hayan pedido datos
+    renderRoute(window.location.pathname);
 });
 
 function renderRoute(path) {
@@ -36,5 +46,4 @@ window.addEventListener('popstate', () => {
   renderRoute(window.location.pathname);
 });
 
-// Inicialización
-renderRoute(window.location.pathname);
+// Note: initial renderRoute is triggered after DB init above

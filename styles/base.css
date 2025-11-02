@@ -99,3 +99,31 @@ body.dark-mode label {
     color: var(--success);
     font-size: 0.95em;
 }
+
+/* Stats indicators styles */
+.stats-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+.stats-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    border: 1px solid var(--border-light);
+    border-radius: 8px;
+    padding: 0 16px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+}
+body.dark-mode .stats-card {
+    background: linear-gradient(180deg, rgba(34,36,37,0.95), rgba(34,36,37,0.9));
+    border: 1px solid var(--border-dark);
+}
+.stats-card-sub {
+    font-size: 0.85em;
+    color: var(--muted-light);
+}
+.stats-loading, .stats-error {
+    color: var(--muted-light);
+    padding: 8px 12px;
+}

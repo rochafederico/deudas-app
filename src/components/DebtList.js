@@ -131,46 +131,6 @@ export class DebtList extends HTMLElement {
         }
         table.columnsConfig = columns;
         table.tableData = tableData;
-
-        // Pasar función para renderizar el footer con totales pagados y pendientes
-        table.footerRenderer = (columns, data) => {
-            let leyendaPendiente = '💰 Pendiente: ';
-            let leyendaPagado = '✅ Pagado: ';
-            const totalesPendientes = this.totalesPendientes || {};
-            const totalesPagados = this.totalesPagados || {};
-            if (Object.keys(totalesPendientes).length === 0) {
-                leyendaPendiente += '🟢 Sin deudas pendientes.';
-            } else {
-                leyendaPendiente += Object.entries(totalesPendientes)
-                    .map(([moneda, total]) => {
-                        let emoji = '';
-                        if (moneda === 'ARS') emoji = '🇦🇷';
-                        else if (moneda === 'USD') emoji = '🇺🇸';
-                        else emoji = '💱';
-                        return `${emoji} ${this.fmtMoneda(moneda, total)}`;
-                    })
-                    .join(' | ');
-            }
-            if (Object.keys(totalesPagados).length === 0) {
-                leyendaPagado += '—';
-            } else {
-                leyendaPagado += Object.entries(totalesPagados)
-                    .map(([moneda, total]) => {
-                        let emoji = '';
-                        if (moneda === 'ARS') emoji = '🇦🇷';
-                        else if (moneda === 'USD') emoji = '🇺🇸';
-                        else emoji = '💱';
-                        return `${emoji} ${this.fmtMoneda(moneda, total)}`;
-                    })
-                    .join(' | ');
-            }
-            const columnsCount = columns.length;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td colspan="${columnsCount}" style="text-align:right;font-weight:bold;color:var(--accent);">
-                ${leyendaPendiente}<br>${leyendaPagado}
-            </td>`;
-            return tr;
-        };
     }
 
     toggleEstado(id) {
