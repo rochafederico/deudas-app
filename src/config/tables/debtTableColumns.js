@@ -7,10 +7,10 @@ export const debtTableColumns = [
     { key: 'acreedor', label: 'Acreedor' },
     { key: 'tipoDeuda', label: 'Tipo' },
     { key: 'vencimiento', label: 'Vencimiento' },
-    { key: 'moneda', label: 'Moneda' },
-    { key: 'monto', label: 'Monto', render: row => {
-        // El formateo de moneda se debe pasar como función desde el componente
-        return row._fmtMoneda ? row._fmtMoneda(row.moneda, row.monto) : row.monto;
+    { key: 'monedaymonto', label: 'Moneda/Monto', render: row => {
+        const monedaLabel = row.moneda || '';
+        const monto = row._fmtMoneda ? row._fmtMoneda(row.moneda, row.monto) : row.monto;
+        return `${monedaLabel} ${monto}`;
     } },
     {
         key: 'acciones',
