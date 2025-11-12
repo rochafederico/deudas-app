@@ -15,6 +15,7 @@ const app = document.createElement('div');
 app.id = 'app';
 wrapper.appendChild(app);
 
+
 document.body.appendChild(wrapper);
 
 // Initialize the IndexedDB and only after DB is ready render indicators + initial route
@@ -31,6 +32,7 @@ initDB().then(async (db) => {
     // Inicialización de rutas después que DB esté lista y los indicadores hayan pedido datos
     renderRoute(window.location.pathname);
 });
+
 
 function renderRoute(path) {
   const root = document.getElementById('app');

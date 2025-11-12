@@ -47,3 +47,9 @@ export const debtTableColumns = [
         }
     }
 ];
+
+export const ingresosColumns = [
+    { key: 'fecha', label: 'Fecha' },
+    { key: 'descripcion', label: 'Descripción' },
+    { key: 'monto', label: 'Monto' },
+];
