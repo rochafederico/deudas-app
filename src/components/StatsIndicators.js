@@ -26,10 +26,10 @@ export default function StatsIndicators({ mes } = {}) {
           .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`)
           .join('<br/>');
       }
-      const ingresosCard = StatsCard({ title: 'Ingresos del mes', subtitle: 'Total registrado por moneda', value: addValue(summary.byCurrency.ingresos), color: 'var(--success)' });
-      const egresosCard = StatsCard({ title: 'Gastos del mes', subtitle: 'Gastos acumulados por moneda', value: addValue(summary.byCurrency.egresos), color: '#d9534f' });
-      const saldoCard = StatsCard({ title: 'Balance del mes', subtitle: 'Diferencia entre ingresos y egresos', value: addValue(summary.byCurrency.saldo), color: 'var(--dark)' });
-      const pendienteCard = StatsCard({ title: 'Total a pagar', subtitle: 'Compromisos pendientes de pago', value: addValue(summary.byCurrency.pendientes), color: '#f0ad4e' });
+      const ingresosCard = StatsCard({ title: 'Ingresos del mes' , value: addValue(summary.byCurrency.ingresos), color: 'var(--success)' });
+      const egresosCard = StatsCard({ title: 'Gastos del mes',value: addValue(summary.byCurrency.egresos), color: '#d9534f' });
+      const saldoCard = StatsCard({ title: 'Balance del mes',  value: addValue(summary.byCurrency.saldo), color: 'var(--dark)' });
+      const pendienteCard = StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), color: '#f0ad4e' });
 
       container.appendChild(ingresosCard);
       container.appendChild(egresosCard);
