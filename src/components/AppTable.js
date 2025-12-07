@@ -51,11 +51,16 @@ export class AppTable extends HTMLElement {
                 th:last-child, td:last-child { text-align: right; }
                 tr:hover { background-color: #f1f1f1; }
                 :host-context(body.dark-mode) tr:hover { background-color: #222a3a; }
+                @media (max-width: 600px) {
+                    .hidden-mobile {
+                        display: none !important;
+                    }
+                }
             </style>
             <table>
                 <thead>
                     <tr>
-                        ${this.columns.map(col => `<th>${col.label}</th>`).join('')}
+                        ${this.columns.map(col => `<th${col.opts && col.opts.classCss ? ` class="${col.opts.classCss}"` : ''}>${col.label}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -76,8 +81,11 @@ export class AppTable extends HTMLElement {
         }
         this.data.forEach(row => {
             const tr = document.createElement('tr');
-            this.columns.forEach(col => {
+            this.columns.forEach((col, i) => {
                 const td = document.createElement('td');
+                if (col.opts && col.opts.classCss) {
+                    td.className = col.opts.classCss;
+                }
                 let content;
                 if (col.render) {
                     content = col.render(row);

@@ -4,9 +4,9 @@
 import { el } from '../../utils/dom.js';
 
 export const debtTableColumns = [
-    { key: 'acreedor', label: 'Acreedor' },
-    { key: 'tipoDeuda', label: 'Tipo' },
-    { key: 'vencimiento', label: 'Vencimiento' },
+    { key: 'acreedor', label: 'Acreedor'},
+    { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'hidden-mobile' } },
+    { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'hidden-mobile' } },
     { key: 'monedaymonto', label: 'Moneda/Monto', render: row => {
         const monedaLabel = row.moneda || '';
         const monto = row._fmtMoneda ? row._fmtMoneda(row.moneda, row.monto) : row.monto;
