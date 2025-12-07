@@ -42,19 +42,21 @@ export class DemoBanner extends HTMLElement {
           background: var(--accent-hover);
           color: #eaeaea;
           border-bottom: 2px solid #333;
+          display: flex;
+          flex-wrap: wrap;
         }
       </style>
       <div class="banner">
-        <div class="title">Control de deeudas</div>
+        <div class="title">Nivva</div>
         <div class="menu"><main-menu></main-menu></div>
         <div class="right"></div>
       </div>
     `;
     // Insertar el botón de modo oscuro en el lado derecho
-    const right = this.shadowRoot.querySelector('.right');
-    if (right) {
-      right.appendChild(document.createElement('dark-toggle'));
-    }
+    // const right = this.shadowRoot.querySelector('.right');
+    // if (right) {
+    //   right.appendChild(document.createElement('dark-toggle'));
+    // }
   }
 }
 customElements.define('demo-banner', DemoBanner);
