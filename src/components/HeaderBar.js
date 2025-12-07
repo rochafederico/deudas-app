@@ -90,47 +90,49 @@ export class HeaderBar extends HTMLElement {
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
         this.shadowRoot.innerHTML = `
             <style>
-                .header-bar { 
-                    display: flex; 
-                    justify-content: space-between; 
-                    align-items: center; 
-                    padding: 10px; 
-                    background-color: var(--panel-light); 
-                    color: var(--text-light);
-                    border-radius: 12px 12px 0 0; 
-                }
-                .month-nav { display: flex; align-items: center; gap: 8px; }
-                .actions { display: flex; gap: 8px; }
-                .group-filter { margin-left: 12px; min-width: 140px; }
-                /* Modo oscuro */
-                :host-context(body.dark-mode) .header-bar {
-                    background-color: var(--panel-dark);
-                    color: var(--text-dark);
-                }
+            .header-bar { 
+                display: flex; 
+                flex-wrap: wrap;
+                justify-content: space-between; 
+                align-items: center; 
+                padding: 10px; 
+                background-color: var(--panel-light); 
+                color: var(--text-light);
+                border-radius: 12px 12px 0 0; 
+                gap: 8px;
+            }
+            .month-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+            .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+            .group-filter { margin-left: 12px; min-width: 140px; }
+            /* Modo oscuro */
+            :host-context(body.dark-mode) .header-bar {
+                background-color: var(--panel-dark);
+                color: var(--text-dark);
+            }
             </style>
             <div class="header-bar">
-                <div class="month-nav">
-                    <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
-                    <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
-                    <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
-                    <app-input type="select" id="group-filter" name="group-filter" class="group-filter" title="Agrupar montos">
-                        ${optionsHtml}
-                    </app-input>
-                </div>
-                <div class="actions">
-                    <app-button id="add-debt" type="button" variant="delete" title="Agregar deuda" aria-label="Agregar deuda">
-                        Nueva deuda
-                    </app-button>
-                    <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
-                        Nuevo ingreso
-                    </app-button>
-                    <app-button id="export-data" type="button" title="Exportar datos">
-                        Exportar
-                    </app-button>
-                    <app-button id="import-data" type="button" title="Importar datos">
-                        Importar
-                    </app-button>
-                </div>
+            <div class="month-nav">
+                <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
+                <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
+                <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
+                <app-input type="select" id="group-filter" name="group-filter" class="group-filter" title="Agrupar montos">
+                ${optionsHtml}
+                </app-input>
+            </div>
+            <div class="actions">
+                <app-button id="add-debt" type="button" variant="delete" title="Agregar deuda" aria-label="Agregar deuda">
+                Nueva deuda
+                </app-button>
+                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
+                Nuevo ingreso
+                </app-button>
+                <app-button id="export-data" type="button" title="Exportar datos">
+                Exportar
+                </app-button>
+                <app-button id="import-data" type="button" title="Importar datos">
+                Importar
+                </app-button>
+            </div>
             </div>
         `;
     }
