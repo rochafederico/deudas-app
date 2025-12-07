@@ -7,7 +7,6 @@ import { ingresosColumns } from '../config/tables/debtTableColumns.js';
 export default function Ingresos() {
     let currentMes = new Date().toISOString().slice(0, 7);
     const container = document.createElement('div');
-    container.style.cssText = 'padding: 20px; max-width: 100%;';
 
     // Usar el header-bar como encabezado principal
     const headerBar = document.createElement('header-bar');
