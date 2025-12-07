@@ -59,7 +59,6 @@ input, select {
     padding: 10px;
     margin: 6px 0;
     width: 100%;
-    box-sizing: border-box;
     font-size: 1em;
     background: var(--panel-light);
     color: var(--text-light);
