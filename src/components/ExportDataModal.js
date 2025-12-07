@@ -24,8 +24,8 @@ export class ExportDataModal extends HTMLElement {
         }));
     }
 
-    #createAndDownloadJsonFile(deudas) {
-        const json = JSON.stringify({ deudas }, null, 2);
+    #createAndDownloadJsonFile(deudas, ingresos) {
+        const json = JSON.stringify({ deudas, ingresos }, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -51,9 +51,11 @@ export class ExportDataModal extends HTMLElement {
         this.modal.returnFocusTo(opener);
         setTimeout(async () => {
             const { listDeudas } = await import('../repository/deudaRepository.js');
+            const { getAll } = await import('../repository/ingresoRepository.js');
             let deudas = await listDeudas();
+            const ingresos = await getAll();
             deudas = this.#mapDeudasForExport(deudas);
-            this.#createAndDownloadJsonFile(deudas);
+            this.#createAndDownloadJsonFile(deudas, ingresos);
         }, 100);
     }
 

@@ -41,6 +41,14 @@ export function listIngresos({ mes } = {}) {
     });
 }
 
+export function getAll() {
+    return _withIngresosStore('readonly', (store, resolve, reject) => {
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject('Error getting all ingresos: ' + e.target.errorCode);
+    });
+}
+
 export function sumIngresosByMonth({ mes } = {}) {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
         const index = store.index('by_periodo');

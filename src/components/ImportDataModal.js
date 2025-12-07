@@ -17,7 +17,7 @@ export class ImportDataModal extends HTMLElement {
         this.shadowRoot.getElementById('select-file-btn').addEventListener('click', () => this.selectFile());
         this.shadowRoot.getElementById('import-btn').addEventListener('click', () => this.importDataToDb());
         this.shadowRoot.getElementById('cancel-btn').addEventListener('click', () => this.close());
-        
+
         // Crear input file oculto
         this.fileInput = document.createElement('input');
         this.fileInput.type = 'file';
@@ -44,7 +44,7 @@ export class ImportDataModal extends HTMLElement {
         try {
             const text = await file.text();
             const data = JSON.parse(text);
-            
+
             // Validar estructura del archivo
             if (!this.#validateImportData(data)) {
                 this.#showError('❌ Archivo JSON no válido. Asegúrate de que sea un backup de DeudasApp.');
@@ -68,7 +68,7 @@ export class ImportDataModal extends HTMLElement {
 
         // Verificar si tiene la estructura de deudas directamente o en data.deudas (nuevo formato)
         const deudas = data.deudas || (data.data && data.data.deudas);
-        
+
         if (!Array.isArray(deudas)) {
             return false;
         }
@@ -81,13 +81,19 @@ export class ImportDataModal extends HTMLElement {
             }
         }
 
+        const ingresos = data.ingresos || (data.data && data.data.ingresos);
+        if (ingresos && !Array.isArray(ingresos)) {
+            return false;
+        }
+
         return true;
     }
 
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
+        const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
-        
+
         const previewHtml = `
             <div class="import-preview">
                 <h3>📋 Vista previa del archivo</h3>
@@ -99,7 +105,7 @@ export class ImportDataModal extends HTMLElement {
                 </div>
                 
                 <div class="preview-items">
-                    <h4>Primeras deudas a importar:</h4>
+                    <h4>Deudas a importar:</h4>
                     ${deudas.slice(0, 3).map(deuda => `
                         <div class="preview-item">
                             <strong>${deuda.acreedor}</strong> - ${deuda.tipoDeuda}
@@ -107,6 +113,16 @@ export class ImportDataModal extends HTMLElement {
                         </div>
                     `).join('')}
                     ${deudas.length > 3 ? `<p>... y ${deudas.length - 3} más</p>` : ''}
+                </div>
+                
+                <div class="preview-items">
+                    <h4>Ingresos a importar:</h4>
+                    ${ingresos.slice(0, 3).map(ingreso => `
+                        <div class="preview-item">
+                            <strong>${ingreso.descripcion || 'Ingreso'} ${ingreso.fecha}</strong> - ${ingreso.monto} ${ingreso.moneda || 'ARS'}
+                        </div>
+                    `).join('')}
+                    ${ingresos.length > 3 ? `<p>... y ${ingresos.length - 3} más</p>` : ''}
                 </div>
                 
                 
@@ -125,10 +141,11 @@ export class ImportDataModal extends HTMLElement {
 
         try {
             this.#showProgress('Importando datos...');
-            
+
             const { addOrMergeDeuda } = await import('../repository/deudaRepository.js');
+            const { addIngreso } = await import('../repository/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
-            
+            const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
             let importedCount = 0;
             let errorCount = 0;
 
@@ -159,16 +176,27 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
+            let ingresosImported = 0;
+            let ingresosErrors = 0;
+            ingresos.forEach(async ingreso => {
+                try {
+                    await addIngreso(ingreso);
+                    ingresosImported++;
+                } catch (error) {
+                    console.error('Error al importar ingreso:', ingreso, error);
+                    ingresosErrors++;
+                }
+            });
             // Mostrar resultado
             if (errorCount === 0) {
-                this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas importadas`);
+                this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas importadas, ${ingresosImported} ingresos importados`);
             } else {
                 this.#showWarning(`⚠️ Importación parcial: ${importedCount} exitosas, ${errorCount} errores`);
             }
 
             // Refrescar la vista después de la importación
             setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('data-imported', { 
+                window.dispatchEvent(new CustomEvent('data-imported', {
                     bubbles: true,
                     detail: { imported: importedCount, errors: errorCount }
                 }));
@@ -211,7 +239,7 @@ export class ImportDataModal extends HTMLElement {
         this.modal.setTitle('Importar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
-        
+
         // Reset state
         this.importData = null;
         this.shadowRoot.querySelector('.file-content').innerHTML = '';
