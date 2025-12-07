@@ -18,7 +18,8 @@ export class ExportDataModal extends HTMLElement {
                 monto: m.monto,
                 moneda: m.moneda,
                 vencimiento: m.vencimiento,
-                periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : '')
+                periodo: m.periodo || (m.vencimiento ? m.vencimiento.slice(0, 7) : ''),
+                pagado: m.pagado,
             }))
         }));
     }
