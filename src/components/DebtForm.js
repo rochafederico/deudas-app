@@ -198,7 +198,18 @@ export class DebtForm extends HTMLElement {
                             on: {
                                 click: () => this.openDuplicateMontoModal(monto, idx)
                             }
-                        })
+                        }),
+                        (() => {
+                            const id = `app-checkbox-${monto.id}`;
+                            const appCheckbox = document.createElement('app-checkbox');
+                            appCheckbox.inputId = id;
+                            appCheckbox.checked = !!monto.pagado;
+                            appCheckbox.title = 'Marcar como pagado';
+                            appCheckbox.addEventListener('checkbox-change', async (e) => {
+                                monto.pagado = e.detail.checked;
+                            });
+                            return appCheckbox;
+                        })()
                     ]
                 }
             ];
