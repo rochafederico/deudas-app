@@ -21,7 +21,6 @@ export class DemoBanner extends HTMLElement {
           font-size: 1.1em;
           font-weight: 600;
           width: 100vw;
-          box-sizing: border-box;
           box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
         .title {
