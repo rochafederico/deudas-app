@@ -119,16 +119,16 @@ export class HeaderBar extends HTMLElement {
                 </div>
                 <div class="actions">
                     <app-button id="add-debt" type="button" variant="delete" title="Agregar deuda" aria-label="Agregar deuda">
-                        <img src="./src/components/icons/DebtIcon.svg" alt="Agregar deuda" width="15" height="15" style="vertical-align:middle;" />
+                        Nueva deuda
                     </app-button>
                     <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
-                        <img src="./src/components/icons/AddIcon.svg" alt="Agregar ingreso" width="15" height="15" style="vertical-align:middle;transform:rotate(90deg);" />
+                        Nuevo ingreso
                     </app-button>
                     <app-button id="export-data" type="button" title="Exportar datos">
-                        <img src="./src/components/icons/ExportIcon.svg" alt="Exportar" width="15" height="15" style="vertical-align:middle;" />
+                        Exportar
                     </app-button>
                     <app-button id="import-data" type="button" title="Importar datos">
-                        <img src="./src/components/icons/ImportIcon.svg" alt="Importar" width="15" height="15" style="vertical-align:middle;" />
+                        Importar
                     </app-button>
                 </div>
             </div>
