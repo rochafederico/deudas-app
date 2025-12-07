@@ -27,7 +27,8 @@ export function addDeuda(deudaModel) {
                         deudaId,
                         monto: monto.monto,
                         moneda: monto.moneda,
-                        vencimiento: monto.vencimiento
+                        vencimiento: monto.vencimiento,
+                        pagado: !!monto.pagado
                     });
                     montosStore.add(montoEntity);
                 });
@@ -105,7 +106,7 @@ export function addOrMergeDeuda(deudaModel) {
                     moneda: m.moneda,
                     vencimiento: m.vencimiento,
                     periodo: m.periodo,
-                    pagado: m.pagado || false
+                    pagado: !!m.pagado
                 })));
 
                 // Delegar la lógica de sincronización/actualización a updateDeuda
@@ -171,7 +172,7 @@ export function updateDeuda(deudaModel) {
                         moneda: monto.moneda,
                         vencimiento: monto.vencimiento,
                         periodo: monto.periodo,
-                        pagado: monto.pagado || false
+                        pagado: !!monto.pagado
                     });
                     if (monto.id) {
                         montoEntity.id = monto.id;
