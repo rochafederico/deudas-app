@@ -73,6 +73,18 @@ export class AppShell extends HTMLElement {
         header.addEventListener('import-data', () => {
             this.openImportModal(header.shadowRoot.getElementById('import-data'));
         });
+        header.addEventListener('delete-data', async () => {
+            const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
+            if (confirmed) {
+                try {
+                    const { deleteDeudas } = await import('../repository/deudaRepository.js');
+                    await deleteDeudas();
+                } catch (error) {
+                    console.error('Error al eliminar los datos:', error);
+                }
+                window.dispatchEvent(new CustomEvent('ui:refresh'));
+            }
+        });
 
         const panel = document.createElement('div');
         panel.className = 'panel';
@@ -107,7 +119,7 @@ export class AppShell extends HTMLElement {
             modal = document.createElement('import-data-modal');
             modal.id = 'importDataModal';
             this.shadowRoot.appendChild(modal);
-            
+
             // Escuchar el evento de datos importados para refrescar la vista
             window.addEventListener('data-imported', () => {
                 // Refrescar la lista de deudas
@@ -128,7 +140,7 @@ export class AppShell extends HTMLElement {
             modal = document.createElement('import-data-modal');
             modal.id = 'importDataModal';
             this.shadowRoot.appendChild(modal);
-            
+
             // Escuchar el evento de datos importados para refrescar la vista
             modal.addEventListener('data-imported', () => {
                 // Refrescar la lista de deudas

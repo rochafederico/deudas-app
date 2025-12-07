@@ -277,3 +277,26 @@ export function listDeudas() {
         };
     });
 }
+
+export function deleteDeudas() {
+    return new Promise((resolve, reject) => {
+
+        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+        const deudasStore = transaction.objectStore(DEUDAS_STORE);
+        const montosStore = transaction.objectStore(MONTOS_STORE);
+
+        const clearMontosRequest = montosStore.clear();
+        clearMontosRequest.onsuccess = () => {
+            const clearDeudasRequest = deudasStore.clear();
+            clearDeudasRequest.onsuccess = () => {
+                resolve();
+            };
+            clearDeudasRequest.onerror = (event) => {
+                reject('Error clearing deudas: ' + event.target.errorCode);
+            };
+        };
+        clearMontosRequest.onerror = (event) => {
+            reject('Error clearing montos: ' + event.target.errorCode);
+        }
+    });
+}

@@ -21,6 +21,7 @@ export class HeaderBar extends HTMLElement {
         const addIncomeBtn = this.shadowRoot.querySelector('#add-income');
         const exportBtn = this.shadowRoot.querySelector('#export-data');
         const importBtn = this.shadowRoot.querySelector('#import-data');
+        const deleteBtn = this.shadowRoot.querySelector('#delete-data');
         const dashboardBtn = this.shadowRoot.querySelector('#dashboard-btn');
 
         if (monthFilter) monthFilter.value = this.month;
@@ -53,6 +54,10 @@ export class HeaderBar extends HTMLElement {
         if (importBtn) importBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('import-data', { bubbles: true, composed: true }));
+        });
+        if (deleteBtn) deleteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            this.dispatchEvent(new CustomEvent('delete-data', { bubbles: true, composed: true }));
         });
         if (dashboardBtn) dashboardBtn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -120,17 +125,20 @@ export class HeaderBar extends HTMLElement {
                 </app-input>
             </div>
             <div class="actions">
-                <app-button id="add-debt" type="button" variant="delete" title="Agregar deuda" aria-label="Agregar deuda">
-                Nueva deuda
-                </app-button>
                 <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
                 Nuevo ingreso
+                </app-button>
+                <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda">
+                Nueva deuda
                 </app-button>
                 <app-button id="export-data" type="button" title="Exportar datos">
                 Exportar
                 </app-button>
                 <app-button id="import-data" type="button" title="Importar datos">
                 Importar
+                </app-button>
+                <app-button id="delete-data" type="button" variant="delete" title="Eliminar datos">
+                Eliminar todo
                 </app-button>
             </div>
             </div>
