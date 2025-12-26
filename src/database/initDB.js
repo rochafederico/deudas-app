@@ -32,7 +32,7 @@ export function initDB() {
             resolve(db);
         };
         request.onerror = (event) => {
-            reject('Error opening database: ' + event.target.errorCode);
+            reject(new Error('Error opening database: ' + event.target.errorCode));
         };
     });
 }

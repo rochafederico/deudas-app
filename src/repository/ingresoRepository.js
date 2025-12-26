@@ -21,7 +21,7 @@ export function addIngreso(ingresoModel) {
         const entity = new IngresoEntity(ingresoModel);
         const request = store.add(entity);
         request.onsuccess = () => resolve(request.result);
-        request.onerror = (e) => reject('Error adding ingreso: ' + e.target.errorCode);
+        request.onerror = (e) => reject(new Error('Error adding ingreso: ' + e.target.errorCode));
     });
 }
 
@@ -31,12 +31,12 @@ export function listIngresos({ mes } = {}) {
             const index = store.index('by_periodo');
             const req = mes ? index.getAll(mes) : index.getAll();
             req.onsuccess = () => resolve(req.result);
-            req.onerror = (e) => reject('Error listing ingresos: ' + e.target.errorCode);
+            req.onerror = (e) => reject(new Error('Error listing ingresos: ' + e.target.errorCode));
         } catch (err) {
             // Fallback: no índice
             const req = store.getAll();
             req.onsuccess = () => resolve(req.result);
-            req.onerror = (e) => reject('Error listing ingresos: ' + e.target.errorCode);
+            req.onerror = (e) => reject(new Error('Error listing ingresos: ' + e.target.errorCode));
         }
     });
 }
@@ -45,7 +45,7 @@ export function getAll() {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
         const req = store.getAll();
         req.onsuccess = () => resolve(req.result);
-        req.onerror = (e) => reject('Error getting all ingresos: ' + e.target.errorCode);
+        req.onerror = (e) => reject(new Error('Error getting all ingresos: ' + e.target.errorCode));
     });
 }
 
@@ -61,7 +61,7 @@ export function sumIngresosByMonth({ mes } = {}) {
             });
             resolve(totals);
         };
-        request.onerror = (e) => reject('Error summing ingresos: ' + e.target.errorCode);
+        request.onerror = (e) => reject(new Error('Error summing ingresos: ' + e.target.errorCode));
     });
 }
 

@@ -35,9 +35,9 @@ export function addDeuda(deudaModel) {
             }
             resolve(deudaId);
         };
-        deudaRequest.onerror = (event) => {
-            reject('Error adding deuda: ' + event.target.errorCode);
-        };
+            deudaRequest.onerror = (event) => {
+                reject(new Error('Error adding deuda: ' + event.target.errorCode));
+            };
     });
 }
 
@@ -123,12 +123,12 @@ export function addOrMergeDeuda(deudaModel) {
                 });
             };
             getMontosReq.onerror = (event) => {
-                reject('Error getting montos for merge: ' + event.target.errorCode);
-            };
+                    reject(new Error('Error getting montos for merge: ' + event.target.errorCode));
+                };
         };
         getAllReq.onerror = (event) => {
-            reject('Error reading deudas: ' + event.target.errorCode);
-        };
+                reject(new Error('Error reading deudas: ' + event.target.errorCode));
+            };
     });
 }
 
@@ -183,9 +183,9 @@ export function updateDeuda(deudaModel) {
                 });
                 resolve();
             };
-            getMontos.onerror = (event) => {
-                reject('Error updating montos: ' + event.target.errorCode);
-            };
+                getMontos.onerror = (event) => {
+                    reject(new Error('Error updating montos: ' + event.target.errorCode));
+                };
         };
         deudaRequest.onerror = (event) => {
             reject('Error updating deuda: ' + event.target.errorCode);
@@ -208,13 +208,13 @@ export function deleteDeuda(id) {
                 keys.forEach(key => montosStore.delete(key));
                 resolve();
             };
-            getMontos.onerror = (event) => {
-                reject('Error deleting montos: ' + event.target.errorCode);
-            };
+                getMontos.onerror = (event) => {
+                    reject(new Error('Error deleting montos: ' + event.target.errorCode));
+                };
         };
         deudaRequest.onerror = (event) => {
-            reject('Error deleting deuda: ' + event.target.errorCode);
-        };
+                reject(new Error('Error deleting deuda: ' + event.target.errorCode));
+            };
     });
 }
 
@@ -237,13 +237,13 @@ export function getDeuda(id) {
                 deuda.montos = montosRequest.result;
                 resolve(deuda);
             };
-            montosRequest.onerror = (event) => {
-                reject('Error getting montos: ' + event.target.errorCode);
-            };
+                montosRequest.onerror = (event) => {
+                    reject(new Error('Error getting montos: ' + event.target.errorCode));
+                };
         };
         deudaRequest.onerror = (event) => {
-            reject('Error getting deuda: ' + event.target.errorCode);
-        };
+                reject(new Error('Error getting deuda: ' + event.target.errorCode));
+            };
     });
 }
 
@@ -269,9 +269,9 @@ export function listDeudas() {
                 });
                 resolve(deudas);
             };
-            montosRequest.onerror = (event) => {
-                reject('Error getting montos: ' + event.target.errorCode);
-            };
+                montosRequest.onerror = (event) => {
+                    reject(new Error('Error getting montos: ' + event.target.errorCode));
+                };
         };
         deudasRequest.onerror = (event) => {
             reject('Error getting deudas: ' + event.target.errorCode);
