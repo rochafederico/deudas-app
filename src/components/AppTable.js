@@ -81,7 +81,7 @@ export class AppTable extends HTMLElement {
         }
         this.data.forEach(row => {
             const tr = document.createElement('tr');
-            this.columns.forEach((col, i) => {
+            this.columns.forEach(col => {
                 const td = document.createElement('td');
                 if (col.opts && col.opts.classCss) {
                     td.className = col.opts.classCss;
