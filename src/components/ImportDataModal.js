@@ -178,27 +178,32 @@ export class ImportDataModal extends HTMLElement {
 
             let ingresosImported = 0;
             let ingresosErrors = 0;
-            ingresos.forEach(async ingreso => {
-                try {
-                    await addIngreso(ingreso);
-                    ingresosImported++;
-                } catch (error) {
-                    console.error('Error al importar ingreso:', ingreso, error);
-                    ingresosErrors++;
+            if (ingresos && ingresos.length > 0) {
+                this.#showProgress('Importando ingresos...');
+                for (const ingreso of ingresos) {
+                    try {
+                        await addIngreso(ingreso);
+                        ingresosImported++;
+                    } catch (error) {
+                        console.error('Error al importar ingreso:', ingreso, error);
+                        ingresosErrors++;
+                    }
                 }
-            });
-            // Mostrar resultado
-            if (errorCount === 0) {
+            }
+
+            // Mostrar resultado combinando errores de deudas e ingresos
+            const totalErrors = errorCount + ingresosErrors;
+            if (totalErrors === 0) {
                 this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas importadas, ${ingresosImported} ingresos importados`);
             } else {
-                this.#showWarning(`⚠️ Importación parcial: ${importedCount} exitosas, ${errorCount} errores`);
+                this.#showWarning(`⚠️ Importación parcial: ${importedCount} deudas importadas (${errorCount} errores), ${ingresosImported} ingresos importados (${ingresosErrors} errores)`);
             }
 
             // Refrescar la vista después de la importación
             setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('data-imported', {
                     bubbles: true,
-                    detail: { imported: importedCount, errors: errorCount }
+                    detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors }
                 }));
                 this.close();
             }, 2000);
