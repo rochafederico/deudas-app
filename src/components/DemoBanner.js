@@ -45,11 +45,11 @@ export class DemoBanner extends HTMLElement {
           flex-wrap: wrap;
         }
       </style>
-      <div class="banner">
-        <div class="title">Nivva</div>
+      <header class="banner">
+        <h1 class="title">Nivva</h1>
         <div class="menu"><main-menu></main-menu></div>
         <div class="right"></div>
-      </div>
+      </header>
     `;
     // Insertar el botón de modo oscuro en el lado derecho
     // const right = this.shadowRoot.querySelector('.right');
