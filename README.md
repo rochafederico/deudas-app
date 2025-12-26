@@ -25,10 +25,11 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 - [x] Demo de datos realistas al iniciar
 - [x] Duplicar montos/cuotas: permite copiar una cuota y elegir la nueva fecha de vencimiento fácilmente.
 - [x] Exportar datos
-- [ ] Importar datos
+ - [x] Importar datos
 - [ ] Encriptar exportación
-- [ ] Agregar ingresos (sueldo o ingresos sueltos) para calcular balance mensual
+ - [x] Agregar ingresos (sueldo o ingresos sueltos) para calcular balance mensual
 - [ ] Marcar montos como pagados
+ - [x] Marcar montos como pagados
 - [ ] Dashboard con gráficos y cálculos para ayudar en la toma de decisiones
 - [ ] Mejoras en validaciones de formularios
 - [ ] Onboarding/tour para nuevos usuarios
@@ -58,6 +59,10 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 - No se usan frameworks ni librerías externas.
 - Los datos se guardan localmente en el navegador.
 - El código está modularizado y es fácil de mantener.
+
+Importante:
+- La importación/exportación de datos está implementada. La función de importación fusiona deudas por **Acreedor + Tipo de Deuda** para evitar duplicados y agrega montos que no estén ya presentes (comparación por monto, moneda y periodo/vencimiento). Esto permite combinar backups sin crear grupos duplicados.
+- Las operaciones de acceso a datos están centralizadas en la carpeta `src/repository/` y usan `IndexedDB` con transacciones para consistencia.
 
 ## Licencia
 MIT
