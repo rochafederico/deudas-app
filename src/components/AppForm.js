@@ -51,12 +51,16 @@ export class AppForm extends HTMLElement {
         this.form = this.shadowRoot.querySelector('form');
         if (this.form) {
             // Remove previous listener if any, then add the bound handler once
-            try { this.form.removeEventListener('submit', this._boundHandleSubmit); } catch(e) {}
+            if (typeof this.form.removeEventListener === 'function') {
+                this.form.removeEventListener('submit', this._boundHandleSubmit);
+            }
             this.form.addEventListener('submit', this._boundHandleSubmit);
         }
         const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
         if (cancelBtn) {
-            try { cancelBtn.removeEventListener('click', this._boundCancelClick); } catch(e) {}
+            if (typeof cancelBtn.removeEventListener === 'function') {
+                cancelBtn.removeEventListener('click', this._boundCancelClick);
+            }
             cancelBtn.addEventListener('click', this._boundCancelClick);
         }
     }

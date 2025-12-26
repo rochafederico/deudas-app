@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "test": "node ./test/run-repo-tests.js"
+    "test": "node ./test/run-repo-tests.js",
+    "lint": "eslint src test --ext .js"
   },
   "devDependencies": {
+    "eslint": "^8.57.1",
     "fake-indexeddb": "^3.0.0"
   }
 }
