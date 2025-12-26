@@ -1,0 +1,11 @@
+{
+  "name": "deudas-app",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "node ./test/run-repo-tests.js"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^3.0.0"
+  }
+}
