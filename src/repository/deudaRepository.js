@@ -280,24 +280,36 @@ export function listDeudas() {
 }
 
 export function deleteDeudas() {
+    const db = getDB();
     return new Promise((resolve, reject) => {
+        if (!db) {
+            return reject(new Error('deleteDeudas: database not initialized'));
+        }
 
-        const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
-        const deudasStore = transaction.objectStore(DEUDAS_STORE);
-        const montosStore = transaction.objectStore(MONTOS_STORE);
+        try {
+            const transaction = db.transaction([DEUDAS_STORE, MONTOS_STORE], 'readwrite');
+            const deudasStore = transaction.objectStore(DEUDAS_STORE);
+            const montosStore = transaction.objectStore(MONTOS_STORE);
 
-        const clearMontosRequest = montosStore.clear();
-        clearMontosRequest.onsuccess = () => {
-            const clearDeudasRequest = deudasStore.clear();
-            clearDeudasRequest.onsuccess = () => {
-                resolve();
+            transaction.onerror = (event) => {
+                reject(new Error('Transaction error clearing data: ' + event.target.errorCode));
             };
-            clearDeudasRequest.onerror = (event) => {
-                reject('Error clearing deudas: ' + event.target.errorCode);
+
+            const clearMontosRequest = montosStore.clear();
+            clearMontosRequest.onsuccess = () => {
+                const clearDeudasRequest = deudasStore.clear();
+                clearDeudasRequest.onsuccess = () => {
+                    resolve();
+                };
+                clearDeudasRequest.onerror = (event) => {
+                    reject(new Error('Error clearing deudas: ' + event.target.errorCode));
+                };
             };
-        };
-        clearMontosRequest.onerror = (event) => {
-            reject('Error clearing montos: ' + event.target.errorCode);
+            clearMontosRequest.onerror = (event) => {
+                reject(new Error('Error clearing montos: ' + event.target.errorCode));
+            };
+        } catch (err) {
+            reject(new Error('deleteDeudas: ' + err.message));
         }
     });
 }
