@@ -49,7 +49,6 @@ export const ingresosColumns = [
     { key: 'fecha', label: 'Fecha' },
     { key: 'descripcion', label: 'Descripción' },
     { key: 'monto', label: 'Monto', align: 'right', render: (row) => {
-        
         return formatMoneda(row.monto, row.moneda);
     } },
 ];

@@ -5,9 +5,11 @@ export async function getMonthlySummary(mes) {
   const periodo = mes || new Date().toISOString().slice(0, 7);
   const { sumIngresosByMonth } = await import('../repository/ingresoRepository.js');
   const { countMontosByMes } = await import('../repository/montoRepository.js');
+  const { listInversiones } = await import('../repository/inversionRepository.js');
 
   const ingresos = await sumIngresosByMonth({ mes: periodo });
   const montos = await countMontosByMes({ mes: periodo });
+  const inversiones = await listInversiones();
 
   // Totales por moneda (desglose)
   const monedas = new Set([
@@ -33,6 +35,29 @@ export async function getMonthlySummary(mes) {
     pendientesByCurrency[m] = pen;
   });
 
+  const totalInversiones = inversiones.reduce((sum, inv) => {
+    if (inv.moneda) {
+      sum[inv.moneda] = (sum[inv.moneda] || 0) + inv.valorInicial;
+    } else {
+      sum.ARS = sum.ARS + inv.valorInicial;
+    }
+    return sum;
+  }, { ARS: 0, USD: 0 });
+
+  const totalInversionesActual = inversiones.reduce((sum, inv) => {
+    if (inv.historialValores.length === 0) {
+      sum.ARS = sum.ARS + inv.valorInicial;
+      return sum;
+    }
+    const lastValor = inv.historialValores[inv.historialValores.length - 1].valor;
+    if (inv.moneda) {
+      sum[inv.moneda] = (sum[inv.moneda] || 0) + lastValor;
+    } else {
+      sum.ARS = sum.ARS +lastValor;
+    }
+    return sum
+  }, { ARS: 0, USD: 0 });
+debugger
   return {
     periodo,
     raw: { ingresos, totalesPagados: montos.totalesPagados, totalesPendientes: montos.totalesPendientes },
@@ -42,6 +67,10 @@ export async function getMonthlySummary(mes) {
       saldo: saldoByCurrency,
       pagados: pagadosByCurrency,
       pendientes: pendientesByCurrency
+    },
+    inversiones: {
+      ARS: totalInversionesActual.ARS - totalInversiones.ARS,
+      USD: totalInversionesActual.USD - totalInversiones.USD
     }
   };
 }
