@@ -1,4 +1,5 @@
 // src/components/MontoForm.js
+import monedas from '../config/monedas.js';
 import { el } from '../utils/dom.js';
 import './AppForm.js';
 
@@ -39,7 +40,7 @@ export class MontoForm extends HTMLElement {
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'monto', type: 'number', label: 'Monto', required: true },
-            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: monedas, required: true },
             { name: 'vencimiento', type: 'date', label: 'Vencimiento', required: true }
         ];
         form.initialValues = this._monto || {};

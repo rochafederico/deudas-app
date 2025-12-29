@@ -1,11 +1,12 @@
 // Entidad para una inversión y su historial de valores
 export class InversionEntity {
-    constructor({ id, nombre, fechaCompra, valorInicial, historialValores = [] }) {
+    constructor({ id, nombre, fechaCompra, valorInicial, moneda, historialValores = [] }) {
         if (id !== undefined)
             this.id = id;
         this.nombre = nombre;
         this.fechaCompra = fechaCompra;
         this.valorInicial = valorInicial;
+        this.moneda = moneda;
         this.historialValores = historialValores; // [{fecha, valor}]
     }
 }

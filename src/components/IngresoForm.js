@@ -2,6 +2,7 @@
 import './AppForm.js';
 import './AppInput.js';
 import { addIngreso } from '../repository/ingresoRepository.js';
+import monedas from '../config/monedas.js';
 
 export class IngresoForm extends HTMLElement {
     constructor() {
@@ -64,7 +65,7 @@ export class IngresoForm extends HTMLElement {
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },
             { name: 'descripcion', label: 'Descripción', type: 'text' },
             { name: 'monto', label: 'Monto', type: 'number', required: true },
-            { name: 'moneda', label: 'Moneda',type: 'select',  options: ['ARS', 'USD'], required: true },
+            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true },
         ];
         this.shadowRoot.innerHTML = '';
         const form = document.createElement('app-form');

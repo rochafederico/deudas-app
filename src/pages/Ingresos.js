@@ -1,5 +1,4 @@
 // src/pages/Ingresos.js
-import createIngresoList from '../components/IngresoList.js';
 import '../components/StatsCard.js';
 import { listIngresos } from '../repository/ingresoRepository.js';
 import { ingresosColumns } from '../config/tables/debtTableColumns.js';
@@ -23,10 +22,6 @@ export default function Ingresos() {
 
     const stats = document.createElement('stats-card');
     container.appendChild(stats);
-
-    // Crear y agregar la lista de ingresos
-    const ingresoList = createIngresoList(currentMes);
-    container.appendChild(ingresoList);
 
     // Cargar y mostrar totales
     const loadTotals = async (mes) => {
@@ -57,7 +52,6 @@ export default function Ingresos() {
     container.cleanup = () => {
         window.removeEventListener('ingreso:added', handleIngresoAdded);
         window.removeEventListener('ui:month', handleMonthChange);
-        if (ingresoList.cleanup) ingresoList.cleanup();
     };
 
     return container;

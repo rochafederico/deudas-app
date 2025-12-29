@@ -1,4 +1,5 @@
 // src/components/IngresoList.js
+import { formatMoneda } from '../config/monedas.js';
 import { listIngresos } from '../repository/ingresoRepository.js';
 import './AppTable.js';
 
@@ -10,18 +11,14 @@ export default function createIngresoList(mes = new Date().toISOString().slice(0
     const table = document.createElement('app-table');
     container.appendChild(table);
 
-    const fmtMoneda = (moneda, n) => {
-        return new Intl.NumberFormat('es-AR', {
-            style: 'currency',
-            currency: moneda
-        }).format(n);
-    };
-
     const renderTable = (ingresos = []) => {
         table.columns = [
             { key: 'fecha', label: 'Fecha', format: v => new Date(v).toLocaleDateString() },
             { key: 'descripcion', label: 'Descripción' },
-            { key: 'monto', label: 'Monto', align: 'right', render: (v, row) => fmtMoneda(row.moneda, v) },
+            { key: 'monto', label: 'Monto', align: 'right', render: (v, row) => {
+                debugger
+                return formatMoneda(row.moneda, v);
+            } },
             { key: 'moneda', label: 'Moneda' }
         ];
         table.items = ingresos;

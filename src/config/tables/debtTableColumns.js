@@ -2,16 +2,13 @@
 // Configuración de columnas para la tabla de deudas
 
 import { el } from '../../utils/dom.js';
+import { formatMoneda } from '../monedas.js';
 
 export const debtTableColumns = [
     { key: 'acreedor', label: 'Acreedor'},
     { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'hidden-mobile' } },
     { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'hidden-mobile' } },
-    { key: 'monedaymonto', label: 'Moneda/Monto', render: row => {
-        const monedaLabel = row.moneda || '';
-        const monto = row._fmtMoneda ? row._fmtMoneda(row.moneda, row.monto) : row.monto;
-        return `${monedaLabel} ${monto}`;
-    } },
+    { key: 'monedaymonto', label: 'Moneda/Monto', render: row => formatMoneda(row.monto, row.moneda) },
     {
         key: 'acciones',
         label: 'Acciones',
@@ -51,5 +48,8 @@ export const debtTableColumns = [
 export const ingresosColumns = [
     { key: 'fecha', label: 'Fecha' },
     { key: 'descripcion', label: 'Descripción' },
-    { key: 'monto', label: 'Monto' },
+    { key: 'monto', label: 'Monto', align: 'right', render: (row) => {
+        
+        return formatMoneda(row.monto, row.moneda);
+    } },
 ];
