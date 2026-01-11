@@ -3,6 +3,7 @@
 import { listInversiones, deleteInversion } from '../../../repository/inversionRepository.js';
 import { inversionTableColumns } from '../../../config/tables/inversionTableColumns.js';
 import { el } from '../../../utils/dom.js';
+import { formatMoneda } from '../../../config/monedas.js';
 
 export class InversionesList extends HTMLElement {
   constructor() {
@@ -56,6 +57,8 @@ export class InversionesList extends HTMLElement {
     const tabla = this.shadowRoot.getElementById('tabla');
     tabla.columnsConfig = inversionTableColumns;
     tabla.tableData = inversiones;
+    tabla.footerContent = this.renderFooter(inversiones).innerHTML;
+    tabla.render();
   }
 
   openModal() {
@@ -67,7 +70,7 @@ export class InversionesList extends HTMLElement {
 
   addValueToInversion(inv) {
     let modal = this.shadowRoot.querySelector('valor-modal');
-    if(!modal) {
+    if (!modal) {
       modal = document.createElement('valor-modal');
       this.shadowRoot.appendChild(modal);
     }
@@ -77,6 +80,43 @@ export class InversionesList extends HTMLElement {
     uiModal.onsave = () => this.renderTable();
     modal.resetValues();
     uiModal.open();
+  }
+
+  renderFooter(inversiones) {
+    const footer = document.createElement('tfoot');
+    const rowTitle = document.createElement('tr');
+    const totalCell = document.createElement('td');
+
+    totalCell.colSpan = inversionTableColumns.length - 1;
+    totalCell.style.textAlign = 'right';
+    totalCell.textContent = 'Total invertido:';
+    const monedas = inversiones.reduce((result, inv) => {
+      const moneda = inv.moneda ?? 'ARS';
+      if (!result.includes(moneda)) {
+        result.push(moneda);
+      }
+      return result
+    }, [])
+    totalCell.rowSpan = monedas.length;
+    rowTitle.appendChild(totalCell);
+
+    const rowTotals = document.createElement('tr');
+    for (let i = 0; i < monedas.length; i++) {
+      const moneda = monedas[i];
+      const sumaCell = document.createElement('td');
+      const totalActual = inversiones.filter(inv => inv.moneda === moneda)
+        .reduce((sum, inv) => sum + (inv.historialValores[inv.historialValores.length - 1]?.valor || 0), 0);
+      sumaCell.textContent = formatMoneda(totalActual, moneda);
+      if (i === 0) {
+        rowTitle.appendChild(sumaCell);
+      } else {
+        rowTotals.appendChild(sumaCell);
+      }
+    }
+    footer.appendChild(rowTitle);
+    footer.appendChild(rowTotals);
+
+    return footer;
   }
 }
 

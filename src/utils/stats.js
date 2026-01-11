@@ -57,7 +57,6 @@ export async function getMonthlySummary(mes) {
     }
     return sum
   }, { ARS: 0, USD: 0 });
-debugger
   return {
     periodo,
     raw: { ingresos, totalesPagados: montos.totalesPagados, totalesPendientes: montos.totalesPendientes },

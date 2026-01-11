@@ -64,7 +64,9 @@ export class AppTable extends HTMLElement {
                     </tr>
                 </thead>
                 <tbody></tbody>
-                <tfoot></tfoot>
+                <tfoot>
+                    ${this.footerContent}
+                </tfoot>
             </table>
         `;
         // Renderizar filas dinámicamente
