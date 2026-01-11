@@ -1,7 +1,8 @@
 
 
-import { listInversiones } from '../../../repository/inversionRepository.js';
+import { listInversiones, deleteInversion } from '../../../repository/inversionRepository.js';
 import { inversionTableColumns } from '../../../config/tables/inversionTableColumns.js';
+import { el } from '../../../utils/dom.js';
 
 export class InversionesList extends HTMLElement {
   constructor() {
@@ -27,11 +28,29 @@ export class InversionesList extends HTMLElement {
     // Inyectar función de acciones en cada fila usando <app-button>
     inversiones.forEach(inv => {
       inv._acciones = () => {
+        const accionesContainer = document.createElement('div');
         const btn = document.createElement('app-button');
         btn.textContent = 'Nuevo valor';
         btn.setAttribute('aria-label', 'Nuevo valor');
         btn.onclick = () => this.addValueToInversion(inv);
-        return btn;
+        accionesContainer.appendChild(btn);
+        const deleteBtn = el('app-button', {
+          attrs: {
+            'aria-label': 'Eliminar inversión',
+            'variant': 'delete',
+          },
+          text: 'Eliminar',
+          on: {
+            click: async () => {
+              if (confirm(`¿Está seguro de que desea eliminar la inversión "${inv.nombre}"?`)) {
+                await deleteInversion(inv.id);
+                await this.renderTable();
+              }
+            }
+          }
+        });
+        accionesContainer.appendChild(deleteBtn);
+        return accionesContainer;
       };
     });
     const tabla = this.shadowRoot.getElementById('tabla');
@@ -49,8 +68,8 @@ export class InversionesList extends HTMLElement {
   addValueToInversion(inv) {
     let modal = this.shadowRoot.querySelector('valor-modal');
     if(!modal) {
-        modal = document.createElement('valor-modal');
-        this.shadowRoot.appendChild(modal);
+      modal = document.createElement('valor-modal');
+      this.shadowRoot.appendChild(modal);
     }
     modal.setIdInversion(inv.id);
     const uiModal = modal.querySelector('ui-modal')
