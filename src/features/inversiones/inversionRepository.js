@@ -1,7 +1,6 @@
-
-import { getDB } from '../shared/database/initDB.js';
-import { INVERSIONES_STORE } from '../shared/database/schema.js';
-import { InversionEntity } from '../entity/InversionEntity.js';
+import { getDB } from '../../shared/database/initDB.js';
+import { INVERSIONES_STORE } from '../../shared/database/schema.js';
+import { InversionEntity } from './InversionEntity.js';
 
 function _getInversionesStore(mode = 'readonly') {
   const db = getDB();

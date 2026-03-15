@@ -1,6 +1,6 @@
 
 
-import { listInversiones, deleteInversion } from '../../../repository/inversionRepository.js';
+import { listInversiones, deleteInversion } from '../inversionRepository.js';
 import { inversionTableColumns } from '../../../shared/config/tables/inversionTableColumns.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
