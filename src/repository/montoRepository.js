@@ -1,7 +1,7 @@
 // src/repository/montoRepository.js
 // Repository for Monto CRUD/query operations
-import { getDB } from '../database/initDB.js';
-import { MONTOS_STORE } from '../database/schema.js';
+import { getDB } from '../shared/database/initDB.js';
+import { MONTOS_STORE } from '../shared/database/schema.js';
 import { MontoEntity } from '../entity/MontoEntity.js';
 
 function _getMontosStore(mode = 'readonly') {
