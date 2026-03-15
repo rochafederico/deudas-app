@@ -2,7 +2,7 @@
 import './AppForm.js';
 import './AppInput.js';
 import { addIngreso } from '../repository/ingresoRepository.js';
-import monedas from '../config/monedas.js';
+import monedas from '../shared/config/monedas.js';
 
 export class IngresoForm extends HTMLElement {
     constructor() {

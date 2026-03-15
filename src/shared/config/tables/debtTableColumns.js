@@ -1,7 +1,7 @@
 // src/config/tables/debtTableColumns.js
 // Configuración de columnas para la tabla de deudas
 
-import { el } from '../../shared/utils/dom.js';
+import { el } from '../../utils/dom.js';
 import { formatMoneda } from '../monedas.js';
 
 export const debtTableColumns = [
@@ -28,7 +28,7 @@ export const debtTableColumns = [
             appCheckbox.checked = !!row.pagado;
             appCheckbox.title = 'Marcar como pagado';
             appCheckbox.addEventListener('checkbox-change', async (e) => {
-                const { setPagado } = await import('../../repository/montoRepository.js');
+                const { setPagado } = await import('../../../repository/montoRepository.js');
                 await setPagado(row.id, e.detail.checked);
                 if (typeof row._reload === 'function') row._reload();
             });

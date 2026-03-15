@@ -1,7 +1,7 @@
 
 import { addInversion } from '../../../repository/inversionRepository.js';
 import { UiModal } from '../../../components/UiModal.js';
-import monedas from '../../../config/monedas.js';
+import monedas from '../../../shared/config/monedas.js';
 
 export class InversionModal extends HTMLElement {
     connectedCallback() {

@@ -1,6 +1,6 @@
 import './AppButton.js';
 import './AppTable.js';
-import { debtTableColumns } from '../config/tables/debtTableColumns.js';
+import { debtTableColumns } from '../shared/config/tables/debtTableColumns.js';
 
 export class DebtList extends HTMLElement {
     constructor() {

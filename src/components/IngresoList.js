@@ -1,5 +1,5 @@
 // src/components/IngresoList.js
-import { formatMoneda } from '../config/monedas.js';
+import { formatMoneda } from '../shared/config/monedas.js';
 import { listIngresos } from '../repository/ingresoRepository.js';
 import './AppTable.js';
 
