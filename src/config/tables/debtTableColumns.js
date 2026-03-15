@@ -1,7 +1,7 @@
 // src/config/tables/debtTableColumns.js
 // Configuración de columnas para la tabla de deudas
 
-import { el } from '../../utils/dom.js';
+import { el } from '../../shared/utils/dom.js';
 import { formatMoneda } from '../monedas.js';
 
 export const debtTableColumns = [

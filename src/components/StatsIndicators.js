@@ -1,6 +1,6 @@
 // src/components/StatsIndicators.js
 import StatsCard from './StatsCard.js';
-import { getMonthlySummary } from '../utils/stats.js';
+import { getMonthlySummary } from '../shared/utils/stats.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');

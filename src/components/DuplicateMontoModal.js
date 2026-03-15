@@ -1,5 +1,5 @@
 // src/components/DuplicateMontoModal.js
-import { el } from '../utils/dom.js';
+import { el } from '../shared/utils/dom.js';
 import './AppForm.js';
 
 export class DuplicateMontoModal extends HTMLElement {
