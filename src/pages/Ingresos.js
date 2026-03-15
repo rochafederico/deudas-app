@@ -1,7 +1,7 @@
 // src/pages/Ingresos.js
 import '../components/StatsCard.js';
 import { listIngresos } from '../repository/ingresoRepository.js';
-import { ingresosColumns } from '../config/tables/debtTableColumns.js';
+import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 
 export default function Ingresos() {
     let currentMes = new Date().toISOString().slice(0, 7);
