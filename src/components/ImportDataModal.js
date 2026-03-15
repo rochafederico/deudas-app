@@ -1,7 +1,7 @@
 // src/components/ImportDataModal.js
 import './UiModal.js';
 import './AppButton.js';
-import { DeudaModel } from '../models/DeudaModel.js';
+import { DeudaModel } from '../features/deudas/DeudaModel.js';
 import { MontoModel } from '../models/MontoModel.js';
 
 export class ImportDataModal extends HTMLElement {
@@ -142,7 +142,7 @@ export class ImportDataModal extends HTMLElement {
         try {
             this.#showProgress('Importando datos...');
 
-            const { addOrMergeDeuda } = await import('../repository/deudaRepository.js');
+            const { addOrMergeDeuda } = await import('../features/deudas/deudaRepository.js');
             const { addIngreso } = await import('../repository/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];

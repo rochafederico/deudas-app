@@ -1,10 +1,10 @@
-import { DeudaModel } from '../models/DeudaModel.js';
-import { el } from '../shared/utils/dom.js';
-import './AppButton.js';
-import './AppInput.js';
-import './AppForm.js';
-import './MontoForm.js';
-import './DuplicateMontoModal.js';
+import { DeudaModel } from '../DeudaModel.js';
+import { el } from '../../../shared/utils/dom.js';
+import '../../../components/AppButton.js';
+import '../../../components/AppInput.js';
+import '../../../components/AppForm.js';
+import '../../../components/MontoForm.js';
+import '../../../components/DuplicateMontoModal.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -265,11 +265,11 @@ export class DebtForm extends HTMLElement {
             montos: this.montos
         });
         if (this.editing && this.deudaId) {
-            const { updateDeuda } = await import('../repository/deudaRepository.js');
+            const { updateDeuda } = await import('../deudaRepository.js');
             await updateDeuda(deuda);
             this.dispatchEvent(new CustomEvent('deuda:updated', { detail: deuda, bubbles: true, composed: true }));
         } else {
-            const { addDeuda } = await import('../repository/deudaRepository.js');
+            const { addDeuda } = await import('../deudaRepository.js');
             await addDeuda(deuda);
             this.dispatchEvent(new CustomEvent('deuda:saved', { detail: deuda, bubbles: true, composed: true }));
         }

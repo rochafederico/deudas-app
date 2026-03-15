@@ -4,7 +4,7 @@ import { default as FakeIndexedDB } from 'fake-indexeddb';
 global.indexedDB = FakeIndexedDB;
 
 import { initDB } from '../src/shared/database/initDB.js';
-import { addDeuda, listDeudas, deleteDeudas } from '../src/repository/deudaRepository.js';
+import { addDeuda, listDeudas, deleteDeudas } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/repository/montoRepository.js';
 import { addIngreso, getAll as getAllIngresos, sumIngresosByMonth } from '../src/repository/ingresoRepository.js';
 

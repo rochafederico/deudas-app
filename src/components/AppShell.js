@@ -1,4 +1,4 @@
-import './DebtModal.js';
+import '../features/deudas/components/DebtModal.js';
 import './IngresoModal.js';
 import './AppInput.js';
 import './ExportDataModal.js';
@@ -80,7 +80,7 @@ export class AppShell extends HTMLElement {
             const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
             if (confirmed) {
                 try {
-                    const { deleteDeudas } = await import('../repository/deudaRepository.js');
+                    const { deleteDeudas } = await import('../features/deudas/deudaRepository.js');
                     await deleteDeudas();
                 } catch (error) {
                     console.error('Error al eliminar los datos:', error);
