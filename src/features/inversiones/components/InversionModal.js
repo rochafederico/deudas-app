@@ -1,5 +1,5 @@
 
-import { addInversion } from '../../../repository/inversionRepository.js';
+import { addInversion } from '../inversionRepository.js';
 import { UiModal } from '../../../components/UiModal.js';
 import monedas from '../../../shared/config/monedas.js';
 

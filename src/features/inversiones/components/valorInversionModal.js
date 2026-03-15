@@ -1,5 +1,5 @@
 
-import { addValorToInversion } from '../../../repository/inversionRepository.js';
+import { addValorToInversion } from '../inversionRepository.js';
 import { UiModal } from '../../../components/UiModal.js';
 
 export class ValorInversionModal extends HTMLElement {
