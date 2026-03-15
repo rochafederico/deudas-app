@@ -1,6 +1,6 @@
 // src/pages/Ingresos.js
 import '../components/StatsCard.js';
-import { listIngresos } from '../repository/ingresoRepository.js';
+import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 
 export default function Ingresos() {

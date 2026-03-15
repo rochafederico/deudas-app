@@ -1,8 +1,8 @@
 // src/components/IngresoForm.js
-import './AppForm.js';
-import './AppInput.js';
-import { addIngreso } from '../repository/ingresoRepository.js';
-import monedas from '../shared/config/monedas.js';
+import '../../../components/AppForm.js';
+import '../../../components/AppInput.js';
+import { addIngreso } from '../ingresoRepository.js';
+import monedas from '../../../shared/config/monedas.js';
 
 export class IngresoForm extends HTMLElement {
     constructor() {

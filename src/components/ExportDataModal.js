@@ -51,7 +51,7 @@ export class ExportDataModal extends HTMLElement {
         this.modal.returnFocusTo(opener);
         setTimeout(async () => {
             const { listDeudas } = await import('../features/deudas/deudaRepository.js');
-            const { getAll } = await import('../repository/ingresoRepository.js');
+            const { getAll } = await import('../features/ingresos/ingresoRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
             deudas = this.#mapDeudasForExport(deudas);
