@@ -2,8 +2,8 @@
 // Centralized repository for Deuda and Monto CRUD/query operations
 // Limpieza final: este archivo solo debe manejar operaciones de Deuda.
 // No debe haber lógica de Monto separada aquí, solo la relación para agregar/actualizar/borrar montos asociados a una deuda.
-import { getDB } from '../database/initDB.js';
-import { DEUDAS_STORE, MONTOS_STORE } from '../database/schema.js';
+import { getDB } from '../shared/database/initDB.js';
+import { DEUDAS_STORE, MONTOS_STORE } from '../shared/database/schema.js';
 import { DeudaEntity } from '../entity/DeudaEntity.js';
 import { MontoEntity } from '../entity/MontoEntity.js';
 

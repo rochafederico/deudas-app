@@ -1,5 +1,5 @@
 // src/main.js
-import initDB from './db.js';
+import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import DemoBanner from './components/DemoBanner.js';
 
