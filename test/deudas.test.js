@@ -2,11 +2,11 @@
 // E2E tests for deudas feature: UI component (DebtForm) → Model → Repository → IndexedDB
 import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
-import { listMontos, countMontosByMes, setPagado } from '../src/repository/montoRepository.js';
+import { listMontos, countMontosByMes, setPagado } from '../src/features/montos/montoRepository.js';
 
 // Import deuda UI components (registers custom elements)
-import '../src/components/MontoForm.js';
-import '../src/components/DuplicateMontoModal.js';
+import '../src/features/montos/components/MontoForm.js';
+import '../src/features/montos/components/DuplicateMontoModal.js';
 import '../src/features/deudas/components/DebtForm.js';
 
 async function cleanup() {

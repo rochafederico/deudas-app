@@ -3,8 +3,8 @@ import { el } from '../../../shared/utils/dom.js';
 import '../../../components/AppButton.js';
 import '../../../components/AppInput.js';
 import '../../../components/AppForm.js';
-import '../../../components/MontoForm.js';
-import '../../../components/DuplicateMontoModal.js';
+import '../../montos/components/MontoForm.js';
+import '../../montos/components/DuplicateMontoModal.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {

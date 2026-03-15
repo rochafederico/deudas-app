@@ -5,7 +5,7 @@
 import { getDB } from '../../shared/database/initDB.js';
 import { DEUDAS_STORE, MONTOS_STORE } from '../../shared/database/schema.js';
 import { DeudaEntity } from './DeudaEntity.js';
-import { MontoEntity } from '../../entity/MontoEntity.js';
+import { MontoEntity } from '../montos/MontoEntity.js';
 
 export function addDeuda(deudaModel) {
     const db = getDB();

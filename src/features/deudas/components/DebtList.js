@@ -43,7 +43,7 @@ export class DebtList extends HTMLElement {
 
     async loadTotals() {
         // Consulta los montos originales desde el repository y calcula los totales
-        const { countMontosByMes } = await import('../../../repository/montoRepository.js');
+        const { countMontosByMes } = await import('../../montos/montoRepository.js');
         const { totalesPendientes, totalesPagados } = await countMontosByMes({ mes: this.mes });
         this.totalesPendientes = totalesPendientes;
         this.totalesPagados = totalesPagados;
@@ -51,7 +51,7 @@ export class DebtList extends HTMLElement {
 
     async listByMes(mes) {
         // Usa montoRepository para consultar montos por periodo 'YYYY-MM' y agrupar por deuda
-        const { listMontos } = await import('../../../repository/montoRepository.js');
+        const { listMontos } = await import('../../montos/montoRepository.js');
         const { getDeuda } = await import('../deudaRepository.js');
         const montos = await listMontos({ mes }); // mes es 'YYYY-MM'
         const deudaIds = [...new Set(montos.map(m => m.deudaId))];
@@ -149,7 +149,7 @@ export class DebtList extends HTMLElement {
     deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
         const montoFmt = this.fmtMoneda(moneda, monto);
         if (!confirm(`¿Seguro que quieres borrar los ${montoFmt} que le debes a "${acreedor}"?\nVencimiento: ${vencimiento} | Periodo: ${periodo}`)) return;
-        import('../../../repository/montoRepository.js').then(({ deleteMonto }) => {
+        import('../../montos/montoRepository.js').then(({ deleteMonto }) => {
             deleteMonto(id).then(() => {
                 this.loadDebts(); // Actualiza la tabla tras borrar
             });
