@@ -143,7 +143,7 @@ export class ImportDataModal extends HTMLElement {
             this.#showProgress('Importando datos...');
 
             const { addOrMergeDeuda } = await import('../features/deudas/deudaRepository.js');
-            const { addIngreso } = await import('../repository/ingresoRepository.js');
+            const { addIngreso } = await import('../features/ingresos/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
             let importedCount = 0;

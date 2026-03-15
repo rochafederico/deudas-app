@@ -1,7 +1,7 @@
 // src/repository/ingresoRepository.js
-import { getDB } from '../shared/database/initDB.js';
-import { INGRESOS_STORE } from '../shared/database/schema.js';
-import { IngresoEntity } from '../entity/IngresoEntity.js';
+import { getDB } from '../../shared/database/initDB.js';
+import { INGRESOS_STORE } from '../../shared/database/schema.js';
+import { IngresoEntity } from './IngresoEntity.js';
 
 function _getIngresosStore(mode = 'readonly') {
     const db = getDB();

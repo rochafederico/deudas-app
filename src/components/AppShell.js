@@ -1,5 +1,5 @@
 import '../features/deudas/components/DebtModal.js';
-import './IngresoModal.js';
+import '../features/ingresos/components/IngresoModal.js';
 import './AppInput.js';
 import './ExportDataModal.js';
 import './ImportDataModal.js';

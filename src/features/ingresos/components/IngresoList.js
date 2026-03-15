@@ -1,7 +1,7 @@
 // src/components/IngresoList.js
-import { formatMoneda } from '../shared/config/monedas.js';
-import { listIngresos } from '../repository/ingresoRepository.js';
-import './AppTable.js';
+import { formatMoneda } from '../../../shared/config/monedas.js';
+import { listIngresos } from '../ingresoRepository.js';
+import '../../../components/AppTable.js';
 
 export default function createIngresoList(mes = new Date().toISOString().slice(0, 7)) {
     const container = document.createElement('div');

@@ -1,5 +1,5 @@
 // src/components/IngresoModal.js
-import { UiModal } from './UiModal.js';
+import '../../../components/UiModal.js';
 import './IngresoForm.js';
 
 export class IngresoModal extends HTMLElement {
