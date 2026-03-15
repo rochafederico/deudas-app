@@ -3,9 +3,9 @@
 export async function getMonthlySummary(mes) {
   // mes expected as 'YYYY-MM' string. If not provided, use current month
   const periodo = mes || new Date().toISOString().slice(0, 7);
-  const { sumIngresosByMonth } = await import('../repository/ingresoRepository.js');
-  const { countMontosByMes } = await import('../repository/montoRepository.js');
-  const { listInversiones } = await import('../repository/inversionRepository.js');
+  const { sumIngresosByMonth } = await import('../../repository/ingresoRepository.js');
+  const { countMontosByMes } = await import('../../repository/montoRepository.js');
+  const { listInversiones } = await import('../../repository/inversionRepository.js');
 
   const ingresos = await sumIngresosByMonth({ mes: periodo });
   const montos = await countMontosByMes({ mes: periodo });

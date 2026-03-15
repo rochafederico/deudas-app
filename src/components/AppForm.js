@@ -1,5 +1,5 @@
 // src/components/AppForm.js
-import { el, getFormValuesAndValidate } from '../utils/dom.js';
+import { el, getFormValuesAndValidate } from '../shared/utils/dom.js';
 
 export class AppForm extends HTMLElement {
     constructor() {

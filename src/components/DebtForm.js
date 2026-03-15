@@ -1,5 +1,5 @@
 import { DeudaModel } from '../models/DeudaModel.js';
-import { el } from '../utils/dom.js';
+import { el } from '../shared/utils/dom.js';
 import './AppButton.js';
 import './AppInput.js';
 import './AppForm.js';

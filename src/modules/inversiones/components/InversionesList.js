@@ -2,7 +2,7 @@
 
 import { listInversiones, deleteInversion } from '../../../repository/inversionRepository.js';
 import { inversionTableColumns } from '../../../config/tables/inversionTableColumns.js';
-import { el } from '../../../utils/dom.js';
+import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../config/monedas.js';
 
 export class InversionesList extends HTMLElement {
