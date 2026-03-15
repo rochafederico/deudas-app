@@ -2,7 +2,7 @@
 import './UiModal.js';
 import './AppButton.js';
 import { DeudaModel } from '../features/deudas/DeudaModel.js';
-import { MontoModel } from '../models/MontoModel.js';
+import { MontoModel } from '../features/montos/MontoModel.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {

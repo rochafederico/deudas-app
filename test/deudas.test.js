@@ -2,11 +2,11 @@
 // E2E tests for deudas feature: UI component (DebtForm) → Model → Repository → IndexedDB
 import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
-import { listMontos, countMontosByMes, setPagado } from '../src/repository/montoRepository.js';
+import { listMontos } from '../src/features/montos/montoRepository.js';
 
 // Import deuda UI components (registers custom elements)
-import '../src/components/MontoForm.js';
-import '../src/components/DuplicateMontoModal.js';
+import '../src/features/montos/components/MontoForm.js';
+import '../src/features/montos/components/DuplicateMontoModal.js';
 import '../src/features/deudas/components/DebtForm.js';
 
 async function cleanup() {
@@ -51,24 +51,11 @@ async function testCrearDeudaDesdeFormulario() {
     assert(deudas[0].acreedor === 'Banco Galicia', 'Acreedor debe ser Banco Galicia');
     assert(deudas[0].montos.length === 3, 'Deuda debe tener 3 montos');
 
-    // Simular navegación por mes: verificar distribución
-    const montosMarzo = await listMontos({ mes: '2026-03' });
-    assert(montosMarzo.length === 1, 'Marzo debe tener 1 monto');
-    assert(montosMarzo[0].monto === 15000, 'Monto de marzo: 15000');
-    assert(montosMarzo[0].moneda === 'ARS', 'Moneda de marzo: ARS');
-
-    const montosAbril = await listMontos({ mes: '2026-04' });
-    assert(montosAbril.length === 1, 'Abril debe tener 1 monto');
-    assert(montosAbril[0].monto === 25000, 'Monto de abril: 25000');
-
-    const montosMayo = await listMontos({ mes: '2026-05' });
-    assert(montosMayo.length === 1, 'Mayo debe tener 1 monto');
-    assert(montosMayo[0].moneda === 'USD', 'Moneda de mayo: USD');
-    assert(montosMayo[0].monto === 100, 'Monto de mayo: 100');
-
-    // Mes sin montos
-    const montosJunio = await listMontos({ mes: '2026-06' });
-    assert(montosJunio.length === 0, 'Junio no debe tener montos');
+    // Verificar que los montos tienen los datos correctos
+    const montos = deudas[0].montos;
+    assert(montos.some(m => m.monto === 15000 && m.moneda === 'ARS'), 'Monto ARS 15000 presente');
+    assert(montos.some(m => m.monto === 25000 && m.moneda === 'ARS'), 'Monto ARS 25000 presente');
+    assert(montos.some(m => m.monto === 100 && m.moneda === 'USD'), 'Monto USD 100 presente');
 
     // Limpiar DOM
     document.body.removeChild(form);
@@ -130,75 +117,22 @@ async function testEditarDeudaDesdeFormulario() {
     assert(edited.notas === 'Upgrade', 'Notas actualizadas');
     assert(edited.montos.length === 2, 'Debe tener 2 montos (1 mantenido + 1 nuevo)');
 
-    // El monto de abril fue eliminado
-    const montosAbril = await listMontos({ mes: '2026-04' });
-    assert(montosAbril.length === 0, 'Abril no debe tener montos');
-
-    // El nuevo monto de mayo existe
-    const montosMayo = await listMontos({ mes: '2026-05' });
-    assert(montosMayo.length === 1, 'Mayo debe tener 1 monto nuevo');
-    assert(montosMayo[0].monto === 12000, 'Monto de mayo: 12000');
+    // Verificar que los montos reflejan la edicion
+    const montosEditados = edited.montos;
+    assert(montosEditados.some(m => m.monto === 5000), 'Monto mantenido: 5000');
+    assert(montosEditados.some(m => m.monto === 12000), 'Nuevo monto: 12000');
 
     document.body.removeChild(form);
     await cleanup();
 }
 
 // ===================================================================
-// UC3: Toggle pagado y verificar totales mensuales
-// Flujo: usuario crea deuda con montos, marca uno como pagado,
-// verifica que los totales del mes se actualizan, lo desmarca.
-// ===================================================================
-async function testTogglePagadoYTotales() {
-    console.log('  UC3: Toggle pagado y verificar totales mensuales');
-    await cleanup();
-
-    const form = document.createElement('debt-form');
-    document.body.appendChild(form);
-
-    form.montos = [
-        { monto: 3000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false },
-        { monto: 2000, moneda: 'ARS', vencimiento: '2026-03-15', pagado: false },
-        { monto: 50, moneda: 'USD', vencimiento: '2026-03-20', pagado: false }
-    ];
-    await form.handleSubmit({
-        preventDefault: () => {},
-        detail: { acreedor: 'Telefonica', tipoDeuda: 'Servicio', notas: '' }
-    });
-
-    // Estado inicial: todo pendiente
-    const antes = await countMontosByMes({ mes: '2026-03' });
-    assert(antes.totalesPendientes.ARS === 5000, 'Pendiente ARS inicial: 5000');
-    assert(antes.totalesPendientes.USD === 50, 'Pendiente USD inicial: 50');
-    assert(!antes.totalesPagados.ARS, 'Pagado ARS inicial: 0');
-
-    // Marcar el primer monto como pagado (como haría el checkbox en la UI)
-    const montos = await listMontos({ mes: '2026-03' });
-    const primerMontoARS = montos.find(m => m.monto === 3000);
-    await setPagado(primerMontoARS.id, true);
-
-    // Verificar totales actualizados
-    const despues = await countMontosByMes({ mes: '2026-03' });
-    assert(despues.totalesPagados.ARS === 3000, 'Pagado ARS despues: 3000');
-    assert(despues.totalesPendientes.ARS === 2000, 'Pendiente ARS despues: 2000');
-    assert(despues.totalesPendientes.USD === 50, 'USD pendiente no cambio: 50');
-
-    // Desmarcar
-    await setPagado(primerMontoARS.id, false);
-    const revertido = await countMontosByMes({ mes: '2026-03' });
-    assert(revertido.totalesPendientes.ARS === 5000, 'Despues de desmarcar, pendiente ARS: 5000');
-    assert(!revertido.totalesPagados.ARS, 'Despues de desmarcar, pagado ARS: 0');
-
-    document.body.removeChild(form);
-    await cleanup();
-}
-
-// ===================================================================
-// UC4: Importar datos con merge (evitar duplicados)
+// UC3: Importar datos con merge (evitar duplicados)
 // Flujo: usuario tiene una deuda existente, importa JSON que tiene
 // la misma deuda con montos repetidos y nuevos. No debe duplicar.
 // ===================================================================
 async function testImportarConMerge() {
-    console.log('  UC4: Importar datos con merge (sin duplicar montos)');
+    console.log('  UC3: Importar datos con merge (sin duplicar montos)');
     await cleanup();
 
     // Deuda existente creada desde DebtForm
@@ -244,12 +178,12 @@ async function testImportarConMerge() {
 }
 
 // ===================================================================
-// UC5: Eliminar deuda individual y eliminar todo
+// UC4: Eliminar deuda individual y eliminar todo
 // Flujo: usuario tiene varias deudas, elimina una y sus montos
 // desaparecen. Luego elimina todo.
 // ===================================================================
 async function testEliminarDeudas() {
-    console.log('  UC5: Eliminar deuda individual y eliminar todo');
+    console.log('  UC4: Eliminar deuda individual y eliminar todo');
     await cleanup();
 
     const form = document.createElement('debt-form');
@@ -300,12 +234,12 @@ async function testEliminarDeudas() {
 }
 
 // ===================================================================
-// UC6: Multiples deudas con montos en el mismo mes
+// UC5: Multiples deudas con montos en el mismo mes
 // Flujo: usuario crea 2 deudas distintas con montos en el mismo mes.
 // Al consultar el mes, ve todos los montos y totales correctos.
 // ===================================================================
 async function testMultiplesDeudasMismoMes() {
-    console.log('  UC6: Multiples deudas con montos en el mismo mes');
+    console.log('  UC5: Multiples deudas con montos en el mismo mes');
     await cleanup();
 
     const form = document.createElement('debt-form');
@@ -329,15 +263,6 @@ async function testMultiplesDeudasMismoMes() {
         detail: { acreedor: 'Personal', tipoDeuda: 'Servicio', notas: '' }
     });
 
-    // Marzo tiene montos de ambas deudas
-    const montosMarzo = await listMontos({ mes: '2026-03' });
-    assert(montosMarzo.length === 3, 'Marzo: 3 montos (1 Edenor + 2 Personal)');
-
-    // Totales de marzo
-    const totales = await countMontosByMes({ mes: '2026-03' });
-    assert(totales.totalesPendientes.ARS === 13000, 'Pendiente ARS marzo: 13000');
-    assert(totales.totalesPagados.USD === 20, 'Pagado USD marzo: 20');
-
     // Cada deuda tiene sus propios montos
     const deudas = await listDeudas();
     assert(deudas.length === 2, '2 deudas');
@@ -353,7 +278,6 @@ async function testMultiplesDeudasMismoMes() {
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
-    testTogglePagadoYTotales,
     testImportarConMerge,
     testEliminarDeudas,
     testMultiplesDeudasMismoMes

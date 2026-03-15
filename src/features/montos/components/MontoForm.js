@@ -1,11 +1,12 @@
-// src/components/DuplicateMontoModal.js
-import './AppForm.js';
+// src/components/MontoForm.js
+import monedas from '../../../shared/config/monedas.js';
+import '../../../components/AppForm.js';
 
-export class DuplicateMontoModal extends HTMLElement {
+export class MontoForm extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-        this._monto = null;
+        this._monto = {};
         this.render();
     }
 
@@ -20,15 +21,15 @@ export class DuplicateMontoModal extends HTMLElement {
     connectedCallback() {
         this.form = this.shadowRoot.querySelector('app-form');
         if (this.form) {
-            this.form.addEventListener('duplicate:submit', e => {
-                this.dispatchEvent(new CustomEvent('duplicate:save', {
+            this.form.addEventListener('monto:submit', e => {
+                this.dispatchEvent(new CustomEvent('monto:save', {
                     detail: e.detail,
                     bubbles: true,
                     composed: true
                 }));
             });
             this.form.addEventListener('form:cancel', () => {
-                this.dispatchEvent(new CustomEvent('duplicate:cancel', { bubbles: true, composed: true }));
+                this.dispatchEvent(new CustomEvent('monto:cancel', { bubbles: true, composed: true }));
             });
         }
     }
@@ -37,19 +38,18 @@ export class DuplicateMontoModal extends HTMLElement {
         this.shadowRoot.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = [
-            { name: 'vencimiento', type: 'date', label: 'Nueva fecha de vencimiento', required: true }
+            { name: 'monto', type: 'number', label: 'Monto', required: true },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: monedas, required: true },
+            { name: 'vencimiento', type: 'date', label: 'Vencimiento', required: true }
         ];
-        // Precargar la fecha del monto original si existe
-        if (this._monto && this._monto.vencimiento) {
-            form.initialValues = { vencimiento: this._monto.vencimiento };
-        }
-        form.submitText = 'Duplicar';
+        form.initialValues = this._monto || {};
+        form.submitText = 'Guardar';
         form.cancelText = 'Cancelar';
         // Usar evento personalizado para submit
         form.addEventListener('form:submit', e => {
-            form.dispatchEvent(new CustomEvent('duplicate:submit', { detail: e.detail, bubbles: true, composed: true }));
+            form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
         this.shadowRoot.appendChild(form);
     }
 }
-customElements.define('duplicate-monto-modal', DuplicateMontoModal);
+customElements.define('monto-form', MontoForm);

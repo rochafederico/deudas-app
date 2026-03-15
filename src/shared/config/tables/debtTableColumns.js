@@ -28,7 +28,7 @@ export const debtTableColumns = [
             appCheckbox.checked = !!row.pagado;
             appCheckbox.title = 'Marcar como pagado';
             appCheckbox.addEventListener('checkbox-change', async (e) => {
-                const { setPagado } = await import('../../../repository/montoRepository.js');
+                const { setPagado } = await import('../../../features/montos/montoRepository.js');
                 await setPagado(row.id, e.detail.checked);
                 if (typeof row._reload === 'function') row._reload();
             });
