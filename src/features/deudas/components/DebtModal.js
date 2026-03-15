@@ -1,7 +1,7 @@
 // src/components/DebtModal.js
 // Web Component <debt-modal> - Wrapper específico para <ui-modal> + <debt-form>
 
-import { UiModal } from './UiModal.js';
+import { UiModal } from '../../../components/UiModal.js';
 import { DebtForm } from './DebtForm.js';
 
 export class DebtModal extends HTMLElement {

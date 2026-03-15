@@ -1,5 +1,5 @@
 // src/models/DeudaModel.js
-import { MontoModel } from './MontoModel.js';
+import { MontoModel } from '../../models/MontoModel.js';
 
 export class DeudaModel {
     /**

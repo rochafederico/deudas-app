@@ -50,7 +50,7 @@ export class ExportDataModal extends HTMLElement {
         this.modal.open();
         this.modal.returnFocusTo(opener);
         setTimeout(async () => {
-            const { listDeudas } = await import('../repository/deudaRepository.js');
+            const { listDeudas } = await import('../features/deudas/deudaRepository.js');
             const { getAll } = await import('../repository/ingresoRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
