@@ -44,7 +44,7 @@ export class Menu extends HTMLElement {
           background: rgba(255,255,255,0.12);
         }
       </style>
-      <nav aria-label="Navegación principal">
+      <nav aria-label="Navegación principal" data-tour-step="menu-navegacion">
         ${routeArray.map(r => `<app-link href="${r.path}" aria-current="${window.location.pathname === r.path ? 'page' : undefined}">${r.label}</app-link>`).join('')}
       </nav>
     `;

@@ -116,7 +116,7 @@ export class HeaderBar extends HTMLElement {
             }
             </style>
             <div class="header-bar">
-            <div class="month-nav">
+            <div class="month-nav" data-tour-step="navegacion-mes">
                 <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
                 <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
@@ -125,10 +125,10 @@ export class HeaderBar extends HTMLElement {
                 </app-input>
             </div>
             <div class="actions">
-                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
+                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
                 Nuevo ingreso
                 </app-button>
-                <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda">
+                <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
                 </app-button>
                 <app-button id="export-data" type="button" title="Exportar datos">

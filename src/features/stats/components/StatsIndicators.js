@@ -5,6 +5,7 @@ import { getMonthlySummary } from '../statsService.js';
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
   container.className = 'stats-row';
+  container.setAttribute('data-tour-step', 'indicadores');
 
   const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 

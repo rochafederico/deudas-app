@@ -46,8 +46,8 @@ export class DemoBanner extends HTMLElement {
         }
       </style>
       <header class="banner">
-        <h1 class="title">Nivva</h1>
-        <div class="menu"><main-menu></main-menu></div>
+        <h1 class="title" data-tour-step="bienvenida">Nivva</h1>
+        <div class="menu" data-tour-step="menu-navegacion"><main-menu></main-menu></div>
         <div class="right"></div>
       </header>
     `;

@@ -47,14 +47,7 @@ export class TourTooltip extends HTMLElement {
 
         // Cambiar texto del boton siguiente en el ultimo paso
         const isLast = index === total - 1;
-        const btnNextInner = btnNext.shadowRoot
-            ? btnNext.shadowRoot.querySelector('button')
-            : null;
-        if (btnNextInner) {
-            btnNextInner.textContent = isLast ? '¡Empezar!' : 'Siguiente';
-        } else {
-            btnNext.textContent = isLast ? '¡Empezar!' : 'Siguiente';
-        }
+        btnNext.textContent = isLast ? '¡Empezar!' : 'Siguiente';
     }
 
     /**
@@ -106,10 +99,19 @@ export class TourTooltip extends HTMLElement {
         // Asegurar que no se salga de la pantalla
         const vw = window.innerWidth;
         const vh = window.innerHeight;
-        if (left < 8) left = 8;
-        if (left + tooltipRect.width > vw - 8) left = vw - tooltipRect.width - 8;
-        if (top < 8) top = 8;
-        if (top + tooltipRect.height > vh - 8) top = vh - tooltipRect.height - 8;
+        const margin = 8;
+        if (left < margin) left = margin;
+        if (left + tooltipRect.width > vw - margin) left = vw - tooltipRect.width - margin;
+        if (top < margin) top = margin;
+        if (top + tooltipRect.height > vh - margin) {
+            // Si no cabe abajo, intentar arriba
+            if (position === 'bottom') {
+                top = rect.top - tooltipRect.height - gap;
+                if (top < margin) top = margin;
+            } else {
+                top = vh - tooltipRect.height - margin;
+            }
+        }
 
         this.style.left = left + 'px';
         this.style.top = top + 'px';
