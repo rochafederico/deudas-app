@@ -24,8 +24,21 @@ export class ExportDataModal extends HTMLElement {
         }));
     }
 
-    #createAndDownloadJsonFile(deudas, ingresos) {
-        const json = JSON.stringify({ deudas, ingresos }, null, 2);
+    #mapInversionesForExport(inversiones) {
+        return inversiones.map(inv => ({
+            nombre: inv.nombre,
+            fechaCompra: inv.fechaCompra,
+            valorInicial: inv.valorInicial,
+            moneda: inv.moneda,
+            historialValores: (inv.historialValores || []).map(h => ({
+                fecha: h.fecha,
+                valor: h.valor,
+            }))
+        }));
+    }
+
+    #createAndDownloadJsonFile(deudas, ingresos, inversiones) {
+        const json = JSON.stringify({ deudas, ingresos, inversiones }, null, 2);
         const blob = new Blob([json], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -52,10 +65,13 @@ export class ExportDataModal extends HTMLElement {
         setTimeout(async () => {
             const { listDeudas } = await import('../../deudas/deudaRepository.js');
             const { getAll } = await import('../../ingresos/ingresoRepository.js');
+            const { listInversiones } = await import('../../inversiones/inversionRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
+            const inversiones = await listInversiones();
             deudas = this.#mapDeudasForExport(deudas);
-            this.#createAndDownloadJsonFile(deudas, ingresos);
+            const inversionesMapped = this.#mapInversionesForExport(inversiones);
+            this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
         }, 100);
     }
 
