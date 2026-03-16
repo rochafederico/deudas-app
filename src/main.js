@@ -2,6 +2,7 @@
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import DemoBanner from './layout/DemoBanner.js';
+import { TourManager } from './features/tour/TourManager.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(DemoBanner());
@@ -31,6 +32,12 @@ initDB().then(async (db) => {
     }
     // Inicialización de rutas después que DB esté lista y los indicadores hayan pedido datos
     renderRoute(window.location.pathname);
+
+    // Iniciar tour guiado en la primera visita (con delay para que el DOM esté listo)
+    setTimeout(() => {
+        const tour = new TourManager();
+        tour.start();
+    }, 500);
 });
 
 
