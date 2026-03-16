@@ -1,6 +1,6 @@
 // src/components/ExportDataModal.js
-import '../../../components/AppForm.js';
-import '../../../components/UiModal.js';
+import '../../../shared/components/AppForm.js';
+import '../../../shared/components/UiModal.js';
 
 export class ExportDataModal extends HTMLElement {
     constructor() {

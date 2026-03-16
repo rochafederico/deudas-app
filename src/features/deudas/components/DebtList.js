@@ -1,5 +1,5 @@
-import '../../../components/AppButton.js';
-import '../../../components/AppTable.js';
+import '../../../shared/components/AppButton.js';
+import '../../../shared/components/AppTable.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 
 export class DebtList extends HTMLElement {

@@ -2,11 +2,11 @@
 // Shared test infrastructure. DOM globals are set by test/globals.js (loaded via --import).
 
 // Import all shared UI components so they register in customElements
-import '../src/components/AppButton.js';
-import '../src/components/AppInput.js';
-import '../src/components/AppForm.js';
-import '../src/components/AppTable.js';
-import '../src/components/UiModal.js';
+import '../src/shared/components/AppButton.js';
+import '../src/shared/components/AppInput.js';
+import '../src/shared/components/AppForm.js';
+import '../src/shared/components/AppTable.js';
+import '../src/shared/components/UiModal.js';
 
 // Track test results
 let passed = 0;

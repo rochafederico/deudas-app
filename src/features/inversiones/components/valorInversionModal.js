@@ -1,6 +1,6 @@
 
 import { addValorToInversion } from '../inversionRepository.js';
-import '../../../components/UiModal.js';
+import '../../../shared/components/UiModal.js';
 
 export class ValorInversionModal extends HTMLElement {
     _form;

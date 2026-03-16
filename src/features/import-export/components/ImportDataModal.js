@@ -1,6 +1,6 @@
 // src/components/ImportDataModal.js
-import '../../../components/UiModal.js';
-import '../../../components/AppButton.js';
+import '../../../shared/components/UiModal.js';
+import '../../../shared/components/AppButton.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { MontoModel } from '../../montos/MontoModel.js';
 

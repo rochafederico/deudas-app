@@ -1,6 +1,6 @@
 
 import { addInversion } from '../inversionRepository.js';
-import '../../../components/UiModal.js';
+import '../../../shared/components/UiModal.js';
 import monedas from '../../../shared/config/monedas.js';
 
 export class InversionModal extends HTMLElement {

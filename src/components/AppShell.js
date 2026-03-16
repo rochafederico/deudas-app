@@ -1,6 +1,6 @@
 import '../features/deudas/components/DebtModal.js';
 import '../features/ingresos/components/IngresoModal.js';
-import './AppInput.js';
+import '../shared/components/AppInput.js';
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';

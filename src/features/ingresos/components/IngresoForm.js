@@ -1,6 +1,6 @@
 // src/components/IngresoForm.js
-import '../../../components/AppForm.js';
-import '../../../components/AppInput.js';
+import '../../../shared/components/AppForm.js';
+import '../../../shared/components/AppInput.js';
 import { addIngreso } from '../ingresoRepository.js';
 import monedas from '../../../shared/config/monedas.js';
 
