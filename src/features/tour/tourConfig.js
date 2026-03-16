@@ -2,6 +2,26 @@
 // Definicion de los pasos del tour guiado
 
 /**
+ * Helper para buscar un elemento con data-tour-step dentro de un arbol de shadow DOMs.
+ * Recorre el path de custom elements, entrando en cada shadowRoot.
+ * @param {Array<{selector: string, shadow?: boolean}>} path - Array de pasos para llegar al elemento.
+ * @returns {HTMLElement|null}
+ */
+export function findTourTarget(path) {
+    let current = document;
+    for (const step of path) {
+        const node = current.querySelector(step.selector);
+        if (!node) return null;
+        if (step.shadow && node.shadowRoot) {
+            current = node.shadowRoot;
+        } else {
+            return node;
+        }
+    }
+    return null;
+}
+
+/**
  * Cada paso tiene:
  * - id: Identificador unico
  * - title: Titulo del paso
@@ -14,64 +34,60 @@ export const tourSteps = [
         id: 'bienvenida',
         title: 'Bienvenida',
         text: 'Organizá tus deudas y gastos fijos en un solo lugar',
-        getTarget: () => document.querySelector('demo-banner'),
+        getTarget: () => findTourTarget([
+            { selector: 'demo-banner', shadow: true },
+            { selector: '[data-tour-step="bienvenida"]' }
+        ]),
         position: 'bottom'
     },
     {
         id: 'indicadores',
         title: 'Indicadores',
         text: 'Acá vas a ver tu resumen mensual de un vistazo',
-        getTarget: () => document.querySelector('.stats-row'),
+        getTarget: () => document.querySelector('[data-tour-step="indicadores"]'),
         position: 'bottom'
     },
     {
         id: 'navegacion-mes',
         title: 'Navegación por mes',
         text: 'Navegá entre meses para ver tus pagos pasados y futuros',
-        getTarget: () => {
-            const appShell = document.querySelector('app-shell');
-            if (!appShell || !appShell.shadowRoot) return null;
-            const header = appShell.shadowRoot.querySelector('header-bar');
-            if (!header || !header.shadowRoot) return null;
-            return header.shadowRoot.querySelector('.month-nav');
-        },
+        getTarget: () => findTourTarget([
+            { selector: 'app-shell', shadow: true },
+            { selector: 'header-bar', shadow: true },
+            { selector: '[data-tour-step="navegacion-mes"]' }
+        ]),
         position: 'bottom'
     },
     {
         id: 'nueva-deuda',
         title: 'Nueva deuda',
         text: 'Cargá tus deudas: tarjeta, alquiler, préstamos, servicios',
-        getTarget: () => {
-            const appShell = document.querySelector('app-shell');
-            if (!appShell || !appShell.shadowRoot) return null;
-            const header = appShell.shadowRoot.querySelector('header-bar');
-            if (!header || !header.shadowRoot) return null;
-            return header.shadowRoot.querySelector('#add-debt');
-        },
+        getTarget: () => findTourTarget([
+            { selector: 'app-shell', shadow: true },
+            { selector: 'header-bar', shadow: true },
+            { selector: '[data-tour-step="nueva-deuda"]' }
+        ]),
         position: 'bottom'
     },
     {
         id: 'nuevo-ingreso',
         title: 'Nuevo ingreso',
         text: 'Registrá tus ingresos para ver si te alcanza el mes',
-        getTarget: () => {
-            const appShell = document.querySelector('app-shell');
-            if (!appShell || !appShell.shadowRoot) return null;
-            const header = appShell.shadowRoot.querySelector('header-bar');
-            if (!header || !header.shadowRoot) return null;
-            return header.shadowRoot.querySelector('#add-income');
-        },
+        getTarget: () => findTourTarget([
+            { selector: 'app-shell', shadow: true },
+            { selector: 'header-bar', shadow: true },
+            { selector: '[data-tour-step="nuevo-ingreso"]' }
+        ]),
         position: 'bottom'
     },
     {
         id: 'menu-navegacion',
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
-        getTarget: () => {
-            const banner = document.querySelector('demo-banner');
-            if (!banner || !banner.shadowRoot) return null;
-            return banner.shadowRoot.querySelector('main-menu');
-        },
+        getTarget: () => findTourTarget([
+            { selector: 'demo-banner', shadow: true },
+            { selector: '[data-tour-step="menu-navegacion"]' }
+        ]),
         position: 'bottom'
     },
     {

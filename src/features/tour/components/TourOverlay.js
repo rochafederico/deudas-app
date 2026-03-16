@@ -29,6 +29,9 @@ export class TourOverlay extends HTMLElement {
                     width: 100%;
                     height: 100%;
                 }
+                #highlight-cutout {
+                    transition: x 0.3s ease-out, y 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
+                }
             </style>
             <svg xmlns="http://www.w3.org/2000/svg">
                 <defs>

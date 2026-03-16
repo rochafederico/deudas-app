@@ -46,6 +46,21 @@ export class TourManager {
         // Reposicionar en resize
         this._resizeHandler = () => this._showStep();
         window.addEventListener('resize', this._resizeHandler);
+
+        // Keyboard: Escape para cerrar, flechas para navegar
+        this._keydownHandler = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                this._end();
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault();
+                this._next();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                this._prev();
+            }
+        };
+        window.addEventListener('keydown', this._keydownHandler);
     }
 
     _showStep() {
@@ -103,6 +118,10 @@ export class TourManager {
         if (this._resizeHandler) {
             window.removeEventListener('resize', this._resizeHandler);
             this._resizeHandler = null;
+        }
+        if (this._keydownHandler) {
+            window.removeEventListener('keydown', this._keydownHandler);
+            this._keydownHandler = null;
         }
     }
 }
