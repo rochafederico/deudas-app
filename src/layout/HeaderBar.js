@@ -131,10 +131,10 @@ export class HeaderBar extends HTMLElement {
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
                 </app-button>
-                <app-button id="export-data" type="button" title="Exportar datos">
+                <app-button id="export-data" type="button" title="Exportar datos" data-tour-step="exportar">
                 Exportar
                 </app-button>
-                <app-button id="import-data" type="button" title="Importar datos">
+                <app-button id="import-data" type="button" title="Importar datos" data-tour-step="importar">
                 Importar
                 </app-button>
                 <app-button id="delete-data" type="button" variant="delete" title="Eliminar datos">

@@ -81,6 +81,28 @@ export const tourSteps = [
         position: 'bottom'
     },
     {
+        id: 'exportar',
+        title: 'Exportar datos',
+        text: 'Descargá un backup de toda tu información en formato JSON para tener un respaldo',
+        getTarget: () => findTourTarget([
+            { selector: 'app-shell', shadow: true },
+            { selector: 'header-bar', shadow: true },
+            { selector: '[data-tour-step="exportar"]' }
+        ]),
+        position: 'bottom'
+    },
+    {
+        id: 'importar',
+        title: 'Importar datos',
+        text: 'Restaurá tus datos desde un archivo JSON exportado previamente',
+        getTarget: () => findTourTarget([
+            { selector: 'app-shell', shadow: true },
+            { selector: 'header-bar', shadow: true },
+            { selector: '[data-tour-step="importar"]' }
+        ]),
+        position: 'bottom'
+    },
+    {
         id: 'menu-navegacion',
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
