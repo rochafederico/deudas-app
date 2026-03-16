@@ -1,6 +1,5 @@
 // src/components/AppInput.js
-// Componente web <app-input> reutilizable para formularios
-import { injectBootstrap } from '../utils/bootstrapStyles.js';
+// Input nativo Bootstrap (sin Shadow DOM)
 
 export class AppInput extends HTMLElement {
     static get observedAttributes() {
@@ -8,58 +7,29 @@ export class AppInput extends HTMLElement {
     }
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
-    }
-    attributeChangedCallback() {
-        this.render();
-    }
-    get input() {
-        return this.shadowRoot.querySelector('input, select, textarea');
+        this.style.display = 'block';
+        this.style.marginBottom = '0.5rem';
     }
     connectedCallback() {
-        this.render();
-        const input = this.input;
-        if (input) {
-            input.addEventListener('input', e => {
-                this._emit(e);
-                // Validación rápida: limpiar error si el campo ya es válido
-                if (this._errorMsg && this.hasAttribute('required') && input.value !== '') {
-                    this.clearError();
-                }
-                if (this._errorMsg && this.getAttribute('type') === 'number' && input.value !== '' && !isNaN(Number(input.value))) {
-                    this.clearError();
-                }
-            });
-            input.addEventListener('change', e => {
-                this._emit(e);
-                // Igual que en input
-                if (this._errorMsg && this.hasAttribute('required') && input.value !== '') {
-                    this.clearError();
-                }
-                if (this._errorMsg && this.getAttribute('type') === 'number' && input.value !== '' && !isNaN(Number(input.value))) {
-                    this.clearError();
-                }
-            });
-            // Workaround para submit en Shadow DOM al presionar Enter
-            input.addEventListener('keydown', e => {
-                if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey) {
-                    const form = this.closest('form');
-                    if (form && input.tagName !== 'TEXTAREA') {
-                        e.preventDefault();
-                        if (typeof form.requestSubmit === 'function') {
-                            form.requestSubmit();
-                        } else {
-                            form.submit();
-                        }
-                    }
-                }
-            });
-        }
+        if (!this._rendered) this.render();
+        this._setupListeners();
     }
-    _emit(e) {
-        this.value = e.target.value;
-        this.dispatchEvent(new Event(e.type, { bubbles: true, composed: true }));
+    attributeChangedCallback() {
+        if (this._rendered) this.render();
+    }
+    get input() {
+        return this.querySelector('input, select, textarea');
+    }
+    _setupListeners() {
+        const input = this.input;
+        if (!input || this._listenersAttached) return;
+        this._listenersAttached = true;
+        input.addEventListener('input', e => {
+            this.dispatchEvent(new Event(e.type, { bubbles: true, composed: true }));
+        });
+        input.addEventListener('change', e => {
+            this.dispatchEvent(new Event(e.type, { bubbles: true, composed: true }));
+        });
     }
     get value() {
         return this.input?.value;
@@ -68,29 +38,30 @@ export class AppInput extends HTMLElement {
         if (this.input) this.input.value = val;
     }
     showError(msg) {
-        this._errorMsg = msg;
-        this._renderError();
-    }
-    clearError() {
-        this._errorMsg = '';
-        this._renderError();
-    }
-    _renderError() {
-        let errDiv = this.shadowRoot.querySelector('.input-error');
-        if (!this._errorMsg) {
-            if (errDiv) errDiv.remove();
-            return;
-        }
+        const input = this.input;
+        if (input) input.classList.add('is-invalid');
+        let errDiv = this.querySelector('.invalid-feedback');
         if (!errDiv) {
             errDiv = document.createElement('div');
-            errDiv.className = 'input-error';
-            errDiv.style.color = 'red';
-            errDiv.style.fontSize = '0.95em';
-            this.shadowRoot.appendChild(errDiv);
+            errDiv.className = 'invalid-feedback';
+            errDiv.style.display = 'block';
+            this.appendChild(errDiv);
         }
-        errDiv.textContent = this._errorMsg;
+        errDiv.textContent = msg;
+        errDiv.style.display = 'block';
+    }
+    clearError() {
+        const input = this.input;
+        if (input) input.classList.remove('is-invalid');
+        const errDiv = this.querySelector('.invalid-feedback');
+        if (errDiv) {
+            errDiv.textContent = '';
+            errDiv.style.display = 'none';
+        }
     }
     render() {
+        this._rendered = true;
+        this._listenersAttached = false;
         const type = this.getAttribute('type') || 'text';
         const name = this.getAttribute('name') || '';
         const value = this.getAttribute('value') || '';
@@ -107,16 +78,11 @@ export class AppInput extends HTMLElement {
             const stepAttr = type === 'number' ? 'step="0.01" ' : '';
             inputHtml = `<input id="${name}" type="${type}" name="${name}" value="${value}" class="form-control" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
         }
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host { display: block; margin-bottom: 0.5rem; }
-                label { display:block; margin-bottom:4px; font-size:0.98em; color:var(--muted-light); }
-            </style>
+        this.innerHTML = `
             ${label ? `<label for="${name}" class="form-label">${label}</label>` : ''}
             ${inputHtml}
         `;
-        injectBootstrap(this.shadowRoot);
-        this._renderError();
+        this._setupListeners();
     }
 }
 customElements.define('app-input', AppInput);

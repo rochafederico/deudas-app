@@ -7,16 +7,16 @@ import monedas from '../../../shared/config/monedas.js';
 export class IngresoForm extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'block';
         this._boundOnSubmit = this._onSubmit.bind(this);
         this._boundOnCancel = () => {
             this.dispatchEvent(new CustomEvent('ingreso:cancel', { bubbles: true, composed: true }));
         };
-        this.render();
     }
 
     connectedCallback() {
-        this.form = this.shadowRoot.querySelector('app-form');
+        this.render();
+        this.form = this.querySelector('app-form');
         if (this.form && !this._listenersAttached) {
             this.form.addEventListener('form:submit', this._boundOnSubmit);
             this.form.addEventListener('form:cancel', this._boundOnCancel);
@@ -55,7 +55,7 @@ export class IngresoForm extends HTMLElement {
     }
 
     reset() {
-        const form = this.shadowRoot.querySelector('app-form');
+        const form = this.querySelector('app-form');
         if (form) form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
     }
 
@@ -67,13 +67,13 @@ export class IngresoForm extends HTMLElement {
             { name: 'monto', label: 'Monto', type: 'number', required: true },
             { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true },
         ];
-        this.shadowRoot.innerHTML = '';
+        this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = fields;
         form.submitText = 'Agregar ingreso';
         form.cancelText = 'Cancelar';
         form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
-        this.shadowRoot.appendChild(form);
+        this.appendChild(form);
     }
 }
 

@@ -3,21 +3,20 @@ import '../../../shared/components/UiModal.js';
 import '../../../shared/components/AppButton.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { MontoModel } from '../../montos/MontoModel.js';
-import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
+        this.style.display = 'block';
         this.importData = null;
         this.fileInput = null;
     }
 
     connectedCallback() {
-        this.shadowRoot.getElementById('select-file-btn').addEventListener('click', () => this.selectFile());
-        this.shadowRoot.getElementById('import-btn').addEventListener('click', () => this.importDataToDb());
-        this.shadowRoot.getElementById('cancel-btn').addEventListener('click', () => this.close());
+        this.render();
+        this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
+        this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());
+        this.querySelector('#cancel-btn').addEventListener('click', () => this.close());
 
         // Crear input file oculto
         this.fileInput = document.createElement('input');
@@ -148,8 +147,8 @@ export class ImportDataModal extends HTMLElement {
             </div>
         `;
 
-        this.shadowRoot.querySelector('.file-content').innerHTML = previewHtml;
-        this.shadowRoot.querySelector('.import-actions').style.display = 'flex';
+        this.querySelector('.file-content').innerHTML = previewHtml;
+        this.querySelector('.import-actions').style.display = 'flex';
     }
 
     async importDataToDb() {
@@ -258,41 +257,41 @@ export class ImportDataModal extends HTMLElement {
     }
 
     #showProgress(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `
-            <div class="progress-message">
-                <div class="spinner"></div>
+            <div class="d-flex align-items-center gap-2 p-2 border border-info rounded">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                 <span>${message}</span>
             </div>
         `;
     }
 
     #showSuccess(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="success-message">${message}</div>`;
     }
 
     #showError(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
     }
 
     #showWarning(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="warning-message">${message}</div>`;
     }
 
     open(opener) {
-        this.modal = this.shadowRoot.querySelector('ui-modal');
+        this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Importar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
 
         // Reset state
         this.importData = null;
-        this.shadowRoot.querySelector('.file-content').innerHTML = '';
-        this.shadowRoot.querySelector('.import-status').innerHTML = '';
-        this.shadowRoot.querySelector('.import-actions').style.display = 'none';
+        this.querySelector('.file-content').innerHTML = '';
+        this.querySelector('.import-status').innerHTML = '';
+        this.querySelector('.import-actions').style.display = 'none';
     }
 
     close() {
@@ -300,7 +299,7 @@ export class ImportDataModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
             <style>
                 .import-content {
                     padding: 1rem;
@@ -487,7 +486,6 @@ export class ImportDataModal extends HTMLElement {
                 </div>
             </ui-modal>
         `;
-        injectBootstrap(this.shadowRoot);
     }
 }
 

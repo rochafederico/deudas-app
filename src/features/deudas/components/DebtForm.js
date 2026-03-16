@@ -5,12 +5,11 @@ import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/DuplicateMontoModal.js';
-import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'block';
         this.montos = [];
         this.editing = false;
         this.deudaId = null;
@@ -18,14 +17,14 @@ export class DebtForm extends HTMLElement {
 
     connectedCallback() {
         this.render();
-        this.montoModal = this.shadowRoot.getElementById('montoModal');
-        this.duplicateModal = this.shadowRoot.getElementById('duplicateMontoModal');
-        this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
-        this.shadowRoot.getElementById('add-monto').addEventListener('click', (event) => {
+        this.montoModal = this.querySelector('#montoModal');
+        this.duplicateModal = this.querySelector('#duplicateMontoModal');
+        this.montosTbody = this.querySelector('#montos-tbody');
+        this.querySelector('#add-monto').addEventListener('click', (event) => {
             event.stopPropagation();
             this.openMontoModal();
         });
-        this.form = this.shadowRoot.querySelector('app-form');
+        this.form = this.querySelector('app-form');
         this._onSubmit = this.handleSubmit.bind(this);
         this._onCancel = () => this.reset();
         this.form.addEventListener('deuda:submit', this._onSubmit);
@@ -41,27 +40,6 @@ export class DebtForm extends HTMLElement {
     }
 
     render() {
-        const style = document.createElement('style');
-        style.textContent = `
-            :host { display: block; }
-            .montos-list {
-                margin: 0.75rem 0;
-                background: var(--panel);
-                border-radius: 0.375rem;
-                padding: 0.75rem;
-            }
-            .montos-list table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .montos-list th, .montos-list td {
-                padding: 0.375rem;
-                border-bottom: 1px solid var(--border);
-            }
-            .montos-list tr:last-child td {
-                border-bottom: none;
-            }
-        `;
         // Formulario principal con <app-form>
         const form = document.createElement('app-form');
         form.fields = [
@@ -109,13 +87,11 @@ export class DebtForm extends HTMLElement {
         });
         const modal = el('ui-modal', { attrs: { id: 'montoModal' } });
         const duplicateModal = el('ui-modal', { attrs: { id: 'duplicateMontoModal' } });
-        this.shadowRoot.innerHTML = '';
-        this.shadowRoot.appendChild(style);
-        this.shadowRoot.appendChild(form);
-        this.shadowRoot.appendChild(montosList);
-        this.shadowRoot.appendChild(modal);
-        this.shadowRoot.appendChild(duplicateModal);
-        injectBootstrap(this.shadowRoot);
+        this.innerHTML = '';
+        this.appendChild(form);
+        this.appendChild(montosList);
+        this.appendChild(modal);
+        this.appendChild(duplicateModal);
     }
 
     openMontoModal(monto = null, index = null) {
@@ -224,7 +200,7 @@ export class DebtForm extends HTMLElement {
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.renderMontosList();
         // Precarga los valores en <app-form>
-        const form = this.shadowRoot.querySelector('app-form');
+        const form = this.querySelector('app-form');
         if (form) {
             form.initialValues = {
                 acreedor: deuda.acreedor || '',
@@ -238,7 +214,7 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
-        const form = this.shadowRoot.querySelector('app-form');
+        const form = this.querySelector('app-form');
         if (form) form.initialValues = {};
         this.renderMontosList();
         // Cerrar el modal de deuda si está abierto
@@ -277,20 +253,20 @@ export class DebtForm extends HTMLElement {
     }
 
     showFormError(msg) {
-        let err = this.shadowRoot.getElementById('form-error');
+        let err = this.querySelector('#form-error');
         if (!err) {
             err = el('div', {
                 attrs: { id: 'form-error' },
                 style: 'color:red;margin:8px 0;'
             });
-            const form = this.shadowRoot.querySelector('app-form');
+            const form = this.querySelector('app-form');
             if (form) form.parentNode.insertBefore(err, form);
         }
         err.textContent = msg;
     }
 
     clearFormError() {
-        const err = this.shadowRoot.getElementById('form-error');
+        const err = this.querySelector('#form-error');
         if (err) err.textContent = '';
     }
 }

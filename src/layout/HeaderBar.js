@@ -2,28 +2,26 @@
 import '../shared/components/AppInput.js';
 import { groupOptions } from '../shared/config/tables/groupOptions.js';
 import '../shared/components/AppButton.js';
-import { injectBootstrap } from '../shared/utils/bootstrapStyles.js';
 
 export class HeaderBar extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'block';
         this.month = new Date().toISOString().slice(0, 7);
-        this.render();
     }
 
     connectedCallback() {
-        // Mes actual
-        const monthFilter = this.shadowRoot.querySelector('#month-filter');
-        const prevBtn = this.shadowRoot.querySelector('#prev-month');
-        const nextBtn = this.shadowRoot.querySelector('#next-month');
-        const groupFilter = this.shadowRoot.querySelector('#group-filter');
-        const addDebtBtn = this.shadowRoot.querySelector('#add-debt');
-        const addIncomeBtn = this.shadowRoot.querySelector('#add-income');
-        const exportBtn = this.shadowRoot.querySelector('#export-data');
-        const importBtn = this.shadowRoot.querySelector('#import-data');
-        const deleteBtn = this.shadowRoot.querySelector('#delete-data');
-        const dashboardBtn = this.shadowRoot.querySelector('#dashboard-btn');
+        this.render();
+        const monthFilter = this.querySelector('#month-filter');
+        const prevBtn = this.querySelector('#prev-month');
+        const nextBtn = this.querySelector('#next-month');
+        const groupFilter = this.querySelector('#group-filter');
+        const addDebtBtn = this.querySelector('#add-debt');
+        const addIncomeBtn = this.querySelector('#add-income');
+        const exportBtn = this.querySelector('#export-data');
+        const importBtn = this.querySelector('#import-data');
+        const deleteBtn = this.querySelector('#delete-data');
+        const dashboardBtn = this.querySelector('#dashboard-btn');
 
         if (monthFilter) monthFilter.value = this.month;
         if (prevBtn) prevBtn.addEventListener('click', () => this.changeMonth(-1));
@@ -71,7 +69,7 @@ export class HeaderBar extends HTMLElement {
         const d = new Date(this.month + '-01T12:00:00');
         d.setMonth(d.getMonth() + delta);
         this.month = d.toISOString().slice(0, 7);
-        this.shadowRoot.getElementById('month-filter').value = this.month;
+        this.querySelector('#month-filter').value = this.month;
         this.emitMonthChange();
     }
 
@@ -93,26 +91,8 @@ export class HeaderBar extends HTMLElement {
 
     render() {
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-        this.shadowRoot.innerHTML = `
-            <style>
-            :host { display: block; }
-            .header-bar { 
-                display: flex; 
-                flex-wrap: wrap;
-                justify-content: space-between; 
-                align-items: center; 
-                padding: 0.75rem; 
-                background-color: var(--panel-light); 
-                color: var(--text-light);
-                border-radius: 0.75rem 0.75rem 0 0; 
-                gap: 0.5rem;
-            }
-            :host-context(body.dark-mode) .header-bar {
-                background-color: var(--panel-dark);
-                color: var(--text-dark);
-            }
-            </style>
-            <div class="header-bar">
+        this.innerHTML = `
+            <div class="header-bar d-flex flex-wrap justify-content-between align-items-center p-2 gap-2" style="background-color:var(--panel-light);color:var(--text-light);border-radius:0.75rem 0.75rem 0 0;">
             <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
                 <app-button id="prev-month" type="button" title="Mes anterior">&#8249;</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
@@ -140,7 +120,6 @@ export class HeaderBar extends HTMLElement {
             </div>
             </div>
         `;
-        injectBootstrap(this.shadowRoot);
     }
 }
 customElements.define('header-bar', HeaderBar);

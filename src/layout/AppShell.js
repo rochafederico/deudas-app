@@ -4,12 +4,11 @@ import '../shared/components/AppInput.js';
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';
-import { injectBootstrap } from '../shared/utils/bootstrapStyles.js';
 
 export class AppShell extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'block';
         this.month = new Date().toISOString().slice(0, 7); // Mes actual por defecto
         this.showForm = false;
         // Handler for import events (idempotent listener registration)
@@ -20,12 +19,12 @@ export class AppShell extends HTMLElement {
 
     connectedCallback() {
         // Usar el id para seleccionar el input correctamente
-        const input = this.shadowRoot.getElementById('month-filter');
+        const input = this.querySelector('#month-filter');
         if (input) input.value = this.month;
-        const opener = this.shadowRoot.querySelector('[data-add-debt]');
+        const opener = this.querySelector('[data-add-debt]');
         if (opener) {
             opener.addEventListener('click', () => {
-                const modal = this.shadowRoot.querySelector('#debtModal');
+                const modal = this.querySelector('#debtModal');
                 modal.openCreate();
                 modal.attachOpener(opener);
             });
@@ -57,25 +56,25 @@ export class AppShell extends HTMLElement {
             this.onGroupChange(this.groupBy);
         });
         header.addEventListener('add-debt', () => {
-            const modal = this.shadowRoot.querySelector('#debtModal');
+            const modal = this.querySelector('#debtModal');
             modal.openCreate();
-            modal.attachOpener(header.shadowRoot.getElementById('add-debt'));
+            modal.attachOpener(header.querySelector('#add-debt'));
         });
         header.addEventListener('add-income', () => {
-            let modal = this.shadowRoot.querySelector('#ingresoModal');
+            let modal = this.querySelector('#ingresoModal');
             if (!modal) {
                 modal = document.createElement('ingreso-modal');
                 modal.id = 'ingresoModal';
-                this.shadowRoot.appendChild(modal);
+                this.appendChild(modal);
             }
             modal.openCreate();
-            modal.attachOpener(header.shadowRoot.getElementById('add-income'));
+            modal.attachOpener(header.querySelector('#add-income'));
         });
         header.addEventListener('export-data', () => {
-            this.openExportModal(header.shadowRoot.getElementById('export-data'));
+            this.openExportModal(header.querySelector('#export-data'));
         });
         header.addEventListener('import-data', () => {
-            this.openImportModal(header.shadowRoot.getElementById('import-data'));
+            this.openImportModal(header.querySelector('#import-data'));
         });
         header.addEventListener('delete-data', async () => {
             const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
@@ -94,15 +93,9 @@ export class AppShell extends HTMLElement {
         panel.className = 'panel';
         panel.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
 
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host { display: block; }
-                .panel { margin-top: 1.25rem; }
-            </style>
-        `;
-        injectBootstrap(this.shadowRoot);
-        this.shadowRoot.appendChild(header);
-        this.shadowRoot.appendChild(panel);
+        this.innerHTML = '';
+        this.appendChild(header);
+        this.appendChild(panel);
     }
 
     onGroupChange(groupBy) {
@@ -110,20 +103,20 @@ export class AppShell extends HTMLElement {
     }
 
     async openExportModal(opener) {
-        let modal = this.shadowRoot.getElementById('exportDataModal');
+        let modal = this.querySelector('#exportDataModal');
         if (!modal) {
             modal = document.createElement('export-data-modal');
             modal.id = 'exportDataModal';
-            this.shadowRoot.appendChild(modal);
+            this.appendChild(modal);
         }
         modal.open(opener);
     }
     async openImportModal(opener) {
-        let modal = this.shadowRoot.getElementById('importDataModal');
+        let modal = this.querySelector('#importDataModal');
         if (!modal) {
             modal = document.createElement('import-data-modal');
             modal.id = 'importDataModal';
-            this.shadowRoot.appendChild(modal);
+            this.appendChild(modal);
         }
 
         // Attach listeners only once; support both modal-dispatched and window-dispatched events
@@ -143,7 +136,7 @@ export class AppShell extends HTMLElement {
 
     _onDataImportedHandler(_e) {
         // Refrescar la lista de deudas
-        const debtList = this.shadowRoot.querySelector('debt-list');
+        const debtList = this.querySelector('debt-list');
         if (debtList && typeof debtList.refresh === 'function') {
             debtList.refresh();
         }
@@ -152,7 +145,7 @@ export class AppShell extends HTMLElement {
     }
 
     updateFormVisibility() {
-        const container = this.shadowRoot.querySelector('#form-container');
+        const container = this.querySelector('#form-container');
         container.innerHTML = this.showForm ? '<debt-form></debt-form>' : '';
     }
 }

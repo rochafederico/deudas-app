@@ -1,18 +1,17 @@
 // src/components/IngresoModal.js
 import '../../../shared/components/UiModal.js';
 import './IngresoForm.js';
-import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class IngresoModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
+        this.style.display = 'block';
     }
 
     connectedCallback() {
-        this.ui = this.shadowRoot.querySelector('ui-modal');
-        this.form = this.shadowRoot.querySelector('ingreso-form');
+        this.render();
+        this.ui = this.querySelector('ui-modal');
+        this.form = this.querySelector('ingreso-form');
         this.form.addEventListener('ingreso:saved', (e) => this._handleEvent(e, 'ingreso:saved'));
         this.form.addEventListener('ingreso:cancel', () => this.ui.close());
     }
@@ -37,18 +36,13 @@ export class IngresoModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
             <ui-modal></ui-modal>
             <ingreso-form></ingreso-form>
-            <style>
-            :host{}
-            ingreso-form{ display:block; }
-            </style>
         `;
-        injectBootstrap(this.shadowRoot);
         setTimeout(() => {
-            const modal = this.shadowRoot.querySelector('ui-modal');
-            const form = this.shadowRoot.querySelector('ingreso-form');
+            const modal = this.querySelector('ui-modal');
+            const form = this.querySelector('ingreso-form');
             if (modal && form) modal.appendChild(form);
         }, 0);
     }

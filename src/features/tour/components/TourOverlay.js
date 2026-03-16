@@ -4,40 +4,28 @@
 export class TourOverlay extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this._visible = false;
+    }
+
+    connectedCallback() {
         this.render();
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100vw;
-                    height: 100vh;
-                    z-index: 9998;
-                    pointer-events: none;
-                }
-                :host([visible]) {
-                    display: block;
-                }
-                svg {
-                    width: 100%;
-                    height: 100%;
-                }
-                #highlight-cutout {
-                    transition: x 0.3s ease-out, y 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
-                }
-            </style>
-            <svg xmlns="http://www.w3.org/2000/svg">
+        this.style.display = 'none';
+        this.style.position = 'fixed';
+        this.style.top = '0';
+        this.style.left = '0';
+        this.style.width = '100vw';
+        this.style.height = '100vh';
+        this.style.zIndex = '9998';
+        this.style.pointerEvents = 'none';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
                 <defs>
                     <mask id="tour-mask">
                         <rect x="0" y="0" width="100%" height="100%" fill="white"/>
-                        <rect id="highlight-cutout" x="0" y="0" width="0" height="0" rx="8" ry="8" fill="black"/>
+                        <rect id="highlight-cutout" x="0" y="0" width="0" height="0" rx="8" ry="8" fill="black" style="transition:x 0.3s ease-out,y 0.3s ease-out,width 0.3s ease-out,height 0.3s ease-out;"/>
                     </mask>
                 </defs>
                 <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#tour-mask)" pointer-events="all"/>
@@ -51,7 +39,7 @@ export class TourOverlay extends HTMLElement {
      * @param {number} padding - Padding alrededor del highlight (px).
      */
     highlight(rect, padding = 8) {
-        const cutout = this.shadowRoot.getElementById('highlight-cutout');
+        const cutout = this.querySelector('#highlight-cutout');
         if (!cutout) return;
 
         if (rect) {

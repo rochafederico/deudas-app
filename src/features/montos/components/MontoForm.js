@@ -5,9 +5,8 @@ import '../../../shared/components/AppForm.js';
 export class MontoForm extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'block';
         this._monto = {};
-        this.render();
     }
 
     set monto(data) {
@@ -19,7 +18,8 @@ export class MontoForm extends HTMLElement {
     }
 
     connectedCallback() {
-        this.form = this.shadowRoot.querySelector('app-form');
+        this.render();
+        this.form = this.querySelector('app-form');
         if (this.form) {
             this.form.addEventListener('monto:submit', e => {
                 this.dispatchEvent(new CustomEvent('monto:save', {
@@ -35,7 +35,7 @@ export class MontoForm extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = '';
+        this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'monto', type: 'number', label: 'Monto', required: true },
@@ -49,7 +49,7 @@ export class MontoForm extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('monto:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
-        this.shadowRoot.appendChild(form);
+        this.appendChild(form);
     }
 }
 customElements.define('monto-form', MontoForm);

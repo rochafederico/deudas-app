@@ -1,27 +1,22 @@
 // src/components/AppCheckbox.js
-import { injectBootstrap } from '../utils/bootstrapStyles.js';
+// Checkbox nativo Bootstrap (sin Shadow DOM)
 
 export class AppCheckbox extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
+        this.style.display = 'inline-block';
     }
 
     static get observedAttributes() {
         return ['checked', 'id'];
     }
 
-    attributeChangedCallback(name, oldValue, newValue) {
-        if (name === 'checked') {
-            this.render();
-        }
-        if (name === 'id') {
-            this.render();
-        }
+    attributeChangedCallback() {
+        if (this._rendered) this.render();
     }
 
     connectedCallback() {
-        this.render();
+        if (!this._rendered) this.render();
     }
 
     set checked(val) {
@@ -39,31 +34,17 @@ export class AppCheckbox extends HTMLElement {
     }
 
     render() {
+        this._rendered = true;
         const checked = this.checked;
         const inputId = this.inputId || 'app-checkbox';
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host { display: inline-block; }
-                .form-check { margin: 0; padding: 0; min-height: auto; }
-                .form-check-input {
-                    width: 1.4em;
-                    height: 1.4em;
-                    cursor: pointer;
-                    margin: 0;
-                }
-                .form-check-input:checked {
-                    background-color: var(--accent, rgb(61, 121, 130));
-                    border-color: var(--accent, rgb(61, 121, 130));
-                }
-            </style>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="${inputId}" ${checked ? 'checked' : ''} />
+        this.innerHTML = `
+            <div class="form-check" style="margin:0;padding:0;min-height:auto;">
+                <input class="form-check-input" type="checkbox" id="${inputId}" ${checked ? 'checked' : ''} style="width:1.4em;height:1.4em;cursor:pointer;margin:0;" />
             </div>
         `;
-        injectBootstrap(this.shadowRoot);
-        const checkbox = this.shadowRoot.querySelector('input[type="checkbox"]');
+        const checkbox = this.querySelector('input[type="checkbox"]');
         checkbox.checked = checked;
-        checkbox.addEventListener('change', e => {
+        checkbox.addEventListener('change', () => {
             this.checked = checkbox.checked;
             this.dispatchEvent(new CustomEvent('checkbox-change', {
                 detail: { checked: checkbox.checked },

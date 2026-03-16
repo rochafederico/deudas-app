@@ -1,20 +1,19 @@
 // src/components/DebtModal.js
 // Web Component <debt-modal> - Wrapper específico para <ui-modal> + <debt-form>
 
-import { UiModal } from '../../../shared/components/UiModal.js';
-import { DebtForm } from './DebtForm.js';
-import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
+import '../../../shared/components/UiModal.js';
+import './DebtForm.js';
 
 export class DebtModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
+        this.style.display = 'block';
     }
 
     connectedCallback() {
-        this.ui = this.shadowRoot.querySelector('ui-modal');
-        this.form = this.shadowRoot.querySelector('debt-form');
+        this.render();
+        this.ui = this.querySelector('ui-modal');
+        this.form = this.querySelector('debt-form');
         // Propagar eventos del formulario y cerrar modal
         this.form.addEventListener('deuda:saved', e => this._handleEvent(e, 'deuda:saved'));
         this.form.addEventListener('deuda:updated', e => this._handleEvent(e, 'deuda:updated'));
@@ -47,18 +46,13 @@ export class DebtModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
         <ui-modal></ui-modal>
         <debt-form></debt-form>
-        <style>
-        :host{}
-        debt-form{ display:block; }
-        </style>
         `;
-        injectBootstrap(this.shadowRoot);
         setTimeout(() => {
-            const modal = this.shadowRoot.querySelector('ui-modal');
-            const form = this.shadowRoot.querySelector('debt-form');
+            const modal = this.querySelector('ui-modal');
+            const form = this.querySelector('debt-form');
             if (modal && form) {
                 modal.appendChild(form);
             }

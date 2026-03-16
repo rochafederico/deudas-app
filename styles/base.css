@@ -123,12 +123,12 @@ body.dark-mode .stats-card {
     background: var(--panel-dark);
     border-color: var(--border-dark);
 }
-.stats-card h2 {
+.stats-card h6 {
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 4px;
 }
-.stats-card h3 {
+.stats-card h4 {
     font-size: 1rem;
     margin-bottom: 0;
 }

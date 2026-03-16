@@ -2,23 +2,20 @@
 // Definicion de los pasos del tour guiado
 
 /**
- * Helper para buscar un elemento con data-tour-step dentro de un arbol de shadow DOMs.
- * Recorre el path de custom elements, entrando en cada shadowRoot.
- * @param {Array<{selector: string, shadow?: boolean}>} path - Array de pasos para llegar al elemento.
+ * Helper para buscar un elemento con data-tour-step dentro del DOM.
+ * Recorre el path de custom elements buscando selectores anidados.
+ * @param {Array<{selector: string}>} path - Array de pasos para llegar al elemento.
  * @returns {HTMLElement|null}
  */
 export function findTourTarget(path) {
+    if (!path || path.length === 0) return null;
     let current = document;
     for (const step of path) {
         const node = current.querySelector(step.selector);
         if (!node) return null;
-        if (step.shadow && node.shadowRoot) {
-            current = node.shadowRoot;
-        } else {
-            return node;
-        }
+        current = node;
     }
-    return null;
+    return current;
 }
 
 /**
@@ -35,7 +32,7 @@ export const tourSteps = [
         title: 'Bienvenida',
         text: 'Organizá tus deudas y gastos fijos en un solo lugar',
         getTarget: () => findTourTarget([
-            { selector: 'demo-banner', shadow: true },
+            { selector: 'demo-banner' },
             { selector: '[data-tour-step="bienvenida"]' }
         ]),
         position: 'bottom'
@@ -52,8 +49,8 @@ export const tourSteps = [
         title: 'Navegación por mes',
         text: 'Navegá entre meses para ver tus pagos pasados y futuros',
         getTarget: () => findTourTarget([
-            { selector: 'app-shell', shadow: true },
-            { selector: 'header-bar', shadow: true },
+            { selector: 'app-shell' },
+            { selector: 'header-bar' },
             { selector: '[data-tour-step="navegacion-mes"]' }
         ]),
         position: 'bottom'
@@ -63,8 +60,8 @@ export const tourSteps = [
         title: 'Nueva deuda',
         text: 'Cargá tus deudas: tarjeta, alquiler, préstamos, servicios',
         getTarget: () => findTourTarget([
-            { selector: 'app-shell', shadow: true },
-            { selector: 'header-bar', shadow: true },
+            { selector: 'app-shell' },
+            { selector: 'header-bar' },
             { selector: '[data-tour-step="nueva-deuda"]' }
         ]),
         position: 'bottom'
@@ -74,8 +71,8 @@ export const tourSteps = [
         title: 'Nuevo ingreso',
         text: 'Registrá tus ingresos para ver si te alcanza el mes',
         getTarget: () => findTourTarget([
-            { selector: 'app-shell', shadow: true },
-            { selector: 'header-bar', shadow: true },
+            { selector: 'app-shell' },
+            { selector: 'header-bar' },
             { selector: '[data-tour-step="nuevo-ingreso"]' }
         ]),
         position: 'bottom'
@@ -85,8 +82,8 @@ export const tourSteps = [
         title: 'Exportar datos',
         text: 'Descargá un backup de toda tu información en formato JSON para tener un respaldo',
         getTarget: () => findTourTarget([
-            { selector: 'app-shell', shadow: true },
-            { selector: 'header-bar', shadow: true },
+            { selector: 'app-shell' },
+            { selector: 'header-bar' },
             { selector: '[data-tour-step="exportar"]' }
         ]),
         position: 'bottom'
@@ -96,8 +93,8 @@ export const tourSteps = [
         title: 'Importar datos',
         text: 'Restaurá tus datos desde un archivo JSON exportado previamente',
         getTarget: () => findTourTarget([
-            { selector: 'app-shell', shadow: true },
-            { selector: 'header-bar', shadow: true },
+            { selector: 'app-shell' },
+            { selector: 'header-bar' },
             { selector: '[data-tour-step="importar"]' }
         ]),
         position: 'bottom'
@@ -107,7 +104,7 @@ export const tourSteps = [
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
         getTarget: () => findTourTarget([
-            { selector: 'demo-banner', shadow: true },
+            { selector: 'demo-banner' },
             { selector: '[data-tour-step="menu-navegacion"]' }
         ]),
         position: 'bottom'
