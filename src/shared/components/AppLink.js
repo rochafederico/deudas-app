@@ -1,5 +1,7 @@
 // src/components/AppLink.js
 // Web Component <app-link> para navegación SPA universal
+import { injectBootstrap } from '../utils/bootstrapStyles.js';
+
 class AppLink extends HTMLElement {
   static get observedAttributes() {
     return ['href'];
@@ -39,21 +41,23 @@ class AppLink extends HTMLElement {
     const label = this.textContent || this.getAttribute('label') || href;
     this.shadowRoot.innerHTML = `
       <style>
+        :host { display: inline-block; }
         a {
           color: inherit;
           text-decoration: none;
           cursor: pointer;
           font: inherit;
-          border-radius: 6px;
-          padding: 4px 10px;
+          border-radius: 0.375rem;
+          padding: 0.375rem 0.75rem;
           transition: background 0.2s, color 0.2s;
         }
         a:hover {
-          background: rgba(0,0,0,0.08);
+          background: rgba(255,255,255,0.15);
         }
       </style>
-      <a href="${href}">${label}</a>
+      <a href="${href}" class="nav-link">${label}</a>
     `;
+    injectBootstrap(this.shadowRoot);
   }
 }
 

@@ -1,5 +1,6 @@
 // src/features/tour/components/TourTooltip.js
 // Web Component <tour-tooltip> - Tooltip/popover del tour con botones de navegacion
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class TourTooltip extends HTMLElement {
     constructor() {
@@ -220,6 +221,7 @@ export class TourTooltip extends HTMLElement {
                 </div>
             </div>
         `;
+        injectBootstrap(this.shadowRoot);
     }
 }
 

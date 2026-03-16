@@ -1,5 +1,6 @@
 // src/components/AppTable.js
 // Componente de tabla reutilizable
+import { injectBootstrap } from '../utils/bootstrapStyles.js';
 
 export class AppTable extends HTMLElement {
     constructor() {
@@ -46,19 +47,22 @@ export class AppTable extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <style>
-                table { width: 100%; border-collapse: collapse; }
-                th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                :host { display: block; }
                 th:last-child, td:last-child { text-align: right; }
-                tr:hover { background-color: #f1f1f1; }
-                :host-context(body.dark-mode) tr:hover { background-color: #222a3a; }
+                :host-context(body.dark-mode) .table { color: var(--text-dark); }
+                :host-context(body.dark-mode) .table-hover > tbody > tr:hover > * { 
+                    background-color: #222a3a; 
+                    --bs-table-hover-bg: #222a3a;
+                }
                 @media (max-width: 600px) {
                     .hidden-mobile {
                         display: none !important;
                     }
                 }
             </style>
-            <table>
-                <thead>
+            <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
                     <tr>
                         ${this.columns.map(col => `<th${col.opts && col.opts.classCss ? ` class="${col.opts.classCss}"` : ''}>${col.label}</th>`).join('')}
                     </tr>
@@ -68,7 +72,9 @@ export class AppTable extends HTMLElement {
                     ${this.footerContent}
                 </tfoot>
             </table>
+            </div>
         `;
+        injectBootstrap(this.shadowRoot);
         // Renderizar filas dinámicamente
         const tbody = this.shadowRoot.querySelector('tbody');
         tbody.innerHTML = '';

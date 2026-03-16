@@ -5,6 +5,7 @@ import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/DuplicateMontoModal.js';
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -42,27 +43,26 @@ export class DebtForm extends HTMLElement {
     render() {
         const style = document.createElement('style');
         style.textContent = `
+            :host { display: block; }
             .montos-list {
-                margin: 10px 0;
+                margin: 0.75rem 0;
                 background: var(--panel);
-                border-radius: 6px;
-                padding: 10px;
+                border-radius: 0.375rem;
+                padding: 0.75rem;
             }
             .montos-list table {
                 width: 100%;
                 border-collapse: collapse;
             }
             .montos-list th, .montos-list td {
-                padding: 6px;
+                padding: 0.375rem;
                 border-bottom: 1px solid var(--border);
             }
             .montos-list tr:last-child td {
                 border-bottom: none;
             }
-            .btn-monto {
-                margin-left: 5px;
-            }
         `;
+        injectBootstrap(this.shadowRoot);
         // Formulario principal con <app-form>
         const form = document.createElement('app-form');
         form.fields = [
@@ -83,7 +83,7 @@ export class DebtForm extends HTMLElement {
             className: 'montos-list',
             children: [
                 el('div', {
-                    attrs: { style: 'display:flex;align-items:center;justify-content:space-between;' },
+                    className: 'd-flex align-items-center justify-content-between mb-2',
                     children: [
                         el('strong', { text: 'Montos' }),
                         el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })

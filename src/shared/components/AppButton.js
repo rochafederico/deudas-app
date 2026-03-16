@@ -1,4 +1,6 @@
 // src/components/AppButton.js
+import { injectBootstrap } from '../utils/bootstrapStyles.js';
+
 export class AppButton extends HTMLElement {
     static get observedAttributes() {
         return ['variant', 'disabled'];
@@ -15,80 +17,51 @@ export class AppButton extends HTMLElement {
         const variant = this.getAttribute('variant') || '';
         const disabled = this.hasAttribute('disabled');
         const type = this.getAttribute('type') || 'button';
+
+        // Mapear variantes a clases Bootstrap
+        let btnClass = 'btn btn-primary';
+        if (variant === 'delete') btnClass = 'btn btn-danger';
+        else if (variant === 'success') btnClass = 'btn btn-success';
+        else if (variant === 'secondary') btnClass = 'btn btn-secondary';
+
         this.shadowRoot.innerHTML = `
             <style>
+                :host { display: inline-block; }
                 button {
-                    background-color: var(--accent);
-                    color: #fff;
-                    border: none;
-                    border-radius: 5px;
-                    padding: 7px 16px;
-                    margin: 4px 2px;
-                    font-size: 1em;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: background 0.2s, color 0.2s;
-                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-                    outline: none;
-                    display: inline-block;
+                    margin: 2px;
+                    font-size: 0.95em;
+                    white-space: nowrap;
                 }
-                button:hover {
-                    background-color: var(--accent-hover);
-                }
-                button:active {
-                    filter: brightness(0.95);
-                }
-                button:disabled {
-                    background-color: var(--muted-light);
-                    color: #eee;
-                    cursor: not-allowed;
-                    opacity: 0.7;
-                }
-                button:focus {
-                    outline: 2px solid var(--accent);
-                    outline-offset: 2px;
-                }
-                :host([variant="delete"]) button {
-                    background-color: var(--error);
-                }
-                :host([variant="delete"]) button:hover {
-                    background-color: #b52a1a;
-                }
-                :host([variant="success"]) button {
-                    background-color: var(--success);
-                }
-                :host([variant="success"]) button:hover {
-                    background-color: #449d44;
-                }
-                /* Dark mode support: invert to darker buttons */
-                :host-context(body.dark-mode) button {
+                /* Dark mode adjustments */
+                :host-context(body.dark-mode) .btn-primary {
                     background-color: #222a3a;
+                    border-color: #222a3a;
                     color: #eaeaea;
                 }
-                :host-context(body.dark-mode) button:hover {
+                :host-context(body.dark-mode) .btn-primary:hover {
                     background-color: #181a1b;
+                    border-color: #181a1b;
                 }
-                :host-context(body.dark-mode) button:disabled {
-                    background-color: var(--muted-dark);
-                    color: #444;
-                }
-                :host-context(body.dark-mode)[variant="delete"] button {
+                :host-context(body.dark-mode) .btn-danger {
                     background-color: #7a1810;
-                    color: #fff;
+                    border-color: #7a1810;
                 }
-                :host-context(body.dark-mode)[variant="delete"] button:hover {
+                :host-context(body.dark-mode) .btn-danger:hover {
                     background-color: #d9534f;
+                    border-color: #d9534f;
                 }
-                :host-context(body.dark-mode)[variant="success"] button {
+                :host-context(body.dark-mode) .btn-success {
                     background-color: #234d23;
-                    color: #fff;
+                    border-color: #234d23;
                 }
-                :host-context(body.dark-mode)[variant="success"] button:hover {
+                :host-context(body.dark-mode) .btn-success:hover {
                     background-color: #5cb85c;
+                    border-color: #5cb85c;
                 }
             </style>
-            <button type="${type}" ${disabled ? 'disabled' : ''} aria-label="${this.getAttribute('aria-label') || this.textContent}" tabindex="0"><slot></slot></button>
+            <button type="${type}" class="${btnClass} btn-sm" ${disabled ? 'disabled' : ''} aria-label="${this.getAttribute('aria-label') || this.textContent}" tabindex="0"><slot></slot></button>
         `;
+        injectBootstrap(this.shadowRoot);
         // Workaround para submit en Shadow DOM
         const btn = this.shadowRoot.querySelector('button');
         if (type === 'submit') {

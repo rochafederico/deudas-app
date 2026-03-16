@@ -1,5 +1,7 @@
 // src/components/AppInput.js
 // Componente web <app-input> reutilizable para formularios
+import { injectBootstrap } from '../utils/bootstrapStyles.js';
+
 export class AppInput extends HTMLElement {
     static get observedAttributes() {
         return ['type', 'name', 'value', 'label', 'required', 'disabled', 'placeholder'];
@@ -98,43 +100,22 @@ export class AppInput extends HTMLElement {
         const placeholder = this.getAttribute('placeholder') || '';
         let inputHtml = '';
         if (type === 'textarea') {
-            inputHtml = `<textarea id="${name}" name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}">${value}</textarea>`;
+            inputHtml = `<textarea id="${name}" name="${name}" class="form-control" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}">${value}</textarea>`;
         } else if (type === 'select') {
-            // Para select, espera que el usuario agregue <option> como children
-            inputHtml = `<select id="${name}" name="${name}" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${this.innerHTML}</select>`;
+            inputHtml = `<select id="${name}" name="${name}" class="form-select" ${required ? 'required' : ''} ${disabled ? 'disabled' : ''}>${this.innerHTML}</select>`;
         } else {
-            // Si es number, agrega step="0.01"
             const stepAttr = type === 'number' ? 'step="0.01" ' : '';
-            inputHtml = `<input id="${name}" type="${type}" name="${name}" value="${value}" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
+            inputHtml = `<input id="${name}" type="${type}" name="${name}" value="${value}" class="form-control" ${stepAttr}${required ? 'required' : ''} ${disabled ? 'disabled' : ''} placeholder="${placeholder}" />`;
         }
         this.shadowRoot.innerHTML = `
             <style>
+                :host { display: block; margin-bottom: 0.5rem; }
                 label { display:block; margin-bottom:4px; font-size:0.98em; color:var(--muted-light); }
-                input, select, textarea {
-                    border: 1px solid var(--border-light);
-                    border-radius: 6px;
-                    padding: 10px;
-                    margin: 6px 0;
-                    width: 100%;
-                    box-sizing: border-box;
-                    font-size: 1em;
-                    background: var(--panel-light);
-                    color: var(--text-light);
-                    transition: background 0.3s, color 0.3s, border 0.3s;
-                }
-                input:focus, select:focus, textarea:focus {
-                    outline: none;
-                    border-color: var(--accent);
-                }
-                :host([disabled]) input, :host([disabled]) select, :host([disabled]) textarea {
-                    background: var(--muted-light);
-                    color: #aaa;
-                    cursor: not-allowed;
-                }
             </style>
-            ${label ? `<label for="${name}">${label}</label>` : ''}
+            ${label ? `<label for="${name}" class="form-label">${label}</label>` : ''}
             ${inputHtml}
         `;
+        injectBootstrap(this.shadowRoot);
         this._renderError();
     }
 }

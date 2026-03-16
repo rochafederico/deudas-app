@@ -1,6 +1,7 @@
 // src/components/IngresoModal.js
 import '../../../shared/components/UiModal.js';
 import './IngresoForm.js';
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class IngresoModal extends HTMLElement {
     constructor() {
@@ -42,9 +43,9 @@ export class IngresoModal extends HTMLElement {
             <style>
             :host{}
             ingreso-form{ display:block; }
-            ui-modal::part(dialog){ border-radius:16px; padding:16px; }
             </style>
         `;
+        injectBootstrap(this.shadowRoot);
         setTimeout(() => {
             const modal = this.shadowRoot.querySelector('ui-modal');
             const form = this.shadowRoot.querySelector('ingreso-form');

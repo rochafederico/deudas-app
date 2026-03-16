@@ -1,6 +1,7 @@
 // src/components/ExportDataModal.js
 import '../../../shared/components/AppForm.js';
 import '../../../shared/components/UiModal.js';
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class ExportDataModal extends HTMLElement {
     constructor() {
@@ -82,17 +83,17 @@ export class ExportDataModal extends HTMLElement {
     render() {
         this.shadowRoot.innerHTML = `
             <ui-modal id="exportModal">
-                <div style="padding:16px;">
+                <div class="p-3">
                     <p>Exporta todos tus datos en un archivo JSON legible.</p>
-                    <div style="text-align:center;margin-top:16px;"><span class="spinner"></span></div>
+                    <div class="text-center mt-3"><span class="spinner"></span></div>
                 </div>
                 <style>
                 .spinner {
                     display: inline-block;
-                    width: 32px;
-                    height: 32px;
+                    width: 2rem;
+                    height: 2rem;
                     border: 4px solid #eee;
-                    border-top: 4px solid var(--accent, #4b6cb7);
+                    border-top: 4px solid var(--accent, rgb(61, 121, 130));
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                 }
@@ -103,6 +104,7 @@ export class ExportDataModal extends HTMLElement {
                 </style>
             </ui-modal>
         `;
+        injectBootstrap(this.shadowRoot);
     }
 }
 

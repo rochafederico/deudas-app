@@ -92,11 +92,11 @@ export class AppForm extends HTMLElement {
             return el('app-input', { attrs, children });
         });
         const form = el('form', {
-            attrs: { style: 'display:flex;flex-direction:column;gap:10px;' },
+            className: 'd-flex flex-column gap-2',
             children: [
                 ...inputs,
                 el('div', {
-                    attrs: { style: 'display:flex;justify-content:flex-end;gap:8px;' },
+                    className: 'd-flex justify-content-end gap-2 mt-2',
                     children: [
                         el('app-button', {
                             attrs: { type: 'button', id: 'cancelBtn', 'aria-label': 'Cancelar formulario' },

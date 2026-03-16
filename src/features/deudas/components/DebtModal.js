@@ -3,6 +3,7 @@
 
 import { UiModal } from '../../../shared/components/UiModal.js';
 import { DebtForm } from './DebtForm.js';
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class DebtModal extends HTMLElement {
     constructor() {
@@ -52,11 +53,9 @@ export class DebtModal extends HTMLElement {
         <style>
         :host{}
         debt-form{ display:block; }
-        ui-modal::part(dialog){ border-radius:16px; padding:16px; background:#111a34; color:#e5e7eb; }
-        ui-modal::part(header){ display:flex; align-items:center; justify-content:space-between; }
         </style>
         `;
-        // Mover el formulario dentro del slot del modal
+        injectBootstrap(this.shadowRoot);
         setTimeout(() => {
             const modal = this.shadowRoot.querySelector('ui-modal');
             const form = this.shadowRoot.querySelector('debt-form');

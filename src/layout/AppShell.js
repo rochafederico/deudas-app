@@ -4,6 +4,7 @@ import '../shared/components/AppInput.js';
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';
+import { injectBootstrap } from '../shared/utils/bootstrapStyles.js';
 
 export class AppShell extends HTMLElement {
     constructor() {
@@ -95,9 +96,11 @@ export class AppShell extends HTMLElement {
 
         this.shadowRoot.innerHTML = `
             <style>
-                .panel { margin-top: 20px; }
+                :host { display: block; }
+                .panel { margin-top: 1.25rem; }
             </style>
         `;
+        injectBootstrap(this.shadowRoot);
         this.shadowRoot.appendChild(header);
         this.shadowRoot.appendChild(panel);
     }

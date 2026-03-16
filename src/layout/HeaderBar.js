@@ -2,6 +2,7 @@
 import '../shared/components/AppInput.js';
 import { groupOptions } from '../shared/config/tables/groupOptions.js';
 import '../shared/components/AppButton.js';
+import { injectBootstrap } from '../shared/utils/bootstrapStyles.js';
 
 export class HeaderBar extends HTMLElement {
     constructor() {
@@ -91,40 +92,36 @@ export class HeaderBar extends HTMLElement {
     }
 
     render() {
-        // Generar las opciones para el select
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
         this.shadowRoot.innerHTML = `
             <style>
+            :host { display: block; }
             .header-bar { 
                 display: flex; 
                 flex-wrap: wrap;
                 justify-content: space-between; 
                 align-items: center; 
-                padding: 10px; 
+                padding: 0.75rem; 
                 background-color: var(--panel-light); 
                 color: var(--text-light);
-                border-radius: 12px 12px 0 0; 
-                gap: 8px;
+                border-radius: 0.75rem 0.75rem 0 0; 
+                gap: 0.5rem;
             }
-            .month-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-            .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-            .group-filter { margin-left: 12px; min-width: 140px; }
-            /* Modo oscuro */
             :host-context(body.dark-mode) .header-bar {
                 background-color: var(--panel-dark);
                 color: var(--text-dark);
             }
             </style>
             <div class="header-bar">
-            <div class="month-nav" data-tour-step="navegacion-mes">
-                <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
+            <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
+                <app-button id="prev-month" type="button" title="Mes anterior">&#8249;</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
-                <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
-                <app-input type="select" id="group-filter" name="group-filter" class="group-filter" title="Agrupar montos">
+                <app-button id="next-month" type="button" title="Mes siguiente">&#8250;</app-button>
+                <app-input type="select" id="group-filter" name="group-filter" title="Agrupar montos">
                 ${optionsHtml}
                 </app-input>
             </div>
-            <div class="actions">
+            <div class="d-flex gap-2 flex-wrap">
                 <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
                 Nuevo ingreso
                 </app-button>
@@ -143,6 +140,7 @@ export class HeaderBar extends HTMLElement {
             </div>
             </div>
         `;
+        injectBootstrap(this.shadowRoot);
     }
 }
 customElements.define('header-bar', HeaderBar);

@@ -4,6 +4,7 @@ import { listInversiones, deleteInversion } from '../inversionRepository.js';
 import { inversionTableColumns } from '../../../shared/config/tables/inversionTableColumns.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
+import { injectBootstrap } from '../../../shared/utils/bootstrapStyles.js';
 
 export class InversionesList extends HTMLElement {
   constructor() {
@@ -14,12 +15,15 @@ export class InversionesList extends HTMLElement {
 
   async render() {
     this.shadowRoot.innerHTML = `<style>
-      app-button { margin-bottom: 1em; }
+      :host { display: block; }
+      h2 { margin-bottom: 0.75rem; }
+      app-button { margin-bottom: 1rem; }
     </style>
     <h2>Inversiones</h2>
     <app-button id="add" aria-label="Agregar inversión">Agregar inversión</app-button>
     <app-table id="tabla"></app-table>
     <inversion-modal id="inversion-modal"></inversion-modal>`;
+    injectBootstrap(this.shadowRoot);
     this.shadowRoot.getElementById('add').onclick = () => this.openModal();
     await this.renderTable();
   }

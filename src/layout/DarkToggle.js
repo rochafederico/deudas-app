@@ -1,4 +1,6 @@
 // src/components/DarkToggle.js
+import { injectBootstrap } from '../shared/utils/bootstrapStyles.js';
+
 class DarkToggle extends HTMLElement {
   constructor() {
     super();
@@ -22,28 +24,29 @@ class DarkToggle extends HTMLElement {
   render() {
     this.shadowRoot.innerHTML = `
       <style>
-        button {
-          margin-top: 12px;
-          margin-bottom: 8px;
+        :host { display: inline-block; }
+        .btn-toggle {
+          margin-top: 0.75rem;
+          margin-bottom: 0.5rem;
           background: var(--panel-light);
           color: var(--accent);
           border: 1px solid var(--border-light);
-          border-radius: 50px;
-          padding: 8px 18px;
-          font-size: 1em;
+          border-radius: 50rem;
+          padding: 0.375rem 1rem;
+          font-size: 0.9rem;
           font-weight: 500;
           cursor: pointer;
-          box-shadow: 0 1px 6px rgba(0,0,0,0.06);
           transition: background 0.3s, color 0.3s;
         }
-        :host-context(body.dark-mode) button {
+        :host-context(body.dark-mode) .btn-toggle {
           background: var(--panel-dark);
           color: var(--accent-hover);
           border: 1px solid var(--border-dark);
         }
       </style>
-      <button type="button" aria-label="Alternar modo oscuro"></button>
+      <button type="button" class="btn-toggle" aria-label="Alternar modo oscuro"></button>
     `;
+    injectBootstrap(this.shadowRoot);
   }
 }
 customElements.define('dark-toggle', DarkToggle);
