@@ -8,16 +8,16 @@ import './HeaderBar.js';
 export class AppShell extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this.month = new Date().toISOString().slice(0, 7); // Mes actual por defecto
         this.showForm = false;
         // Handler for import events (idempotent listener registration)
         this._onDataImported = this._onDataImportedHandler.bind(this);
         this._importListenerAttached = false;
-        this.render();
     }
 
     connectedCallback() {
+        this.style.display = 'block';
+        this.render();
         // Usar el id para seleccionar el input correctamente
         const input = this.querySelector('#month-filter');
         if (input) input.value = this.month;

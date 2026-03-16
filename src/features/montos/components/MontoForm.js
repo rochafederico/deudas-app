@@ -5,7 +5,6 @@ import '../../../shared/components/AppForm.js';
 export class MontoForm extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this._monto = {};
     }
 
@@ -18,6 +17,7 @@ export class MontoForm extends HTMLElement {
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.form = this.querySelector('app-form');
         if (this.form) {

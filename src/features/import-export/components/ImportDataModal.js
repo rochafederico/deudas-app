@@ -7,12 +7,12 @@ import { MontoModel } from '../../montos/MontoModel.js';
 export class ImportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this.importData = null;
         this.fileInput = null;
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
         this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());

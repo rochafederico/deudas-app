@@ -7,10 +7,10 @@ export class AppInput extends HTMLElement {
     }
     constructor() {
         super();
-        this.style.display = 'block';
-        this.style.marginBottom = '0.5rem';
     }
     connectedCallback() {
+        this.style.display = 'block';
+        this.style.marginBottom = '0.5rem';
         if (!this._rendered) this.render();
         this._setupListeners();
     }

@@ -4,7 +4,6 @@ import '../../../shared/components/AppForm.js';
 export class DuplicateMontoModal extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this._monto = null;
     }
 
@@ -17,6 +16,7 @@ export class DuplicateMontoModal extends HTMLElement {
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.form = this.querySelector('app-form');
         if (this.form) {

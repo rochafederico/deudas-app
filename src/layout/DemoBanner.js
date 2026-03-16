@@ -4,10 +4,10 @@ import './DarkToggle.js';
 export class DemoBanner extends HTMLElement {
   constructor() {
     super();
-    this.style.display = 'block';
   }
 
   connectedCallback() {
+    this.style.display = 'block';
     this.render();
   }
 

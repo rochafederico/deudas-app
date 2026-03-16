@@ -7,9 +7,9 @@ export class AppButton extends HTMLElement {
     }
     constructor() {
         super();
-        this.style.display = 'inline-block';
     }
     connectedCallback() {
+        this.style.display = 'inline-block';
         if (!this._rendered) this.render();
     }
     attributeChangedCallback() {

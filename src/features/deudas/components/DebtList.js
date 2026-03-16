@@ -5,13 +5,13 @@ import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns
 export class DebtList extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this.debts = [];
         this.mes = new Date().toISOString().slice(0, 7); // mes actual por defecto
         this.groupBy = 'none'; // agrupamiento por defecto
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.loadDebts();
         this.addEventListeners();

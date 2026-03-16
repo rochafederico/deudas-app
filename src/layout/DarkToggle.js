@@ -3,10 +3,10 @@
 class DarkToggle extends HTMLElement {
   constructor() {
     super();
-    this.style.display = 'inline-block';
   }
 
   connectedCallback() {
+    this.style.display = 'inline-block';
     this.render();
     this.querySelector('button').addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');

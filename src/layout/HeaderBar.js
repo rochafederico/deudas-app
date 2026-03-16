@@ -6,11 +6,11 @@ import '../shared/components/AppButton.js';
 export class HeaderBar extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this.month = new Date().toISOString().slice(0, 7);
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         const monthFilter = this.querySelector('#month-filter');
         const prevBtn = this.querySelector('#prev-month');

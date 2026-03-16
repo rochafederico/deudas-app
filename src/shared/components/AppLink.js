@@ -8,11 +8,11 @@ class AppLink extends HTMLElement {
 
   constructor() {
     super();
-    this.style.display = 'inline-block';
     this.handleClick = this.handleClick.bind(this);
   }
 
   connectedCallback() {
+    this.style.display = 'inline-block';
     if (!this._rendered) this.render();
     this.addEventListener('click', this.handleClick);
   }

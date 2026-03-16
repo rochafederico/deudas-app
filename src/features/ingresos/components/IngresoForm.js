@@ -7,7 +7,6 @@ import monedas from '../../../shared/config/monedas.js';
 export class IngresoForm extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this._boundOnSubmit = this._onSubmit.bind(this);
         this._boundOnCancel = () => {
             this.dispatchEvent(new CustomEvent('ingreso:cancel', { bubbles: true, composed: true }));
@@ -15,6 +14,7 @@ export class IngresoForm extends HTMLElement {
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.form = this.querySelector('app-form');
         if (this.form && !this._listenersAttached) {

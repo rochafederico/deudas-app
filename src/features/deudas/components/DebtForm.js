@@ -10,13 +10,13 @@ import '../../montos/components/DuplicateMontoModal.js';
 export class DebtForm extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
         this.montos = [];
         this.editing = false;
         this.deudaId = null;
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.montoModal = this.querySelector('#montoModal');
         this.duplicateModal = this.querySelector('#duplicateMontoModal');

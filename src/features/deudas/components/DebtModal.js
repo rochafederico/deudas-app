@@ -7,10 +7,10 @@ import './DebtForm.js';
 export class DebtModal extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
     }
 
     connectedCallback() {
+        this.style.display = 'block';
         this.render();
         this.ui = this.querySelector('ui-modal');
         this.form = this.querySelector('debt-form');

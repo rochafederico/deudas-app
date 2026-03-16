@@ -4,7 +4,6 @@
 export class AppCheckbox extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'inline-block';
     }
 
     static get observedAttributes() {
@@ -16,6 +15,7 @@ export class AppCheckbox extends HTMLElement {
     }
 
     connectedCallback() {
+        this.style.display = 'inline-block';
         if (!this._rendered) this.render();
     }
 

@@ -5,10 +5,10 @@ import '../shared/components/AppLink.js';
 export class Menu extends HTMLElement {
   constructor() {
     super();
-    this.style.display = 'block';
   }
 
   connectedCallback() {
+    this.style.display = 'block';
     this.render();
     this.addEventListener('click', (e) => {
       const link = e.target.closest('[app-link]');

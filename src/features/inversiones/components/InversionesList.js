@@ -8,10 +8,10 @@ import { formatMoneda } from '../../../shared/config/monedas.js';
 export class InversionesList extends HTMLElement {
   constructor() {
     super();
-    this.style.display = 'block';
   }
 
   connectedCallback() {
+    this.style.display = 'block';
     this.render();
   }
 

@@ -5,7 +5,6 @@ import '../../../shared/components/UiModal.js';
 export class ExportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.style.display = 'block';
     }
 
     #mapDeudasForExport(deudas) {
