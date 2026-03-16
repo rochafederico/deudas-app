@@ -4,7 +4,7 @@ import { getMonthlySummary } from '../statsService.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
-  container.className = 'stats-row';
+  container.className = 'row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 stats-row';
   container.setAttribute('data-tour-step', 'indicadores');
 
   const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -27,17 +27,19 @@ export default function StatsIndicators({ mes } = {}) {
           .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`)
           .join('<br/>');
       }
-      const ingresosCard = StatsCard({ title: 'Ingresos' , value: addValue(summary.byCurrency.ingresos), color: 'var(--success)' });
-      const egresosCard = StatsCard({ title: 'Gastos',value: addValue(summary.byCurrency.egresos), color: '#d9534f' });
-      const saldoCard = StatsCard({ title: 'Balance',  value: addValue(summary.byCurrency.saldo), color: 'var(--dark)' });
-      const pendienteCard = StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), color: '#f0ad4e' });
-      const inversionesCard = StatsCard({ title: 'Inversiones', value: addValue(summary.inversiones), color: '#5bc0de' });
-
-      container.appendChild(ingresosCard);
-      container.appendChild(egresosCard);
-      container.appendChild(saldoCard);
-      container.appendChild(pendienteCard);
-      container.appendChild(inversionesCard);
+      const cards = [
+        StatsCard({ title: 'Ingresos' , value: addValue(summary.byCurrency.ingresos), color: 'var(--success)' }),
+        StatsCard({ title: 'Gastos', value: addValue(summary.byCurrency.egresos), color: '#d9534f' }),
+        StatsCard({ title: 'Balance', value: addValue(summary.byCurrency.saldo), color: 'var(--dark)' }),
+        StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), color: '#f0ad4e' }),
+        StatsCard({ title: 'Inversiones', value: addValue(summary.inversiones), color: '#5bc0de' }),
+      ];
+      cards.forEach(card => {
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.appendChild(card);
+        container.appendChild(col);
+      });
     } catch (err) {
       container.innerHTML = '';
       const errEl = document.createElement('div');

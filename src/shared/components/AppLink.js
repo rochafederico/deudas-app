@@ -1,5 +1,6 @@
 // src/components/AppLink.js
-// Web Component <app-link> para navegación SPA universal
+// Web Component <app-link> para navegación SPA (sin Shadow DOM)
+
 class AppLink extends HTMLElement {
   static get observedAttributes() {
     return ['href'];
@@ -7,21 +8,21 @@ class AppLink extends HTMLElement {
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
     this.handleClick = this.handleClick.bind(this);
   }
 
   connectedCallback() {
-    this.render();
-    this.shadowRoot.addEventListener('click', this.handleClick);
+    this.style.display = 'inline-block';
+    if (!this._rendered) this.render();
+    this.addEventListener('click', this.handleClick);
   }
 
   disconnectedCallback() {
-    this.shadowRoot.removeEventListener('click', this.handleClick);
+    this.removeEventListener('click', this.handleClick);
   }
 
   attributeChangedCallback() {
-    this.render();
+    if (this._rendered) this.render();
   }
 
   handleClick(e) {
@@ -35,25 +36,11 @@ class AppLink extends HTMLElement {
   }
 
   render() {
+    this._rendered = true;
     const href = this.getAttribute('href') || '#';
-    const label = this.textContent || this.getAttribute('label') || href;
-    this.shadowRoot.innerHTML = `
-      <style>
-        a {
-          color: inherit;
-          text-decoration: none;
-          cursor: pointer;
-          font: inherit;
-          border-radius: 6px;
-          padding: 4px 10px;
-          transition: background 0.2s, color 0.2s;
-        }
-        a:hover {
-          background: rgba(0,0,0,0.08);
-        }
-      </style>
-      <a href="${href}">${label}</a>
-    `;
+    const label = this._originalText || this.textContent.trim() || this.getAttribute('label') || href;
+    if (!this._originalText) this._originalText = label;
+    this.innerHTML = `<a href="${href}" style="color:inherit;text-decoration:none;cursor:pointer;font:inherit;border-radius:0.375rem;padding:0.375rem 0.75rem;transition:background 0.2s,color 0.2s;display:inline-block;">${label}</a>`;
   }
 }
 

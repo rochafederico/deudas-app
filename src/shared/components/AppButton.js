@@ -1,109 +1,35 @@
 // src/components/AppButton.js
+// Botón nativo Bootstrap (sin Shadow DOM)
+
 export class AppButton extends HTMLElement {
     static get observedAttributes() {
         return ['variant', 'disabled'];
     }
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
+    }
+    connectedCallback() {
+        this.style.display = 'inline-block';
+        if (!this._rendered) this.render();
     }
     attributeChangedCallback() {
-        this.render();
+        if (this._rendered) this.render();
     }
     render() {
+        this._rendered = true;
         const variant = this.getAttribute('variant') || '';
         const disabled = this.hasAttribute('disabled');
         const type = this.getAttribute('type') || 'button';
-        this.shadowRoot.innerHTML = `
-            <style>
-                button {
-                    background-color: var(--accent);
-                    color: #fff;
-                    border: none;
-                    border-radius: 5px;
-                    padding: 7px 16px;
-                    margin: 4px 2px;
-                    font-size: 1em;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: background 0.2s, color 0.2s;
-                    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-                    outline: none;
-                    display: inline-block;
-                }
-                button:hover {
-                    background-color: var(--accent-hover);
-                }
-                button:active {
-                    filter: brightness(0.95);
-                }
-                button:disabled {
-                    background-color: var(--muted-light);
-                    color: #eee;
-                    cursor: not-allowed;
-                    opacity: 0.7;
-                }
-                button:focus {
-                    outline: 2px solid var(--accent);
-                    outline-offset: 2px;
-                }
-                :host([variant="delete"]) button {
-                    background-color: var(--error);
-                }
-                :host([variant="delete"]) button:hover {
-                    background-color: #b52a1a;
-                }
-                :host([variant="success"]) button {
-                    background-color: var(--success);
-                }
-                :host([variant="success"]) button:hover {
-                    background-color: #449d44;
-                }
-                /* Dark mode support: invert to darker buttons */
-                :host-context(body.dark-mode) button {
-                    background-color: #222a3a;
-                    color: #eaeaea;
-                }
-                :host-context(body.dark-mode) button:hover {
-                    background-color: #181a1b;
-                }
-                :host-context(body.dark-mode) button:disabled {
-                    background-color: var(--muted-dark);
-                    color: #444;
-                }
-                :host-context(body.dark-mode)[variant="delete"] button {
-                    background-color: #7a1810;
-                    color: #fff;
-                }
-                :host-context(body.dark-mode)[variant="delete"] button:hover {
-                    background-color: #d9534f;
-                }
-                :host-context(body.dark-mode)[variant="success"] button {
-                    background-color: #234d23;
-                    color: #fff;
-                }
-                :host-context(body.dark-mode)[variant="success"] button:hover {
-                    background-color: #5cb85c;
-                }
-            </style>
-            <button type="${type}" ${disabled ? 'disabled' : ''} aria-label="${this.getAttribute('aria-label') || this.textContent}" tabindex="0"><slot></slot></button>
-        `;
-        // Workaround para submit en Shadow DOM
-        const btn = this.shadowRoot.querySelector('button');
-        if (type === 'submit') {
-            btn.addEventListener('click', (e) => {
-                const form = this.closest('form');
-                if (form) {
-                    e.preventDefault();
-                    if (typeof form.requestSubmit === 'function') {
-                        form.requestSubmit();
-                    } else {
-                        form.submit();
-                    }
-                }
-            });
-        }
+        const text = this.textContent.trim();
+        const ariaLabel = this.getAttribute('aria-label') || text;
+        const title = this.getAttribute('title') || '';
+
+        let btnClass = 'btn btn-primary btn-sm';
+        if (variant === 'delete') btnClass = 'btn btn-danger btn-sm';
+        else if (variant === 'success') btnClass = 'btn btn-success btn-sm';
+        else if (variant === 'secondary') btnClass = 'btn btn-secondary btn-sm';
+
+        this.innerHTML = `<button type="${type}" class="${btnClass}" ${disabled ? 'disabled' : ''} aria-label="${ariaLabel}" ${title ? `title="${title}"` : ''} tabindex="0">${text}</button>`;
     }
 }
 customElements.define('app-button', AppButton);

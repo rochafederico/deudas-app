@@ -9,7 +9,7 @@ export default function Ingresos() {
 
     // Usar el header-bar como encabezado principal
     const headerBar = document.createElement('header-bar');
-    headerBar.style.marginBottom = '20px';
+    headerBar.style.marginBottom = '1.25rem';
     container.appendChild(headerBar);
 
     headerBar.month = currentMes;

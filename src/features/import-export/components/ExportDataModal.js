@@ -5,8 +5,6 @@ import '../../../shared/components/UiModal.js';
 export class ExportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
     }
 
     #mapDeudasForExport(deudas) {
@@ -58,7 +56,8 @@ export class ExportDataModal extends HTMLElement {
     }
 
     async open(opener) {
-        this.modal = this.shadowRoot.querySelector('ui-modal');
+        if (!this._rendered) this.render();
+        this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Exportar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
@@ -80,27 +79,17 @@ export class ExportDataModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this._rendered = true;
+        this.innerHTML = `
             <ui-modal id="exportModal">
-                <div style="padding:16px;">
+                <div class="p-3">
                     <p>Exporta todos tus datos en un archivo JSON legible.</p>
-                    <div style="text-align:center;margin-top:16px;"><span class="spinner"></span></div>
+                    <div class="text-center mt-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
                 </div>
-                <style>
-                .spinner {
-                    display: inline-block;
-                    width: 32px;
-                    height: 32px;
-                    border: 4px solid #eee;
-                    border-top: 4px solid var(--accent, #4b6cb7);
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                </style>
             </ui-modal>
         `;
     }

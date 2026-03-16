@@ -7,16 +7,16 @@ import { MontoModel } from '../../montos/MontoModel.js';
 export class ImportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
         this.importData = null;
         this.fileInput = null;
     }
 
     connectedCallback() {
-        this.shadowRoot.getElementById('select-file-btn').addEventListener('click', () => this.selectFile());
-        this.shadowRoot.getElementById('import-btn').addEventListener('click', () => this.importDataToDb());
-        this.shadowRoot.getElementById('cancel-btn').addEventListener('click', () => this.close());
+        this.style.display = 'block';
+        this.render();
+        this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
+        this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());
+        this.querySelector('#cancel-btn').addEventListener('click', () => this.close());
 
         // Crear input file oculto
         this.fileInput = document.createElement('input');
@@ -147,8 +147,8 @@ export class ImportDataModal extends HTMLElement {
             </div>
         `;
 
-        this.shadowRoot.querySelector('.file-content').innerHTML = previewHtml;
-        this.shadowRoot.querySelector('.import-actions').style.display = 'flex';
+        this.querySelector('.file-content').innerHTML = previewHtml;
+        this.querySelector('.import-actions').style.display = 'flex';
     }
 
     async importDataToDb() {
@@ -257,41 +257,41 @@ export class ImportDataModal extends HTMLElement {
     }
 
     #showProgress(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `
-            <div class="progress-message">
-                <div class="spinner"></div>
+            <div class="d-flex align-items-center gap-2 p-2 border border-info rounded">
+                <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                 <span>${message}</span>
             </div>
         `;
     }
 
     #showSuccess(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="success-message">${message}</div>`;
     }
 
     #showError(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
     }
 
     #showWarning(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
+        const statusDiv = this.querySelector('.import-status');
         statusDiv.innerHTML = `<div class="warning-message">${message}</div>`;
     }
 
     open(opener) {
-        this.modal = this.shadowRoot.querySelector('ui-modal');
+        this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Importar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
 
         // Reset state
         this.importData = null;
-        this.shadowRoot.querySelector('.file-content').innerHTML = '';
-        this.shadowRoot.querySelector('.import-status').innerHTML = '';
-        this.shadowRoot.querySelector('.import-actions').style.display = 'none';
+        this.querySelector('.file-content').innerHTML = '';
+        this.querySelector('.import-status').innerHTML = '';
+        this.querySelector('.import-actions').style.display = 'none';
     }
 
     close() {
@@ -299,121 +299,121 @@ export class ImportDataModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
             <style>
                 .import-content {
-                    padding: 16px;
+                    padding: 1rem;
                     min-height: 300px;
                 }
 
                 .file-selection {
                     text-align: center;
-                    padding: 20px;
-                    border: 2px dashed #ccc;
-                    border-radius: 8px;
-                    margin-bottom: 16px;
+                    padding: 1.25rem;
+                    border: 2px dashed var(--border-light, #ccc);
+                    border-radius: 0.5rem;
+                    margin-bottom: 1rem;
                 }
 
                 .file-selection p {
-                    margin: 0 0 16px 0;
+                    margin: 0 0 1rem 0;
                 }
 
                 .file-content {
-                    margin: 16px 0;
+                    margin: 1rem 0;
                 }
 
                 .import-preview {
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    padding: 16px;
+                    border: 1px solid var(--border-light, #ddd);
+                    border-radius: 0.5rem;
+                    padding: 1rem;
                 }
 
                 .import-preview h3 {
                     margin-top: 0;
-                    color: #ddd;
+                    color: var(--accent, rgb(61, 121, 130));
                 }
 
                 .preview-stats {
-                    margin: 12px 0;
-                    padding: 12px;
-                    border-radius: 4px;
+                    margin: 0.75rem 0;
+                    padding: 0.75rem;
+                    border-radius: 0.25rem;
                 }
 
                 .preview-stats p {
-                    margin: 4px 0;
+                    margin: 0.25rem 0;
                 }
 
                 .preview-items {
-                    margin: 12px 0;
+                    margin: 0.75rem 0;
                 }
 
                 .preview-item {
-                    padding: 8px;
-                    margin: 4px 0;
-                    border-radius: 4px;
-                    border-left: 3px solid #4b6cb7;
+                    padding: 0.5rem;
+                    margin: 0.25rem 0;
+                    border-radius: 0.25rem;
+                    border-left: 3px solid var(--accent, rgb(61, 121, 130));
                 }
 
                 .import-warning {
-                    margin: 12px 0;
-                    padding: 12px;
+                    margin: 0.75rem 0;
+                    padding: 0.75rem;
                     border: 1px solid #ffeaa7;
-                    border-radius: 4px;
+                    border-radius: 0.25rem;
                     max-width: 600px;
                 }
 
                 .import-warning p {
-                    margin: 4px 0;
+                    margin: 0.25rem 0;
                 }
 
                 .import-actions {
                     display: none;
-                    gap: 12px;
-                    margin-top: 16px;
-                    padding-top: 16px;                }
+                    gap: 0.75rem;
+                    margin-top: 1rem;
+                    padding-top: 1rem;
                 }
 
                 .import-status {
-                    margin-top: 16px;
+                    margin-top: 1rem;
                     min-height: 30px;
                 }
 
                 .success-message {
-                    color: green;
-                    padding: 12px;
-                    border: 1px solid green;
-                    border-radius: 4px;
+                    color: var(--bs-success, green);
+                    padding: 0.75rem;
+                    border: 1px solid var(--bs-success, green);
+                    border-radius: 0.25rem;
                 }
 
                 .error-message {
-                    color: red;
-                    padding: 12px;
-                    border: 1px solid red;
-                    border-radius: 4px;
+                    color: var(--bs-danger, red);
+                    padding: 0.75rem;
+                    border: 1px solid var(--bs-danger, red);
+                    border-radius: 0.25rem;
                 }
 
                 .warning-message {
                     color: #856404;
-                    padding: 12px;
+                    padding: 0.75rem;
                     border: 1px solid #ffeaa7;
-                    border-radius: 4px;
+                    border-radius: 0.25rem;
                 }
 
                 .progress-message {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
-                    padding: 12px;
+                    gap: 0.75rem;
+                    padding: 0.75rem;
                     border: 1px solid #2196f3;
-                    border-radius: 4px;
+                    border-radius: 0.25rem;
                 }
 
                 .spinner {
                     display: inline-block;
-                    width: 20px;
-                    height: 20px;
+                    width: 1.25rem;
+                    height: 1.25rem;
                     border: 2px solid #eee;
-                    border-top: 2px solid var(--accent, #4b6cb7);
+                    border-top: 2px solid var(--accent, rgb(61, 121, 130));
                     border-radius: 50%;
                     animation: spin 1s linear infinite;
                 }

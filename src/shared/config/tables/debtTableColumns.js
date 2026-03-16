@@ -3,6 +3,7 @@
 
 import { el } from '../../utils/dom.js';
 import { formatMoneda } from '../monedas.js';
+import '../../components/AppCheckbox.js';
 
 export const debtTableColumns = [
     { key: 'acreedor', label: 'Acreedor'},

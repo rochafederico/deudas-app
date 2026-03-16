@@ -8,19 +8,20 @@ import { formatMoneda } from '../../../shared/config/monedas.js';
 export class InversionesList extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.style.display = 'block';
     this.render();
   }
 
   async render() {
-    this.shadowRoot.innerHTML = `<style>
-      app-button { margin-bottom: 1em; }
-    </style>
-    <h2>Inversiones</h2>
+    this.innerHTML = `
+    <h2 class="mb-3">Inversiones</h2>
     <app-button id="add" aria-label="Agregar inversión">Agregar inversión</app-button>
     <app-table id="tabla"></app-table>
     <inversion-modal id="inversion-modal"></inversion-modal>`;
-    this.shadowRoot.getElementById('add').onclick = () => this.openModal();
+    this.querySelector('#add').onclick = () => this.openModal();
     await this.renderTable();
   }
 
@@ -54,7 +55,7 @@ export class InversionesList extends HTMLElement {
         return accionesContainer;
       };
     });
-    const tabla = this.shadowRoot.getElementById('tabla');
+    const tabla = this.querySelector('#tabla');
     tabla.columnsConfig = inversionTableColumns;
     tabla.tableData = inversiones;
     tabla.footerContent = this.renderFooter(inversiones).innerHTML;
@@ -62,17 +63,17 @@ export class InversionesList extends HTMLElement {
   }
 
   openModal() {
-    const modal = this.shadowRoot.querySelector('#inversion-modal');
+    const modal = this.querySelector('#inversion-modal');
     const uiModal = modal.querySelector('ui-modal')
     uiModal.onsave = () => this.renderTable();
     uiModal.open();
   }
 
   addValueToInversion(inv) {
-    let modal = this.shadowRoot.querySelector('valor-modal');
+    let modal = this.querySelector('valor-modal');
     if (!modal) {
       modal = document.createElement('valor-modal');
-      this.shadowRoot.appendChild(modal);
+      this.appendChild(modal);
     }
     modal.setIdInversion(inv.id);
     const uiModal = modal.querySelector('ui-modal')

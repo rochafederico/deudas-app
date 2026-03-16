@@ -33,9 +33,9 @@ async function testAgregarMontoDesdeMontoForm() {
     const montoForm = document.createElement('monto-form');
     document.body.appendChild(montoForm);
 
-    // Verificar que MontoForm renderiza un app-form en su shadow DOM
-    const appForm = montoForm.shadowRoot.querySelector('app-form');
-    assert(appForm !== null, 'MontoForm debe contener un app-form en su shadow DOM');
+    // Verificar que MontoForm renderiza un app-form
+    const appForm = montoForm.querySelector('app-form');
+    assert(appForm !== null, 'MontoForm debe contener un app-form');
 
     // Simular que el usuario llena los campos y hace submit
     // MontoForm escucha form:submit y re-emite como monto:save
@@ -101,7 +101,7 @@ async function testEditarMontoDesdeMontoForm() {
     assert(montoForm.monto.monto === 5000, 'MontoForm precargado con monto 5000');
 
     // Get the fresh app-form after re-render
-    const appForm = montoForm.shadowRoot.querySelector('app-form');
+    const appForm = montoForm.querySelector('app-form');
 
     // Simular edicion: usuario cambia monto y moneda
     // MontoForm.render() sets up form:submit -> monto:submit on the app-form,
@@ -172,7 +172,7 @@ async function testDuplicarMontoDesdeModal() {
     assert(dupModal.monto.vencimiento === '2026-05-01', 'Modal precargado con fecha original');
 
     // Get fresh app-form after re-render and listen for duplicate:submit
-    const appForm = dupModal.shadowRoot.querySelector('app-form');
+    const appForm = dupModal.querySelector('app-form');
     let submitEvent = null;
     appForm.addEventListener('duplicate:submit', (e) => { submitEvent = e; });
 
@@ -230,7 +230,7 @@ async function testCancelarFormularios() {
     let cancelMonto = false;
     montoForm.addEventListener('monto:cancel', () => { cancelMonto = true; });
 
-    const appForm = montoForm.shadowRoot.querySelector('app-form');
+    const appForm = montoForm.querySelector('app-form');
     appForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     assert(cancelMonto, 'MontoForm emite monto:cancel al cancelar');
 
@@ -244,7 +244,7 @@ async function testCancelarFormularios() {
     let cancelDup = false;
     dupModal.addEventListener('duplicate:cancel', () => { cancelDup = true; });
 
-    const dupForm = dupModal.shadowRoot.querySelector('app-form');
+    const dupForm = dupModal.querySelector('app-form');
     dupForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     assert(cancelDup, 'DuplicateMontoModal emite duplicate:cancel al cancelar');
 

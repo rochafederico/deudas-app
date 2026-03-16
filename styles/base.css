@@ -13,6 +13,11 @@
     --border-dark: #333;
     --error: #d9534f;
     --success: #5cb85c;
+    /* Bootstrap overrides con colores de marca */
+    --bs-primary: rgb(61, 121, 130);
+    --bs-primary-rgb: 61, 121, 130;
+    --bs-link-color: rgb(61, 121, 130);
+    --bs-link-hover-color: rgb(51, 101, 110);
 }
 
 body {
@@ -33,14 +38,12 @@ body.dark-mode {
 #app-wrapper {
     max-width: 1100px;
     width: 100%;
-    margin: 40px auto 0 auto;
+    margin: 32px auto 0 auto;
     padding: 24px;
     border-radius: 12px;
     background-color: var(--panel-light);
     box-shadow: 0 2px 16px rgba(0,0,0,0.08);
     transition: background 0.3s;
-    /* Ajusta el margen superior para dejar espacio al banner */
-    margin-top: 32px;
 }
 body.dark-mode #app-wrapper {
     background-color: var(--panel-dark);
@@ -53,53 +56,53 @@ h1, h2, h3 {
     margin-bottom: 8px;
 }
 
-input, select {
-    border: 1px solid var(--border-light);
-    border-radius: 6px;
-    padding: 10px;
-    margin: 6px 0;
-    width: 100%;
-    font-size: 1em;
-    background: var(--panel-light);
-    color: var(--text-light);
-    transition: background 0.3s, color 0.3s, border 0.3s;
+/* Bootstrap override: botones primarios con color de marca */
+.btn-primary, .btn-primary:active {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
 }
-body.dark-mode input, body.dark-mode select {
-    background: var(--panel-dark);
-    color: var(--text-dark);
-    border: 1px solid var(--border-dark);
+.btn-primary:hover, .btn-primary:focus {
+    background-color: var(--accent-hover) !important;
+    border-color: var(--accent-hover) !important;
 }
-input:focus, select:focus {
-    outline: none;
+.btn-outline-primary {
+    color: var(--accent) !important;
+    border-color: var(--accent) !important;
+}
+.btn-outline-primary:hover, .btn-outline-primary:focus {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+    color: #fff !important;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem rgba(61, 121, 130, 0.25);
+}
+.form-check-input:checked {
+    background-color: var(--accent);
     border-color: var(--accent);
 }
 
-.table-wrapper {
-    margin-top: 24px;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 1px 8px rgba(0,0,0,0.04);
-}
-
-label {
-    display: block;
-    margin: 6px 0 2px 0;
-    font-size: 0.98em;
-    color: var(--muted-light);
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: var(--panel-dark);
+    color: var(--text-dark);
+    border-color: var(--border-dark);
 }
 body.dark-mode label {
     color: var(--muted-dark);
 }
-.error {
+
+.error, .text-danger {
     color: var(--error);
     font-size: 0.95em;
 }
-.success {
+.success, .text-success {
     color: var(--success);
     font-size: 0.95em;
 }
 
-/* Stats indicators styles */
+/* Stats indicators styles - Bootstrap card overrides */
 .stats-row {
     display: flex;
     gap: 12px;
@@ -108,15 +111,26 @@ body.dark-mode label {
     flex-wrap: wrap;
 }
 .stats-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    flex: 1 1 0;
+    min-width: 150px;
     border: 1px solid var(--border-light);
-    border-radius: 8px;
-    padding: 0 16px;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: var(--panel-light);
     box-shadow: 0 1px 6px rgba(0,0,0,0.04);
 }
 body.dark-mode .stats-card {
-    background: linear-gradient(180deg, rgba(34,36,37,0.95), rgba(34,36,37,0.9));
-    border: 1px solid var(--border-dark);
+    background: var(--panel-dark);
+    border-color: var(--border-dark);
+}
+.stats-card h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+.stats-card h4 {
+    font-size: 1rem;
+    margin-bottom: 0;
 }
 .stats-card-sub {
     font-size: 0.85em;
