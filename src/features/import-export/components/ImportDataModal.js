@@ -1,8 +1,8 @@
 // src/components/ImportDataModal.js
-import './UiModal.js';
-import './AppButton.js';
-import { DeudaModel } from '../features/deudas/DeudaModel.js';
-import { MontoModel } from '../features/montos/MontoModel.js';
+import '../../../components/UiModal.js';
+import '../../../components/AppButton.js';
+import { DeudaModel } from '../../deudas/DeudaModel.js';
+import { MontoModel } from '../../montos/MontoModel.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
@@ -142,8 +142,8 @@ export class ImportDataModal extends HTMLElement {
         try {
             this.#showProgress('Importando datos...');
 
-            const { addOrMergeDeuda } = await import('../features/deudas/deudaRepository.js');
-            const { addIngreso } = await import('../features/ingresos/ingresoRepository.js');
+            const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
+            const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
             let importedCount = 0;

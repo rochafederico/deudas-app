@@ -1,8 +1,8 @@
 import '../features/deudas/components/DebtModal.js';
 import '../features/ingresos/components/IngresoModal.js';
 import './AppInput.js';
-import './ExportDataModal.js';
-import './ImportDataModal.js';
+import '../features/import-export/components/ExportDataModal.js';
+import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';
 
 export class AppShell extends HTMLElement {

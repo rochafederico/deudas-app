@@ -1,6 +1,6 @@
 // src/components/ExportDataModal.js
-import './AppForm.js';
-import './UiModal.js';
+import '../../../components/AppForm.js';
+import '../../../components/UiModal.js';
 
 export class ExportDataModal extends HTMLElement {
     constructor() {
@@ -50,8 +50,8 @@ export class ExportDataModal extends HTMLElement {
         this.modal.open();
         this.modal.returnFocusTo(opener);
         setTimeout(async () => {
-            const { listDeudas } = await import('../features/deudas/deudaRepository.js');
-            const { getAll } = await import('../features/ingresos/ingresoRepository.js');
+            const { listDeudas } = await import('../../deudas/deudaRepository.js');
+            const { getAll } = await import('../../ingresos/ingresoRepository.js');
             let deudas = await listDeudas();
             const ingresos = await getAll();
             deudas = this.#mapDeudasForExport(deudas);
