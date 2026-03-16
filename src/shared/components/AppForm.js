@@ -1,5 +1,6 @@
 // src/components/AppForm.js
 import { el, getFormValuesAndValidate } from '../utils/dom.js';
+import { injectBootstrap } from '../utils/bootstrapStyles.js';
 
 export class AppForm extends HTMLElement {
     constructor() {
@@ -111,6 +112,7 @@ export class AppForm extends HTMLElement {
             ]
         });
         this.shadowRoot.appendChild(form);
+        injectBootstrap(this.shadowRoot);
         // Reasociar listeners tras render
         this._setupListeners();
     }

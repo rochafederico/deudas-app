@@ -62,7 +62,6 @@ export class DebtForm extends HTMLElement {
                 border-bottom: none;
             }
         `;
-        injectBootstrap(this.shadowRoot);
         // Formulario principal con <app-form>
         const form = document.createElement('app-form');
         form.fields = [
@@ -116,6 +115,7 @@ export class DebtForm extends HTMLElement {
         this.shadowRoot.appendChild(montosList);
         this.shadowRoot.appendChild(modal);
         this.shadowRoot.appendChild(duplicateModal);
+        injectBootstrap(this.shadowRoot);
     }
 
     openMontoModal(monto = null, index = null) {
