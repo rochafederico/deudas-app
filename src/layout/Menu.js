@@ -1,5 +1,6 @@
 // src/components/Menu.js
 import routes from '../routes.js';
+import '../shared/components/AppLink.js';
 
 export class Menu extends HTMLElement {
   constructor() {

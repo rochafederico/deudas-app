@@ -59,11 +59,13 @@ export class TourOverlay extends HTMLElement {
     show() {
         this._visible = true;
         this.setAttribute('visible', '');
+        this.style.display = 'block';
     }
 
     hide() {
         this._visible = false;
         this.removeAttribute('visible');
+        this.style.display = 'none';
     }
 }
 

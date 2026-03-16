@@ -108,7 +108,7 @@ export class AppForm extends HTMLElement {
                 input.id = name;
                 input.name = name;
                 if (required) input.required = true;
-                if (value) input.value = value;
+                if (value !== '' && value != null) input.value = value;
                 if (field.type === 'number') input.step = '0.01';
             }
 

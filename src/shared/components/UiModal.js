@@ -24,6 +24,11 @@ export class UiModal extends HTMLElement {
         modalEl.addEventListener('hidden.bs.modal', () => this._onClose());
     }
 
+    clearBody() {
+        const body = this.querySelector('.modal-body');
+        if (body) body.innerHTML = '';
+    }
+
     setTitle(text) {
         const h = this.querySelector('.modal-title');
         if (h) h.textContent = text;

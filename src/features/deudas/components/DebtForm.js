@@ -1,6 +1,7 @@
 import { DeudaModel } from '../DeudaModel.js';
 import { el } from '../../../shared/utils/dom.js';
 import '../../../shared/components/AppButton.js';
+import '../../../shared/components/AppCheckbox.js';
 import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
@@ -97,7 +98,7 @@ export class DebtForm extends HTMLElement {
     openMontoModal(monto = null, index = null) {
         this.montoEditIndex = index;
         this.montoModal.setTitle(monto ? 'Editar monto' : 'Agregar monto');
-        this.montoModal.innerHTML = '';
+        this.montoModal.clearBody();
         const montoForm = document.createElement('monto-form');
         if (monto) montoForm.monto = monto;
         montoForm.addEventListener('monto:save', (e) => {
@@ -118,7 +119,7 @@ export class DebtForm extends HTMLElement {
     openDuplicateMontoModal(monto, idx) {
         this.duplicateMontoIndex = idx;
         this.duplicateModal.setTitle('Duplicar monto');
-        this.duplicateModal.innerHTML = '';
+        this.duplicateModal.clearBody();
         const duplicateForm = document.createElement('duplicate-monto-modal');
         duplicateForm.monto = monto;
         duplicateForm.addEventListener('duplicate:save', (e) => {
