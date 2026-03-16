@@ -1,6 +1,6 @@
 // src/components/MontoForm.js
 import monedas from '../../../shared/config/monedas.js';
-import '../../../components/AppForm.js';
+import '../../../shared/components/AppForm.js';
 
 export class MontoForm extends HTMLElement {
     constructor() {

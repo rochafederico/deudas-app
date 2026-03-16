@@ -1,7 +1,7 @@
 // src/components/HeaderBar.js
-import './AppInput.js';
+import '../shared/components/AppInput.js';
 import { groupOptions } from '../shared/config/tables/groupOptions.js';
-import './AppButton.js';
+import '../shared/components/AppButton.js';
 
 export class HeaderBar extends HTMLElement {
     constructor() {

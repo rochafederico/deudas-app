@@ -1,8 +1,8 @@
 import { DeudaModel } from '../DeudaModel.js';
 import { el } from '../../../shared/utils/dom.js';
-import '../../../components/AppButton.js';
-import '../../../components/AppInput.js';
-import '../../../components/AppForm.js';
+import '../../../shared/components/AppButton.js';
+import '../../../shared/components/AppInput.js';
+import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/DuplicateMontoModal.js';
 
