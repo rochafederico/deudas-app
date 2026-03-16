@@ -1,7 +1,7 @@
 // src/main.js
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
-import DemoBanner from './components/DemoBanner.js';
+import DemoBanner from './layout/DemoBanner.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(DemoBanner());
