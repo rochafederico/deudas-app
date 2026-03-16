@@ -138,7 +138,7 @@ export class AppShell extends HTMLElement {
         modal.open(opener);
     }
 
-    _onDataImportedHandler(e) {
+    _onDataImportedHandler(_e) {
         // Refrescar la lista de deudas
         const debtList = this.shadowRoot.querySelector('debt-list');
         if (debtList && typeof debtList.refresh === 'function') {
