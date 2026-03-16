@@ -8,6 +8,7 @@ import { tests as deudasTests } from './deudas.test.js';
 import { tests as montosTests } from './montos.test.js';
 import { tests as ingresosTests } from './ingresos.test.js';
 import { tests as inversionesTests } from './inversiones.test.js';
+import { tests as importExportTests } from './import-export.test.js';
 
 async function run() {
     try {
@@ -25,6 +26,9 @@ async function run() {
 
         console.log('\n--- Inversiones ---');
         for (const test of inversionesTests) { await test(); }
+
+        console.log('\n--- Import/Export ---');
+        for (const test of importExportTests) { await test(); }
 
         printResults();
         process.exit(0);

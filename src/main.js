@@ -22,7 +22,7 @@ document.body.appendChild(wrapper);
 initDB().then(async (db) => {
     window.db = db;
     try {
-      const { default: StatsIndicators } = await import('./components/StatsIndicators.js');
+      const { default: StatsIndicators } = await import('./features/stats/components/StatsIndicators.js');
       const indicatorsNode = StatsIndicators();
       // Insert indicators above the app container
       wrapper.insertBefore(indicatorsNode, app);

@@ -1,5 +1,5 @@
 // src/pages/Ingresos.js
-import '../components/StatsCard.js';
+import '../features/stats/components/StatsCard.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 

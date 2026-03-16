@@ -1,8 +1,8 @@
 // src/components/ImportDataModal.js
-import './UiModal.js';
-import './AppButton.js';
-import { DeudaModel } from '../features/deudas/DeudaModel.js';
-import { MontoModel } from '../features/montos/MontoModel.js';
+import '../../../components/UiModal.js';
+import '../../../components/AppButton.js';
+import { DeudaModel } from '../../deudas/DeudaModel.js';
+import { MontoModel } from '../../montos/MontoModel.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
@@ -86,12 +86,18 @@ export class ImportDataModal extends HTMLElement {
             return false;
         }
 
+        const inversiones = data.inversiones || (data.data && data.data.inversiones);
+        if (inversiones && !Array.isArray(inversiones)) {
+            return false;
+        }
+
         return true;
     }
 
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
+        const inversiones = data.inversiones || (data.data && data.data.inversiones) || [];
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
         const previewHtml = `
@@ -101,6 +107,8 @@ export class ImportDataModal extends HTMLElement {
                     <p><strong>📊 Resumen:</strong></p>
                     <p>• ${deudas.length} deudas</p>
                     <p>• ${totalMontos} montos</p>
+                    <p>• ${ingresos.length} ingresos</p>
+                    <p>• ${inversiones.length} inversiones</p>
                     ${data.metadata ? `<p>• Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</p>` : ''}
                 </div>
                 
@@ -125,6 +133,16 @@ export class ImportDataModal extends HTMLElement {
                     ${ingresos.length > 3 ? `<p>... y ${ingresos.length - 3} más</p>` : ''}
                 </div>
                 
+                <div class="preview-items">
+                    <h4>Inversiones a importar:</h4>
+                    ${inversiones.slice(0, 3).map(inv => `
+                        <div class="preview-item">
+                            <strong>${inv.nombre}</strong> - ${inv.valorInicial} ${inv.moneda || 'ARS'}
+                            ${inv.historialValores?.length ? `(${inv.historialValores.length} valores)` : ''}
+                        </div>
+                    `).join('')}
+                    ${inversiones.length > 3 ? `<p>... y ${inversiones.length - 3} más</p>` : ''}
+                </div>
                 
             </div>
         `;
@@ -142,10 +160,12 @@ export class ImportDataModal extends HTMLElement {
         try {
             this.#showProgress('Importando datos...');
 
-            const { addOrMergeDeuda } = await import('../features/deudas/deudaRepository.js');
-            const { addIngreso } = await import('../features/ingresos/ingresoRepository.js');
+            const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
+            const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
+            const { addInversion } = await import('../../inversiones/inversionRepository.js');
             const deudas = this.importData.deudas || (this.importData.data && this.importData.data.deudas) || [];
             const ingresos = this.importData.ingresos || (this.importData.data && this.importData.data.ingresos) || [];
+            const inversiones = this.importData.inversiones || (this.importData.data && this.importData.data.inversiones) || [];
             let importedCount = 0;
             let errorCount = 0;
 
@@ -191,19 +211,41 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
-            // Mostrar resultado combinando errores de deudas e ingresos
-            const totalErrors = errorCount + ingresosErrors;
+            let inversionesImported = 0;
+            let inversionesErrors = 0;
+            if (inversiones && inversiones.length > 0) {
+                this.#showProgress('Importando inversiones...');
+                for (const inv of inversiones) {
+                    try {
+                        const inversionData = {
+                            nombre: inv.nombre,
+                            fechaCompra: inv.fechaCompra,
+                            valorInicial: inv.valorInicial,
+                            moneda: inv.moneda || 'ARS',
+                            historialValores: inv.historialValores || []
+                        };
+                        await addInversion(inversionData);
+                        inversionesImported++;
+                    } catch (error) {
+                        console.error('Error al importar inversión:', inv, error);
+                        inversionesErrors++;
+                    }
+                }
+            }
+
+            // Mostrar resultado combinando errores de deudas, ingresos e inversiones
+            const totalErrors = errorCount + ingresosErrors + inversionesErrors;
             if (totalErrors === 0) {
-                this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas importadas, ${ingresosImported} ingresos importados`);
+                this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`);
             } else {
-                this.#showWarning(`⚠️ Importación parcial: ${importedCount} deudas importadas (${errorCount} errores), ${ingresosImported} ingresos importados (${ingresosErrors} errores)`);
+                this.#showWarning(`⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err), ${inversionesImported} inversiones (${inversionesErrors} err)`);
             }
 
             // Refrescar la vista después de la importación
             setTimeout(() => {
                 window.dispatchEvent(new CustomEvent('data-imported', {
                     bubbles: true,
-                    detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors }
+                    detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
                 }));
                 this.close();
             }, 2000);
