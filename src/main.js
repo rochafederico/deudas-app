@@ -3,6 +3,8 @@ import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
+import { checkAndNotify } from './features/notifications/NotificationService.js';
+import { listDeudas } from './features/deudas/deudaRepository.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
@@ -34,6 +36,25 @@ initDB().then(async (db) => {
     }
     // Inicialización de rutas después que DB esté lista y los indicadores hayan pedido datos
     renderRoute(window.location.pathname);
+
+    // Verificar y enviar notificaciones de pagos próximos a vencer
+    async function runNotificationCheck() {
+        try {
+            const deudas = await listDeudas();
+            await checkAndNotify(deudas);
+        } catch (err) {
+            console.warn('No se pudo verificar notificaciones:', err);
+        }
+    }
+
+    await runNotificationCheck();
+
+    // Volver a verificar cuando el usuario regresa a la pestaña (sólo una vez)
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+            runNotificationCheck();
+        }
+    }, { once: false });
 
     // Iniciar tour guiado en la primera visita (con delay para que el DOM esté listo)
     setTimeout(() => {

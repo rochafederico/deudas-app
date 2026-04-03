@@ -11,6 +11,7 @@ import { tests as inversionesTests } from './inversiones.test.js';
 import { tests as importExportTests } from './import-export.test.js';
 import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
+import { tests as notificationsTests } from './notifications.test.js';
 
 async function run() {
     try {
@@ -37,6 +38,9 @@ async function run() {
 
         console.log('\n--- Tour ---');
         for (const test of tourTests) { await test(); }
+
+        console.log('\n--- Notifications ---');
+        for (const test of notificationsTests) { await test(); }
 
         printResults();
         process.exit(0);
