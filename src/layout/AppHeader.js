@@ -14,6 +14,11 @@ export class AppHeader extends HTMLElement {
   connectedCallback() {
     this.classList.add('d-block');
     this.render();
+    this.querySelector('.navbar-brand').addEventListener('click', (e) => {
+      e.preventDefault();
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
     this.querySelector('#tour-btn').addEventListener('click', () => {
       window.dispatchEvent(new CustomEvent('tour:start'));
     });
