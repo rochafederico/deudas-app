@@ -3,7 +3,7 @@
 
 class AppLink extends HTMLElement {
   static get observedAttributes() {
-    return ['href'];
+    return ['href', 'variant'];
   }
 
   constructor() {
@@ -43,7 +43,9 @@ class AppLink extends HTMLElement {
     this.replaceChildren();
     const link = document.createElement('a');
     link.href = href;
-    link.className = 'link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block';
+    const variantMap = { light: 'link-light', dark: 'link-dark' };
+    const colorClass = variantMap[this.getAttribute('variant')] ?? 'link-body-emphasis';
+    link.className = `${colorClass} link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block`;
     link.textContent = label;
     this.appendChild(link);
   }

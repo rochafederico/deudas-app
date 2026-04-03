@@ -30,7 +30,7 @@ export const tests = [
         const cases = [
             { tag: 'header-bar', selector: '.card-header' },
             { tag: 'dark-toggle', selector: '.btn.btn-outline-secondary.rounded-pill' },
-            { tag: 'app-link', selector: 'a.link-light.d-inline-block' },
+            { tag: 'app-link', selector: 'a.link-body-emphasis.d-inline-block' },
             { tag: 'app-checkbox', selector: '.form-check.form-switch .form-check-input' },
             { tag: 'tour-overlay', selector: 'svg.w-100.h-100' },
             { tag: 'tour-tooltip', selector: '.card.bg-dark.text-white' },
