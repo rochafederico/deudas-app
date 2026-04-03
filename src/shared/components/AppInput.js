@@ -9,7 +9,7 @@ export class AppInput extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.classList.add('d-block', 'mb-2');
+        this.classList.add('d-block');
         if (!this._rendered) this.render();
         this._setupListeners();
     }
