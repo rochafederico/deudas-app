@@ -188,7 +188,7 @@ export function updateDeuda(deudaModel) {
                 };
         };
         deudaRequest.onerror = (event) => {
-            reject('Error updating deuda: ' + event.target.errorCode);
+            reject(new Error('Error updating deuda: ' + event.target.errorCode));
         };
     });
 }
@@ -274,7 +274,7 @@ export function listDeudas() {
                 };
         };
         deudasRequest.onerror = (event) => {
-            reject('Error getting deudas: ' + event.target.errorCode);
+            reject(new Error('Error getting deudas: ' + event.target.errorCode));
         };
     });
 }

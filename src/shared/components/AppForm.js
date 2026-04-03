@@ -80,7 +80,7 @@ export class AppForm extends HTMLElement {
             if (field.type === 'select' && field.options) {
                 children = field.options.map(opt => {
                     const attrsOpt = {
-                        valuee: opt
+                        value: opt
                     }
                     if (attrs.value === opt) attrsOpt.selected = '';
                     return el('option', {
