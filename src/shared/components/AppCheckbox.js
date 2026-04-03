@@ -1,5 +1,5 @@
 // src/components/AppCheckbox.js
-// Checkbox nativo Bootstrap (sin Shadow DOM)
+// Switch nativo Bootstrap form-switch (sin Shadow DOM)
 
 export class AppCheckbox extends HTMLElement {
     constructor() {
@@ -40,10 +40,11 @@ export class AppCheckbox extends HTMLElement {
         const ariaLabel = this.getAttribute('aria-label') || this.getAttribute('title') || 'Seleccionar opción';
         this.replaceChildren();
         const wrapper = document.createElement('div');
-        wrapper.className = 'form-check';
+        wrapper.className = 'form-check form-switch';
         const checkboxInput = document.createElement('input');
         checkboxInput.className = 'form-check-input';
         checkboxInput.type = 'checkbox';
+        checkboxInput.setAttribute('role', 'switch');
         checkboxInput.id = inputId;
         checkboxInput.setAttribute('aria-label', ariaLabel);
         checkboxInput.checked = checked;
