@@ -32,7 +32,7 @@ export const tourSteps = [
         title: 'Bienvenida',
         text: 'Organizá tus deudas y gastos fijos en un solo lugar',
         getTarget: () => findTourTarget([
-            { selector: 'demo-banner' },
+            { selector: 'app-header' },
             { selector: '[data-tour-step="bienvenida"]' }
         ]),
         position: 'bottom'
@@ -104,7 +104,7 @@ export const tourSteps = [
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
         getTarget: () => findTourTarget([
-            { selector: 'demo-banner' },
+            { selector: 'app-header' },
             { selector: '[data-tour-step="menu-navegacion"]' }
         ]),
         position: 'bottom'

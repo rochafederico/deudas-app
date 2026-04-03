@@ -1,14 +1,13 @@
-// src/components/Menu.js
+// src/layout/Menu.js
 import routes from '../routes.js';
 import '../shared/components/AppLink.js';
 
-export class Menu extends HTMLElement {
+export class AppNav extends HTMLElement {
   constructor() {
     super();
   }
 
   connectedCallback() {
-    this.classList.add('d-block');
     this.render();
     this.addEventListener('click', (e) => {
       const link = e.target.closest('[app-link]');
@@ -18,6 +17,13 @@ export class Menu extends HTMLElement {
         window.dispatchEvent(new PopStateEvent('popstate'));
       }
     });
+    // Re-render on navigation to keep active state in sync
+    this._onPopState = () => this.render();
+    window.addEventListener('popstate', this._onPopState);
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('popstate', this._onPopState);
   }
 
   render() {
@@ -26,10 +32,13 @@ export class Menu extends HTMLElement {
       : Object.entries(routes).map(([path, component]) => ({ path, label: path === '/' ? 'Dashboard' : path.replace('/', ''), component }));
 
     this.innerHTML = `
-      <nav class="nav d-flex gap-2" aria-label="Navegación principal" data-tour-step="menu-navegacion">
-        ${routeArray.map(r => `<app-link href="${r.path}" aria-current="${window.location.pathname === r.path ? 'page' : undefined}">${r.label}</app-link>`).join('')}
-      </nav>
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0" aria-label="Navegación principal" data-tour-step="menu-navegacion">
+        ${routeArray.map(r => `
+          <li class="nav-item${window.location.pathname === r.path ? ' active' : ''}">
+            <app-link href="${r.path}">${r.label}</app-link>
+          </li>`).join('')}
+      </ul>
     `;
   }
 }
-customElements.define('main-menu', Menu);
+customElements.define('app-nav', AppNav);

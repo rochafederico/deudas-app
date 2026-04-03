@@ -20,7 +20,14 @@ export class TourManager {
      */
     start() {
         if (isTourCompleted()) return false;
+        return this.forceStart();
+    }
 
+    /**
+     * Inicia el tour sin importar si ya fue completado.
+     * @returns {boolean} true siempre.
+     */
+    forceStart() {
         this._currentIndex = 0;
         this._createElements();
         this._attachListeners();

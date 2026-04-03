@@ -39,6 +39,8 @@ initDB().then(async (db) => {
     setTimeout(() => {
         const tour = new TourManager();
         tour.start();
+        // Botón "Tour" en el header puede forzar el tour en cualquier momento
+        window.addEventListener('tour:start', () => new TourManager().forceStart());
     }, 500);
 });
 
