@@ -5,7 +5,7 @@ export default function StatsCard({ title = '', items = [], valueClass = 'text-b
   card.className = 'card h-100 shadow-sm';
 
   const header = document.createElement('div');
-  header.className = 'card-header text-center text-uppercase small text-body-secondary';
+  header.className = `card-header text-center text-uppercase small fw-semibold ${valueClass}`;
   header.textContent = title;
 
   const ul = document.createElement('ul');
