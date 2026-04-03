@@ -40,7 +40,10 @@ initDB().then(async (db) => {
         const tour = new TourManager();
         tour.start();
         // Botón "Tour" en el header puede forzar el tour en cualquier momento
-        window.addEventListener('tour:start', () => new TourManager().forceStart());
+        window.addEventListener('tour:start', () => {
+            tour._cleanup();
+            tour.forceStart();
+        });
     }, 500);
 });
 
