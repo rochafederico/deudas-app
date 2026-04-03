@@ -124,7 +124,7 @@ export class TourTooltip extends HTMLElement {
     }
 
     render() {
-        this.className = 'position-fixed d-none px-2 z-3';
+        this.classList.add('position-fixed', 'd-none', 'px-2', 'z-3');
         this.setAttribute('role', 'tooltip');
         this.innerHTML = `
             <div class="card bg-dark text-light shadow-lg border-0 p-4">
