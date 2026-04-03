@@ -24,15 +24,14 @@ export default function StatsIndicators({ mes } = {}) {
       // Only show per-currency breakdowns (no aggregated totals)
       const addValue = (obj) => {
         return Object.entries(obj || {})
-          .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`)
-          .join('<br/>');
+          .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`);
       }
       const cards = [
-        StatsCard({ title: 'Ingresos' , value: addValue(summary.byCurrency.ingresos), valueClass: 'text-success' }),
-        StatsCard({ title: 'Gastos', value: addValue(summary.byCurrency.egresos), valueClass: 'text-danger' }),
-        StatsCard({ title: 'Balance', value: addValue(summary.byCurrency.saldo), valueClass: 'text-dark' }),
-        StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), valueClass: 'text-warning' }),
-        StatsCard({ title: 'Inversiones', value: addValue(summary.inversiones), valueClass: 'text-info' }),
+        StatsCard({ title: 'Ingresos' , items: addValue(summary.byCurrency.ingresos), valueClass: 'text-success' }),
+        StatsCard({ title: 'Gastos', items: addValue(summary.byCurrency.egresos), valueClass: 'text-danger' }),
+        StatsCard({ title: 'Balance', items: addValue(summary.byCurrency.saldo), valueClass: 'text-dark' }),
+        StatsCard({ title: 'Total a pagar', items: addValue(summary.byCurrency.pendientes), valueClass: 'text-warning' }),
+        StatsCard({ title: 'Inversiones', items: addValue(summary.inversiones), valueClass: 'text-info' }),
       ];
       cards.forEach(card => {
         const col = document.createElement('div');

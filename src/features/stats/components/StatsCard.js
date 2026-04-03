@@ -1,28 +1,25 @@
 // src/components/StatsCard.js
 // Utiliza clases Bootstrap para las tarjetas de estadísticas
-export default function StatsCard({ title = '', value = '', subtitle = '', valueClass = 'text-body' } = {}) {
+export default function StatsCard({ title = '', items = [], valueClass = 'text-body' } = {}) {
   const card = document.createElement('div');
   card.className = 'card h-100 shadow-sm';
 
-  const body = document.createElement('div');
-  body.className = 'card-body text-center';
+  const header = document.createElement('div');
+  header.className = 'card-header text-center text-uppercase small text-body-secondary';
+  header.textContent = title;
 
-  const titleEl = document.createElement('h6');
-  titleEl.className = 'card-title text-body-secondary text-uppercase small';
-  titleEl.innerHTML = title;
+  const ul = document.createElement('ul');
+  ul.className = 'list-group list-group-flush text-center';
 
-  const valueEl = document.createElement('h4');
-  valueEl.className = `card-text fw-bold mb-0 ${valueClass}`;
-  valueEl.innerHTML = value;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.className = `list-group-item fw-bold ${valueClass}`;
+    li.textContent = item;
+    ul.appendChild(li);
+  });
 
-  const subEl = document.createElement('p');
-  subEl.className = 'card-text text-body-secondary small mb-1';
-  subEl.textContent = subtitle || '';
-
-  body.appendChild(titleEl);
-  body.appendChild(subEl);
-  body.appendChild(valueEl);
-  card.appendChild(body);
+  card.appendChild(header);
+  card.appendChild(ul);
 
   return card;
 }
