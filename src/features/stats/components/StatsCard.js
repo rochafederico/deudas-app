@@ -1,23 +1,25 @@
 // src/components/StatsCard.js
-export default function StatsCard({ title = '', value = '', subtitle = '', color } = {}) {
+// Utiliza clases Bootstrap para las tarjetas de estadísticas
+export default function StatsCard({ title = '', items = [], color = 'secondary' } = {}) {
   const card = document.createElement('div');
-  card.className = 'stats-card';
+  card.className = `card h-100 border border-${color}`;
 
-  const titleEl = document.createElement('h2');
-  titleEl.innerHTML = title;
+  const header = document.createElement('div');
+  header.className = `card-header bg-${color} text-white text-center text-uppercase small fw-semibold`;
+  header.textContent = title;
 
-  const valueEl = document.createElement('h3');
-  valueEl.innerHTML = value;
+  const ul = document.createElement('ul');
+  ul.className = 'list-group list-group-flush text-center';
 
-  if (color) valueEl.style.color = color;
+  items.forEach(item => {
+    const li = document.createElement('li');
+    li.className = `list-group-item border-0 fw-bold text-${color}`;
+    li.textContent = item;
+    ul.appendChild(li);
+  });
 
-  const subEl = document.createElement('p');
-  subEl.className = 'stats-card-sub';
-  subEl.textContent = subtitle || '';
-
-  card.appendChild(titleEl);
-  card.appendChild(subEl);
-  card.appendChild(valueEl);
+  card.appendChild(header);
+  card.appendChild(ul);
 
   return card;
 }

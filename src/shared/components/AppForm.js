@@ -1,20 +1,18 @@
 // src/components/AppForm.js
+// Formulario reutilizable que usa Bootstrap directamente (sin Shadow DOM)
 import { el, getFormValuesAndValidate } from '../utils/dom.js';
 
 export class AppForm extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this._fields = [];
         this._initialValues = {};
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
-        // Bind handlers once to avoid adding duplicate listeners on multiple renders
         this._boundHandleSubmit = this.handleSubmit.bind(this);
         this._boundCancelClick = () => {
             this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
         };
-        this.render();
     }
 
     set fields(fields) {
@@ -43,86 +41,135 @@ export class AppForm extends HTMLElement {
     }
 
     connectedCallback() {
-        // Siempre volver a asociar los listeners después de cada render
+        if (!this._rendered) this.render();
         this._setupListeners();
     }
 
     _setupListeners() {
-        this.form = this.shadowRoot.querySelector('form');
+        this.form = this.querySelector('form');
         if (this.form) {
-            // Remove previous listener if any, then add the bound handler once
-            if (typeof this.form.removeEventListener === 'function') {
-                this.form.removeEventListener('submit', this._boundHandleSubmit);
-            }
+            this.form.removeEventListener('submit', this._boundHandleSubmit);
             this.form.addEventListener('submit', this._boundHandleSubmit);
         }
-        const cancelBtn = this.shadowRoot.getElementById('cancelBtn');
+        const cancelBtn = this.querySelector('#cancelBtn');
         if (cancelBtn) {
-            if (typeof cancelBtn.removeEventListener === 'function') {
-                cancelBtn.removeEventListener('click', this._boundCancelClick);
-            }
+            cancelBtn.removeEventListener('click', this._boundCancelClick);
             cancelBtn.addEventListener('click', this._boundCancelClick);
         }
     }
 
     render() {
-        this.shadowRoot.innerHTML = '';
+        this._rendered = true;
+        this.innerHTML = '';
         const inputs = this._fields.map(field => {
-            let attrs = {
-                type: field.type,
-                name: field.name,
-                label: field.label || '',
-            };
-            if (field.required) attrs.required = '';
-            if (field.value !== undefined) attrs.value = field.value;
-            if (this._initialValues[field.name] !== undefined) attrs.value = this._initialValues[field.name];
-            let children = [];
-            if (field.type === 'select' && field.options) {
-                children = field.options.map(opt => {
-                    const attrsOpt = {
-                        value: opt
-                    }
-                    if (attrs.value === opt) attrsOpt.selected = '';
-                    return el('option', {
-                        attrs: attrsOpt,
-                        text: opt
-                    })
-                });
+            const wrapper = document.createElement('div');
+            wrapper.className = 'mb-2';
+            const name = field.name;
+            const label = field.label || '';
+            const required = field.required;
+            let value = field.value !== undefined ? field.value : '';
+            if (this._initialValues[name] !== undefined) value = this._initialValues[name];
+
+            if (label) {
+                const lbl = document.createElement('label');
+                lbl.setAttribute('for', name);
+                lbl.className = 'form-label';
+                lbl.textContent = label;
+                wrapper.appendChild(lbl);
             }
-            return el('app-input', { attrs, children });
+
+            let input;
+            if (field.type === 'textarea') {
+                input = document.createElement('textarea');
+                input.className = 'form-control';
+                input.id = name;
+                input.name = name;
+                if (required) input.required = true;
+                input.textContent = value;
+            } else if (field.type === 'select') {
+                input = document.createElement('select');
+                input.className = 'form-select';
+                input.id = name;
+                input.name = name;
+                if (required) input.required = true;
+                if (field.options) {
+                    field.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt;
+                        if (value === opt) option.selected = true;
+                        input.appendChild(option);
+                    });
+                }
+            } else {
+                input = document.createElement('input');
+                input.type = field.type || 'text';
+                input.className = 'form-control';
+                input.id = name;
+                input.name = name;
+                if (required) input.required = true;
+                if (value !== '' && value != null) input.value = value;
+                if (field.type === 'number') input.step = '0.01';
+            }
+
+            wrapper.appendChild(input);
+
+            // Error container
+            const errDiv = document.createElement('div');
+            errDiv.className = 'invalid-feedback';
+            errDiv.dataset.errorFor = name;
+            wrapper.appendChild(errDiv);
+
+            return wrapper;
         });
-        const form = el('form', {
-            attrs: { style: 'display:flex;flex-direction:column;gap:10px;' },
-            children: [
-                ...inputs,
-                el('div', {
-                    attrs: { style: 'display:flex;justify-content:flex-end;gap:8px;' },
-                    children: [
-                        el('app-button', {
-                            attrs: { type: 'button', id: 'cancelBtn', 'aria-label': 'Cancelar formulario' },
-                            text: this._cancelText
-                        }),
-                        el('app-button', {
-                            attrs: { type: 'submit', variant: 'success', 'aria-label': 'Guardar formulario' },
-                            text: this._submitText
-                        })
-                    ]
-                })
-            ]
-        });
-        this.shadowRoot.appendChild(form);
-        // Reasociar listeners tras render
+
+        const form = document.createElement('form');
+        form.className = 'd-flex flex-column gap-2';
+        form.noValidate = true;
+        inputs.forEach(input => form.appendChild(input));
+
+        // Buttons
+        const btnRow = document.createElement('div');
+        btnRow.className = 'd-flex justify-content-end gap-2 mt-2';
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.id = 'cancelBtn';
+        cancelBtn.className = 'btn btn-primary btn-sm';
+        cancelBtn.setAttribute('aria-label', 'Cancelar formulario');
+        cancelBtn.textContent = this._cancelText;
+
+        const submitBtn = document.createElement('button');
+        submitBtn.type = 'submit';
+        submitBtn.className = 'btn btn-success btn-sm';
+        submitBtn.setAttribute('aria-label', 'Guardar formulario');
+        submitBtn.textContent = this._submitText;
+
+        btnRow.appendChild(cancelBtn);
+        btnRow.appendChild(submitBtn);
+        form.appendChild(btnRow);
+
+        this.appendChild(form);
         this._setupListeners();
     }
 
     handleSubmit(e) {
         e.preventDefault();
         const { values, valid, errors } = getFormValuesAndValidate(this.form);
-        this.form.querySelectorAll('app-input').forEach(input => input.clearError());
+        // Clear previous errors
+        this.form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+        this.form.querySelectorAll('.invalid-feedback').forEach(el => { el.textContent = ''; });
         if (!valid) {
             Object.entries(errors).forEach(([name, msg]) => {
-                const input = this.form.querySelector(`app-input[name="${name}"]`);
-                if (input) input.showError(msg);
+                const input = this.form.querySelector(`[name="${name}"]`);
+                if (input) {
+                    input.classList.add('is-invalid');
+                    const errDiv = this.form.querySelector(`[data-error-for="${name}"]`);
+                    if (errDiv) {
+                        errDiv.textContent = msg;
+                        errDiv.classList.add('d-block');
+                    }
+                }
             });
             return;
         }

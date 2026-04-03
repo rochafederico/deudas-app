@@ -1,38 +1,73 @@
 // src/components/UiModal.js
-// Web Component <ui-modal> - Modal genérico accesible con <dialog>
+// Web Component <ui-modal> - Modal usando Bootstrap 5 Modal JS (sin Shadow DOM)
 
 export class UiModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.opener = null;
-        this.render();
+        this._bsModal = null;
+        this._modalEl = null;
+        this._bodyEl = null;
+        this._titleEl = null;
+        this._movedToBody = false;
     }
 
     connectedCallback() {
-        this.dialog = this.shadowRoot.querySelector('dialog');
-        this.btnClose = this.shadowRoot.querySelector('.btn-close');
-        this.header = this.shadowRoot.querySelector('h2');
-        this.btnClose.addEventListener('click', () => this.close());
-        this.dialog.addEventListener('close', () => this._onClose());
-        this.dialog.addEventListener('keydown', this._onKeyDown.bind(this));
-        this.dialog.addEventListener('click', (e) => {
-            if (e.target === this.dialog) this.close();
-        });
+        if (!this._rendered) this.render();
+        this._initModal();
+    }
+
+    _initModal() {
+        const modalEl = this.querySelector('.modal');
+        if (!modalEl) return;
+        this._modalEl = modalEl;
+        this._bodyEl = modalEl.querySelector('.modal-body');
+        this._titleEl = modalEl.querySelector('.modal-title');
+        // Use Bootstrap Modal JS if available
+        if (window.bootstrap && window.bootstrap.Modal) {
+            this._bsModal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: true });
+        }
+        // Listen for hidden event to return focus
+        modalEl.addEventListener('hidden.bs.modal', () => this._onClose());
+    }
+
+    clearBody() {
+        if (this._bodyEl) this._bodyEl.innerHTML = '';
     }
 
     setTitle(text) {
-        this.header.textContent = text;
+        if (this._titleEl) this._titleEl.textContent = text;
     }
 
     open() {
-        this.dialog.showModal();
-        document.body.style.overflow = 'hidden';
+        // Move the .modal element to document.body so Bootstrap stacks
+        // z-index correctly when multiple modals are open simultaneously.
+        if (this._modalEl && !this._movedToBody) {
+            document.body.appendChild(this._modalEl);
+            this._movedToBody = true;
+        }
+        if (this._bsModal) {
+            this._bsModal.show();
+        } else {
+            // Fallback: manual show
+            if (this._modalEl) {
+                this._modalEl.classList.add('show', 'd-block');
+                document.body.classList.add('modal-open');
+            }
+        }
         this._focusFirst();
     }
 
     close() {
-        this.dialog.close();
+        if (this._bsModal) {
+            this._bsModal.hide();
+        } else {
+            if (this._modalEl) {
+                this._modalEl.classList.remove('show', 'd-block');
+                document.body.classList.remove('modal-open');
+            }
+            this._onClose();
+        }
     }
 
     returnFocusTo(el) {
@@ -40,74 +75,50 @@ export class UiModal extends HTMLElement {
     }
 
     _onClose() {
-        document.body.style.overflow = '';
-        if (this.opener) {
+        // Return the .modal element from body back into this custom element.
+        if (this._movedToBody && this._modalEl) {
+            HTMLElement.prototype.appendChild.call(this, this._modalEl);
+            this._movedToBody = false;
+        }
+        if (this.opener && typeof this.opener.focus === 'function') {
             this.opener.focus();
         }
     }
 
     _focusFirst() {
-        // Focus en el primer focoable del slot
         setTimeout(() => {
-            const slot = this.shadowRoot.querySelector('slot');
-            const nodes = slot.assignedElements({flatten:true});
-            let firstInput = nodes.find(n => n.querySelector && n.querySelector('input,select,textarea,button'));
-            if (firstInput) {
-                const el = firstInput.querySelector('input,select,textarea,button');
-                el && el.focus();
-            } else {
-                // fallback: focus en el primer input dentro del modal
-                const el = this.dialog.querySelector('input,select,textarea,button');
-                el && el.focus();
-            }
-        }, 10);
-    }
-
-    _onKeyDown(e) {
-        if (e.key === 'Escape') {
-            e.preventDefault();
-            this.close();
-        }
-        // Focus trap
-        if (e.key === 'Tab') {
-            const focusables = this._getFocusable();
-            if (focusables.length === 0) return;
-            const first = focusables[0];
-            const last = focusables[focusables.length - 1];
-            if (!e.shiftKey && document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            } else if (e.shiftKey && document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            }
-        }
-    }
-
-    _getFocusable() {
-        return Array.from(this.dialog.querySelectorAll('input,select,textarea,button,[tabindex]:not([tabindex="-1"])'))
-            .filter(el => !el.disabled && el.offsetParent !== null);
+            const el = this._bodyEl && this._bodyEl.querySelector('input, select, textarea, button');
+            if (el) el.focus();
+        }, 100);
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-        <style>
-        :host{}
-        dialog::backdrop{ background:rgba(0,0,0,.5); }
-        dialog[open]{ animation: fadeIn .2s; }
-        @keyframes fadeIn{ from{opacity:0} to{opacity:1} }
-        dialog{ border-radius:16px; padding:16px; background:#111a34; color:#e5e7eb; min-width:320px; border:none; }
-        .header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-        .btn-close{ background:transparent; border:0; color:#e5e7eb; font-size:20px; cursor:pointer; }
-        </style>
-        <dialog role="dialog" aria-modal="true" aria-labelledby="modal-title" part="dialog">
-            <div class="header" part="header">
-                <h2 id="modal-title"></h2>
-                <app-button class="btn-close" aria-label="Cerrar modal" variant="delete" style="font-size:20px;padding:2px 10px;" tabindex="0">×</app-button>
+        this._rendered = true;
+        // Preserve existing children to place in modal body
+        const existingChildren = Array.from(this.childNodes).map(n => n.cloneNode(true));
+        this.innerHTML = `
+        <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-modal="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal-title"></h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body"></div>
+                </div>
             </div>
-            <slot></slot>
-        </dialog>
+        </div>
         `;
+        const body = this.querySelector('.modal-body');
+        existingChildren.forEach(child => body.appendChild(child));
+    }
+
+    // Override appendChild to place children inside modal-body
+    appendChild(child) {
+        if (this._bodyEl) {
+            return this._bodyEl.appendChild(child);
+        }
+        return super.appendChild(child);
     }
 }
 

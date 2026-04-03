@@ -5,13 +5,13 @@ import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns
 export class DebtList extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.debts = [];
         this.mes = new Date().toISOString().slice(0, 7); // mes actual por defecto
         this.groupBy = 'none'; // agrupamiento por defecto
     }
 
     connectedCallback() {
+        this.classList.add('d-block');
         this.render();
         this.loadDebts();
         this.addEventListeners();
@@ -107,8 +107,8 @@ export class DebtList extends HTMLElement {
             _onEdit: async (monto) => {
                 let modal = null;
                 const appShell = document.querySelector('app-shell');
-                if (appShell && appShell.shadowRoot) {
-                    modal = appShell.shadowRoot.getElementById('debtModal');
+                if (appShell) {
+                    modal = appShell.querySelector('#debtModal');
                 }
                 if (!modal) {
                     modal = document.getElementById('debtModal');
@@ -124,10 +124,10 @@ export class DebtList extends HTMLElement {
         }));
 
         // Renderizar AppTable
-        let table = this.shadowRoot.querySelector('app-table');
+        let table = this.querySelector('app-table');
         if (!table) {
             table = document.createElement('app-table');
-            this.shadowRoot.appendChild(table);
+            this.appendChild(table);
         }
         table.columnsConfig = columns;
         table.tableData = tableData;
@@ -161,7 +161,7 @@ export class DebtList extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this.innerHTML = `
             <app-table></app-table>
         `;
     }

@@ -1,19 +1,21 @@
 // src/main.js
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
-import DemoBanner from './layout/DemoBanner.js';
+import AppHeader from './layout/AppHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 
 // Wrapper para el contenido principal
-document.body.appendChild(DemoBanner());
+document.body.appendChild(AppHeader());
+document.body.classList.add('bg-body-tertiary');
 
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
-wrapper.style.cssText = '';
+wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');
 app.id = 'app';
+app.className = 'mt-3';
 wrapper.appendChild(app);
 
 
@@ -37,6 +39,11 @@ initDB().then(async (db) => {
     setTimeout(() => {
         const tour = new TourManager();
         tour.start();
+        // Botón "Tour" en el header puede forzar el tour en cualquier momento
+        window.addEventListener('tour:start', () => {
+            tour._cleanup();
+            tour.forceStart();
+        });
     }, 500);
 });
 

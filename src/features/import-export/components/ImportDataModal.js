@@ -1,28 +1,38 @@
 // src/components/ImportDataModal.js
 import '../../../shared/components/UiModal.js';
 import '../../../shared/components/AppButton.js';
+import '../../../shared/components/AppSpinner.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { MontoModel } from '../../montos/MontoModel.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
         this.importData = null;
         this.fileInput = null;
     }
 
     connectedCallback() {
-        this.shadowRoot.getElementById('select-file-btn').addEventListener('click', () => this.selectFile());
-        this.shadowRoot.getElementById('import-btn').addEventListener('click', () => this.importDataToDb());
-        this.shadowRoot.getElementById('cancel-btn').addEventListener('click', () => this.close());
+        this.classList.add('d-block');
+        this.render();
+
+        // Cache element references now, before UiModal.open() moves the .modal
+        // node to document.body (which would make this.querySelector return null).
+        this._fileSelector = this.querySelector('.file-selector');
+        this._importWarning = this.querySelector('.import-warning');
+        this._fileContent = this.querySelector('.file-content');
+        this._importStatus = this.querySelector('.import-status');
+        this._importActions = this.querySelector('.import-actions');
+
+        this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
+        this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());
+        this.querySelector('#cancel-btn').addEventListener('click', () => this.close());
 
         // Crear input file oculto
         this.fileInput = document.createElement('input');
         this.fileInput.type = 'file';
         this.fileInput.accept = '.json';
-        this.fileInput.style.display = 'none';
+        this.fileInput.className = 'd-none';
         this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
         document.body.appendChild(this.fileInput);
     }
@@ -101,21 +111,21 @@ export class ImportDataModal extends HTMLElement {
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
         const previewHtml = `
-            <div class="import-preview">
-                <h3>📋 Vista previa del archivo</h3>
-                <div class="preview-stats">
-                    <p><strong>📊 Resumen:</strong></p>
-                    <p>• ${deudas.length} deudas</p>
-                    <p>• ${totalMontos} montos</p>
-                    <p>• ${ingresos.length} ingresos</p>
-                    <p>• ${inversiones.length} inversiones</p>
+            <div class="border rounded p-3">
+                <h3 class="h5 text-primary mb-3">📋 Vista previa del archivo</h3>
+                <div class="bg-body-tertiary rounded p-3 mb-3">
+                    <p class="mb-1"><strong>📊 Resumen:</strong></p>
+                    <p class="mb-1">• ${deudas.length} deudas</p>
+                    <p class="mb-1">• ${totalMontos} montos</p>
+                    <p class="mb-1">• ${ingresos.length} ingresos</p>
+                    <p class="mb-1">• ${inversiones.length} inversiones</p>
                     ${data.metadata ? `<p>• Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Deudas a importar:</h4>
+                <div class="mb-3">
+                    <h4 class="h6">Deudas a importar:</h4>
                     ${deudas.slice(0, 3).map(deuda => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${deuda.acreedor}</strong> - ${deuda.tipoDeuda}
                             ${deuda.montos?.length ? `(${deuda.montos.length} montos)` : ''}
                         </div>
@@ -123,20 +133,20 @@ export class ImportDataModal extends HTMLElement {
                     ${deudas.length > 3 ? `<p>... y ${deudas.length - 3} más</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Ingresos a importar:</h4>
+                <div class="mb-3">
+                    <h4 class="h6">Ingresos a importar:</h4>
                     ${ingresos.slice(0, 3).map(ingreso => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${ingreso.descripcion || 'Ingreso'} ${ingreso.fecha}</strong> - ${ingreso.monto} ${ingreso.moneda || 'ARS'}
                         </div>
                     `).join('')}
                     ${ingresos.length > 3 ? `<p>... y ${ingresos.length - 3} más</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Inversiones a importar:</h4>
+                <div class="mb-0">
+                    <h4 class="h6">Inversiones a importar:</h4>
                     ${inversiones.slice(0, 3).map(inv => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${inv.nombre}</strong> - ${inv.valorInicial} ${inv.moneda || 'ARS'}
                             ${inv.historialValores?.length ? `(${inv.historialValores.length} valores)` : ''}
                         </div>
@@ -147,8 +157,10 @@ export class ImportDataModal extends HTMLElement {
             </div>
         `;
 
-        this.shadowRoot.querySelector('.file-content').innerHTML = previewHtml;
-        this.shadowRoot.querySelector('.import-actions').style.display = 'flex';
+        this._fileContent.innerHTML = previewHtml;
+        this._fileSelector.classList.add('d-none');
+        this._importWarning.classList.add('d-none');
+        this._importActions.classList.remove('d-none');
     }
 
     async importDataToDb() {
@@ -158,7 +170,7 @@ export class ImportDataModal extends HTMLElement {
         }
 
         try {
-            this.#showProgress('Importando datos...');
+            this.#showLoading('Importando datos...');
 
             const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
             const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
@@ -199,7 +211,7 @@ export class ImportDataModal extends HTMLElement {
             let ingresosImported = 0;
             let ingresosErrors = 0;
             if (ingresos && ingresos.length > 0) {
-                this.#showProgress('Importando ingresos...');
+                this.#showLoading('Importando ingresos...');
                 for (const ingreso of ingresos) {
                     try {
                         await addIngreso(ingreso);
@@ -214,7 +226,7 @@ export class ImportDataModal extends HTMLElement {
             let inversionesImported = 0;
             let inversionesErrors = 0;
             if (inversiones && inversiones.length > 0) {
-                this.#showProgress('Importando inversiones...');
+                this.#showLoading('Importando inversiones...');
                 for (const inv of inversiones) {
                     try {
                         const inversionData = {
@@ -233,65 +245,52 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
-            // Mostrar resultado combinando errores de deudas, ingresos e inversiones
             const totalErrors = errorCount + ingresosErrors + inversionesErrors;
-            if (totalErrors === 0) {
-                this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`);
-            } else {
-                this.#showWarning(`⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err), ${inversionesImported} inversiones (${inversionesErrors} err)`);
-            }
+            const notifyType = totalErrors === 0 ? 'success' : 'warning';
+            const notifyMsg = totalErrors === 0
+                ? `✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`
+                : `⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err), ${inversionesImported} inversiones (${inversionesErrors} err)`;
 
-            // Refrescar la vista después de la importación
-            setTimeout(() => {
-                window.dispatchEvent(new CustomEvent('data-imported', {
-                    bubbles: true,
-                    detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
-                }));
-                this.close();
-            }, 2000);
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: notifyMsg, type: notifyType } }));
+            window.dispatchEvent(new CustomEvent('data-imported', {
+                bubbles: true,
+                detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
+            }));
+            this.close();
 
         } catch (error) {
             console.error('Error en importación:', error);
             this.#showError('❌ Error durante la importación');
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error durante la importación', type: 'danger' } }));
         }
     }
 
-    #showProgress(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
-        statusDiv.innerHTML = `
-            <div class="progress-message">
-                <div class="spinner"></div>
-                <span>${message}</span>
-            </div>
-        `;
-    }
-
-    #showSuccess(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="success-message">${message}</div>`;
+    #showLoading(label = 'Cargando...') {
+        this._fileSelector.classList.add('d-none');
+        this._importWarning.classList.add('d-none');
+        this._importActions.classList.add('d-none');
+        this._importStatus.innerHTML = '';
+        this._fileContent.innerHTML = `<app-spinner label="${label}"></app-spinner>`;
     }
 
     #showError(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
-    }
-
-    #showWarning(message) {
-        const statusDiv = this.shadowRoot.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="warning-message">${message}</div>`;
+        this._importStatus.innerHTML = `<div class="alert alert-danger py-2 mb-0" role="alert">${message}</div>`;
     }
 
     open(opener) {
-        this.modal = this.shadowRoot.querySelector('ui-modal');
+        this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Importar datos');
+
+        // Reset state before opening (elements are moved to document.body on open)
+        this.importData = null;
+        this._fileSelector.classList.remove('d-none');
+        this._importWarning.classList.remove('d-none');
+        this._fileContent.innerHTML = '';
+        this._importStatus.innerHTML = '';
+        this._importActions.classList.add('d-none');
+
         this.modal.open();
         this.modal.returnFocusTo(opener);
-
-        // Reset state
-        this.importData = null;
-        this.shadowRoot.querySelector('.file-content').innerHTML = '';
-        this.shadowRoot.querySelector('.import-status').innerHTML = '';
-        this.shadowRoot.querySelector('.import-actions').style.display = 'none';
     }
 
     close() {
@@ -299,147 +298,17 @@ export class ImportDataModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-            <style>
-                .import-content {
-                    padding: 16px;
-                    min-height: 300px;
-                }
-
-                .file-selection {
-                    text-align: center;
-                    padding: 20px;
-                    border: 2px dashed #ccc;
-                    border-radius: 8px;
-                    margin-bottom: 16px;
-                }
-
-                .file-selection p {
-                    margin: 0 0 16px 0;
-                }
-
-                .file-content {
-                    margin: 16px 0;
-                }
-
-                .import-preview {
-                    border: 1px solid #ddd;
-                    border-radius: 8px;
-                    padding: 16px;
-                }
-
-                .import-preview h3 {
-                    margin-top: 0;
-                    color: #ddd;
-                }
-
-                .preview-stats {
-                    margin: 12px 0;
-                    padding: 12px;
-                    border-radius: 4px;
-                }
-
-                .preview-stats p {
-                    margin: 4px 0;
-                }
-
-                .preview-items {
-                    margin: 12px 0;
-                }
-
-                .preview-item {
-                    padding: 8px;
-                    margin: 4px 0;
-                    border-radius: 4px;
-                    border-left: 3px solid #4b6cb7;
-                }
-
-                .import-warning {
-                    margin: 12px 0;
-                    padding: 12px;
-                    border: 1px solid #ffeaa7;
-                    border-radius: 4px;
-                    max-width: 600px;
-                }
-
-                .import-warning p {
-                    margin: 4px 0;
-                }
-
-                .import-actions {
-                    display: none;
-                    gap: 12px;
-                    margin-top: 16px;
-                    padding-top: 16px;                }
-                }
-
-                .import-status {
-                    margin-top: 16px;
-                    min-height: 30px;
-                }
-
-                .success-message {
-                    color: green;
-                    padding: 12px;
-                    border: 1px solid green;
-                    border-radius: 4px;
-                }
-
-                .error-message {
-                    color: red;
-                    padding: 12px;
-                    border: 1px solid red;
-                    border-radius: 4px;
-                }
-
-                .warning-message {
-                    color: #856404;
-                    padding: 12px;
-                    border: 1px solid #ffeaa7;
-                    border-radius: 4px;
-                }
-
-                .progress-message {
-                    display: flex;
-                    align-items: center;
-                    gap: 12px;
-                    padding: 12px;
-                    border: 1px solid #2196f3;
-                    border-radius: 4px;
-                }
-
-                .spinner {
-                    display: inline-block;
-                    width: 20px;
-                    height: 20px;
-                    border: 2px solid #eee;
-                    border-top: 2px solid var(--accent, #4b6cb7);
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-
-                @media (max-width: 600px) {
-                    .import-actions {
-                        flex-direction: column;
-                    }
-                }
-            </style>
-            
+        this.innerHTML = `
             <ui-modal id="importModal">
-                <div class="import-content">
-                    <div class="file-selection">
-                        <p>📁 Selecciona un archivo JSON de backup para importar</p>
+                <div class="p-3 d-grid gap-3">
+                    <div class="file-selector text-center p-4 border border-2 border-secondary border-opacity-25 rounded">
+                        <p class="mb-3">📁 Selecciona un archivo JSON de backup para importar</p>
                         <app-button id="select-file-btn" variant="primary">
                             Seleccionar archivo
                         </app-button>
                     </div>
-                    <div class="import-warning">
-                        <p>⚠️ <strong>Importante:</strong></p>
+                    <div class="import-warning alert alert-warning mb-0" role="alert">
+                        <p class="mb-2">⚠️ <strong>Importante:</strong></p>
                         <ul>
                             <li>La importación añade datos (no elimina):
                                 <ul>
@@ -471,9 +340,9 @@ export class ImportDataModal extends HTMLElement {
                         </ul>
                     </div>
                     
-                    <div class="file-content"></div>
+                    <div class="file-content my-2"></div>
                     
-                    <div class="import-actions">
+                    <div class="import-actions d-none d-flex flex-column flex-sm-row gap-3 pt-3 border-top">
                         <app-button id="import-btn" variant="success">
                             📥 Importar datos
                         </app-button>
@@ -482,7 +351,7 @@ export class ImportDataModal extends HTMLElement {
                         </app-button>
                     </div>
                     
-                    <div class="import-status"></div>
+                    <div class="import-status mt-3"></div>
                 </div>
             </ui-modal>
         `;
