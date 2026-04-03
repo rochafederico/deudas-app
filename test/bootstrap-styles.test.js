@@ -38,7 +38,7 @@ export const tests = [
             if (tag === 'app-checkbox') {
                 element.render();
             }
-            assert(!element.innerHTML.includes('style='), `${tag} no debe renderizar estilos inline`);
+            assert(element.querySelector('[style]') === null, `${tag} no debe renderizar atributos style inline`);
             element.remove();
         }
     }

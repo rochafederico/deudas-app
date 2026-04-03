@@ -268,17 +268,17 @@ export class ImportDataModal extends HTMLElement {
 
     #showSuccess(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-success py-2 mb-0">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-success py-2 mb-0" role="alert">${message}</div>`;
     }
 
     #showError(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-danger py-2 mb-0">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-danger py-2 mb-0" role="alert">${message}</div>`;
     }
 
     #showWarning(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-warning py-2 mb-0">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-warning py-2 mb-0" role="alert">${message}</div>`;
     }
 
     open(opener) {
