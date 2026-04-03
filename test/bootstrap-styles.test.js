@@ -33,7 +33,7 @@ export const tests = [
             { tag: 'app-link', selector: 'a.link-light.d-inline-block' },
             { tag: 'app-checkbox', selector: '.form-check.form-switch .form-check-input' },
             { tag: 'tour-overlay', selector: 'svg.w-100.h-100' },
-            { tag: 'tour-tooltip', selector: '.card.bg-dark.text-light' },
+            { tag: 'tour-tooltip', selector: '.card.bg-dark.text-white' },
             { tag: 'import-data-modal', selector: '.alert.alert-warning' }
         ];
         for (const testCase of cases) {
