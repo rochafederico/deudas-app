@@ -40,7 +40,12 @@ class AppLink extends HTMLElement {
     const href = this.getAttribute('href') || '#';
     const label = this._originalText || this.textContent.trim() || this.getAttribute('label') || href;
     if (!this._originalText) this._originalText = label;
-    this.innerHTML = `<a href="${href}" class="link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block">${label}</a>`;
+    this.replaceChildren();
+    const link = document.createElement('a');
+    link.href = href;
+    link.className = 'link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block';
+    link.textContent = label;
+    this.appendChild(link);
   }
 }
 
