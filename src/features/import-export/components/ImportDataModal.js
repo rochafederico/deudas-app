@@ -14,6 +14,13 @@ export class ImportDataModal extends HTMLElement {
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
+
+        // Cache element references now, before UiModal.open() moves the .modal
+        // node to document.body (which would make this.querySelector return null).
+        this._fileContent = this.querySelector('.file-content');
+        this._importStatus = this.querySelector('.import-status');
+        this._importActions = this.querySelector('.import-actions');
+
         this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
         this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());
         this.querySelector('#cancel-btn').addEventListener('click', () => this.close());
@@ -147,8 +154,8 @@ export class ImportDataModal extends HTMLElement {
             </div>
         `;
 
-        this.querySelector('.file-content').innerHTML = previewHtml;
-        this.querySelector('.import-actions').classList.remove('d-none');
+        this._fileContent.innerHTML = previewHtml;
+        this._importActions.classList.remove('d-none');
     }
 
     async importDataToDb() {
@@ -257,8 +264,7 @@ export class ImportDataModal extends HTMLElement {
     }
 
     #showProgress(message) {
-        const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `
+        this._importStatus.innerHTML = `
             <div class="d-flex align-items-center gap-2 p-2 border border-info rounded">
                 <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
                 <span>${message}</span>
@@ -267,18 +273,15 @@ export class ImportDataModal extends HTMLElement {
     }
 
     #showSuccess(message) {
-        const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-success py-2 mb-0" role="alert">${message}</div>`;
+        this._importStatus.innerHTML = `<div class="alert alert-success py-2 mb-0" role="alert">${message}</div>`;
     }
 
     #showError(message) {
-        const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-danger py-2 mb-0" role="alert">${message}</div>`;
+        this._importStatus.innerHTML = `<div class="alert alert-danger py-2 mb-0" role="alert">${message}</div>`;
     }
 
     #showWarning(message) {
-        const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="alert alert-warning py-2 mb-0" role="alert">${message}</div>`;
+        this._importStatus.innerHTML = `<div class="alert alert-warning py-2 mb-0" role="alert">${message}</div>`;
     }
 
     open(opener) {
@@ -287,9 +290,9 @@ export class ImportDataModal extends HTMLElement {
 
         // Reset state before opening (elements are moved to document.body on open)
         this.importData = null;
-        this.querySelector('.file-content').innerHTML = '';
-        this.querySelector('.import-status').innerHTML = '';
-        this.querySelector('.import-actions').classList.add('d-none');
+        this._fileContent.innerHTML = '';
+        this._importStatus.innerHTML = '';
+        this._importActions.classList.add('d-none');
 
         this.modal.open();
         this.modal.returnFocusTo(opener);
