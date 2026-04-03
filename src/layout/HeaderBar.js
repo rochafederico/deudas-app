@@ -92,7 +92,7 @@ export class HeaderBar extends HTMLElement {
     render() {
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
         this.innerHTML = `
-            <div class="d-flex flex-wrap justify-content-between align-items-center p-2 gap-2 bg-body border border-bottom-0 rounded-top-4 shadow-sm">
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center p-2 gap-2">
             <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
                 <app-button id="prev-month" type="button" title="Mes anterior">&#8249;</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>

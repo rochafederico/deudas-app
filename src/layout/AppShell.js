@@ -89,13 +89,18 @@ export class AppShell extends HTMLElement {
             }
         });
 
-        const panel = document.createElement('div');
-        panel.className = 'bg-body border rounded-bottom-4 shadow-sm p-3';
-        panel.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
+        const card = document.createElement('div');
+        card.className = 'card shadow-sm';
+
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body p-3';
+        cardBody.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
+
+        card.appendChild(header);
+        card.appendChild(cardBody);
 
         this.innerHTML = '';
-        this.appendChild(header);
-        this.appendChild(panel);
+        this.appendChild(card);
     }
 
     onGroupChange(groupBy) {
