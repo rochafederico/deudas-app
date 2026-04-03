@@ -16,9 +16,9 @@ export class AppHeader extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm" data-tour-step="bienvenida">
+      <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm">
         <div class="container-fluid">
-          <a class="navbar-brand fw-bold" href="/" aria-label="Inicio">Nivva</a>
+          <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
           <button class="navbar-toggler" type="button"
             data-bs-toggle="collapse" data-bs-target="#main-nav-collapse"
             aria-controls="main-nav-collapse" aria-expanded="false" aria-label="Abrir menú">
