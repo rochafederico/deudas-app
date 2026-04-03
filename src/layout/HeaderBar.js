@@ -98,9 +98,18 @@ export class HeaderBar extends HTMLElement {
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
                 </app-button>
-                <app-button id="delete-data" type="button" variant="delete" title="Eliminar datos">
-                Eliminar todo
-                </app-button>
+                <div class="dropdown">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Opciones">
+                        ⚙️
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button id="delete-data" class="dropdown-item text-danger" type="button">
+                                🗑️ Eliminar todo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
             </div>
         `;
