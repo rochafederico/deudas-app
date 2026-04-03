@@ -31,7 +31,7 @@ export const tests = [
             { tag: 'header-bar', selector: '.bg-body.border.rounded-top-4' },
             { tag: 'dark-toggle', selector: '.btn.btn-outline-secondary.rounded-pill' },
             { tag: 'app-link', selector: 'a.link-light.d-inline-block' },
-            { tag: 'app-checkbox', selector: '.form-check-input.position-static' },
+            { tag: 'app-checkbox', selector: '.form-check-input' },
             { tag: 'tour-overlay', selector: 'svg.w-100.h-100' },
             { tag: 'tour-tooltip', selector: '.card.bg-dark.text-light' },
             { tag: 'import-data-modal', selector: '.alert.alert-warning' }

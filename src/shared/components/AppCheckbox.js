@@ -40,24 +40,22 @@ export class AppCheckbox extends HTMLElement {
         const ariaLabel = this.getAttribute('aria-label') || this.getAttribute('title') || 'Seleccionar opción';
         this.replaceChildren();
         const wrapper = document.createElement('div');
-        wrapper.className = 'form-check m-0';
+        wrapper.className = 'form-check';
         const checkboxInput = document.createElement('input');
-        checkboxInput.className = 'form-check-input position-static m-0';
+        checkboxInput.className = 'form-check-input';
         checkboxInput.type = 'checkbox';
         checkboxInput.id = inputId;
         checkboxInput.setAttribute('aria-label', ariaLabel);
         checkboxInput.checked = checked;
-        wrapper.appendChild(checkboxInput);
-        this.appendChild(wrapper);
-        const checkbox = this.querySelector('input[type="checkbox"]');
-        checkbox.checked = checked;
-        checkbox.addEventListener('change', () => {
-            this.checked = checkbox.checked;
+        checkboxInput.addEventListener('change', () => {
+            this.checked = checkboxInput.checked;
             this.dispatchEvent(new CustomEvent('checkbox-change', {
-                detail: { checked: checkbox.checked },
+                detail: { checked: checkboxInput.checked },
                 bubbles: true
             }));
         });
+        wrapper.appendChild(checkboxInput);
+        this.appendChild(wrapper);
     }
 }
 
