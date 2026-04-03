@@ -27,7 +27,7 @@ export class AppHeader extends HTMLElement {
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
           </div>
-          <button id="tour-btn" class="btn btn-outline-light btn-sm ms-lg-2 flex-shrink-0" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
+          <button id="tour-btn" class="btn btn-light btn-sm ms-lg-2 flex-shrink-0" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
             ❓ Tour
           </button>
         </div>
