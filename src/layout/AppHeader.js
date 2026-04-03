@@ -2,6 +2,7 @@ import './Menu.js';
 import './DarkToggle.js';
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
+import '../shared/components/AppToast.js';
 
 export class AppHeader extends HTMLElement {
   constructor() {
@@ -50,6 +51,7 @@ export class AppHeader extends HTMLElement {
 
   render() {
     this.innerHTML = `
+      <app-toast></app-toast>
       <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
@@ -60,7 +62,7 @@ export class AppHeader extends HTMLElement {
           </button>
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button"
                   data-bs-toggle="dropdown" aria-expanded="false">
@@ -79,11 +81,13 @@ export class AppHeader extends HTMLElement {
                   </li>
                 </ul>
               </li>
+              <li class="nav-item">
+                <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
+                  ❓ Tour
+                </button>
+              </li>
             </ul>
           </div>
-          <button id="tour-btn" class="btn btn-light btn-sm ms-lg-2 flex-shrink-0" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
-            ❓ Tour
-          </button>
         </div>
       </nav>
     `;

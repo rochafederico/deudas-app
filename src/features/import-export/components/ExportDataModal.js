@@ -62,15 +62,22 @@ export class ExportDataModal extends HTMLElement {
         this.modal.open();
         this.modal.returnFocusTo(opener);
         setTimeout(async () => {
-            const { listDeudas } = await import('../../deudas/deudaRepository.js');
-            const { getAll } = await import('../../ingresos/ingresoRepository.js');
-            const { listInversiones } = await import('../../inversiones/inversionRepository.js');
-            let deudas = await listDeudas();
-            const ingresos = await getAll();
-            const inversiones = await listInversiones();
-            deudas = this.#mapDeudasForExport(deudas);
-            const inversionesMapped = this.#mapInversionesForExport(inversiones);
-            this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
+            try {
+                const { listDeudas } = await import('../../deudas/deudaRepository.js');
+                const { getAll } = await import('../../ingresos/ingresoRepository.js');
+                const { listInversiones } = await import('../../inversiones/inversionRepository.js');
+                let deudas = await listDeudas();
+                const ingresos = await getAll();
+                const inversiones = await listInversiones();
+                deudas = this.#mapDeudasForExport(deudas);
+                const inversionesMapped = this.#mapInversionesForExport(inversiones);
+                this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
+                window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
+            } catch (error) {
+                console.error('Error al exportar:', error);
+                window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
+                this.close();
+            }
         }, 100);
     }
 

@@ -240,7 +240,6 @@ export class ImportDataModal extends HTMLElement {
                 }
             }
 
-            // Mostrar resultado combinando errores de deudas, ingresos e inversiones
             const totalErrors = errorCount + ingresosErrors + inversionesErrors;
             if (totalErrors === 0) {
                 this.#showSuccess(`✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`);
@@ -250,6 +249,11 @@ export class ImportDataModal extends HTMLElement {
 
             // Refrescar la vista después de la importación
             setTimeout(() => {
+                const notifyType = totalErrors === 0 ? 'success' : 'warning';
+                const notifyMsg = totalErrors === 0
+                    ? `✅ Importación exitosa: ${importedCount} deudas, ${ingresosImported} ingresos, ${inversionesImported} inversiones`
+                    : `⚠️ Importación parcial: ${importedCount} deudas (${errorCount} err), ${ingresosImported} ingresos (${ingresosErrors} err), ${inversionesImported} inversiones (${inversionesErrors} err)`;
+                window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: notifyMsg, type: notifyType } }));
                 window.dispatchEvent(new CustomEvent('data-imported', {
                     bubbles: true,
                     detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
@@ -260,6 +264,7 @@ export class ImportDataModal extends HTMLElement {
         } catch (error) {
             console.error('Error en importación:', error);
             this.#showError('❌ Error durante la importación');
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error durante la importación', type: 'danger' } }));
         }
     }
 
