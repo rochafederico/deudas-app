@@ -342,7 +342,7 @@ export class ImportDataModal extends HTMLElement {
                     
                     <div class="file-content my-2"></div>
                     
-                    <div class="import-actions d-none flex-column flex-sm-row gap-3 pt-3 border-top">
+                    <div class="import-actions d-none d-flex flex-column flex-sm-row gap-3 pt-3 border-top">
                         <app-button id="import-btn" variant="success">
                             📥 Importar datos
                         </app-button>
