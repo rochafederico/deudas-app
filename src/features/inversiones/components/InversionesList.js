@@ -31,6 +31,7 @@ export class InversionesList extends HTMLElement {
     inversiones.forEach(inv => {
       inv._acciones = () => {
         const accionesContainer = document.createElement('div');
+        accionesContainer.className = 'd-flex gap-2 align-items-center justify-content-center';
         const btn = document.createElement('app-button');
         btn.textContent = 'Nuevo valor';
         btn.setAttribute('aria-label', 'Nuevo valor');

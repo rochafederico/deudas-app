@@ -160,45 +160,49 @@ export class DebtForm extends HTMLElement {
                 { text: monto.vencimiento },
                 {
                     children: [
-                        el('app-button', {
-                            className: 'edit-monto',
-                            text: '✎',
-                            attrs: { title: 'Editar' },
-                            on: {
-                                click: () => this.openMontoModal(monto, idx)
-                            }
-                        }),
-                        el('app-button', {
-                            className: 'delete-monto',
-                            text: '×',
-                            attrs: { variant: 'delete', title: 'Eliminar' },
-                            on: {
-                                click: () => {
-                                    this.montos.splice(idx, 1);
-                                    this.renderMontosList();
-                                }
-                            }
-                        }),
-                        el('app-button', {
-                            className: 'duplicate-monto',
-                            text: '⧉',
-                            attrs: { variant: 'success', title: 'Duplicar' },
-                            on: {
-                                click: () => this.openDuplicateMontoModal(monto, idx)
-                            }
-                        }),
-                        (() => {
-                            const id = `app-checkbox-${monto.id}`;
-                            const appCheckbox = document.createElement('app-checkbox');
-                            appCheckbox.classList.add('ms-2');
-                            appCheckbox.inputId = id;
-                            appCheckbox.checked = !!monto.pagado;
-                            appCheckbox.title = 'Marcar como pagado';
-                            appCheckbox.addEventListener('checkbox-change', async (e) => {
-                                monto.pagado = e.detail.checked;
-                            });
-                            return appCheckbox;
-                        })()
+                        el('div', {
+                            className: 'd-flex gap-1 align-items-center',
+                            children: [
+                                el('app-button', {
+                                    className: 'edit-monto',
+                                    text: '✎',
+                                    attrs: { title: 'Editar' },
+                                    on: {
+                                        click: () => this.openMontoModal(monto, idx)
+                                    }
+                                }),
+                                el('app-button', {
+                                    className: 'delete-monto',
+                                    text: '×',
+                                    attrs: { variant: 'delete', title: 'Eliminar' },
+                                    on: {
+                                        click: () => {
+                                            this.montos.splice(idx, 1);
+                                            this.renderMontosList();
+                                        }
+                                    }
+                                }),
+                                el('app-button', {
+                                    className: 'duplicate-monto',
+                                    text: '⧉',
+                                    attrs: { variant: 'success', title: 'Duplicar' },
+                                    on: {
+                                        click: () => this.openDuplicateMontoModal(monto, idx)
+                                    }
+                                }),
+                                (() => {
+                                    const id = `app-checkbox-${monto.id}`;
+                                    const appCheckbox = document.createElement('app-checkbox');
+                                    appCheckbox.inputId = id;
+                                    appCheckbox.checked = !!monto.pagado;
+                                    appCheckbox.title = 'Marcar como pagado';
+                                    appCheckbox.addEventListener('checkbox-change', async (e) => {
+                                        monto.pagado = e.detail.checked;
+                                    });
+                                    return appCheckbox;
+                                })()
+                            ]
+                        })
                     ]
                 }
             ];
