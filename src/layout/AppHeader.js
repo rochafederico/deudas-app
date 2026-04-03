@@ -42,9 +42,6 @@ export class AppHeader extends HTMLElement {
       this._importModal.addEventListener('data-imported', () => {
         window.dispatchEvent(new CustomEvent('ui:refresh'));
       });
-      window.addEventListener('data-imported', () => {
-        window.dispatchEvent(new CustomEvent('ui:refresh'));
-      });
     }
     this._importModal.open(opener);
   }
