@@ -284,14 +284,15 @@ export class ImportDataModal extends HTMLElement {
     open(opener) {
         this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Importar datos');
-        this.modal.open();
-        this.modal.returnFocusTo(opener);
 
-        // Reset state
+        // Reset state before opening (elements are moved to document.body on open)
         this.importData = null;
         this.querySelector('.file-content').innerHTML = '';
         this.querySelector('.import-status').innerHTML = '';
         this.querySelector('.import-actions').classList.add('d-none');
+
+        this.modal.open();
+        this.modal.returnFocusTo(opener);
     }
 
     close() {
