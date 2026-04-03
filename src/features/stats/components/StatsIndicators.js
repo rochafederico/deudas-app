@@ -30,7 +30,7 @@ export default function StatsIndicators({ mes } = {}) {
         StatsCard({ title: 'Ingresos' , items: addValue(summary.byCurrency.ingresos), theme: 'bg-success text-white' }),
         StatsCard({ title: 'Gastos', items: addValue(summary.byCurrency.egresos), theme: 'bg-danger text-white' }),
         StatsCard({ title: 'Balance', items: addValue(summary.byCurrency.saldo), theme: 'bg-primary text-white' }),
-        StatsCard({ title: 'Total a pagar', items: addValue(summary.byCurrency.pendientes), theme: 'bg-warning text-dark' }),
+        StatsCard({ title: 'Total a pagar', items: addValue(summary.byCurrency.pendientes), theme: 'bg-warning text-white' }),
         StatsCard({ title: 'Inversiones', items: addValue(summary.inversiones), theme: 'bg-info text-white' }),
       ];
       cards.forEach(card => {
