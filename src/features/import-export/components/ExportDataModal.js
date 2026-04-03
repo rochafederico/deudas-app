@@ -52,7 +52,6 @@ export class ExportDataModal extends HTMLElement {
     #removeDownloadLink(a, url) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        setTimeout(() => this.close(), 100);
     }
 
     async open(opener) {
@@ -72,6 +71,7 @@ export class ExportDataModal extends HTMLElement {
                 deudas = this.#mapDeudasForExport(deudas);
                 const inversionesMapped = this.#mapInversionesForExport(inversiones);
                 this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
+                this.close();
                 window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
             } catch (error) {
                 console.error('Error al exportar:', error);
