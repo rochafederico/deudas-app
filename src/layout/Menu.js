@@ -9,14 +9,6 @@ export class AppNav extends HTMLElement {
 
   connectedCallback() {
     this.render();
-    this.addEventListener('click', (e) => {
-      const link = e.target.closest('[app-link]');
-      if (link) {
-        e.preventDefault();
-        window.history.pushState({}, '', link.getAttribute('href'));
-        window.dispatchEvent(new PopStateEvent('popstate'));
-      }
-    });
     // Re-render on navigation to keep active state in sync
     this._onPopState = () => this.render();
     window.addEventListener('popstate', this._onPopState);
