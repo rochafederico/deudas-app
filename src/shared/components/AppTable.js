@@ -1,10 +1,9 @@
 // src/components/AppTable.js
-// Componente de tabla reutilizable
+// Componente de tabla reutilizable usando Bootstrap directamente (sin Shadow DOM)
 
 export class AppTable extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.columns = [];
         this.data = [];
         this.footerContent = null;
@@ -44,34 +43,20 @@ export class AppTable extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-            <style>
-                table { width: 100%; border-collapse: collapse; }
-                th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
-                th:last-child, td:last-child { text-align: right; }
-                tr:hover { background-color: #f1f1f1; }
-                :host-context(body.dark-mode) tr:hover { background-color: #222a3a; }
-                @media (max-width: 600px) {
-                    .hidden-mobile {
-                        display: none !important;
-                    }
-                }
-            </style>
-            <table>
-                <thead>
+        this.innerHTML = `
+            <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
                     <tr>
                         ${this.columns.map(col => `<th${col.opts && col.opts.classCss ? ` class="${col.opts.classCss}"` : ''}>${col.label}</th>`).join('')}
                     </tr>
                 </thead>
                 <tbody></tbody>
-                <tfoot>
-                    ${this.footerContent}
-                </tfoot>
+                <tfoot></tfoot>
             </table>
+            </div>
         `;
-        // Renderizar filas dinámicamente
-        const tbody = this.shadowRoot.querySelector('tbody');
-        tbody.innerHTML = '';
+        const tbody = this.querySelector('tbody');
         if (this.data.length === 0) {
             const tr = document.createElement('tr');
             const td = document.createElement('td');
@@ -107,8 +92,7 @@ export class AppTable extends HTMLElement {
         });
 
         // Renderizar footer dinámico
-        const tfoot = this.shadowRoot.querySelector('tfoot');
-        tfoot.innerHTML = '';
+        const tfoot = this.querySelector('tfoot');
         if (this._footerRenderer) {
             const result = this._footerRenderer(this.columns, this.data);
             if (result instanceof Node) {

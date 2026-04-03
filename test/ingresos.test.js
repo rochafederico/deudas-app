@@ -39,9 +39,9 @@ async function testAgregarIngresoDesdeForm() {
     const ingresoForm = document.createElement('ingreso-form');
     document.body.appendChild(ingresoForm);
 
-    // Verificar que IngresoForm renderiza un app-form en su shadow DOM
-    const appForm = ingresoForm.shadowRoot.querySelector('app-form');
-    assert(appForm !== null, 'IngresoForm debe contener un app-form en su shadow DOM');
+    // Verificar que IngresoForm renderiza un app-form
+    const appForm = ingresoForm.querySelector('app-form');
+    assert(appForm !== null, 'IngresoForm debe contener un app-form');
 
     // Escuchar evento ingreso:saved que emite IngresoForm al guardar
     let savedEvent = null;
@@ -96,7 +96,7 @@ async function testCancelarIngresoForm() {
     let cancelEvent = false;
     ingresoForm.addEventListener('ingreso:cancel', () => { cancelEvent = true; });
 
-    const appForm = ingresoForm.shadowRoot.querySelector('app-form');
+    const appForm = ingresoForm.querySelector('app-form');
     appForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
 
     assert(cancelEvent, 'IngresoForm debe emitir ingreso:cancel al cancelar');
@@ -202,7 +202,7 @@ async function testFlujoCompletoIngresosUI() {
     document.body.appendChild(ingresoForm);
 
     // Primer ingreso via UI
-    const appForm = ingresoForm.shadowRoot.querySelector('app-form');
+    const appForm = ingresoForm.querySelector('app-form');
     appForm.dispatchEvent(new CustomEvent('form:submit', {
         detail: {
             fecha: '2026-06-01',

@@ -1,30 +1,25 @@
 import '../features/deudas/components/DebtModal.js';
 import '../features/ingresos/components/IngresoModal.js';
 import '../shared/components/AppInput.js';
-import '../features/import-export/components/ExportDataModal.js';
-import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';
 
 export class AppShell extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.month = new Date().toISOString().slice(0, 7); // Mes actual por defecto
         this.showForm = false;
-        // Handler for import events (idempotent listener registration)
-        this._onDataImported = this._onDataImportedHandler.bind(this);
-        this._importListenerAttached = false;
-        this.render();
     }
 
     connectedCallback() {
+        this.classList.add('d-block');
+        this.render();
         // Usar el id para seleccionar el input correctamente
-        const input = this.shadowRoot.getElementById('month-filter');
+        const input = this.querySelector('#month-filter');
         if (input) input.value = this.month;
-        const opener = this.shadowRoot.querySelector('[data-add-debt]');
+        const opener = this.querySelector('[data-add-debt]');
         if (opener) {
             opener.addEventListener('click', () => {
-                const modal = this.shadowRoot.querySelector('#debtModal');
+                const modal = this.querySelector('#debtModal');
                 modal.openCreate();
                 modal.attachOpener(opener);
             });
@@ -56,25 +51,19 @@ export class AppShell extends HTMLElement {
             this.onGroupChange(this.groupBy);
         });
         header.addEventListener('add-debt', () => {
-            const modal = this.shadowRoot.querySelector('#debtModal');
+            const modal = this.querySelector('#debtModal');
             modal.openCreate();
-            modal.attachOpener(header.shadowRoot.getElementById('add-debt'));
+            modal.attachOpener(header.querySelector('#add-debt'));
         });
         header.addEventListener('add-income', () => {
-            let modal = this.shadowRoot.querySelector('#ingresoModal');
+            let modal = this.querySelector('#ingresoModal');
             if (!modal) {
                 modal = document.createElement('ingreso-modal');
                 modal.id = 'ingresoModal';
-                this.shadowRoot.appendChild(modal);
+                this.appendChild(modal);
             }
             modal.openCreate();
-            modal.attachOpener(header.shadowRoot.getElementById('add-income'));
-        });
-        header.addEventListener('export-data', () => {
-            this.openExportModal(header.shadowRoot.getElementById('export-data'));
-        });
-        header.addEventListener('import-data', () => {
-            this.openImportModal(header.shadowRoot.getElementById('import-data'));
+            modal.attachOpener(header.querySelector('#add-income'));
         });
         header.addEventListener('delete-data', async () => {
             const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
@@ -89,67 +78,26 @@ export class AppShell extends HTMLElement {
             }
         });
 
-        const panel = document.createElement('div');
-        panel.className = 'panel';
-        panel.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
+        const card = document.createElement('div');
+        card.className = 'card shadow-sm';
 
-        this.shadowRoot.innerHTML = `
-            <style>
-                .panel { margin-top: 20px; }
-            </style>
-        `;
-        this.shadowRoot.appendChild(header);
-        this.shadowRoot.appendChild(panel);
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body p-3';
+        cardBody.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
+
+        card.appendChild(header);
+        card.appendChild(cardBody);
+
+        this.innerHTML = '';
+        this.appendChild(card);
     }
 
     onGroupChange(groupBy) {
         window.dispatchEvent(new CustomEvent('ui:group', { detail: { groupBy } }));
     }
 
-    async openExportModal(opener) {
-        let modal = this.shadowRoot.getElementById('exportDataModal');
-        if (!modal) {
-            modal = document.createElement('export-data-modal');
-            modal.id = 'exportDataModal';
-            this.shadowRoot.appendChild(modal);
-        }
-        modal.open(opener);
-    }
-    async openImportModal(opener) {
-        let modal = this.shadowRoot.getElementById('importDataModal');
-        if (!modal) {
-            modal = document.createElement('import-data-modal');
-            modal.id = 'importDataModal';
-            this.shadowRoot.appendChild(modal);
-        }
-
-        // Attach listeners only once; support both modal-dispatched and window-dispatched events
-        if (!this._importListenerAttached) {
-            try {
-                modal.addEventListener('data-imported', this._onDataImported);
-            } catch (err) {
-                // ignore if addEventListener on modal fails for any reason
-                console.warn('Could not attach modal listener:', err);
-            }
-            window.addEventListener('data-imported', this._onDataImported);
-            this._importListenerAttached = true;
-        }
-
-        modal.open(opener);
-    }
-
-    _onDataImportedHandler(_e) {
-        // Refrescar la lista de deudas
-        const debtList = this.shadowRoot.querySelector('debt-list');
-        if (debtList && typeof debtList.refresh === 'function') {
-            debtList.refresh();
-        }
-        // Emitir evento global para que otros componentes se actualicen
-        window.dispatchEvent(new CustomEvent('ui:refresh'));
-    }
-
     updateFormVisibility() {
-        const container = this.shadowRoot.querySelector('#form-container');
+        const container = this.querySelector('#form-container');
         container.innerHTML = this.showForm ? '<debt-form></debt-form>' : '';
     }
 }

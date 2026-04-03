@@ -6,23 +6,20 @@ import '../shared/components/AppButton.js';
 export class HeaderBar extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.month = new Date().toISOString().slice(0, 7);
-        this.render();
     }
 
     connectedCallback() {
-        // Mes actual
-        const monthFilter = this.shadowRoot.querySelector('#month-filter');
-        const prevBtn = this.shadowRoot.querySelector('#prev-month');
-        const nextBtn = this.shadowRoot.querySelector('#next-month');
-        const groupFilter = this.shadowRoot.querySelector('#group-filter');
-        const addDebtBtn = this.shadowRoot.querySelector('#add-debt');
-        const addIncomeBtn = this.shadowRoot.querySelector('#add-income');
-        const exportBtn = this.shadowRoot.querySelector('#export-data');
-        const importBtn = this.shadowRoot.querySelector('#import-data');
-        const deleteBtn = this.shadowRoot.querySelector('#delete-data');
-        const dashboardBtn = this.shadowRoot.querySelector('#dashboard-btn');
+        this.classList.add('d-block');
+        this.render();
+        const monthFilter = this.querySelector('#month-filter');
+        const prevBtn = this.querySelector('#prev-month');
+        const nextBtn = this.querySelector('#next-month');
+        const groupFilter = this.querySelector('#group-filter');
+        const addDebtBtn = this.querySelector('#add-debt');
+        const addIncomeBtn = this.querySelector('#add-income');
+        const deleteBtn = this.querySelector('#delete-data');
+        const dashboardBtn = this.querySelector('#dashboard-btn');
 
         if (monthFilter) monthFilter.value = this.month;
         if (prevBtn) prevBtn.addEventListener('click', () => this.changeMonth(-1));
@@ -47,14 +44,6 @@ export class HeaderBar extends HTMLElement {
                 this.dispatchEvent(new CustomEvent('add-income', { bubbles: true, composed: true }));
             });
         }
-        if (exportBtn) exportBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.dispatchEvent(new CustomEvent('export-data', { bubbles: true, composed: true }));
-        });
-        if (importBtn) importBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.dispatchEvent(new CustomEvent('import-data', { bubbles: true, composed: true }));
-        });
         if (deleteBtn) deleteBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('delete-data', { bubbles: true, composed: true }));
@@ -70,7 +59,7 @@ export class HeaderBar extends HTMLElement {
         const d = new Date(this.month + '-01T12:00:00');
         d.setMonth(d.getMonth() + delta);
         this.month = d.toISOString().slice(0, 7);
-        this.shadowRoot.getElementById('month-filter').value = this.month;
+        this.querySelector('#month-filter').value = this.month;
         this.emitMonthChange();
     }
 
@@ -91,55 +80,36 @@ export class HeaderBar extends HTMLElement {
     }
 
     render() {
-        // Generar las opciones para el select
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
-        this.shadowRoot.innerHTML = `
-            <style>
-            .header-bar { 
-                display: flex; 
-                flex-wrap: wrap;
-                justify-content: space-between; 
-                align-items: center; 
-                padding: 10px; 
-                background-color: var(--panel-light); 
-                color: var(--text-light);
-                border-radius: 12px 12px 0 0; 
-                gap: 8px;
-            }
-            .month-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-            .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-            .group-filter { margin-left: 12px; min-width: 140px; }
-            /* Modo oscuro */
-            :host-context(body.dark-mode) .header-bar {
-                background-color: var(--panel-dark);
-                color: var(--text-dark);
-            }
-            </style>
-            <div class="header-bar">
-            <div class="month-nav" data-tour-step="navegacion-mes">
-                <app-button id="prev-month" type="button" title="Mes anterior">‹</app-button>
+        this.innerHTML = `
+            <div class="card-header d-flex flex-wrap justify-content-between align-items-center p-2 gap-2">
+            <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
+                <app-button id="prev-month" type="button" title="Mes anterior">&#8249;</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>
-                <app-button id="next-month" type="button" title="Mes siguiente">›</app-button>
-                <app-input type="select" id="group-filter" name="group-filter" class="group-filter" title="Agrupar montos">
+                <app-button id="next-month" type="button" title="Mes siguiente">&#8250;</app-button>
+                <app-input type="select" id="group-filter" name="group-filter" title="Agrupar montos">
                 ${optionsHtml}
                 </app-input>
             </div>
-            <div class="actions">
+            <div class="d-flex gap-2 flex-wrap">
                 <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
                 Nuevo ingreso
                 </app-button>
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
                 </app-button>
-                <app-button id="export-data" type="button" title="Exportar datos" data-tour-step="exportar">
-                Exportar
-                </app-button>
-                <app-button id="import-data" type="button" title="Importar datos" data-tour-step="importar">
-                Importar
-                </app-button>
-                <app-button id="delete-data" type="button" variant="delete" title="Eliminar datos">
-                Eliminar todo
-                </app-button>
+                <div class="dropdown">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Opciones">
+                        ⚙️
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <button id="delete-data" class="dropdown-item text-danger" type="button">
+                                🗑️ Eliminar todo
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
             </div>
         `;

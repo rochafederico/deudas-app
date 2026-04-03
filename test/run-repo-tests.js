@@ -9,6 +9,7 @@ import { tests as montosTests } from './montos.test.js';
 import { tests as ingresosTests } from './ingresos.test.js';
 import { tests as inversionesTests } from './inversiones.test.js';
 import { tests as importExportTests } from './import-export.test.js';
+import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
 
 async function run() {
@@ -30,6 +31,9 @@ async function run() {
 
         console.log('\n--- Import/Export ---');
         for (const test of importExportTests) { await test(); }
+
+        console.log('\n--- Bootstrap styles ---');
+        for (const test of bootstrapStylesTests) { await test(); }
 
         console.log('\n--- Tour ---');
         for (const test of tourTests) { await test(); }

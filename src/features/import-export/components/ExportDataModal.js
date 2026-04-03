@@ -5,8 +5,6 @@ import '../../../shared/components/UiModal.js';
 export class ExportDataModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
-        this.render();
     }
 
     #mapDeudasForExport(deudas) {
@@ -54,15 +52,16 @@ export class ExportDataModal extends HTMLElement {
     #removeDownloadLink(a, url) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        setTimeout(() => this.close(), 100);
     }
 
     async open(opener) {
-        this.modal = this.shadowRoot.querySelector('ui-modal');
+        if (!this._rendered) this.render();
+        this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Exportar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
-        setTimeout(async () => {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        try {
             const { listDeudas } = await import('../../deudas/deudaRepository.js');
             const { getAll } = await import('../../ingresos/ingresoRepository.js');
             const { listInversiones } = await import('../../inversiones/inversionRepository.js');
@@ -72,7 +71,13 @@ export class ExportDataModal extends HTMLElement {
             deudas = this.#mapDeudasForExport(deudas);
             const inversionesMapped = this.#mapInversionesForExport(inversiones);
             this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
-        }, 100);
+            this.close();
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
+        } catch (error) {
+            console.error('Error al exportar:', error);
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
+            this.close();
+        }
     }
 
     close() {
@@ -80,27 +85,17 @@ export class ExportDataModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
+        this._rendered = true;
+        this.innerHTML = `
             <ui-modal id="exportModal">
-                <div style="padding:16px;">
+                <div class="p-3">
                     <p>Exporta todos tus datos en un archivo JSON legible.</p>
-                    <div style="text-align:center;margin-top:16px;"><span class="spinner"></span></div>
+                    <div class="text-center mt-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                    </div>
                 </div>
-                <style>
-                .spinner {
-                    display: inline-block;
-                    width: 32px;
-                    height: 32px;
-                    border: 4px solid #eee;
-                    border-top: 4px solid var(--accent, #4b6cb7);
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-                </style>
             </ui-modal>
         `;
     }

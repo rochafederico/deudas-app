@@ -1,27 +1,28 @@
 // src/components/AppLink.js
-// Web Component <app-link> para navegación SPA universal
+// Web Component <app-link> para navegación SPA (sin Shadow DOM)
+
 class AppLink extends HTMLElement {
   static get observedAttributes() {
-    return ['href'];
+    return ['href', 'variant'];
   }
 
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
     this.handleClick = this.handleClick.bind(this);
   }
 
   connectedCallback() {
-    this.render();
-    this.shadowRoot.addEventListener('click', this.handleClick);
+    this.classList.add('d-inline-block');
+    if (!this._rendered) this.render();
+    this.addEventListener('click', this.handleClick);
   }
 
   disconnectedCallback() {
-    this.shadowRoot.removeEventListener('click', this.handleClick);
+    this.removeEventListener('click', this.handleClick);
   }
 
   attributeChangedCallback() {
-    this.render();
+    if (this._rendered) this.render();
   }
 
   handleClick(e) {
@@ -35,25 +36,18 @@ class AppLink extends HTMLElement {
   }
 
   render() {
+    this._rendered = true;
     const href = this.getAttribute('href') || '#';
-    const label = this.textContent || this.getAttribute('label') || href;
-    this.shadowRoot.innerHTML = `
-      <style>
-        a {
-          color: inherit;
-          text-decoration: none;
-          cursor: pointer;
-          font: inherit;
-          border-radius: 6px;
-          padding: 4px 10px;
-          transition: background 0.2s, color 0.2s;
-        }
-        a:hover {
-          background: rgba(0,0,0,0.08);
-        }
-      </style>
-      <a href="${href}">${label}</a>
-    `;
+    const label = this._originalText || this.textContent.trim() || this.getAttribute('label') || href;
+    if (!this._originalText) this._originalText = label;
+    this.replaceChildren();
+    const link = document.createElement('a');
+    link.href = href;
+    const variantMap = { light: 'link-light', dark: 'link-dark' };
+    const colorClass = variantMap[this.getAttribute('variant')] ?? 'link-body-emphasis';
+    link.className = `${colorClass} link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block`;
+    link.textContent = label;
+    this.appendChild(link);
   }
 }
 

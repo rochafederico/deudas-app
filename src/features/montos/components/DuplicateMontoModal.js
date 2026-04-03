@@ -4,9 +4,7 @@ import '../../../shared/components/AppForm.js';
 export class DuplicateMontoModal extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this._monto = null;
-        this.render();
     }
 
     set monto(data) {
@@ -18,7 +16,9 @@ export class DuplicateMontoModal extends HTMLElement {
     }
 
     connectedCallback() {
-        this.form = this.shadowRoot.querySelector('app-form');
+        this.classList.add('d-block');
+        this.render();
+        this.form = this.querySelector('app-form');
         if (this.form) {
             this.form.addEventListener('duplicate:submit', e => {
                 this.dispatchEvent(new CustomEvent('duplicate:save', {
@@ -34,7 +34,7 @@ export class DuplicateMontoModal extends HTMLElement {
     }
 
     render() {
-        this.shadowRoot.innerHTML = '';
+        this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'vencimiento', type: 'date', label: 'Nueva fecha de vencimiento', required: true }
@@ -49,7 +49,7 @@ export class DuplicateMontoModal extends HTMLElement {
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('duplicate:submit', { detail: e.detail, bubbles: true, composed: true }));
         });
-        this.shadowRoot.appendChild(form);
+        this.appendChild(form);
     }
 }
 customElements.define('duplicate-monto-modal', DuplicateMontoModal);

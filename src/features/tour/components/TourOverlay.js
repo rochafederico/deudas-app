@@ -4,36 +4,18 @@
 export class TourOverlay extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this._visible = false;
+    }
+
+    connectedCallback() {
         this.render();
     }
 
     render() {
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: none;
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100vw;
-                    height: 100vh;
-                    z-index: 9998;
-                    pointer-events: none;
-                }
-                :host([visible]) {
-                    display: block;
-                }
-                svg {
-                    width: 100%;
-                    height: 100%;
-                }
-                #highlight-cutout {
-                    transition: x 0.3s ease-out, y 0.3s ease-out, width 0.3s ease-out, height 0.3s ease-out;
-                }
-            </style>
-            <svg xmlns="http://www.w3.org/2000/svg">
+        this.classList.add('position-fixed', 'top-0', 'start-0', 'w-100', 'h-100', 'pe-none', 'd-none');
+        this.style.zIndex = '9998';
+        this.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-100 h-100">
                 <defs>
                     <mask id="tour-mask">
                         <rect x="0" y="0" width="100%" height="100%" fill="white"/>
@@ -51,7 +33,7 @@ export class TourOverlay extends HTMLElement {
      * @param {number} padding - Padding alrededor del highlight (px).
      */
     highlight(rect, padding = 8) {
-        const cutout = this.shadowRoot.getElementById('highlight-cutout');
+        const cutout = this.querySelector('#highlight-cutout');
         if (!cutout) return;
 
         if (rect) {
@@ -71,11 +53,13 @@ export class TourOverlay extends HTMLElement {
     show() {
         this._visible = true;
         this.setAttribute('visible', '');
+        this.classList.remove('d-none');
     }
 
     hide() {
         this._visible = false;
         this.removeAttribute('visible');
+        this.classList.add('d-none');
     }
 }
 

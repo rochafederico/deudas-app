@@ -1,6 +1,7 @@
 import { DeudaModel } from '../DeudaModel.js';
 import { el } from '../../../shared/utils/dom.js';
 import '../../../shared/components/AppButton.js';
+import '../../../shared/components/AppCheckbox.js';
 import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
@@ -9,22 +10,26 @@ import '../../montos/components/DuplicateMontoModal.js';
 export class DebtForm extends HTMLElement {
     constructor() {
         super();
-        this.attachShadow({ mode: 'open' });
         this.montos = [];
         this.editing = false;
         this.deudaId = null;
     }
 
     connectedCallback() {
-        this.render();
-        this.montoModal = this.shadowRoot.getElementById('montoModal');
-        this.duplicateModal = this.shadowRoot.getElementById('duplicateMontoModal');
-        this.montosTbody = this.shadowRoot.getElementById('montos-tbody');
-        this.shadowRoot.getElementById('add-monto').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.openMontoModal();
-        });
-        this.form = this.shadowRoot.querySelector('app-form');
+        this.classList.add('d-block');
+        if (!this._rendered) {
+            this._rendered = true;
+            this.render();
+            this.montoModal = this.querySelector('#montoModal');
+            this.duplicateModal = this.querySelector('#duplicateMontoModal');
+            this.montosTbody = this.querySelector('#montos-tbody');
+            this.querySelector('#add-monto').addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openMontoModal();
+            });
+        }
+        // Re-attach form listeners on every (re)connect so they survive DOM moves
+        this.form = this.querySelector('app-form');
         this._onSubmit = this.handleSubmit.bind(this);
         this._onCancel = () => this.reset();
         this.form.addEventListener('deuda:submit', this._onSubmit);
@@ -40,29 +45,6 @@ export class DebtForm extends HTMLElement {
     }
 
     render() {
-        const style = document.createElement('style');
-        style.textContent = `
-            .montos-list {
-                margin: 10px 0;
-                background: var(--panel);
-                border-radius: 6px;
-                padding: 10px;
-            }
-            .montos-list table {
-                width: 100%;
-                border-collapse: collapse;
-            }
-            .montos-list th, .montos-list td {
-                padding: 6px;
-                border-bottom: 1px solid var(--border);
-            }
-            .montos-list tr:last-child td {
-                border-bottom: none;
-            }
-            .btn-monto {
-                margin-left: 5px;
-            }
-        `;
         // Formulario principal con <app-form>
         const form = document.createElement('app-form');
         form.fields = [
@@ -80,48 +62,54 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
-            className: 'montos-list',
+            className: 'montos-list mt-3',
             children: [
                 el('div', {
-                    attrs: { style: 'display:flex;align-items:center;justify-content:space-between;' },
+                    className: 'd-flex align-items-center justify-content-between mb-2',
                     children: [
                         el('strong', { text: 'Montos' }),
                         el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
                     ]
                 }),
-                el('table', {
+                el('div', {
+                    className: 'overflow-auto',
+                    style: 'min-height: 100px; max-height: 220px;',
                     children: [
-                        el('thead', {
+                        el('table', {
+                            className: 'table table-sm w-100',
                             children: [
-                                el('tr', {
+                                el('thead', {
                                     children: [
-                                        el('th', { text: 'Monto' }),
-                                        el('th', { text: 'Moneda' }),
-                                        el('th', { text: 'Vencimiento' }),
-                                        el('th', { text: 'Acciones' })
+                                        el('tr', {
+                                            children: [
+                                                el('th', { text: 'Monto' }),
+                                                el('th', { text: 'Moneda' }),
+                                                el('th', { text: 'Vencimiento' }),
+                                                el('th', { text: 'Acciones' })
+                                            ]
+                                        })
                                     ]
-                                })
+                                }),
+                                el('tbody', { attrs: { id: 'montos-tbody' } })
                             ]
-                        }),
-                        el('tbody', { attrs: { id: 'montos-tbody' } })
+                        })
                     ]
                 })
             ]
         });
         const modal = el('ui-modal', { attrs: { id: 'montoModal' } });
         const duplicateModal = el('ui-modal', { attrs: { id: 'duplicateMontoModal' } });
-        this.shadowRoot.innerHTML = '';
-        this.shadowRoot.appendChild(style);
-        this.shadowRoot.appendChild(form);
-        this.shadowRoot.appendChild(montosList);
-        this.shadowRoot.appendChild(modal);
-        this.shadowRoot.appendChild(duplicateModal);
+        this.innerHTML = '';
+        this.appendChild(form);
+        this.appendChild(montosList);
+        this.appendChild(modal);
+        this.appendChild(duplicateModal);
     }
 
     openMontoModal(monto = null, index = null) {
         this.montoEditIndex = index;
         this.montoModal.setTitle(monto ? 'Editar monto' : 'Agregar monto');
-        this.montoModal.innerHTML = '';
+        this.montoModal.clearBody();
         const montoForm = document.createElement('monto-form');
         if (monto) montoForm.monto = monto;
         montoForm.addEventListener('monto:save', (e) => {
@@ -142,7 +130,7 @@ export class DebtForm extends HTMLElement {
     openDuplicateMontoModal(monto, idx) {
         this.duplicateMontoIndex = idx;
         this.duplicateModal.setTitle('Duplicar monto');
-        this.duplicateModal.innerHTML = '';
+        this.duplicateModal.clearBody();
         const duplicateForm = document.createElement('duplicate-monto-modal');
         duplicateForm.monto = monto;
         duplicateForm.addEventListener('duplicate:save', (e) => {
@@ -172,44 +160,49 @@ export class DebtForm extends HTMLElement {
                 { text: monto.vencimiento },
                 {
                     children: [
-                        el('app-button', {
-                            className: 'edit-monto',
-                            text: '✎',
-                            attrs: { title: 'Editar' },
-                            on: {
-                                click: () => this.openMontoModal(monto, idx)
-                            }
-                        }),
-                        el('app-button', {
-                            className: 'delete-monto',
-                            text: '×',
-                            attrs: { variant: 'delete', title: 'Eliminar' },
-                            on: {
-                                click: () => {
-                                    this.montos.splice(idx, 1);
-                                    this.renderMontosList();
-                                }
-                            }
-                        }),
-                        el('app-button', {
-                            className: 'duplicate-monto',
-                            text: '⧉',
-                            attrs: { variant: 'success', title: 'Duplicar' },
-                            on: {
-                                click: () => this.openDuplicateMontoModal(monto, idx)
-                            }
-                        }),
-                        (() => {
-                            const id = `app-checkbox-${monto.id}`;
-                            const appCheckbox = document.createElement('app-checkbox');
-                            appCheckbox.inputId = id;
-                            appCheckbox.checked = !!monto.pagado;
-                            appCheckbox.title = 'Marcar como pagado';
-                            appCheckbox.addEventListener('checkbox-change', async (e) => {
-                                monto.pagado = e.detail.checked;
-                            });
-                            return appCheckbox;
-                        })()
+                        el('div', {
+                            className: 'd-flex gap-1 align-items-center',
+                            children: [
+                                el('app-button', {
+                                    className: 'edit-monto',
+                                    text: '✎',
+                                    attrs: { title: 'Editar' },
+                                    on: {
+                                        click: () => this.openMontoModal(monto, idx)
+                                    }
+                                }),
+                                el('app-button', {
+                                    className: 'delete-monto',
+                                    text: '×',
+                                    attrs: { variant: 'delete', title: 'Eliminar' },
+                                    on: {
+                                        click: () => {
+                                            this.montos.splice(idx, 1);
+                                            this.renderMontosList();
+                                        }
+                                    }
+                                }),
+                                el('app-button', {
+                                    className: 'duplicate-monto',
+                                    text: '⧉',
+                                    attrs: { variant: 'success', title: 'Duplicar' },
+                                    on: {
+                                        click: () => this.openDuplicateMontoModal(monto, idx)
+                                    }
+                                }),
+                                (() => {
+                                    const id = `app-checkbox-${monto.id}`;
+                                    const appCheckbox = document.createElement('app-checkbox');
+                                    appCheckbox.inputId = id;
+                                    appCheckbox.checked = !!monto.pagado;
+                                    appCheckbox.title = 'Marcar como pagado';
+                                    appCheckbox.addEventListener('checkbox-change', async (e) => {
+                                        monto.pagado = e.detail.checked;
+                                    });
+                                    return appCheckbox;
+                                })()
+                            ]
+                        })
                     ]
                 }
             ];
@@ -224,7 +217,7 @@ export class DebtForm extends HTMLElement {
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.renderMontosList();
         // Precarga los valores en <app-form>
-        const form = this.shadowRoot.querySelector('app-form');
+        const form = this.querySelector('app-form');
         if (form) {
             form.initialValues = {
                 acreedor: deuda.acreedor || '',
@@ -238,7 +231,7 @@ export class DebtForm extends HTMLElement {
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
-        const form = this.shadowRoot.querySelector('app-form');
+        const form = this.querySelector('app-form');
         if (form) form.initialValues = {};
         this.renderMontosList();
         // Cerrar el modal de deuda si está abierto
@@ -277,20 +270,20 @@ export class DebtForm extends HTMLElement {
     }
 
     showFormError(msg) {
-        let err = this.shadowRoot.getElementById('form-error');
+        let err = this.querySelector('#form-error');
         if (!err) {
             err = el('div', {
                 attrs: { id: 'form-error' },
-                style: 'color:red;margin:8px 0;'
+                className: 'text-danger my-2'
             });
-            const form = this.shadowRoot.querySelector('app-form');
+            const form = this.querySelector('app-form');
             if (form) form.parentNode.insertBefore(err, form);
         }
         err.textContent = msg;
     }
 
     clearFormError() {
-        const err = this.shadowRoot.getElementById('form-error');
+        const err = this.querySelector('#form-error');
         if (err) err.textContent = '';
     }
 }
