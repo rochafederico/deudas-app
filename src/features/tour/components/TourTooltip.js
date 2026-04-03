@@ -57,13 +57,15 @@ export class TourTooltip extends HTMLElement {
     positionAt(rect, position) {
         if (!rect || position === 'center') {
             // Centrar en pantalla
-            this.style.left = '50%';
-            this.style.top = '50%';
-            this.style.transform = 'translate(-50%, -50%)';
+            this.classList.add('top-50', 'start-50', 'translate-middle');
+            this.style.left = '';
+            this.style.top = '';
+            this.style.transform = '';
             return;
         }
 
         // Reset transform
+        this.classList.remove('top-50', 'start-50', 'translate-middle');
         this.style.transform = '';
 
         const tooltipRect = this.getBoundingClientRect();
@@ -122,8 +124,7 @@ export class TourTooltip extends HTMLElement {
     }
 
     render() {
-        this.className = 'position-fixed d-none px-2';
-        this.style.zIndex = '1055';
+        this.className = 'position-fixed d-none px-2 z-3';
         this.innerHTML = `
             <div class="card bg-dark text-light shadow-lg border-0 p-4">
                 <h3 id="tour-title" class="fs-5 fw-bold text-primary mb-2"></h3>
