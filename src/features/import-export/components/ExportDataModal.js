@@ -60,25 +60,24 @@ export class ExportDataModal extends HTMLElement {
         this.modal.setTitle('Exportar datos');
         this.modal.open();
         this.modal.returnFocusTo(opener);
-        setTimeout(async () => {
-            try {
-                const { listDeudas } = await import('../../deudas/deudaRepository.js');
-                const { getAll } = await import('../../ingresos/ingresoRepository.js');
-                const { listInversiones } = await import('../../inversiones/inversionRepository.js');
-                let deudas = await listDeudas();
-                const ingresos = await getAll();
-                const inversiones = await listInversiones();
-                deudas = this.#mapDeudasForExport(deudas);
-                const inversionesMapped = this.#mapInversionesForExport(inversiones);
-                this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
-                this.close();
-                window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
-            } catch (error) {
-                console.error('Error al exportar:', error);
-                window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
-                this.close();
-            }
-        }, 100);
+        await new Promise(resolve => setTimeout(resolve, 100));
+        try {
+            const { listDeudas } = await import('../../deudas/deudaRepository.js');
+            const { getAll } = await import('../../ingresos/ingresoRepository.js');
+            const { listInversiones } = await import('../../inversiones/inversionRepository.js');
+            let deudas = await listDeudas();
+            const ingresos = await getAll();
+            const inversiones = await listInversiones();
+            deudas = this.#mapDeudasForExport(deudas);
+            const inversionesMapped = this.#mapInversionesForExport(inversiones);
+            this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
+            this.close();
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
+        } catch (error) {
+            console.error('Error al exportar:', error);
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
+            this.close();
+        }
     }
 
     close() {
