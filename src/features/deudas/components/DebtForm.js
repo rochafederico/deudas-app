@@ -58,7 +58,7 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
-            className: 'montos-list',
+            className: 'montos-list mt-3',
             children: [
                 el('div', {
                     className: 'd-flex align-items-center justify-content-between mb-2',
@@ -67,21 +67,27 @@ export class DebtForm extends HTMLElement {
                         el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
                     ]
                 }),
-                el('table', {
+                el('div', {
+                    className: 'overflow-auto',
+                    style: 'min-height: 100px; max-height: 220px;',
                     children: [
-                        el('thead', {
+                        el('table', {
                             children: [
-                                el('tr', {
+                                el('thead', {
                                     children: [
-                                        el('th', { text: 'Monto' }),
-                                        el('th', { text: 'Moneda' }),
-                                        el('th', { text: 'Vencimiento' }),
-                                        el('th', { text: 'Acciones' })
+                                        el('tr', {
+                                            children: [
+                                                el('th', { text: 'Monto' }),
+                                                el('th', { text: 'Moneda' }),
+                                                el('th', { text: 'Vencimiento' }),
+                                                el('th', { text: 'Acciones' })
+                                            ]
+                                        })
                                     ]
-                                })
+                                }),
+                                el('tbody', { attrs: { id: 'montos-tbody' } })
                             ]
-                        }),
-                        el('tbody', { attrs: { id: 'montos-tbody' } })
+                        })
                     ]
                 })
             ]
