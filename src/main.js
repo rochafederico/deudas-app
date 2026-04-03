@@ -1,11 +1,11 @@
 // src/main.js
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
-import DemoBanner from './layout/DemoBanner.js';
+import AppHeader from './layout/AppHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 
 // Wrapper para el contenido principal
-document.body.appendChild(DemoBanner());
+document.body.appendChild(AppHeader());
 document.body.classList.add('bg-body-tertiary');
 
 const wrapper = document.createElement('div');
