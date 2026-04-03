@@ -16,7 +16,7 @@ export class AppShell extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
+        this.classList.add('d-block');
         this.render();
         // Usar el id para seleccionar el input correctamente
         const input = this.querySelector('#month-filter');
@@ -90,7 +90,7 @@ export class AppShell extends HTMLElement {
         });
 
         const panel = document.createElement('div');
-        panel.className = 'panel';
+        panel.className = 'bg-body border rounded-bottom-4 shadow-sm p-3';
         panel.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
 
         this.innerHTML = '';

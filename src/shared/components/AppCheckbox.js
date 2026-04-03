@@ -15,7 +15,7 @@ export class AppCheckbox extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'inline-block';
+        this.classList.add('d-inline-block');
         if (!this._rendered) this.render();
     }
 
@@ -38,8 +38,8 @@ export class AppCheckbox extends HTMLElement {
         const checked = this.checked;
         const inputId = this.inputId || 'app-checkbox';
         this.innerHTML = `
-            <div class="form-check" style="margin:0;padding:0;min-height:auto;">
-                <input class="form-check-input" type="checkbox" id="${inputId}" ${checked ? 'checked' : ''} style="width:1.4em;height:1.4em;cursor:pointer;margin:0;" />
+            <div class="form-check m-0">
+                <input class="form-check-input position-static m-0" type="checkbox" id="${inputId}" ${checked ? 'checked' : ''} />
             </div>
         `;
         const checkbox = this.querySelector('input[type="checkbox"]');

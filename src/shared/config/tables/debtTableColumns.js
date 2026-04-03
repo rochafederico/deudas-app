@@ -35,10 +35,7 @@ export const debtTableColumns = [
             });
             // Contenedor flex
             const container = document.createElement('div');
-            container.style.display = 'flex';
-            container.style.alignItems = 'center';
-            container.style.justifyContent = 'flex-end';
-            container.style.gap = '12px';
+            container.className = 'd-flex align-items-center justify-content-end gap-3';
             container.appendChild(btn);
             container.appendChild(appCheckbox);
             return container;

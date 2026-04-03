@@ -6,7 +6,7 @@ class DarkToggle extends HTMLElement {
   }
 
   connectedCallback() {
-    this.style.display = 'inline-block';
+    this.classList.add('d-inline-block');
     this.render();
     this.querySelector('button').addEventListener('click', () => {
       document.body.classList.toggle('dark-mode');
@@ -22,7 +22,7 @@ class DarkToggle extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <button type="button" class="btn btn-outline-secondary btn-sm" style="border-radius:50rem;padding:0.375rem 1rem;font-size:0.9rem;font-weight:500;cursor:pointer;" aria-label="Alternar modo oscuro"></button>
+      <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3 fw-medium" aria-label="Alternar modo oscuro"></button>
     `;
   }
 }

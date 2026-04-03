@@ -167,7 +167,7 @@ export class AppForm extends HTMLElement {
                     const errDiv = this.form.querySelector(`[data-error-for="${name}"]`);
                     if (errDiv) {
                         errDiv.textContent = msg;
-                        errDiv.style.display = 'block';
+                        errDiv.classList.add('d-block');
                     }
                 }
             });

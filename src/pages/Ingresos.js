@@ -6,10 +6,11 @@ import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 export default function Ingresos() {
     let currentMes = new Date().toISOString().slice(0, 7);
     const container = document.createElement('div');
+    container.className = 'd-grid gap-3';
 
     // Usar el header-bar como encabezado principal
     const headerBar = document.createElement('header-bar');
-    headerBar.style.marginBottom = '1.25rem';
+    headerBar.classList.add('mb-4');
     container.appendChild(headerBar);
 
     headerBar.month = currentMes;
@@ -17,7 +18,7 @@ export default function Ingresos() {
     // Título y stats opcionales debajo del header-bar
     const title = document.createElement('h1');
     title.textContent = 'Ingresos del mes';
-    title.style.cssText = 'margin: 0 0 10px 0; font-size: 1.5em;';
+    title.className = 'h3 mb-2';
     container.appendChild(title);
 
     const stats = document.createElement('stats-card');

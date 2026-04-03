@@ -11,7 +11,7 @@ export class DebtList extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
+        this.classList.add('d-block');
         this.render();
         this.loadDebts();
         this.addEventListeners();

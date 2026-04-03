@@ -10,7 +10,7 @@ export class DebtModal extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
+        this.classList.add('d-block');
         this.render();
         this.ui = this.querySelector('ui-modal');
         this.form = this.querySelector('debt-form');

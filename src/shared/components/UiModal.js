@@ -42,7 +42,7 @@ export class UiModal extends HTMLElement {
             const modalEl = this.querySelector('.modal');
             if (modalEl) {
                 modalEl.classList.add('show');
-                modalEl.style.display = 'block';
+                modalEl.classList.add('d-block');
                 document.body.classList.add('modal-open');
             }
         }
@@ -56,7 +56,7 @@ export class UiModal extends HTMLElement {
             const modalEl = this.querySelector('.modal');
             if (modalEl) {
                 modalEl.classList.remove('show');
-                modalEl.style.display = 'none';
+                modalEl.classList.remove('d-block');
                 document.body.classList.remove('modal-open');
             }
             this._onClose();

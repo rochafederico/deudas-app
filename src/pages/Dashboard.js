@@ -3,7 +3,7 @@
 
 export default function Dashboard() {
   const container = document.createElement('div');
-  container.className = 'container-fluid dashboard-container py-3';
+  container.className = 'container-fluid py-3';
 
   const title = document.createElement('h2');
   title.className = 'mb-2';

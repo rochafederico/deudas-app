@@ -9,8 +9,7 @@ export class AppInput extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.style.display = 'block';
-        this.style.marginBottom = '0.5rem';
+        this.classList.add('d-block', 'mb-2');
         if (!this._rendered) this.render();
         this._setupListeners();
     }
@@ -43,12 +42,11 @@ export class AppInput extends HTMLElement {
         let errDiv = this.querySelector('.invalid-feedback');
         if (!errDiv) {
             errDiv = document.createElement('div');
-            errDiv.className = 'invalid-feedback';
-            errDiv.style.display = 'block';
+            errDiv.className = 'invalid-feedback d-block';
             this.appendChild(errDiv);
         }
         errDiv.textContent = msg;
-        errDiv.style.display = 'block';
+        errDiv.classList.add('d-block');
     }
     clearError() {
         const input = this.input;
@@ -56,7 +54,7 @@ export class AppInput extends HTMLElement {
         const errDiv = this.querySelector('.invalid-feedback');
         if (errDiv) {
             errDiv.textContent = '';
-            errDiv.style.display = 'none';
+            errDiv.classList.remove('d-block');
         }
     }
     render() {

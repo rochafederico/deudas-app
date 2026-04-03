@@ -9,7 +9,7 @@ export class AppButton extends HTMLElement {
         super();
     }
     connectedCallback() {
-        this.style.display = 'inline-block';
+        this.classList.add('d-inline-block');
         if (!this._rendered) this.render();
     }
     attributeChangedCallback() {

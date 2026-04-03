@@ -5,8 +5,7 @@ import '../../../shared/components/AppTable.js';
 
 export default function createIngresoList(mes = new Date().toISOString().slice(0, 7)) {
     const container = document.createElement('div');
-    container.className = 'ingresos-list';
-    container.style.cssText = 'width: 100%; overflow-x: auto;';
+    container.className = 'w-100 overflow-auto';
 
     const table = document.createElement('app-table');
     container.appendChild(table);

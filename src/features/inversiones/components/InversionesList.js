@@ -11,7 +11,7 @@ export class InversionesList extends HTMLElement {
   }
 
   connectedCallback() {
-    this.style.display = 'block';
+    this.classList.add('d-block');
     this.render();
   }
 
@@ -89,7 +89,7 @@ export class InversionesList extends HTMLElement {
     const totalCell = document.createElement('td');
 
     totalCell.colSpan = inversionTableColumns.length - 1;
-    totalCell.style.textAlign = 'right';
+    totalCell.className = 'text-end';
     totalCell.textContent = 'Total invertido:';
     const monedas = inversiones.reduce((result, inv) => {
       const moneda = inv.moneda ?? 'ARS';

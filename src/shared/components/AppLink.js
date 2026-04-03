@@ -12,7 +12,7 @@ class AppLink extends HTMLElement {
   }
 
   connectedCallback() {
-    this.style.display = 'inline-block';
+    this.classList.add('d-inline-block');
     if (!this._rendered) this.render();
     this.addEventListener('click', this.handleClick);
   }
@@ -40,7 +40,7 @@ class AppLink extends HTMLElement {
     const href = this.getAttribute('href') || '#';
     const label = this._originalText || this.textContent.trim() || this.getAttribute('label') || href;
     if (!this._originalText) this._originalText = label;
-    this.innerHTML = `<a href="${href}" style="color:inherit;text-decoration:none;cursor:pointer;font:inherit;border-radius:0.375rem;padding:0.375rem 0.75rem;transition:background 0.2s,color 0.2s;display:inline-block;">${label}</a>`;
+    this.innerHTML = `<a href="${href}" class="link-light link-underline link-underline-opacity-0 link-underline-opacity-75-hover rounded px-3 py-2 d-inline-block">${label}</a>`;
   }
 }
 

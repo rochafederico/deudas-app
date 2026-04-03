@@ -4,7 +4,7 @@ import { getMonthlySummary } from '../statsService.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
-  container.className = 'row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 stats-row';
+  container.className = 'row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 mb-4';
   container.setAttribute('data-tour-step', 'indicadores');
 
   const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -13,7 +13,7 @@ export default function StatsIndicators({ mes } = {}) {
   async function render(periodo) {
     container.innerHTML = '';
     const loading = document.createElement('div');
-    loading.className = 'stats-loading';
+    loading.className = 'col-12 text-body-secondary px-2';
     loading.textContent = 'Cargando resumen...';
     container.appendChild(loading);
 
@@ -28,11 +28,11 @@ export default function StatsIndicators({ mes } = {}) {
           .join('<br/>');
       }
       const cards = [
-        StatsCard({ title: 'Ingresos' , value: addValue(summary.byCurrency.ingresos), color: 'var(--success)' }),
-        StatsCard({ title: 'Gastos', value: addValue(summary.byCurrency.egresos), color: '#d9534f' }),
-        StatsCard({ title: 'Balance', value: addValue(summary.byCurrency.saldo), color: 'var(--dark)' }),
-        StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), color: '#f0ad4e' }),
-        StatsCard({ title: 'Inversiones', value: addValue(summary.inversiones), color: '#5bc0de' }),
+        StatsCard({ title: 'Ingresos' , value: addValue(summary.byCurrency.ingresos), valueClass: 'text-success' }),
+        StatsCard({ title: 'Gastos', value: addValue(summary.byCurrency.egresos), valueClass: 'text-danger' }),
+        StatsCard({ title: 'Balance', value: addValue(summary.byCurrency.saldo), valueClass: 'text-dark' }),
+        StatsCard({ title: 'Total a pagar', value: addValue(summary.byCurrency.pendientes), valueClass: 'text-warning' }),
+        StatsCard({ title: 'Inversiones', value: addValue(summary.inversiones), valueClass: 'text-info' }),
       ];
       cards.forEach(card => {
         const col = document.createElement('div');
@@ -43,7 +43,7 @@ export default function StatsIndicators({ mes } = {}) {
     } catch (err) {
       container.innerHTML = '';
       const errEl = document.createElement('div');
-      errEl.className = 'stats-error';
+      errEl.className = 'col-12 text-danger px-2';
       errEl.textContent = 'Error cargando resumen';
       container.appendChild(errEl);
       console.error('Error getMonthlySummary', err);

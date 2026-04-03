@@ -6,14 +6,16 @@ import { TourManager } from './features/tour/TourManager.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(DemoBanner());
+document.body.classList.add('bg-body-tertiary');
 
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
-wrapper.style.cssText = '';
+wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');
 app.id = 'app';
+app.className = 'mt-3';
 wrapper.appendChild(app);
 
 

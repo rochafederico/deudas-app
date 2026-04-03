@@ -12,20 +12,14 @@ export class TourOverlay extends HTMLElement {
     }
 
     render() {
-        this.style.display = 'none';
-        this.style.position = 'fixed';
-        this.style.top = '0';
-        this.style.left = '0';
-        this.style.width = '100vw';
-        this.style.height = '100vh';
-        this.style.zIndex = '9998';
-        this.style.pointerEvents = 'none';
+        this.className = 'position-fixed top-0 start-0 w-100 h-100 pe-none d-none';
+        this.style.zIndex = '1050';
         this.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-100 h-100">
                 <defs>
                     <mask id="tour-mask">
                         <rect x="0" y="0" width="100%" height="100%" fill="white"/>
-                        <rect id="highlight-cutout" x="0" y="0" width="0" height="0" rx="8" ry="8" fill="black" style="transition:x 0.3s ease-out,y 0.3s ease-out,width 0.3s ease-out,height 0.3s ease-out;"/>
+                        <rect id="highlight-cutout" x="0" y="0" width="0" height="0" rx="8" ry="8" fill="black"/>
                     </mask>
                 </defs>
                 <rect x="0" y="0" width="100%" height="100%" fill="rgba(0,0,0,0.6)" mask="url(#tour-mask)" pointer-events="all"/>
@@ -59,13 +53,13 @@ export class TourOverlay extends HTMLElement {
     show() {
         this._visible = true;
         this.setAttribute('visible', '');
-        this.style.display = 'block';
+        this.classList.remove('d-none');
     }
 
     hide() {
         this._visible = false;
         this.removeAttribute('visible');
-        this.style.display = 'none';
+        this.classList.add('d-none');
     }
 }
 

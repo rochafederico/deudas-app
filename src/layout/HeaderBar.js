@@ -10,7 +10,7 @@ export class HeaderBar extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
+        this.classList.add('d-block');
         this.render();
         const monthFilter = this.querySelector('#month-filter');
         const prevBtn = this.querySelector('#prev-month');
@@ -92,7 +92,7 @@ export class HeaderBar extends HTMLElement {
     render() {
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
         this.innerHTML = `
-            <div class="header-bar d-flex flex-wrap justify-content-between align-items-center p-2 gap-2" style="background-color:var(--panel-light);color:var(--text-light);border-radius:0.75rem 0.75rem 0 0;">
+            <div class="d-flex flex-wrap justify-content-between align-items-center p-2 gap-2 bg-body border border-bottom-0 rounded-top-4 shadow-sm">
             <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
                 <app-button id="prev-month" type="button" title="Mes anterior">&#8249;</app-button>
                 <app-input type="month" name="month-filter" id="month-filter" value="${this.month}"></app-input>

@@ -42,7 +42,7 @@ export class TourTooltip extends HTMLElement {
         counter.textContent = `${index + 1} / ${total}`;
 
         // Mostrar/ocultar boton "Anterior"
-        btnPrev.style.display = index === 0 ? 'none' : '';
+        btnPrev.classList.toggle('d-none', index === 0);
 
         // Cambiar texto del boton siguiente en el ultimo paso
         const isLast = index === total - 1;
@@ -55,9 +55,6 @@ export class TourTooltip extends HTMLElement {
      * @param {string} position - 'top', 'bottom', 'left', 'right', 'center'
      */
     positionAt(rect, position) {
-        this.style.position = 'fixed';
-        this.style.zIndex = '9999';
-
         if (!rect || position === 'center') {
             // Centrar en pantalla
             this.style.left = '50%';
@@ -117,29 +114,26 @@ export class TourTooltip extends HTMLElement {
     }
 
     show() {
-        this.style.display = 'block';
+        this.classList.remove('d-none');
     }
 
     hide() {
-        this.style.display = 'none';
+        this.classList.add('d-none');
     }
 
     render() {
-        this.style.display = 'none';
-        this.style.position = 'fixed';
-        this.style.zIndex = '9999';
-        this.style.maxWidth = '360px';
-        this.style.minWidth = '260px';
+        this.className = 'position-fixed d-none px-2';
+        this.style.zIndex = '1055';
         this.innerHTML = `
-            <div class="tour-tooltip-box" style="background:#111a34;color:#e5e7eb;border-radius:12px;padding:20px;box-shadow:0 8px 32px rgba(0,0,0,0.3);font-family:'Inter',Arial,sans-serif;">
-                <h3 id="tour-title" style="font-size:1.1em;font-weight:700;color:var(--accent, rgb(61, 121, 130));margin:0 0 8px 0;"></h3>
-                <p id="tour-text" style="font-size:0.95em;line-height:1.5;margin:0 0 16px 0;color:#c5c8d0;"></p>
+            <div class="card bg-dark text-light shadow-lg border-0 p-4">
+                <h3 id="tour-title" class="fs-5 fw-bold text-primary mb-2"></h3>
+                <p id="tour-text" class="mb-3 text-light-emphasis"></p>
                 <div class="d-flex justify-content-between align-items-center gap-2">
-                    <span id="tour-counter" style="font-size:0.8em;color:#888;"></span>
+                    <span id="tour-counter" class="small text-secondary"></span>
                     <div class="d-flex gap-1 align-items-center">
-                        <button class="btn btn-sm" id="btn-skip" type="button" style="background:transparent;color:#888;">Saltar</button>
-                        <button class="btn btn-sm" id="btn-prev" type="button" style="background:rgba(255,255,255,0.1);color:#e5e7eb;">Anterior</button>
-                        <button class="btn btn-sm" id="btn-next" type="button" style="background:var(--accent, rgb(61, 121, 130));color:#fff;">Siguiente</button>
+                        <button class="btn btn-sm btn-link text-secondary text-decoration-none" id="btn-skip" type="button">Saltar</button>
+                        <button class="btn btn-sm btn-outline-light" id="btn-prev" type="button">Anterior</button>
+                        <button class="btn btn-sm btn-primary" id="btn-next" type="button">Siguiente</button>
                     </div>
                 </div>
             </div>

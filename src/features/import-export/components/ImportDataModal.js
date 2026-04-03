@@ -12,7 +12,7 @@ export class ImportDataModal extends HTMLElement {
     }
 
     connectedCallback() {
-        this.style.display = 'block';
+        this.classList.add('d-block');
         this.render();
         this.querySelector('#select-file-btn').addEventListener('click', () => this.selectFile());
         this.querySelector('#import-btn').addEventListener('click', () => this.importDataToDb());
@@ -22,7 +22,7 @@ export class ImportDataModal extends HTMLElement {
         this.fileInput = document.createElement('input');
         this.fileInput.type = 'file';
         this.fileInput.accept = '.json';
-        this.fileInput.style.display = 'none';
+        this.fileInput.className = 'd-none';
         this.fileInput.addEventListener('change', (e) => this.handleFileSelect(e));
         document.body.appendChild(this.fileInput);
     }
@@ -101,21 +101,21 @@ export class ImportDataModal extends HTMLElement {
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
         const previewHtml = `
-            <div class="import-preview">
-                <h3>📋 Vista previa del archivo</h3>
-                <div class="preview-stats">
-                    <p><strong>📊 Resumen:</strong></p>
-                    <p>• ${deudas.length} deudas</p>
-                    <p>• ${totalMontos} montos</p>
-                    <p>• ${ingresos.length} ingresos</p>
-                    <p>• ${inversiones.length} inversiones</p>
+            <div class="border rounded p-3">
+                <h3 class="h5 text-primary mb-3">📋 Vista previa del archivo</h3>
+                <div class="bg-body-tertiary rounded p-3 mb-3">
+                    <p class="mb-1"><strong>📊 Resumen:</strong></p>
+                    <p class="mb-1">• ${deudas.length} deudas</p>
+                    <p class="mb-1">• ${totalMontos} montos</p>
+                    <p class="mb-1">• ${ingresos.length} ingresos</p>
+                    <p class="mb-1">• ${inversiones.length} inversiones</p>
                     ${data.metadata ? `<p>• Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Deudas a importar:</h4>
+                <div class="mb-3">
+                    <h4 class="h6">Deudas a importar:</h4>
                     ${deudas.slice(0, 3).map(deuda => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${deuda.acreedor}</strong> - ${deuda.tipoDeuda}
                             ${deuda.montos?.length ? `(${deuda.montos.length} montos)` : ''}
                         </div>
@@ -123,20 +123,20 @@ export class ImportDataModal extends HTMLElement {
                     ${deudas.length > 3 ? `<p>... y ${deudas.length - 3} más</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Ingresos a importar:</h4>
+                <div class="mb-3">
+                    <h4 class="h6">Ingresos a importar:</h4>
                     ${ingresos.slice(0, 3).map(ingreso => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${ingreso.descripcion || 'Ingreso'} ${ingreso.fecha}</strong> - ${ingreso.monto} ${ingreso.moneda || 'ARS'}
                         </div>
                     `).join('')}
                     ${ingresos.length > 3 ? `<p>... y ${ingresos.length - 3} más</p>` : ''}
                 </div>
                 
-                <div class="preview-items">
-                    <h4>Inversiones a importar:</h4>
+                <div class="mb-0">
+                    <h4 class="h6">Inversiones a importar:</h4>
                     ${inversiones.slice(0, 3).map(inv => `
-                        <div class="preview-item">
+                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
                             <strong>${inv.nombre}</strong> - ${inv.valorInicial} ${inv.moneda || 'ARS'}
                             ${inv.historialValores?.length ? `(${inv.historialValores.length} valores)` : ''}
                         </div>
@@ -148,7 +148,7 @@ export class ImportDataModal extends HTMLElement {
         `;
 
         this.querySelector('.file-content').innerHTML = previewHtml;
-        this.querySelector('.import-actions').style.display = 'flex';
+        this.querySelector('.import-actions').classList.remove('d-none');
     }
 
     async importDataToDb() {
@@ -268,17 +268,17 @@ export class ImportDataModal extends HTMLElement {
 
     #showSuccess(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="success-message">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-success py-2 mb-0">${message}</div>`;
     }
 
     #showError(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="error-message">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-danger py-2 mb-0">${message}</div>`;
     }
 
     #showWarning(message) {
         const statusDiv = this.querySelector('.import-status');
-        statusDiv.innerHTML = `<div class="warning-message">${message}</div>`;
+        statusDiv.innerHTML = `<div class="alert alert-warning py-2 mb-0">${message}</div>`;
     }
 
     open(opener) {
@@ -291,7 +291,7 @@ export class ImportDataModal extends HTMLElement {
         this.importData = null;
         this.querySelector('.file-content').innerHTML = '';
         this.querySelector('.import-status').innerHTML = '';
-        this.querySelector('.import-actions').style.display = 'none';
+        this.querySelector('.import-actions').classList.add('d-none');
     }
 
     close() {
@@ -300,146 +300,16 @@ export class ImportDataModal extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <style>
-                .import-content {
-                    padding: 1rem;
-                    min-height: 300px;
-                }
-
-                .file-selection {
-                    text-align: center;
-                    padding: 1.25rem;
-                    border: 2px dashed var(--border-light, #ccc);
-                    border-radius: 0.5rem;
-                    margin-bottom: 1rem;
-                }
-
-                .file-selection p {
-                    margin: 0 0 1rem 0;
-                }
-
-                .file-content {
-                    margin: 1rem 0;
-                }
-
-                .import-preview {
-                    border: 1px solid var(--border-light, #ddd);
-                    border-radius: 0.5rem;
-                    padding: 1rem;
-                }
-
-                .import-preview h3 {
-                    margin-top: 0;
-                    color: var(--accent, rgb(61, 121, 130));
-                }
-
-                .preview-stats {
-                    margin: 0.75rem 0;
-                    padding: 0.75rem;
-                    border-radius: 0.25rem;
-                }
-
-                .preview-stats p {
-                    margin: 0.25rem 0;
-                }
-
-                .preview-items {
-                    margin: 0.75rem 0;
-                }
-
-                .preview-item {
-                    padding: 0.5rem;
-                    margin: 0.25rem 0;
-                    border-radius: 0.25rem;
-                    border-left: 3px solid var(--accent, rgb(61, 121, 130));
-                }
-
-                .import-warning {
-                    margin: 0.75rem 0;
-                    padding: 0.75rem;
-                    border: 1px solid #ffeaa7;
-                    border-radius: 0.25rem;
-                    max-width: 600px;
-                }
-
-                .import-warning p {
-                    margin: 0.25rem 0;
-                }
-
-                .import-actions {
-                    display: none;
-                    gap: 0.75rem;
-                    margin-top: 1rem;
-                    padding-top: 1rem;
-                }
-
-                .import-status {
-                    margin-top: 1rem;
-                    min-height: 30px;
-                }
-
-                .success-message {
-                    color: var(--bs-success, green);
-                    padding: 0.75rem;
-                    border: 1px solid var(--bs-success, green);
-                    border-radius: 0.25rem;
-                }
-
-                .error-message {
-                    color: var(--bs-danger, red);
-                    padding: 0.75rem;
-                    border: 1px solid var(--bs-danger, red);
-                    border-radius: 0.25rem;
-                }
-
-                .warning-message {
-                    color: #856404;
-                    padding: 0.75rem;
-                    border: 1px solid #ffeaa7;
-                    border-radius: 0.25rem;
-                }
-
-                .progress-message {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.75rem;
-                    padding: 0.75rem;
-                    border: 1px solid #2196f3;
-                    border-radius: 0.25rem;
-                }
-
-                .spinner {
-                    display: inline-block;
-                    width: 1.25rem;
-                    height: 1.25rem;
-                    border: 2px solid #eee;
-                    border-top: 2px solid var(--accent, rgb(61, 121, 130));
-                    border-radius: 50%;
-                    animation: spin 1s linear infinite;
-                }
-
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-
-                @media (max-width: 600px) {
-                    .import-actions {
-                        flex-direction: column;
-                    }
-                }
-            </style>
-            
             <ui-modal id="importModal">
-                <div class="import-content">
-                    <div class="file-selection">
-                        <p>📁 Selecciona un archivo JSON de backup para importar</p>
+                <div class="p-3 d-grid gap-3">
+                    <div class="text-center p-4 border border-2 border-secondary border-opacity-25 rounded">
+                        <p class="mb-3">📁 Selecciona un archivo JSON de backup para importar</p>
                         <app-button id="select-file-btn" variant="primary">
                             Seleccionar archivo
                         </app-button>
                     </div>
-                    <div class="import-warning">
-                        <p>⚠️ <strong>Importante:</strong></p>
+                    <div class="alert alert-warning mb-0">
+                        <p class="mb-2">⚠️ <strong>Importante:</strong></p>
                         <ul>
                             <li>La importación añade datos (no elimina):
                                 <ul>
@@ -471,9 +341,9 @@ export class ImportDataModal extends HTMLElement {
                         </ul>
                     </div>
                     
-                    <div class="file-content"></div>
+                    <div class="file-content my-2"></div>
                     
-                    <div class="import-actions">
+                    <div class="import-actions d-none flex-column flex-sm-row gap-3 pt-3 border-top">
                         <app-button id="import-btn" variant="success">
                             📥 Importar datos
                         </app-button>
@@ -482,7 +352,7 @@ export class ImportDataModal extends HTMLElement {
                         </app-button>
                     </div>
                     
-                    <div class="import-status"></div>
+                    <div class="import-status mt-3"></div>
                 </div>
             </ui-modal>
         `;

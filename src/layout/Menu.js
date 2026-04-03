@@ -8,7 +8,7 @@ export class Menu extends HTMLElement {
   }
 
   connectedCallback() {
-    this.style.display = 'block';
+    this.classList.add('d-block');
     this.render();
     this.addEventListener('click', (e) => {
       const link = e.target.closest('[app-link]');
