@@ -68,7 +68,7 @@ export class DebtForm extends HTMLElement {
                     ]
                 }),
                 el('div', {
-                    className: 'overflow-auto',
+                    className: 'overflow-auto mh-100',
                     style: 'min-height: 100px; max-height: 220px;',
                     children: [
                         el('table', {
