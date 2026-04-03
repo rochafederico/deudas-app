@@ -274,7 +274,7 @@ export class DebtForm extends HTMLElement {
         if (!err) {
             err = el('div', {
                 attrs: { id: 'form-error' },
-                style: 'color:red;margin:8px 0;'
+                className: 'text-danger my-2'
             });
             const form = this.querySelector('app-form');
             if (form) form.parentNode.insertBefore(err, form);
