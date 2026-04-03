@@ -18,6 +18,8 @@ export class ImportDataModal extends HTMLElement {
 
         // Cache element references now, before UiModal.open() moves the .modal
         // node to document.body (which would make this.querySelector return null).
+        this._fileSelector = this.querySelector('.file-selector');
+        this._importWarning = this.querySelector('.import-warning');
         this._fileContent = this.querySelector('.file-content');
         this._importStatus = this.querySelector('.import-status');
         this._importActions = this.querySelector('.import-actions');
@@ -156,6 +158,8 @@ export class ImportDataModal extends HTMLElement {
         `;
 
         this._fileContent.innerHTML = previewHtml;
+        this._fileSelector.classList.add('d-none');
+        this._importWarning.classList.add('d-none');
         this._importActions.classList.remove('d-none');
     }
 
@@ -262,9 +266,11 @@ export class ImportDataModal extends HTMLElement {
     }
 
     #showLoading(label = 'Cargando...') {
-        this._fileContent.innerHTML = `<app-spinner label="${label}"></app-spinner>`;
+        this._fileSelector.classList.add('d-none');
+        this._importWarning.classList.add('d-none');
         this._importActions.classList.add('d-none');
         this._importStatus.innerHTML = '';
+        this._fileContent.innerHTML = `<app-spinner label="${label}"></app-spinner>`;
     }
 
     #showError(message) {
@@ -277,6 +283,8 @@ export class ImportDataModal extends HTMLElement {
 
         // Reset state before opening (elements are moved to document.body on open)
         this.importData = null;
+        this._fileSelector.classList.remove('d-none');
+        this._importWarning.classList.remove('d-none');
         this._fileContent.innerHTML = '';
         this._importStatus.innerHTML = '';
         this._importActions.classList.add('d-none');
@@ -293,13 +301,13 @@ export class ImportDataModal extends HTMLElement {
         this.innerHTML = `
             <ui-modal id="importModal">
                 <div class="p-3 d-grid gap-3">
-                    <div class="text-center p-4 border border-2 border-secondary border-opacity-25 rounded">
+                    <div class="file-selector text-center p-4 border border-2 border-secondary border-opacity-25 rounded">
                         <p class="mb-3">📁 Selecciona un archivo JSON de backup para importar</p>
                         <app-button id="select-file-btn" variant="primary">
                             Seleccionar archivo
                         </app-button>
                     </div>
-                    <div class="alert alert-warning mb-0" role="alert">
+                    <div class="import-warning alert alert-warning mb-0" role="alert">
                         <p class="mb-2">⚠️ <strong>Importante:</strong></p>
                         <ul>
                             <li>La importación añade datos (no elimina):
