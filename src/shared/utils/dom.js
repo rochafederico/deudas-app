@@ -12,6 +12,7 @@ export function el(tag, opts = {}) {
     if (opts.text) node.textContent = opts.text;
     if (opts.html) node.innerHTML = opts.html;
     if (opts.className) node.className = opts.className;
+    if (opts.style) node.setAttribute('style', opts.style);
     if (opts.attrs) {
         Object.entries(opts.attrs).forEach(([k, v]) => node.setAttribute(k, v));
     }

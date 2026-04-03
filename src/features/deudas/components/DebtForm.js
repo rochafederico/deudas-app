@@ -72,6 +72,7 @@ export class DebtForm extends HTMLElement {
                     style: 'min-height: 100px; max-height: 220px;',
                     children: [
                         el('table', {
+                            className: 'table table-sm w-100',
                             children: [
                                 el('thead', {
                                     children: [
