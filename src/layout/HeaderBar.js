@@ -18,8 +18,6 @@ export class HeaderBar extends HTMLElement {
         const groupFilter = this.querySelector('#group-filter');
         const addDebtBtn = this.querySelector('#add-debt');
         const addIncomeBtn = this.querySelector('#add-income');
-        const exportBtn = this.querySelector('#export-data');
-        const importBtn = this.querySelector('#import-data');
         const deleteBtn = this.querySelector('#delete-data');
         const dashboardBtn = this.querySelector('#dashboard-btn');
 
@@ -46,14 +44,6 @@ export class HeaderBar extends HTMLElement {
                 this.dispatchEvent(new CustomEvent('add-income', { bubbles: true, composed: true }));
             });
         }
-        if (exportBtn) exportBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.dispatchEvent(new CustomEvent('export-data', { bubbles: true, composed: true }));
-        });
-        if (importBtn) importBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.dispatchEvent(new CustomEvent('import-data', { bubbles: true, composed: true }));
-        });
         if (deleteBtn) deleteBtn.addEventListener('click', (e) => {
             e.preventDefault();
             this.dispatchEvent(new CustomEvent('delete-data', { bubbles: true, composed: true }));
@@ -107,12 +97,6 @@ export class HeaderBar extends HTMLElement {
                 </app-button>
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
-                </app-button>
-                <app-button id="export-data" type="button" title="Exportar datos" data-tour-step="exportar">
-                Exportar
-                </app-button>
-                <app-button id="import-data" type="button" title="Importar datos" data-tour-step="importar">
-                Importar
                 </app-button>
                 <app-button id="delete-data" type="button" variant="delete" title="Eliminar datos">
                 Eliminar todo

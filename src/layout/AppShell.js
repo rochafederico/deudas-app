@@ -1,8 +1,6 @@
 import '../features/deudas/components/DebtModal.js';
 import '../features/ingresos/components/IngresoModal.js';
 import '../shared/components/AppInput.js';
-import '../features/import-export/components/ExportDataModal.js';
-import '../features/import-export/components/ImportDataModal.js';
 import './HeaderBar.js';
 
 export class AppShell extends HTMLElement {
@@ -10,9 +8,6 @@ export class AppShell extends HTMLElement {
         super();
         this.month = new Date().toISOString().slice(0, 7); // Mes actual por defecto
         this.showForm = false;
-        // Handler for import events (idempotent listener registration)
-        this._onDataImported = this._onDataImportedHandler.bind(this);
-        this._importListenerAttached = false;
     }
 
     connectedCallback() {
@@ -70,12 +65,6 @@ export class AppShell extends HTMLElement {
             modal.openCreate();
             modal.attachOpener(header.querySelector('#add-income'));
         });
-        header.addEventListener('export-data', () => {
-            this.openExportModal(header.querySelector('#export-data'));
-        });
-        header.addEventListener('import-data', () => {
-            this.openImportModal(header.querySelector('#import-data'));
-        });
         header.addEventListener('delete-data', async () => {
             const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
             if (confirmed) {
@@ -105,48 +94,6 @@ export class AppShell extends HTMLElement {
 
     onGroupChange(groupBy) {
         window.dispatchEvent(new CustomEvent('ui:group', { detail: { groupBy } }));
-    }
-
-    async openExportModal(opener) {
-        let modal = this.querySelector('#exportDataModal');
-        if (!modal) {
-            modal = document.createElement('export-data-modal');
-            modal.id = 'exportDataModal';
-            this.appendChild(modal);
-        }
-        modal.open(opener);
-    }
-    async openImportModal(opener) {
-        let modal = this.querySelector('#importDataModal');
-        if (!modal) {
-            modal = document.createElement('import-data-modal');
-            modal.id = 'importDataModal';
-            this.appendChild(modal);
-        }
-
-        // Attach listeners only once; support both modal-dispatched and window-dispatched events
-        if (!this._importListenerAttached) {
-            try {
-                modal.addEventListener('data-imported', this._onDataImported);
-            } catch (err) {
-                // ignore if addEventListener on modal fails for any reason
-                console.warn('Could not attach modal listener:', err);
-            }
-            window.addEventListener('data-imported', this._onDataImported);
-            this._importListenerAttached = true;
-        }
-
-        modal.open(opener);
-    }
-
-    _onDataImportedHandler(_e) {
-        // Refrescar la lista de deudas
-        const debtList = this.querySelector('debt-list');
-        if (debtList && typeof debtList.refresh === 'function') {
-            debtList.refresh();
-        }
-        // Emitir evento global para que otros componentes se actualicen
-        window.dispatchEvent(new CustomEvent('ui:refresh'));
     }
 
     updateFormVisibility() {
