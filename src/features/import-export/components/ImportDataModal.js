@@ -308,7 +308,7 @@ export class ImportDataModal extends HTMLElement {
                             Seleccionar archivo
                         </app-button>
                     </div>
-                    <div class="alert alert-warning mb-0">
+                    <div class="alert alert-warning mb-0" role="alert">
                         <p class="mb-2">⚠️ <strong>Importante:</strong></p>
                         <ul>
                             <li>La importación añade datos (no elimina):

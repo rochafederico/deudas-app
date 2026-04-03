@@ -27,8 +27,17 @@ export const tests = [
 
     async function bootstrapStyles_componentsRenderWithoutInlineStyles() {
         console.log('  bootstrap styles: componentes principales sin style inline');
-        const tags = ['header-bar', 'dark-toggle', 'app-link', 'app-checkbox', 'tour-overlay', 'tour-tooltip', 'import-data-modal'];
-        for (const tag of tags) {
+        const cases = [
+            { tag: 'header-bar', selector: '.bg-body.border.rounded-top-4' },
+            { tag: 'dark-toggle', selector: '.btn.btn-outline-secondary.rounded-pill' },
+            { tag: 'app-link', selector: 'a.link-light.d-inline-block' },
+            { tag: 'app-checkbox', selector: '.form-check-input.position-static' },
+            { tag: 'tour-overlay', selector: 'svg.w-100.h-100' },
+            { tag: 'tour-tooltip', selector: '.card.bg-dark.text-light' },
+            { tag: 'import-data-modal', selector: '.alert.alert-warning' }
+        ];
+        for (const testCase of cases) {
+            const { tag, selector } = testCase;
             const element = mount(tag);
             if (tag === 'app-link') {
                 element.setAttribute('href', '/');
@@ -39,6 +48,7 @@ export const tests = [
                 element.render();
             }
             assert(element.querySelector('[style]') === null, `${tag} no debe renderizar atributos style inline`);
+            assert(element.querySelector(selector) !== null, `${tag} debe renderizar clases Bootstrap esperadas`);
             element.remove();
         }
     }
