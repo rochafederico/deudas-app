@@ -17,20 +17,23 @@ export class DebtForm extends HTMLElement {
 
     connectedCallback() {
         this.classList.add('d-block');
-        this.render();
-        this.montoModal = this.querySelector('#montoModal');
-        this.duplicateModal = this.querySelector('#duplicateMontoModal');
-        this.montosTbody = this.querySelector('#montos-tbody');
-        this.querySelector('#add-monto').addEventListener('click', (event) => {
-            event.stopPropagation();
-            this.openMontoModal();
-        });
-        this.form = this.querySelector('app-form');
-        this._onSubmit = this.handleSubmit.bind(this);
-        this._onCancel = () => this.reset();
-        this.form.addEventListener('deuda:submit', this._onSubmit);
-        this.form.addEventListener('form:cancel', this._onCancel);
-        this.renderMontosList();
+        if (!this._rendered) {
+            this._rendered = true;
+            this.render();
+            this.montoModal = this.querySelector('#montoModal');
+            this.duplicateModal = this.querySelector('#duplicateMontoModal');
+            this.montosTbody = this.querySelector('#montos-tbody');
+            this.querySelector('#add-monto').addEventListener('click', (event) => {
+                event.stopPropagation();
+                this.openMontoModal();
+            });
+            this.form = this.querySelector('app-form');
+            this._onSubmit = this.handleSubmit.bind(this);
+            this._onCancel = () => this.reset();
+            this.form.addEventListener('deuda:submit', this._onSubmit);
+            this.form.addEventListener('form:cancel', this._onCancel);
+            this.renderMontosList();
+        }
     }
 
     disconnectedCallback() {
