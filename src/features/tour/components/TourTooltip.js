@@ -127,13 +127,13 @@ export class TourTooltip extends HTMLElement {
         this.classList.add('position-fixed', 'd-none', 'px-2', 'z-3');
         this.setAttribute('role', 'tooltip');
         this.innerHTML = `
-            <div class="card bg-dark text-light shadow-lg border-0 p-4">
-                <h3 id="tour-title" class="fs-5 fw-bold text-primary mb-2"></h3>
-                <p id="tour-text" class="mb-3 text-light-emphasis"></p>
+            <div class="card bg-dark text-white shadow-lg border-0 p-4">
+                <h3 id="tour-title" class="fs-5 fw-bold text-info mb-2"></h3>
+                <p id="tour-text" class="mb-3 text-white opacity-75"></p>
                 <div class="d-flex justify-content-between align-items-center gap-2">
-                    <span id="tour-counter" class="small text-secondary"></span>
+                    <span id="tour-counter" class="small text-white-50"></span>
                     <div class="d-flex gap-1 align-items-center">
-                        <button class="btn btn-sm btn-link text-secondary text-decoration-none" id="btn-skip" type="button">Saltar</button>
+                        <button class="btn btn-sm btn-link text-white-50 text-decoration-none" id="btn-skip" type="button">Saltar</button>
                         <button class="btn btn-sm btn-outline-light" id="btn-prev" type="button">Anterior</button>
                         <button class="btn btn-sm btn-primary" id="btn-next" type="button">Siguiente</button>
                     </div>
