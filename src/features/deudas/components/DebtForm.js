@@ -190,6 +190,7 @@ export class DebtForm extends HTMLElement {
                         (() => {
                             const id = `app-checkbox-${monto.id}`;
                             const appCheckbox = document.createElement('app-checkbox');
+                            appCheckbox.classList.add('ms-2');
                             appCheckbox.inputId = id;
                             appCheckbox.checked = !!monto.pagado;
                             appCheckbox.title = 'Marcar como pagado';
