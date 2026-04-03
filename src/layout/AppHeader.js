@@ -14,22 +14,28 @@ export class AppHeader extends HTMLElement {
   connectedCallback() {
     this.classList.add('d-block');
     this.render();
-    this.querySelector('.navbar-brand').addEventListener('click', (e) => {
+    this._onBrandClick = (e) => {
       e.preventDefault();
       window.history.pushState({}, '', '/');
       window.dispatchEvent(new PopStateEvent('popstate'));
-    });
-    this.querySelector('#tour-btn').addEventListener('click', () => {
-      window.dispatchEvent(new CustomEvent('tour:start'));
-    });
-    this.querySelector('#export-data-nav').addEventListener('click', (e) => {
-      e.preventDefault();
-      this._openExportModal(e.currentTarget);
-    });
-    this.querySelector('#import-data-nav').addEventListener('click', (e) => {
-      e.preventDefault();
-      this._openImportModal(e.currentTarget);
-    });
+    };
+    this._onTourClick = () => window.dispatchEvent(new CustomEvent('tour:start'));
+    this._onExportClick = (e) => { e.preventDefault(); this._openExportModal(e.currentTarget); };
+    this._onImportClick = (e) => { e.preventDefault(); this._openImportModal(e.currentTarget); };
+    this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
+    this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
+    this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
+    this.querySelector('#export-data-nav').addEventListener('click', this._onExportClick);
+    this.querySelector('#import-data-nav').addEventListener('click', this._onImportClick);
+    window.addEventListener('data-imported', this._onDataImported);
+  }
+
+  disconnectedCallback() {
+    this.querySelector('.navbar-brand')?.removeEventListener('click', this._onBrandClick);
+    this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
+    this.querySelector('#export-data-nav')?.removeEventListener('click', this._onExportClick);
+    this.querySelector('#import-data-nav')?.removeEventListener('click', this._onImportClick);
+    window.removeEventListener('data-imported', this._onDataImported);
   }
 
   _openExportModal(opener) {
@@ -44,9 +50,6 @@ export class AppHeader extends HTMLElement {
     if (!this._importModal) {
       this._importModal = document.createElement('import-data-modal');
       document.body.appendChild(this._importModal);
-      this._importModal.addEventListener('data-imported', () => {
-        window.dispatchEvent(new CustomEvent('ui:refresh'));
-      });
     }
     this._importModal.open(opener);
   }
