@@ -27,13 +27,14 @@ export class DebtForm extends HTMLElement {
                 event.stopPropagation();
                 this.openMontoModal();
             });
-            this.form = this.querySelector('app-form');
-            this._onSubmit = this.handleSubmit.bind(this);
-            this._onCancel = () => this.reset();
-            this.form.addEventListener('deuda:submit', this._onSubmit);
-            this.form.addEventListener('form:cancel', this._onCancel);
-            this.renderMontosList();
         }
+        // Re-attach form listeners on every (re)connect so they survive DOM moves
+        this.form = this.querySelector('app-form');
+        this._onSubmit = this.handleSubmit.bind(this);
+        this._onCancel = () => this.reset();
+        this.form.addEventListener('deuda:submit', this._onSubmit);
+        this.form.addEventListener('form:cancel', this._onCancel);
+        this.renderMontosList();
     }
 
     disconnectedCallback() {
