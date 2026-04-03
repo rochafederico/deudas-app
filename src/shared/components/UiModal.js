@@ -6,6 +6,10 @@ export class UiModal extends HTMLElement {
         super();
         this.opener = null;
         this._bsModal = null;
+        this._modalEl = null;
+        this._bodyEl = null;
+        this._titleEl = null;
+        this._movedToBody = false;
     }
 
     connectedCallback() {
@@ -16,6 +20,9 @@ export class UiModal extends HTMLElement {
     _initModal() {
         const modalEl = this.querySelector('.modal');
         if (!modalEl) return;
+        this._modalEl = modalEl;
+        this._bodyEl = modalEl.querySelector('.modal-body');
+        this._titleEl = modalEl.querySelector('.modal-title');
         // Use Bootstrap Modal JS if available
         if (window.bootstrap && window.bootstrap.Modal) {
             this._bsModal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: true });
@@ -25,24 +32,26 @@ export class UiModal extends HTMLElement {
     }
 
     clearBody() {
-        const body = this.querySelector('.modal-body');
-        if (body) body.innerHTML = '';
+        if (this._bodyEl) this._bodyEl.innerHTML = '';
     }
 
     setTitle(text) {
-        const h = this.querySelector('.modal-title');
-        if (h) h.textContent = text;
+        if (this._titleEl) this._titleEl.textContent = text;
     }
 
     open() {
+        // Move the .modal element to document.body so Bootstrap stacks
+        // z-index correctly when multiple modals are open simultaneously.
+        if (this._modalEl && !this._movedToBody) {
+            document.body.appendChild(this._modalEl);
+            this._movedToBody = true;
+        }
         if (this._bsModal) {
             this._bsModal.show();
         } else {
             // Fallback: manual show
-            const modalEl = this.querySelector('.modal');
-            if (modalEl) {
-                modalEl.classList.add('show');
-                modalEl.classList.add('d-block');
+            if (this._modalEl) {
+                this._modalEl.classList.add('show', 'd-block');
                 document.body.classList.add('modal-open');
             }
         }
@@ -53,10 +62,8 @@ export class UiModal extends HTMLElement {
         if (this._bsModal) {
             this._bsModal.hide();
         } else {
-            const modalEl = this.querySelector('.modal');
-            if (modalEl) {
-                modalEl.classList.remove('show');
-                modalEl.classList.remove('d-block');
+            if (this._modalEl) {
+                this._modalEl.classList.remove('show', 'd-block');
                 document.body.classList.remove('modal-open');
             }
             this._onClose();
@@ -68,6 +75,11 @@ export class UiModal extends HTMLElement {
     }
 
     _onClose() {
+        // Return the .modal element from body back into this custom element.
+        if (this._movedToBody && this._modalEl) {
+            HTMLElement.prototype.appendChild.call(this, this._modalEl);
+            this._movedToBody = false;
+        }
         if (this.opener && typeof this.opener.focus === 'function') {
             this.opener.focus();
         }
@@ -75,7 +87,7 @@ export class UiModal extends HTMLElement {
 
     _focusFirst() {
         setTimeout(() => {
-            const el = this.querySelector('.modal-body input, .modal-body select, .modal-body textarea, .modal-body button');
+            const el = this._bodyEl && this._bodyEl.querySelector('input, select, textarea, button');
             if (el) el.focus();
         }, 100);
     }
@@ -103,9 +115,8 @@ export class UiModal extends HTMLElement {
 
     // Override appendChild to place children inside modal-body
     appendChild(child) {
-        const body = this.querySelector('.modal-body');
-        if (body) {
-            return body.appendChild(child);
+        if (this._bodyEl) {
+            return this._bodyEl.appendChild(child);
         }
         return super.appendChild(child);
     }
