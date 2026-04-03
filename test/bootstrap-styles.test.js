@@ -28,7 +28,7 @@ export const tests = [
     async function bootstrapStyles_componentsRenderWithoutInlineStyles() {
         console.log('  bootstrap styles: componentes principales sin style inline');
         const cases = [
-            { tag: 'header-bar', selector: '.bg-body.border.rounded-top-4' },
+            { tag: 'header-bar', selector: '.card-header' },
             { tag: 'dark-toggle', selector: '.btn.btn-outline-secondary.rounded-pill' },
             { tag: 'app-link', selector: 'a.link-light.d-inline-block' },
             { tag: 'app-checkbox', selector: '.form-check.form-switch .form-check-input' },
