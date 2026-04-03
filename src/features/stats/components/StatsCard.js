@@ -13,7 +13,7 @@ export default function StatsCard({ title = '', items = [], theme = 'bg-secondar
 
   items.forEach(item => {
     const li = document.createElement('li');
-    li.className = 'list-group-item bg-transparent border-0 fw-bold';
+    li.className = 'list-group-item bg-transparent border-0 fw-bold text-white';
     li.textContent = item;
     ul.appendChild(li);
   });
