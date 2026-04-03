@@ -25,10 +25,13 @@ export class AppNav extends HTMLElement {
 
     this.innerHTML = `
       <ul class="navbar-nav me-auto mb-2 mb-lg-0" aria-label="Navegación principal" data-tour-step="menu-navegacion">
-        ${routeArray.map(r => `
-          <li class="nav-item${window.location.pathname === r.path ? ' active' : ''}">
+        ${routeArray.map(r => {
+          const isActive = window.location.pathname === r.path;
+          return `
+          <li class="nav-item${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}>
             <app-link href="${r.path}">${r.label}</app-link>
-          </li>`).join('')}
+          </li>`;
+        }).join('')}
       </ul>
     `;
   }
