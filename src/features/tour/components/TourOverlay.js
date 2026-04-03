@@ -12,8 +12,7 @@ export class TourOverlay extends HTMLElement {
     }
 
     render() {
-        this.className = 'position-fixed top-0 start-0 w-100 h-100 pe-none d-none';
-        this.style.zIndex = '1050';
+        this.className = 'position-fixed top-0 start-0 w-100 h-100 pe-none d-none z-3';
         this.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" class="w-100 h-100">
                 <defs>

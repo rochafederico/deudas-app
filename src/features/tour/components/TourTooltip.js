@@ -58,9 +58,9 @@ export class TourTooltip extends HTMLElement {
         if (!rect || position === 'center') {
             // Centrar en pantalla
             this.classList.add('top-50', 'start-50', 'translate-middle');
-            this.style.left = '';
-            this.style.top = '';
-            this.style.transform = '';
+            this.style.removeProperty('left');
+            this.style.removeProperty('top');
+            this.style.removeProperty('transform');
             return;
         }
 

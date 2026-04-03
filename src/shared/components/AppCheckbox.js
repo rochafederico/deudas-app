@@ -37,9 +37,10 @@ export class AppCheckbox extends HTMLElement {
         this._rendered = true;
         const checked = this.checked;
         const inputId = this.inputId || 'app-checkbox';
+        const ariaLabel = this.getAttribute('aria-label') || this.getAttribute('title') || 'Seleccionar opción';
         this.innerHTML = `
             <div class="form-check m-0">
-                <input class="form-check-input position-static m-0" type="checkbox" id="${inputId}" ${checked ? 'checked' : ''} />
+                <input class="form-check-input position-static m-0" type="checkbox" id="${inputId}" aria-label="${ariaLabel}" ${checked ? 'checked' : ''} />
             </div>
         `;
         const checkbox = this.querySelector('input[type="checkbox"]');
