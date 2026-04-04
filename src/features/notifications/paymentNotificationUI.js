@@ -98,8 +98,7 @@ function renderUpcomingSection(payments) {
     const restText = names.length <= MAX_REST_NAMES
         ? names.join(', ')
         : `${names.slice(0, MAX_REST_NAMES).join(', ')} y ${names.length - MAX_REST_NAMES} más`;
-    return `<p class="mb-1 fw-semibold small">📆 Próximos días</p>` +
-        `<p class="mb-0 small">${restText}</p>`;
+    return renderItemDetail('Próximos días', `<p class="mb-0 small">${restText}</p>`);
 }
 
 /**
@@ -172,4 +171,22 @@ export function showGroupedInAppNotification(count) {
     if (typeof window === 'undefined') return;
     const message = `⚠️ Tenés <strong>${count} pagos próximos a vencer</strong> en los próximos 3 días. <a href="/" class="alert-link">Ver detalle</a>`;
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
+}
+
+/**
+ * Attaches a delegated click handler to the given container element so that
+ * clicking an ℹ️ button with `data-deuda-id` dispatches a `deuda:open` event.
+ * Keeping this alongside renderPaymentItem ensures the interaction logic lives
+ * in the same UI layer as the rendering logic.
+ * @param {HTMLElement} containerEl
+ */
+export function attachDeudaClickHandler(containerEl) {
+    containerEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-deuda-id]');
+        if (!btn) return;
+        e.preventDefault();
+        const deudaId = btn.dataset.deudaId;
+        if (!deudaId) return;
+        window.dispatchEvent(new CustomEvent('deuda:open', { detail: { deudaId: Number(deudaId) } }));
+    });
 }

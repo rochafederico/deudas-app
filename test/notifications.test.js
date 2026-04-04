@@ -371,6 +371,52 @@ async function testBuildUpcomingPaymentsHTML() {
     window.removeEventListener('app:upcoming-panel', handler);
 }
 
+// ===================================================================
+// UC13: checkAndNotify – localStorage deduplication
+// ===================================================================
+async function testCheckAndNotifyDeduplication() {
+    console.log('  UC13: checkAndNotify only shows panel when new upcoming payments exist');
+
+    const NOTIFIED_KEY = 'nivva_notified_payments';
+    localStorage.removeItem(NOTIFIED_KEY);
+
+    const panelEvents = [];
+    const handler = (e) => panelEvents.push(e.detail);
+    window.addEventListener('app:upcoming-panel', handler);
+
+    const originalNotification = global.Notification;
+    delete global.Notification; // disable native notifications for this test
+
+    const deuda = {
+        id: 1,
+        acreedor: 'TestBank',
+        montos: [{ monto: 500, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
+    };
+
+    const { checkAndNotify: can } = await import('../src/features/notifications/NotificationService.js');
+
+    // First call: new payment → panel should appear
+    await can([deuda], new Date('2026-04-03'));
+    assert(panelEvents.length === 1, 'Primera llamada debe mostrar el panel');
+
+    // Second call: same payment (already in localStorage) → panel should NOT appear
+    await can([deuda], new Date('2026-04-03'));
+    assert(panelEvents.length === 1, 'Segunda llamada con misma deuda no debe repetir el panel');
+
+    // Add a new debt → panel should appear again (new payment detected)
+    const deuda2 = {
+        id: 2,
+        acreedor: 'NewBank',
+        montos: [{ monto: 300, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
+    };
+    await can([deuda, deuda2], new Date('2026-04-03'));
+    assert(panelEvents.length === 2, 'Nueva deuda debe volver a mostrar el panel');
+
+    window.removeEventListener('app:upcoming-panel', handler);
+    global.Notification = originalNotification;
+    localStorage.removeItem(NOTIFIED_KEY);
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -383,5 +429,6 @@ export const tests = [
     testCheckAndNotifyGroupedNative,
     testShowGroupedInAppNotification,
     testFormatHelpers,
-    testBuildUpcomingPaymentsHTML
+    testBuildUpcomingPaymentsHTML,
+    testCheckAndNotifyDeduplication
 ];

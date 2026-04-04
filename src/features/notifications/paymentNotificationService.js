@@ -1,9 +1,31 @@
 // src/features/notifications/paymentNotificationService.js
 // Business logic: payment filtering, native notification dispatch, orchestration
 
-import { DAYS_AHEAD, MAX_INDIVIDUAL_NOTIFICATIONS } from './config/notificationConfig.js';
+import { DAYS_AHEAD, MAX_INDIVIDUAL_NOTIFICATIONS, NOTIFIED_PAYMENTS_KEY } from './config/notificationConfig.js';
 import { isNotificationSupported, requestPermission } from './notificationPermissions.js';
 import { formatDate, formatRelativeDate, showInAppPanel } from './paymentNotificationUI.js';
+
+// ── localStorage deduplication ────────────────────────────────────────────────
+
+function paymentKey(p) {
+    return `${p.deudaId ?? p.acreedor}-${p.vencimiento}`;
+}
+
+function getNotifiedKeys() {
+    try {
+        return new Set(JSON.parse(localStorage.getItem(NOTIFIED_PAYMENTS_KEY) || '[]'));
+    } catch {
+        return new Set();
+    }
+}
+
+function saveNotifiedKeys(payments) {
+    try {
+        localStorage.setItem(NOTIFIED_PAYMENTS_KEY, JSON.stringify(payments.map(paymentKey)));
+    } catch {
+        // localStorage not available (e.g. private browsing quota exceeded) — ignore
+    }
+}
 
 /**
  * Returns montos that are unpaid and due within the next `days` days.
@@ -66,14 +88,22 @@ export function sendGroupedNotification(count) {
 /**
  * Main entry point: shows the in-app panel and, when permitted, sends native
  * browser notifications (individual or grouped).
+ * Only shows the panel when there are new upcoming payments not previously notified.
+ * When new payments are detected, re-shows all upcoming payments and updates the
+ * stored set so future calls skip unless another new payment appears.
  * @param {Array} deudas - List of debts from the repository.
+ * @param {Date} [now=new Date()] - Reference date (injectable for testing).
  */
-export async function checkAndNotify(deudas) {
-    const now = new Date();
+export async function checkAndNotify(deudas, now = new Date()) {
     const payments = getUpcomingPayments(deudas, DAYS_AHEAD, now);
     if (payments.length === 0) return;
 
+    const notifiedKeys = getNotifiedKeys();
+    const hasNew = payments.some(p => !notifiedKeys.has(paymentKey(p)));
+    if (!hasNew) return;
+
     showInAppPanel(payments, now);
+    saveNotifiedKeys(payments);
 
     if (!isNotificationSupported()) return;
 
