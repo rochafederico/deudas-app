@@ -5,7 +5,7 @@ import { addValue } from '../utils/formatCurrency.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
-  container.className = 'row g-2 mb-3';
+  container.className = 'row g-2 mb-3 row-cols-2 row-cols-md-3 row-cols-lg-5';
   container.setAttribute('data-tour-step', 'indicadores');
 
   // Render helper
@@ -28,7 +28,7 @@ export default function StatsIndicators({ mes } = {}) {
       ];
       cards.forEach(card => {
         const col = document.createElement('div');
-        col.className = 'col-6 col-md-4';
+        col.className = 'col';
         col.appendChild(card);
         container.appendChild(col);
       });
