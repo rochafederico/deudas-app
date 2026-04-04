@@ -16,7 +16,7 @@ export class UpcomingPaymentsPanel extends HTMLElement {
         this.innerHTML = '';
 
         const alert = document.createElement('div');
-        alert.className = 'alert alert-light border-start border-warning border-4 alert-dismissible mb-3 py-2 px-3';
+        alert.className = 'alert alert-warning alert-dismissible fade show mb-3';
         alert.setAttribute('role', 'alert');
         alert.innerHTML = `
             <h6 class="alert-heading fw-bold mb-2">⚠️ Vencimientos próximos</h6>
