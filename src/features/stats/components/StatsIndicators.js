@@ -21,14 +21,15 @@ export default function StatsIndicators({ mes } = {}) {
       const summary = await getMonthlySummary(periodo);
       container.innerHTML = '';
 
-      // Only show per-currency breakdowns (no aggregated totals)
+      // Always render ARS and USD rows; show "-" when value is absent or zero
+      const CURRENCIES = ['ARS', 'USD'];
       const addValue = (obj) => {
-        return Object.entries(obj || {})
-          .map(([moneda, monto]) => {
-            const val = (monto == null || monto === 0) ? '-' : `$ ${format(monto)}`;
-            return `${moneda}: ${val}`;
-          });
-      }
+        return CURRENCIES.map(moneda => {
+          const monto = obj ? obj[moneda] : undefined;
+          const val = (monto == null || monto === 0) ? '-' : `$ ${format(monto)}`;
+          return `${moneda}: ${val}`;
+        });
+      };
       const cards = [
         StatsCard({ title: 'Ingresos' , items: addValue(summary.byCurrency.ingresos), color: 'success' }),
         StatsCard({ title: 'Gastos', items: addValue(summary.byCurrency.egresos), color: 'danger' }),
