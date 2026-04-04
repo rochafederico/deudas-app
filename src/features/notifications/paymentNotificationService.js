@@ -8,7 +8,9 @@ import { formatDate, formatRelativeDate, showInAppPanel } from './paymentNotific
 // ── localStorage deduplication ────────────────────────────────────────────────
 
 function paymentKey(p) {
-    return `${p.deudaId ?? p.acreedor}-${p.vencimiento}`;
+    return p.deudaId != null
+        ? `${p.deudaId}-${p.vencimiento}`
+        : `${p.acreedor}-${p.monto}-${p.moneda}-${p.vencimiento}`;
 }
 
 function getNotifiedKeys() {
