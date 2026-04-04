@@ -4,7 +4,7 @@ import { getMonthlySummary } from '../statsService.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
-  container.className = 'row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 mb-4';
+  container.className = 'row g-2 mb-3';
   container.setAttribute('data-tour-step', 'indicadores');
 
   const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -24,7 +24,10 @@ export default function StatsIndicators({ mes } = {}) {
       // Only show per-currency breakdowns (no aggregated totals)
       const addValue = (obj) => {
         return Object.entries(obj || {})
-          .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`);
+          .map(([moneda, monto]) => {
+            const val = (monto == null || monto === 0) ? '-' : `$ ${format(monto)}`;
+            return `${moneda}: ${val}`;
+          });
       }
       const cards = [
         StatsCard({ title: 'Ingresos' , items: addValue(summary.byCurrency.ingresos), color: 'success' }),
@@ -35,7 +38,7 @@ export default function StatsIndicators({ mes } = {}) {
       ];
       cards.forEach(card => {
         const col = document.createElement('div');
-        col.className = 'col';
+        col.className = 'col-6 col-md-4';
         col.appendChild(card);
         container.appendChild(col);
       });
