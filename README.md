@@ -104,11 +104,13 @@ MIT
       - ✅ Historial de valores
       - 🚧 Rendimiento *(muestra valor actual vs. inicial; sin gráficos ni % de retorno)*
 
-  - 🚧 **Gestión de datos** *(accesible desde el menú Datos del header)*
-    - ✅ Importar datos *(con previsualización y fusión inteligente por acreedor+tipo)*
-    - ✅ Exportar datos *(JSON descargable con deudas, ingresos e inversiones)*
-    - 🚧 Backup / restaurar *(exportar/importar cumple la función; sin flujo dedicado de backup)*
-    - 🚧 Reiniciar información *("Eliminar todo" borra deudas y montos; ingresos e inversiones no se borran)*
+  - 🚧 **Gestión de datos**
+    - Desde el menú **Datos** del header:
+      - ✅ Importar datos *(con previsualización y fusión inteligente por acreedor+tipo)*
+      - ✅ Exportar datos *(JSON descargable con deudas, ingresos e inversiones)*
+      - 🚧 Backup / restaurar *(exportar/importar cumple la función; sin flujo dedicado de backup)*
+    - Desde el menú de opciones **⚙️** del `header-bar`:
+      - 🚧 Reiniciar información *("Eliminar todo" borra deudas y montos; ingresos e inversiones no se borran)*
 
   - ⏳ **Configuración** *(no existe página ni sección de configuración)*
     - ⏳ Moneda *(ARS/USD están hardcodeados en `monedas.js`)*
