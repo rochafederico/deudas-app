@@ -4,8 +4,7 @@ import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
-import './features/notifications/UpcomingPaymentsPanel.js';
-import { listDeudas, getDeuda } from './features/deudas/deudaRepository.js';
+import { listDeudas } from './features/deudas/deudaRepository.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
@@ -28,9 +27,6 @@ document.body.appendChild(wrapper);
 initDB().then(async (db) => {
     window.db = db;
 
-    // Mount the upcoming-payments alert panel at the top of the wrapper
-    const panelEl = document.createElement('upcoming-payments-panel');
-    wrapper.insertBefore(panelEl, wrapper.firstChild);
     try {
       const { default: StatsIndicators } = await import('./features/stats/components/StatsIndicators.js');
       const indicatorsNode = StatsIndicators();
@@ -86,21 +82,6 @@ function renderRoute(path) {
 
 window.addEventListener('popstate', () => {
   renderRoute(window.location.pathname);
-});
-
-// Handle deuda:open event emitted by UpcomingPaymentsPanel to open the debt modal
-window.addEventListener('deuda:open', async ({ detail: { deudaId } }) => {
-    try {
-        const deuda = await getDeuda(deudaId);
-        if (!deuda) return;
-        const modal = document.querySelector('app-shell')?.querySelector('#debtModal')
-            ?? document.getElementById('debtModal');
-        if (!modal) return;
-        modal.openEdit(deuda);
-        modal.attachOpener();
-    } catch (err) {
-        console.warn('No se pudo abrir modal de deuda:', err);
-    }
 });
 
 // Note: initial renderRoute is triggered after DB init above

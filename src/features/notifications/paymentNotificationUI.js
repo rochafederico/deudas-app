@@ -52,8 +52,7 @@ function renderPaymentItem(p) {
     const acreedor = escapeHtml(p.acreedor);
     const moneda = escapeHtml(p.moneda);
     const formattedMonto = `${moneda} ${p.monto.toLocaleString('es-AR')}`;
-    const deudaIdAttr = p.deudaId != null ? ` data-deuda-id="${escapeHtml(String(p.deudaId))}"` : '';
-    return `<li class="mb-1">${acreedor} — <strong>${formattedMonto}</strong> <button type="button" class="btn btn-link btn-sm p-0 text-warning-emphasis ms-1 align-baseline border-0"${deudaIdAttr} title="Ver detalle" aria-label="Ver detalle de ${acreedor}">ℹ️</button></li>`;
+    return `<li class="mb-1">${acreedor} — <strong>${formattedMonto}</strong></li>`;
 }
 
 /**
@@ -173,20 +172,4 @@ export function showGroupedInAppNotification(count) {
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
 }
 
-/**
- * Attaches a delegated click handler to the given container element so that
- * clicking an ℹ️ button with `data-deuda-id` dispatches a `deuda:open` event.
- * Keeping this alongside renderPaymentItem ensures the interaction logic lives
- * in the same UI layer as the rendering logic.
- * @param {HTMLElement} containerEl
- */
-export function attachDeudaClickHandler(containerEl) {
-    containerEl.addEventListener('click', (e) => {
-        const btn = e.target.closest('[data-deuda-id]');
-        if (!btn) return;
-        e.preventDefault();
-        const deudaId = btn.dataset.deudaId;
-        if (!deudaId) return;
-        window.dispatchEvent(new CustomEvent('deuda:open', { detail: { deudaId: Number(deudaId) } }));
-    });
-}
+

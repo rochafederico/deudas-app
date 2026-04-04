@@ -23,11 +23,13 @@ export class AppHeader extends HTMLElement {
     this._onExportClick = (e) => { e.preventDefault(); this._openExportModal(e.currentTarget); };
     this._onImportClick = (e) => { e.preventDefault(); this._openImportModal(e.currentTarget); };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
+    this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html);
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav').addEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav').addEventListener('click', this._onImportClick);
     window.addEventListener('data-imported', this._onDataImported);
+    window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
   }
 
   disconnectedCallback() {
@@ -36,6 +38,29 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#export-data-nav')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav')?.removeEventListener('click', this._onImportClick);
     window.removeEventListener('data-imported', this._onDataImported);
+    window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
+    this._popover?.dispose();
+    this._popover = null;
+  }
+
+  _updateNotificationPopover(html) {
+    const btn = this.querySelector('#notifications-btn');
+    if (!btn || !window.bootstrap?.Popover) return;
+    if (this._popover) this._popover.dispose();
+    this._popover = new window.bootstrap.Popover(btn, {
+      html: true,
+      sanitize: false,
+      title: '<strong>⚠️ Vencimientos próximos</strong>',
+      content: html,
+      trigger: 'click',
+      placement: 'bottom',
+      container: 'body',
+    });
+    btn.querySelector('.notif-badge')?.remove();
+    const badge = document.createElement('span');
+    badge.className = 'notif-badge badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle p-1 border border-primary';
+    badge.setAttribute('aria-label', 'Hay vencimientos próximos');
+    btn.appendChild(badge);
   }
 
   _openExportModal(opener) {
@@ -68,6 +93,11 @@ export class AppHeader extends HTMLElement {
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+              <li class="nav-item me-1">
+                <button id="notifications-btn" class="btn btn-link text-light fs-5 p-2 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
+                  🔔
+                </button>
+              </li>
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button"
                   data-bs-toggle="dropdown" aria-expanded="false">
