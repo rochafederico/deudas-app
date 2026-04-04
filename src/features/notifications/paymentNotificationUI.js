@@ -57,14 +57,23 @@ function renderPaymentItem(p) {
 }
 
 /**
+ * Renders a labeled section with a title and HTML body.
+ * @param {string} titulo - Section label (e.g. 'Hoy', 'Mañana')
+ * @param {string} html - Inner HTML for the section body
+ * @returns {string} HTML string
+ */
+function renderItemDetail(titulo, html) {
+    return `<p class="mb-1 fw-semibold small">📅 ${titulo}</p>${html}`;
+}
+
+/**
  * Renders the "Hoy" section (payments due today).
  * @param {Array} payments
  * @returns {string} HTML string or empty string
  */
 function renderTodaySection(payments) {
     if (payments.length === 0) return '';
-    return `<p class="mb-1 fw-semibold small">📅 Hoy</p>` +
-        `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`;
+    return renderItemDetail('Hoy', `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`);
 }
 
 /**
@@ -74,8 +83,7 @@ function renderTodaySection(payments) {
  */
 function renderTomorrowSection(payments) {
     if (payments.length === 0) return '';
-    return `<p class="mb-1 fw-semibold small">📅 Mañana</p>` +
-        `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`;
+    return renderItemDetail('Mañana', `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`);
 }
 
 /**

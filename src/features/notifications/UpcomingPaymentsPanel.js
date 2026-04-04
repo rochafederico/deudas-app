@@ -28,7 +28,9 @@ export class UpcomingPaymentsPanel extends HTMLElement {
             const btn = e.target.closest('[data-deuda-id]');
             if (!btn) return;
             e.preventDefault();
-            this.#openDeudaModal(btn.dataset.deudaId);
+            const deudaId = btn.dataset.deudaId;
+            if (!deudaId) return;
+            window.dispatchEvent(new CustomEvent('deuda:open', { detail: { deudaId: Number(deudaId) } }));
         });
 
         this.appendChild(alertEl);
@@ -36,18 +38,6 @@ export class UpcomingPaymentsPanel extends HTMLElement {
         if (window.bootstrap?.Alert) {
             new window.bootstrap.Alert(alertEl);
         }
-    }
-
-    async #openDeudaModal(deudaId) {
-        if (!deudaId) return;
-        const modal = document.querySelector('app-shell')?.querySelector('#debtModal')
-            ?? document.getElementById('debtModal');
-        if (!modal) return;
-        const { getDeuda } = await import('../deudas/deudaRepository.js');
-        const deuda = await getDeuda(Number(deudaId));
-        if (!deuda) return;
-        modal.openEdit(deuda);
-        modal.attachOpener();
     }
 }
 
