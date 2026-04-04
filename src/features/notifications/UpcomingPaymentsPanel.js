@@ -53,7 +53,7 @@ export class UpcomingPaymentsPanel extends HTMLElement {
             ?? document.getElementById('debtModal');
         if (!modal) return;
         const { getDeuda } = await import('../deudas/deudaRepository.js');
-        const deuda = await getDeuda(deudaId);
+        const deuda = await getDeuda(Number(deudaId));
         if (!deuda) return;
         modal.openEdit(deuda);
         modal.attachOpener();
