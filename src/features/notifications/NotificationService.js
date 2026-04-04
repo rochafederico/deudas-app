@@ -158,6 +158,86 @@ export function showInAppNotification(payment, now = new Date()) {
 }
 
 /**
+ * Builds the inner HTML for the structured upcoming-payments alert panel.
+ * Groups payments into three sections:
+ *   - Hoy (today)
+ *   - Mañana (tomorrow)
+ *   - Próximos días (all remaining payments beyond tomorrow): comma-separated names,
+ *     up to 5 shown, then "y N más"
+ * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string}>} payments
+ * @param {Date} [now=new Date()]
+ * @returns {string} HTML string for the alert body
+ */
+export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const today = [];
+    const tomorrow = [];
+    const rest = [];
+
+    for (const p of payments) {
+        const venc = new Date(p.vencimiento + 'T00:00:00');
+        const diffDays = Math.round((venc - todayStart) / (1000 * 60 * 60 * 24));
+        if (diffDays === 0) today.push(p);
+        else if (diffDays === 1) tomorrow.push(p);
+        else rest.push(p);
+    }
+
+    const itemHTML = (p) => {
+        const formattedMonto = `${p.moneda} ${p.monto.toLocaleString('es-AR')}`;
+        return `<li class="mb-1">${p.acreedor} — <strong>${formattedMonto}</strong> <a href="/" class="text-warning-emphasis ms-1" title="Ver detalle" aria-label="Ver detalle de ${p.acreedor}">ℹ️</a></li>`;
+    };
+
+    const sections = [];
+
+    if (today.length > 0) {
+        sections.push(
+            `<p class="mb-1 fw-semibold small">📅 Hoy</p>` +
+            `<ul class="list-unstyled ms-2 mb-2">${today.map(itemHTML).join('')}</ul>`
+        );
+    }
+
+    if (tomorrow.length > 0) {
+        sections.push(
+            `<p class="mb-1 fw-semibold small">📅 Mañana</p>` +
+            `<ul class="list-unstyled ms-2 mb-2">${tomorrow.map(itemHTML).join('')}</ul>`
+        );
+    }
+
+    if (rest.length > 0) {
+        const MAX_NAMES = 5;
+        const names = rest.map(p => p.acreedor);
+        let restText;
+        if (names.length <= MAX_NAMES) {
+            restText = names.join(', ');
+        } else {
+            const more = names.length - MAX_NAMES;
+            restText = `${names.slice(0, MAX_NAMES).join(', ')} y ${more} más`;
+        }
+        sections.push(
+            `<p class="mb-1 fw-semibold small">📆 Próximos días</p>` +
+            `<p class="mb-0 small">${restText}</p>`
+        );
+    }
+
+    return sections.join('');
+}
+
+/**
+ * Dispatches an `app:upcoming-panel` event with the structured HTML for the
+ * upcoming-payments alert panel.
+ * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string}>} payments
+ * @param {Date} [now=new Date()]
+ */
+export function showInAppPanel(payments, now = new Date()) {
+    if (typeof window === 'undefined') return;
+    const html = buildUpcomingPaymentsHTML(payments, now);
+    window.dispatchEvent(new CustomEvent('app:upcoming-panel', {
+        detail: { html }
+    }));
+}
+
+/**
  * Sends a single grouped browser notification summarising all upcoming payments.
  * Used when there are more than MAX_INDIVIDUAL_NOTIFICATIONS payments due.
  * Clicking the notification focuses the app window so the user can see the list.
@@ -189,11 +269,9 @@ export function showGroupedInAppNotification(count) {
 }
 
 /**
- * Main entry point: requests permission and notifies the user about upcoming payments.
- * - Up to 5 payments: one notification per payment.
- * - More than 5 payments: a single grouped notification.
- * Falls back to in-app toasts when the browser Notifications API is unavailable or
- * the user has not granted permission (e.g. iOS Safari).
+ * Main entry point: shows a structured in-app alert panel for upcoming payments
+ * and, when the browser supports it and permission is granted, also sends native
+ * browser notifications (individual or grouped).
  * Should be called when the app loads or becomes visible.
  * @param {Array} deudas - List of debts from the repository.
  */
@@ -202,18 +280,15 @@ export async function checkAndNotify(deudas) {
     const payments = getUpcomingPayments(deudas, DAYS_AHEAD, now);
     if (payments.length === 0) return;
 
-    const grouped = payments.length > MAX_INDIVIDUAL_NOTIFICATIONS;
+    // Always show the single structured in-app panel
+    showInAppPanel(payments, now);
 
-    if (!isNotificationSupported()) {
-        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(p => showInAppNotification(p, now));
-        return;
-    }
+    // Also send native browser notification if the API is available
+    if (!isNotificationSupported()) return;
 
     const permission = await requestPermission();
-    if (permission !== 'granted') {
-        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(p => showInAppNotification(p, now));
-        return;
-    }
+    if (permission !== 'granted') return;
 
+    const grouped = payments.length > MAX_INDIVIDUAL_NOTIFICATIONS;
     grouped ? sendGroupedNotification(payments.length) : payments.forEach(p => sendPaymentNotification(p, now));
 }

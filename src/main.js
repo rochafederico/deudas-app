@@ -4,6 +4,7 @@ import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
+import './features/notifications/UpcomingPaymentsPanel.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
 
 // Wrapper para el contenido principal
@@ -26,6 +27,10 @@ document.body.appendChild(wrapper);
 // Initialize the IndexedDB and only after DB is ready render indicators + initial route
 initDB().then(async (db) => {
     window.db = db;
+
+    // Mount the upcoming-payments alert panel at the top of the wrapper
+    const panelEl = document.createElement('upcoming-payments-panel');
+    wrapper.insertBefore(panelEl, wrapper.firstChild);
     try {
       const { default: StatsIndicators } = await import('./features/stats/components/StatsIndicators.js');
       const indicatorsNode = StatsIndicators();

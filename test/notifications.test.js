@@ -11,7 +11,9 @@ import {
     showInAppNotification,
     showGroupedInAppNotification,
     formatDate,
-    formatRelativeDate
+    formatRelativeDate,
+    buildUpcomingPaymentsHTML,
+    showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
 
 // ===================================================================
@@ -194,7 +196,7 @@ async function testCheckAndNotifyUnsupported() {
 
     const events = [];
     const handler = (e) => events.push(e.detail);
-    window.addEventListener('app:notify', handler);
+    window.addEventListener('app:upcoming-panel', handler);
 
     // Should not throw
     let threw = false;
@@ -204,9 +206,9 @@ async function testCheckAndNotifyUnsupported() {
         threw = true;
     }
     assert(!threw, 'checkAndNotify no debe lanzar error cuando API no está soportada');
-    assert(events.length === 0, 'Sin deudas no se despachan eventos app:notify');
+    assert(events.length === 0, 'Sin deudas no se despachan eventos app:upcoming-panel');
 
-    window.removeEventListener('app:notify', handler);
+    window.removeEventListener('app:upcoming-panel', handler);
     global.Notification = originalNotification;
 }
 
@@ -317,6 +319,56 @@ async function testFormatHelpers() {
     assert(formatRelativeDate('2026-04-06', now) === 'en 3 días', 'formatRelativeDate: 3 días después');
 }
 
+// ===================================================================
+// UC12: buildUpcomingPaymentsHTML – groups by today/tomorrow/rest, truncates rest>5
+// ===================================================================
+async function testBuildUpcomingPaymentsHTML() {
+    console.log('  UC12: buildUpcomingPaymentsHTML groups payments and truncates rest list');
+
+    const now = new Date('2026-04-03');
+
+    const payments = [
+        { acreedor: 'NaranjaX', monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
+        { acreedor: 'Brubank',  monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
+        { acreedor: 'Juli',     monto: 598646, moneda: 'ARS', vencimiento: '2026-04-04' }, // tomorrow
+        { acreedor: 'Personal', monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'Edenor',   monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'Netflix',  monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-05' }, // rest
+        { acreedor: 'San Lorenzo', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
+        { acreedor: 'Expensas', monto: 1000,   moneda: 'ARS', vencimiento: '2026-04-06' }, // rest
+        { acreedor: 'MercadoPago', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest (6th → truncated)
+    ];
+
+    const html = buildUpcomingPaymentsHTML(payments, now);
+
+    // Today section
+    assert(html.includes('Hoy'), 'Incluye sección Hoy');
+    assert(html.includes('NaranjaX'), 'Incluye NaranjaX en Hoy');
+    assert(html.includes('Brubank'), 'Incluye Brubank en Hoy');
+
+    // Tomorrow section
+    assert(html.includes('Mañana'), 'Incluye sección Mañana');
+    assert(html.includes('Juli'), 'Incluye Juli en Mañana');
+
+    // Rest section – 6 items, max 5 shown, "y 1 más"
+    assert(html.includes('Próximos días'), 'Incluye sección Próximos días');
+    assert(html.includes('Personal'), 'Lista rest incluye Personal');
+    assert(html.includes('y 1 más'), 'Trunca con "y 1 más" cuando rest > 5');
+
+    // showInAppPanel dispatches app:upcoming-panel with the html
+    const events = [];
+    const handler = (e) => events.push(e.detail);
+    window.addEventListener('app:upcoming-panel', handler);
+
+    showInAppPanel(payments, now);
+
+    assert(events.length === 1, 'showInAppPanel despacha 1 evento app:upcoming-panel');
+    assert(typeof events[0].html === 'string', 'El evento incluye html como string');
+    assert(events[0].html.includes('NaranjaX'), 'El html del evento incluye datos de los pagos');
+
+    window.removeEventListener('app:upcoming-panel', handler);
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -328,5 +380,6 @@ export const tests = [
     testShowInAppNotification,
     testCheckAndNotifyGroupedNative,
     testShowGroupedInAppNotification,
-    testFormatHelpers
+    testFormatHelpers,
+    testBuildUpcomingPaymentsHTML
 ];
