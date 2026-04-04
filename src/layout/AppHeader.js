@@ -45,9 +45,14 @@ export class AppHeader extends HTMLElement {
     const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
     if (!confirmed) return;
     try {
-      const { deleteDeudas } = await import('../features/deudas/deudaRepository.js');
-      const { deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
-      const { deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
+      const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
+      const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
+      const { listInversiones, deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
+      const [deudas, ingresos, inversiones] = await Promise.all([listDeudas(), getAll(), listInversiones()]);
+      if (!deudas.length && !ingresos.length && !inversiones.length) {
+        window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '⚠️ No hay datos para borrar.', type: 'warning' } }));
+        return;
+      }
       await Promise.all([deleteDeudas(), deleteAllIngresos(), deleteAllInversiones()]);
     } catch (error) {
       console.error('Error al eliminar los datos:', error);
@@ -55,6 +60,7 @@ export class AppHeader extends HTMLElement {
       return;
     }
     window.dispatchEvent(new CustomEvent('ui:refresh'));
+    window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Todos los datos fueron eliminados.', type: 'success' } }));
   }
 
   _openExportModal(opener) {
