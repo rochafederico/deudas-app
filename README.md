@@ -73,7 +73,7 @@ MIT
 
 > Estado relevado del código real. Última revisión: 2026-04-04.
 
-- ✅ **NIVVA**
+- ✅ **Nivva**
 
   - 🚧 **Inicio / Dashboard** *(la home es Egresos, no existe dashboard dedicado)*
     - ✅ KPIs
