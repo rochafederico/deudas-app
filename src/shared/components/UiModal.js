@@ -46,6 +46,13 @@ export class UiModal extends HTMLElement {
             document.body.appendChild(this._modalEl);
             this._movedToBody = true;
         }
+        const shownPromise = new Promise((resolve) => {
+            if (this._bsModal && this._modalEl) {
+                this._modalEl.addEventListener('shown.bs.modal', resolve, { once: true });
+            } else {
+                resolve();
+            }
+        });
         if (this._bsModal) {
             this._bsModal.show();
         } else {
@@ -56,6 +63,7 @@ export class UiModal extends HTMLElement {
             }
         }
         this._focusFirst();
+        return shownPromise;
     }
 
     close() {
