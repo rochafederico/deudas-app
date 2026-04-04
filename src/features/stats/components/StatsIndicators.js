@@ -1,13 +1,12 @@
 // src/components/StatsIndicators.js
 import StatsCard from './StatsCard.js';
 import { getMonthlySummary } from '../statsService.js';
+import { addValue } from '../utils/formatCurrency.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
-  container.className = 'row row-cols-1 row-cols-md-3 row-cols-lg-5 g-3 mb-4';
+  container.className = 'row g-2 mb-3 row-cols-2 row-cols-md-3 row-cols-lg-5';
   container.setAttribute('data-tour-step', 'indicadores');
-
-  const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   // Render helper
   async function render(periodo) {
@@ -20,12 +19,6 @@ export default function StatsIndicators({ mes } = {}) {
     try {
       const summary = await getMonthlySummary(periodo);
       container.innerHTML = '';
-
-      // Only show per-currency breakdowns (no aggregated totals)
-      const addValue = (obj) => {
-        return Object.entries(obj || {})
-          .map(([moneda, monto]) => `${moneda}: $ ${format(monto)}`);
-      }
       const cards = [
         StatsCard({ title: 'Ingresos' , items: addValue(summary.byCurrency.ingresos), color: 'success' }),
         StatsCard({ title: 'Gastos', items: addValue(summary.byCurrency.egresos), color: 'danger' }),

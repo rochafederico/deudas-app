@@ -5,7 +5,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   card.className = `card h-100 border border-${color}`;
 
   const header = document.createElement('div');
-  header.className = `card-header bg-${color} text-white text-center text-uppercase small fw-semibold`;
+  header.className = `card-header bg-${color} text-white text-center text-uppercase small fw-semibold py-1 px-2`;
   header.textContent = title;
 
   const ul = document.createElement('ul');
@@ -13,7 +13,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
 
   items.forEach(item => {
     const li = document.createElement('li');
-    li.className = `list-group-item border-0 fw-bold text-${color}`;
+    li.className = `list-group-item border-0 fw-bold text-${color} py-1 px-2 small`;
     li.textContent = item;
     ul.appendChild(li);
   });
