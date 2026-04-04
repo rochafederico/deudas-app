@@ -62,7 +62,7 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 
 Importante:
 - La importación/exportación de datos está implementada. La función de importación fusiona deudas por **Acreedor + Tipo de Deuda** para evitar duplicados y agrega montos que no estén ya presentes (comparación por monto, moneda y periodo/vencimiento). Esto permite combinar backups sin crear grupos duplicados.
-- Las operaciones de acceso a datos están centralizadas en la carpeta `src/repository/` y usan `IndexedDB` con transacciones para consistencia.
+- Las operaciones de acceso a datos se organizan en los módulos de `src/features/**`, mientras que la infraestructura de `IndexedDB` se encuentra en `src/shared/database`, usando transacciones para consistencia.
 
 ## Licencia
 MIT
