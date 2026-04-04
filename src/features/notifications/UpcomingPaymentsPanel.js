@@ -3,6 +3,15 @@
 
 export class UpcomingPaymentsPanel extends HTMLElement {
     connectedCallback() {
+        Object.assign(this.style, {
+            position: 'fixed',
+            top: '1rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'min(92vw, 480px)',
+            zIndex: '1050',
+        });
+
         this._handler = (e) => this.#render(e.detail.html);
         window.addEventListener('app:upcoming-panel', this._handler);
     }
@@ -15,20 +24,20 @@ export class UpcomingPaymentsPanel extends HTMLElement {
     #render(html) {
         this.innerHTML = '';
 
-        const alert = document.createElement('div');
-        alert.className = 'alert alert-warning alert-dismissible fade show mb-3';
-        alert.setAttribute('role', 'alert');
-        alert.innerHTML = `
+        const alertEl = document.createElement('div');
+        alertEl.className = 'alert alert-warning alert-dismissible fade show shadow';
+        alertEl.setAttribute('role', 'alert');
+        alertEl.innerHTML = `
             <h6 class="alert-heading fw-bold mb-2">⚠️ Vencimientos próximos</h6>
             ${html}
-            <button type="button" class="btn-close" aria-label="Cerrar"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         `;
 
-        alert.querySelector('.btn-close').addEventListener('click', () => {
-            alert.remove();
-        });
+        this.appendChild(alertEl);
 
-        this.appendChild(alert);
+        if (window.bootstrap?.Alert) {
+            new window.bootstrap.Alert(alertEl);
+        }
     }
 }
 
