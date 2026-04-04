@@ -59,6 +59,31 @@ export async function requestPermission() {
 }
 
 /**
+ * Formats an ISO date string (YYYY-MM-DD) as DD/MM/YYYY.
+ * @param {string} dateStr
+ * @returns {string}
+ */
+export function formatDate(dateStr) {
+    const [year, month, day] = dateStr.split('-');
+    return `${day}/${month}/${year}`;
+}
+
+/**
+ * Returns a human-readable relative label for a vencimiento date.
+ * @param {string} dateStr - ISO date string (YYYY-MM-DD)
+ * @param {Date} [now=new Date()]
+ * @returns {string} 'hoy', 'mañana', or 'en N días'
+ */
+export function formatRelativeDate(dateStr, now = new Date()) {
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const venc = new Date(dateStr + 'T00:00:00');
+    const diffDays = Math.round((venc - todayStart) / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return 'hoy';
+    if (diffDays === 1) return 'mañana';
+    return `en ${diffDays} días`;
+}
+
+/**
  * Returns montos (payments) that are unpaid and due within the next `days` days.
  * @param {Array<{acreedor: string, montos: Array}>} deudas
  * @param {number} [days=3]
@@ -95,13 +120,16 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
 /**
  * Sends a browser notification for a single upcoming payment.
  * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
+ * @param {Date} [now=new Date()]
  */
-export function sendPaymentNotification(payment) {
+export function sendPaymentNotification(payment, now = new Date()) {
     if (!isNotificationSupported() || Notification.permission !== 'granted') return;
 
     const { acreedor, monto, moneda, vencimiento } = payment;
-    const body = `Monto: ${monto.toLocaleString('es-AR')} ${moneda} — Vence: ${vencimiento}`;
-    new Notification(`Pago próximo a vencer: ${acreedor}`, {
+    const relDate = formatRelativeDate(vencimiento, now);
+    const formattedDate = formatDate(vencimiento);
+    const body = `💰 ${moneda} ${monto.toLocaleString('es-AR')} · 📅 Vence ${relDate} (${formattedDate})`;
+    new Notification(`⚠️ Próximo vencimiento: ${acreedor}`, {
         body,
         icon: '/favicon.ico'
     });
@@ -112,11 +140,18 @@ export function sendPaymentNotification(payment) {
  * Used as a fallback when the browser Notifications API is unavailable or denied
  * (e.g. iOS Safari, or when the user has not granted permission).
  * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
+ * @param {Date} [now=new Date()]
  */
-export function showInAppNotification(payment) {
+export function showInAppNotification(payment, now = new Date()) {
     if (typeof window === 'undefined') return;
     const { acreedor, monto, moneda, vencimiento } = payment;
-    const message = `⚠️ Pago próximo a vencer: ${acreedor} — Monto: ${monto.toLocaleString('es-AR')} ${moneda} — Vence: ${vencimiento}`;
+    const relDate = formatRelativeDate(vencimiento, now);
+    const formattedDate = formatDate(vencimiento);
+    const message = [
+        `<strong>⚠️ Próximo vencimiento</strong>`,
+        `💰 <strong>${acreedor} — ${moneda} ${monto.toLocaleString('es-AR')}</strong>`,
+        `📅 Vence ${relDate} (${formattedDate}) · <a href="/" class="alert-link">Ver detalle</a>`
+    ].join('<br>');
     window.dispatchEvent(new CustomEvent('app:notify', {
         detail: { message, type: 'warning' }
     }));
@@ -163,21 +198,22 @@ export function showGroupedInAppNotification(count) {
  * @param {Array} deudas - List of debts from the repository.
  */
 export async function checkAndNotify(deudas) {
-    const payments = getUpcomingPayments(deudas);
+    const now = new Date();
+    const payments = getUpcomingPayments(deudas, DAYS_AHEAD, now);
     if (payments.length === 0) return;
 
     const grouped = payments.length > MAX_INDIVIDUAL_NOTIFICATIONS;
 
     if (!isNotificationSupported()) {
-        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(showInAppNotification);
+        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(p => showInAppNotification(p, now));
         return;
     }
 
     const permission = await requestPermission();
     if (permission !== 'granted') {
-        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(showInAppNotification);
+        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(p => showInAppNotification(p, now));
         return;
     }
 
-    grouped ? sendGroupedNotification(payments.length) : payments.forEach(sendPaymentNotification);
+    grouped ? sendGroupedNotification(payments.length) : payments.forEach(p => sendPaymentNotification(p, now));
 }

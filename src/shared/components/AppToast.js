@@ -21,9 +21,9 @@ export class AppToast extends HTMLElement {
         toastEl.setAttribute('aria-live', 'assertive');
         toastEl.setAttribute('aria-atomic', 'true');
         toastEl.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+            <div class="d-flex align-items-start">
+                <div class="toast-body flex-grow-1">${message}</div>
+                <button type="button" class="btn-close btn-close-white mt-2 me-2 flex-shrink-0" data-bs-dismiss="toast" aria-label="Cerrar"></button>
             </div>
         `;
         this._container.appendChild(toastEl);

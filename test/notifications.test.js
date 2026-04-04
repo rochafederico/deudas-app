@@ -9,7 +9,9 @@ import {
     requestPermission,
     checkAndNotify,
     showInAppNotification,
-    showGroupedInAppNotification
+    showGroupedInAppNotification,
+    formatDate,
+    formatRelativeDate
 } from '../src/features/notifications/NotificationService.js';
 
 // ===================================================================
@@ -167,12 +169,12 @@ async function testCheckAndNotifySendsNotifications() {
     // Use getUpcomingPayments + sendPaymentNotification directly (avoids async permission)
     const { getUpcomingPayments: gup, sendPaymentNotification: spn } = await import('../src/features/notifications/NotificationService.js');
     const upcoming = gup(deudas, 3, now);
-    upcoming.forEach(spn);
+    upcoming.forEach(p => spn(p, now));
 
     assert(notificationsSent.length === 1, `Debe enviar 1 notificación, enviadas: ${notificationsSent.length}`);
     assert(notificationsSent[0].title.includes('MiCredito'), 'Título incluye acreedor');
     assert(notificationsSent[0].body.includes('ARS'), 'Cuerpo incluye moneda');
-    assert(notificationsSent[0].body.includes('2026-04-04'), 'Cuerpo incluye fecha');
+    assert(notificationsSent[0].body.includes('04/04/2026'), 'Cuerpo incluye fecha en formato DD/MM/YYYY');
 
     // Restore
     global.Notification = originalNotification;
@@ -212,19 +214,25 @@ async function testCheckAndNotifyUnsupported() {
 // UC8: showInAppNotification – dispatches app:notify event as warning
 // ===================================================================
 async function testShowInAppNotification() {
-    console.log('  UC8: showInAppNotification dispatches an app:notify warning event');
+    console.log('  UC8: showInAppNotification dispatches an app:notify warning event with new visual format');
 
     const events = [];
     const handler = (e) => events.push(e.detail);
     window.addEventListener('app:notify', handler);
 
-    showInAppNotification({ acreedor: 'Pago Test', monto: 999, moneda: 'ARS', vencimiento: '2026-04-04' });
+    // Pass a fixed `now` so the relative-date label is deterministic
+    showInAppNotification(
+        { acreedor: 'Pago Test', monto: 999, moneda: 'ARS', vencimiento: '2026-04-05' },
+        new Date('2026-04-04')
+    );
 
     assert(events.length === 1, 'Debe despachar 1 evento app:notify');
     assert(events[0].type === 'warning', 'El tipo de toast es warning');
     assert(events[0].message.includes('Pago Test'), 'El mensaje incluye el acreedor');
     assert(events[0].message.includes('ARS'), 'El mensaje incluye la moneda');
-    assert(events[0].message.includes('2026-04-04'), 'El mensaje incluye la fecha de vencimiento');
+    assert(events[0].message.includes('05/04/2026'), 'El mensaje incluye la fecha en formato DD/MM/YYYY');
+    assert(events[0].message.includes('mañana'), 'El mensaje incluye la etiqueta relativa de fecha');
+    assert(events[0].message.includes('Ver detalle'), 'El mensaje incluye la acción Ver detalle');
 
     window.removeEventListener('app:notify', handler);
 }
@@ -292,6 +300,23 @@ async function testShowGroupedInAppNotification() {
     window.removeEventListener('app:notify', handler);
 }
 
+// ===================================================================
+// UC11: formatDate y formatRelativeDate – date formatting helpers
+// ===================================================================
+async function testFormatHelpers() {
+    console.log('  UC11: formatDate y formatRelativeDate formatean fechas correctamente');
+
+    // formatDate
+    assert(formatDate('2026-04-05') === '05/04/2026', 'formatDate: YYYY-MM-DD → DD/MM/YYYY');
+    assert(formatDate('2026-01-01') === '01/01/2026', 'formatDate: maneja mes y día con ceros');
+
+    // formatRelativeDate
+    const now = new Date('2026-04-03');
+    assert(formatRelativeDate('2026-04-03', now) === 'hoy', 'formatRelativeDate: misma fecha → hoy');
+    assert(formatRelativeDate('2026-04-04', now) === 'mañana', 'formatRelativeDate: día siguiente → mañana');
+    assert(formatRelativeDate('2026-04-06', now) === 'en 3 días', 'formatRelativeDate: 3 días después');
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -302,5 +327,6 @@ export const tests = [
     testCheckAndNotifyUnsupported,
     testShowInAppNotification,
     testCheckAndNotifyGroupedNative,
-    testShowGroupedInAppNotification
+    testShowGroupedInAppNotification,
+    testFormatHelpers
 ];
