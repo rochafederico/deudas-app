@@ -3,6 +3,7 @@
 
 const NOTIFICATION_PERM_KEY = 'nivva_notifications_permission';
 const DAYS_AHEAD = 3;
+const MAX_INDIVIDUAL_NOTIFICATIONS = 5;
 
 /**
  * Returns true if the browser supports the Notifications API.
@@ -122,7 +123,40 @@ export function showInAppNotification(payment) {
 }
 
 /**
+ * Sends a single grouped browser notification summarising all upcoming payments.
+ * Used when there are more than MAX_INDIVIDUAL_NOTIFICATIONS payments due.
+ * Clicking the notification focuses the app window so the user can see the list.
+ * @param {number} count - Number of upcoming payments.
+ */
+export function sendGroupedNotification(count) {
+    if (!isNotificationSupported() || Notification.permission !== 'granted') return;
+
+    const n = new Notification('Pagos próximos a vencer', {
+        body: `Tenés ${count} pagos próximos a vencer en los próximos 3 días. Abrí la app para ver el detalle.`,
+        icon: '/favicon.ico'
+    });
+    n.onclick = () => window.focus();
+}
+
+/**
+ * Shows a single grouped in-app toast summarising all upcoming payments.
+ * Used as a fallback when the browser Notifications API is unavailable or denied,
+ * and there are more than MAX_INDIVIDUAL_NOTIFICATIONS payments due.
+ * Includes a link to the home page where the full debt list is visible.
+ * @param {number} count - Number of upcoming payments.
+ */
+export function showGroupedInAppNotification(count) {
+    if (typeof window === 'undefined') return;
+    const message = `⚠️ Tenés <strong>${count} pagos próximos a vencer</strong> en los próximos 3 días. <a href="/" class="alert-link">Ver detalle</a>`;
+    window.dispatchEvent(new CustomEvent('app:notify', {
+        detail: { message, type: 'warning' }
+    }));
+}
+
+/**
  * Main entry point: requests permission and notifies the user about upcoming payments.
+ * - Up to 5 payments: one notification per payment.
+ * - More than 5 payments: a single grouped notification.
  * Falls back to in-app toasts when the browser Notifications API is unavailable or
  * the user has not granted permission (e.g. iOS Safari).
  * Should be called when the app loads or becomes visible.
@@ -130,17 +164,20 @@ export function showInAppNotification(payment) {
  */
 export async function checkAndNotify(deudas) {
     const payments = getUpcomingPayments(deudas);
+    if (payments.length === 0) return;
+
+    const grouped = payments.length > MAX_INDIVIDUAL_NOTIFICATIONS;
 
     if (!isNotificationSupported()) {
-        payments.forEach(showInAppNotification);
+        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(showInAppNotification);
         return;
     }
 
     const permission = await requestPermission();
     if (permission !== 'granted') {
-        payments.forEach(showInAppNotification);
+        grouped ? showGroupedInAppNotification(payments.length) : payments.forEach(showInAppNotification);
         return;
     }
 
-    payments.forEach(sendPaymentNotification);
+    grouped ? sendGroupedNotification(payments.length) : payments.forEach(sendPaymentNotification);
 }
