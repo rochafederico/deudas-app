@@ -22,11 +22,13 @@ export class AppHeader extends HTMLElement {
     this._onTourClick = () => window.dispatchEvent(new CustomEvent('tour:start'));
     this._onExportClick = (e) => { e.preventDefault(); this._openExportModal(e.currentTarget); };
     this._onImportClick = (e) => { e.preventDefault(); this._openImportModal(e.currentTarget); };
+    this._onDeleteAllClick = (e) => { e.preventDefault(); this._deleteAllData(); };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav').addEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav').addEventListener('click', this._onImportClick);
+    this.querySelector('#delete-all-nav').addEventListener('click', this._onDeleteAllClick);
     window.addEventListener('data-imported', this._onDataImported);
   }
 
@@ -35,7 +37,24 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav')?.removeEventListener('click', this._onImportClick);
+    this.querySelector('#delete-all-nav')?.removeEventListener('click', this._onDeleteAllClick);
     window.removeEventListener('data-imported', this._onDataImported);
+  }
+
+  async _deleteAllData() {
+    const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
+    if (!confirmed) return;
+    try {
+      const { deleteDeudas } = await import('../features/deudas/deudaRepository.js');
+      const { deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
+      const { deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
+      await Promise.all([deleteDeudas(), deleteAllIngresos(), deleteAllInversiones()]);
+    } catch (error) {
+      console.error('Error al eliminar los datos:', error);
+      window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: 'Error al eliminar los datos.', type: 'danger' } }));
+      return;
+    }
+    window.dispatchEvent(new CustomEvent('ui:refresh'));
   }
 
   _openExportModal(opener) {
@@ -82,6 +101,12 @@ export class AppHeader extends HTMLElement {
                   <li>
                     <a class="dropdown-item" href="#" id="import-data-nav" data-tour-step="importar">
                       📥 Importar
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="#" id="delete-all-nav">
+                      🗑️ Eliminar todo
                     </a>
                   </li>
                 </ul>
