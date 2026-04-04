@@ -107,16 +107,40 @@ export function sendPaymentNotification(payment) {
 }
 
 /**
+ * Shows an in-app toast alert for an upcoming payment.
+ * Used as a fallback when the browser Notifications API is unavailable or denied
+ * (e.g. iOS Safari, or when the user has not granted permission).
+ * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
+ */
+export function showInAppNotification(payment) {
+    if (typeof window === 'undefined') return;
+    const { acreedor, monto, moneda, vencimiento } = payment;
+    const message = `⚠️ Pago próximo a vencer: ${acreedor} — Monto: ${monto.toLocaleString('es-AR')} ${moneda} — Vence: ${vencimiento}`;
+    window.dispatchEvent(new CustomEvent('app:notify', {
+        detail: { message, type: 'warning' }
+    }));
+}
+
+/**
  * Main entry point: requests permission and notifies the user about upcoming payments.
+ * Falls back to in-app toasts when the browser Notifications API is unavailable or
+ * the user has not granted permission (e.g. iOS Safari).
  * Should be called when the app loads or becomes visible.
  * @param {Array} deudas - List of debts from the repository.
  */
 export async function checkAndNotify(deudas) {
-    if (!isNotificationSupported()) return;
+    const payments = getUpcomingPayments(deudas);
+
+    if (!isNotificationSupported()) {
+        payments.forEach(showInAppNotification);
+        return;
+    }
 
     const permission = await requestPermission();
-    if (permission !== 'granted') return;
+    if (permission !== 'granted') {
+        payments.forEach(showInAppNotification);
+        return;
+    }
 
-    const payments = getUpcomingPayments(deudas);
     payments.forEach(sendPaymentNotification);
 }

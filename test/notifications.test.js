@@ -7,7 +7,8 @@ import {
     getStoredPermission,
     setStoredPermission,
     requestPermission,
-    checkAndNotify
+    checkAndNotify,
+    showInAppNotification
 } from '../src/features/notifications/NotificationService.js';
 
 // ===================================================================
@@ -178,15 +179,19 @@ async function testCheckAndNotifySendsNotifications() {
 }
 
 // ===================================================================
-// UC7: checkAndNotify – does nothing when Notification not supported
+// UC7: checkAndNotify – does nothing when Notification not supported and no payments
 // ===================================================================
 async function testCheckAndNotifyUnsupported() {
-    console.log('  UC7: checkAndNotify does nothing when Notification API is not supported');
+    console.log('  UC7: checkAndNotify does nothing when Notification API is not supported and deudas is empty');
 
     const originalNotification = global.Notification;
     delete global.Notification;
 
     assert(!isNotificationSupported(), 'isNotificationSupported debe ser false');
+
+    const events = [];
+    const handler = (e) => events.push(e.detail);
+    window.addEventListener('app:notify', handler);
 
     // Should not throw
     let threw = false;
@@ -196,9 +201,31 @@ async function testCheckAndNotifyUnsupported() {
         threw = true;
     }
     assert(!threw, 'checkAndNotify no debe lanzar error cuando API no está soportada');
+    assert(events.length === 0, 'Sin deudas no se despachan eventos app:notify');
 
-    // Restore
+    window.removeEventListener('app:notify', handler);
     global.Notification = originalNotification;
+}
+
+// ===================================================================
+// UC8: showInAppNotification – dispatches app:notify event as warning
+// ===================================================================
+async function testShowInAppNotification() {
+    console.log('  UC8: showInAppNotification dispatches an app:notify warning event');
+
+    const events = [];
+    const handler = (e) => events.push(e.detail);
+    window.addEventListener('app:notify', handler);
+
+    showInAppNotification({ acreedor: 'Pago Test', monto: 999, moneda: 'ARS', vencimiento: '2026-04-04' });
+
+    assert(events.length === 1, 'Debe despachar 1 evento app:notify');
+    assert(events[0].type === 'warning', 'El tipo de toast es warning');
+    assert(events[0].message.includes('Pago Test'), 'El mensaje incluye el acreedor');
+    assert(events[0].message.includes('ARS'), 'El mensaje incluye la moneda');
+    assert(events[0].message.includes('2026-04-04'), 'El mensaje incluye la fecha de vencimiento');
+
+    window.removeEventListener('app:notify', handler);
 }
 
 export const tests = [
@@ -208,5 +235,6 @@ export const tests = [
     testStoredPermission,
     testRequestPermissionDeniedSkipsPrompt,
     testCheckAndNotifySendsNotifications,
-    testCheckAndNotifyUnsupported
+    testCheckAndNotifyUnsupported,
+    testShowInAppNotification
 ];
