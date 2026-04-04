@@ -49,18 +49,18 @@ export class AppHeader extends HTMLElement {
     if (this._popover) this._popover.dispose();
     this._popover = new window.bootstrap.Popover(btn, {
       html: true,
-      sanitize: false,
       title: '<strong>⚠️ Vencimientos próximos</strong>',
       content: html,
       trigger: 'click',
       placement: 'bottom',
       container: 'body',
     });
-    btn.querySelector('.notif-badge')?.remove();
-    const badge = document.createElement('span');
-    badge.className = 'notif-badge badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle p-1 border border-primary';
-    badge.setAttribute('aria-label', 'Hay vencimientos próximos');
-    btn.appendChild(badge);
+    if (!btn.querySelector('.notif-badge')) {
+      const badge = document.createElement('span');
+      badge.className = 'notif-badge badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle p-1 border border-primary';
+      badge.setAttribute('aria-label', 'Hay vencimientos próximos');
+      btn.appendChild(badge);
+    }
   }
 
   _openExportModal(opener) {
