@@ -2,17 +2,7 @@
 // Tests for StatsCard and StatsIndicators components
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
-
-// Mirrors the addValue logic from StatsIndicators to test it in isolation
-function makeAddValue() {
-    const format = n => n == null ? '-' : n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const CURRENCIES = ['ARS', 'USD'];
-    return (obj) => CURRENCIES.map(moneda => {
-        const monto = obj ? obj[moneda] : undefined;
-        const val = (monto == null || monto === 0) ? '-' : `$ ${format(monto)}`;
-        return `${moneda}: ${val}`;
-    });
-}
+import { addValue } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
 // UC1: StatsCard renders with correct Bootstrap classes
@@ -84,10 +74,9 @@ async function testStatsCardDefaultColor() {
 // ===================================================================
 async function testAddValueZeroDisplaysAsDash() {
     console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
-    const addValue = makeAddValue();
     const result = addValue({ ARS: 0, USD: 2500 });
     assert(result[0] === 'ARS: -', 'valor 0 debe mostrarse como "ARS: -" sin símbolo $');
-    assert(result[1] === 'USD: $ 2,500.00', 'valor positivo debe mostrarse con símbolo $');
+    assert(result[1] === 'USD: $ 2.500,00', 'valor positivo debe mostrarse con símbolo $');
 }
 
 // ===================================================================
@@ -95,7 +84,6 @@ async function testAddValueZeroDisplaysAsDash() {
 // ===================================================================
 async function testAddValueNullDisplaysAsDash() {
     console.log('  UC6: addValue muestra "-" para valores null o undefined');
-    const addValue = makeAddValue();
     const resultNull = addValue({ ARS: null });
     assert(resultNull[0] === 'ARS: -', 'valor null debe mostrarse como "ARS: -"');
     assert(resultNull[1] === 'USD: -', 'USD ausente debe mostrarse como "USD: -"');
@@ -112,7 +100,6 @@ async function testAddValueNullDisplaysAsDash() {
 // ===================================================================
 async function testAddValueAlwaysShowsBothCurrencies() {
     console.log('  UC7: addValue siempre muestra ARS y USD aunque el objeto esté vacío');
-    const addValue = makeAddValue();
 
     const resultEmpty = addValue({});
     assert(resultEmpty.length === 2, 'addValue debe retornar siempre 2 filas');
