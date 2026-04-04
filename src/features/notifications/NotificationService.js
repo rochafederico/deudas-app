@@ -105,6 +105,7 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
             const venc = new Date(monto.vencimiento + 'T00:00:00');
             if (venc >= todayStart && venc <= limitDate) {
                 upcoming.push({
+                    deudaId: deuda.id,
                     acreedor: deuda.acreedor,
                     monto: monto.monto,
                     moneda: monto.moneda || 'ARS',
@@ -185,7 +186,8 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
 
     const itemHTML = (p) => {
         const formattedMonto = `${p.moneda} ${p.monto.toLocaleString('es-AR')}`;
-        return `<li class="mb-1">${p.acreedor} — <strong>${formattedMonto}</strong> <a href="/" class="text-warning-emphasis ms-1" title="Ver detalle" aria-label="Ver detalle de ${p.acreedor}">ℹ️</a></li>`;
+        const deudaIdAttr = p.deudaId != null ? ` data-deuda-id="${p.deudaId}"` : '';
+        return `<li class="mb-1">${p.acreedor} — <strong>${formattedMonto}</strong> <button type="button" class="btn btn-link btn-sm p-0 text-warning-emphasis ms-1 align-baseline border-0"${deudaIdAttr} title="Ver detalle" aria-label="Ver detalle de ${p.acreedor}">ℹ️</button></li>`;
     };
 
     const sections = [];

@@ -64,6 +64,7 @@ async function testGetUpcomingPaymentsShape() {
 
     const now = new Date('2026-04-03');
     const deudas = [{
+        id: 42,
         acreedor: 'Visa',
         montos: [{ monto: 500, moneda: 'USD', vencimiento: '2026-04-04', pagado: false }]
     }];
@@ -72,6 +73,7 @@ async function testGetUpcomingPaymentsShape() {
     assert(upcoming.length === 1, 'Debe haber 1 pago');
 
     const p = upcoming[0];
+    assert(p.deudaId === 42, 'deudaId correcto');
     assert(p.acreedor === 'Visa', 'acreedor correcto');
     assert(p.monto === 500, 'monto correcto');
     assert(p.moneda === 'USD', 'moneda correcta');

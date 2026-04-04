@@ -33,11 +33,30 @@ export class UpcomingPaymentsPanel extends HTMLElement {
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         `;
 
+        alertEl.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-deuda-id]');
+            if (!btn) return;
+            e.preventDefault();
+            this.#openDeudaModal(btn.dataset.deudaId);
+        });
+
         this.appendChild(alertEl);
 
         if (window.bootstrap?.Alert) {
             new window.bootstrap.Alert(alertEl);
         }
+    }
+
+    async #openDeudaModal(deudaId) {
+        if (!deudaId) return;
+        const modal = document.querySelector('app-shell')?.querySelector('#debtModal')
+            ?? document.getElementById('debtModal');
+        if (!modal) return;
+        const { getDeuda } = await import('../deudas/deudaRepository.js');
+        const deuda = await getDeuda(deudaId);
+        if (!deuda) return;
+        modal.openEdit(deuda);
+        modal.attachOpener();
     }
 }
 
