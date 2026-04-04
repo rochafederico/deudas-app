@@ -3,15 +3,6 @@
 
 export class UpcomingPaymentsPanel extends HTMLElement {
     connectedCallback() {
-        Object.assign(this.style, {
-            position: 'fixed',
-            top: '1rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            width: 'min(92vw, 480px)',
-            zIndex: '1050',
-        });
-
         this._handler = (e) => this.#render(e.detail.html);
         window.addEventListener('app:upcoming-panel', this._handler);
     }
@@ -25,7 +16,7 @@ export class UpcomingPaymentsPanel extends HTMLElement {
         this.innerHTML = '';
 
         const alertEl = document.createElement('div');
-        alertEl.className = 'alert alert-warning alert-dismissible fade show shadow';
+        alertEl.className = 'alert alert-warning alert-dismissible fade show shadow position-fixed top-0 start-50 translate-middle-x mt-3';
         alertEl.setAttribute('role', 'alert');
         alertEl.innerHTML = `
             <h6 class="alert-heading fw-bold mb-2">⚠️ Vencimientos próximos</h6>
