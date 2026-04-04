@@ -12,6 +12,7 @@ import { tests as importExportTests } from './import-export.test.js';
 import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
 import { tests as notificationsTests } from './notifications.test.js';
+import { tests as statsTests } from './stats.test.js';
 
 async function run() {
     try {
@@ -41,6 +42,9 @@ async function run() {
 
         console.log('\n--- Notifications ---');
         for (const test of notificationsTests) { await test(); }
+
+        console.log('\n--- Stats ---');
+        for (const test of statsTests) { await test(); }
 
         printResults();
         process.exit(0);
