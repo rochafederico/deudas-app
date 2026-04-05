@@ -10,7 +10,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   body.className = 'card-body p-3';
 
   const titleEl = document.createElement('div');
-  titleEl.className = `fw-bold text-uppercase small text-${color} mb-2`;
+  titleEl.className = `fw-semibold text-uppercase small text-${color} mb-2`;
   titleEl.textContent = title;
   body.appendChild(titleEl);
 

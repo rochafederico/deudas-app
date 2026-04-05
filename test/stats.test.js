@@ -25,7 +25,7 @@ async function testStatsCardBootstrapClasses() {
 
     const titleEl = body.querySelector('div');
     assert(titleEl !== null, 'card-body debe contener un div de título');
-    assert(titleEl.classList.contains('fw-bold'), 'título debe tener clase "fw-bold"');
+    assert(titleEl.classList.contains('fw-semibold'), 'título debe tener clase "fw-semibold"');
     assert(titleEl.classList.contains('text-uppercase'), 'título debe tener clase "text-uppercase"');
     assert(titleEl.classList.contains('text-success'), 'título debe tener clase "text-success"');
     assert(titleEl.textContent === 'Ingresos', 'título debe mostrar el texto correcto');
