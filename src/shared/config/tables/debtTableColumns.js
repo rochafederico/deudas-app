@@ -14,10 +14,18 @@ export const debtTableColumns = [
         key: 'acciones',
         label: 'Acciones',
         render: row => {
+            // Botón ver detalle
+            const btnDetalle = el('app-button', {
+                text: 'ℹ',
+                attrs: { title: 'Ver detalle', 'aria-label': 'Ver detalle', variant: 'light' },
+                on: {
+                    click: () => row._onDetail(row, btnDetalle)
+                }
+            });
             // Botón editar
             const btn = el('app-button', {
-                text: '✎',
-                attrs: { title: 'Editar deuda' },
+                text: '✏️',
+                attrs: { title: 'Editar deuda', 'aria-label': 'Editar deuda', variant: 'light' },
                 on: {
                     click: () => row._onEdit(row)
                 }
@@ -36,6 +44,7 @@ export const debtTableColumns = [
             // Contenedor flex
             const container = document.createElement('div');
             container.className = 'd-flex align-items-center justify-content-end gap-3';
+            container.appendChild(btnDetalle);
             container.appendChild(btn);
             container.appendChild(appCheckbox);
             return container;

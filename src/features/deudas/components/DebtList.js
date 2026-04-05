@@ -1,6 +1,7 @@
 import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppTable.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
+import './DebtDetailModal.js';
 
 export class DebtList extends HTMLElement {
     constructor() {
@@ -104,6 +105,22 @@ export class DebtList extends HTMLElement {
         const tableData = allMontos.map(row => ({
             ...row,
             _fmtMoneda: this.fmtMoneda.bind(this),
+            _onDetail: async (monto, opener) => {
+                let modal = null;
+                const appShell = document.querySelector('app-shell');
+                if (appShell) {
+                    modal = appShell.querySelector('#debtDetailModal');
+                }
+                if (!modal) {
+                    modal = document.getElementById('debtDetailModal');
+                }
+                if (modal) {
+                    const { getDeuda } = await import('../deudaRepository.js');
+                    const deudaActualizada = await getDeuda(monto.deudaId);
+                    modal.openDetail(deudaActualizada);
+                    modal.attachOpener(opener || null);
+                }
+            },
             _onEdit: async (monto) => {
                 let modal = null;
                 const appShell = document.querySelector('app-shell');

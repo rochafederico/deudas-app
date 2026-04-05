@@ -4,8 +4,8 @@ import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 
-// Import deuda UI components (registers custom elements)
-import '../src/features/montos/components/MontoForm.js';
+// Import DebtDetailModal component
+import '../src/features/deudas/components/DebtDetailModal.js';
 import '../src/features/montos/components/DuplicateMontoModal.js';
 import '../src/features/deudas/components/DebtForm.js';
 
@@ -275,10 +275,75 @@ async function testMultiplesDeudasMismoMes() {
     await cleanup();
 }
 
+// ===================================================================
+// UC6: DebtDetailModal muestra el detalle de una deuda con sus montos
+// Flujo: se crea una deuda con montos, se abre el modal de detalle,
+// y se verifica que renderiza la info correcta.
+// ===================================================================
+async function testDebtDetailModal() {
+    console.log('  UC6: DebtDetailModal renderiza detalle de deuda');
+    await cleanup();
+
+    // Crear una deuda con dos montos
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [
+        { monto: 12000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
+        { monto: 50, moneda: 'USD', vencimiento: '2026-06-15', pagado: false }
+    ];
+    await form.handleSubmit({
+        preventDefault: () => {},
+        detail: { acreedor: 'Banco Nación', tipoDeuda: 'Hipoteca', notas: 'Cuota mensual' }
+    });
+    document.body.removeChild(form);
+
+    // Obtener la deuda creada
+    const deudas = await listDeudas();
+    assert(deudas.length === 1, 'UC6: debe existir 1 deuda');
+    const deuda = deudas[0];
+    assert(deuda.montos.length === 2, 'UC6: la deuda tiene 2 montos');
+
+    // Montar el componente DebtDetailModal
+    const modal = document.createElement('debt-detail-modal');
+    document.body.appendChild(modal);
+
+    let detachedModalEl = null;
+    try {
+        // Abrir el detalle de la deuda
+        await modal.openDetail(deuda);
+
+        // UiModal mueve su .modal a document.body al abrirse,
+        // por lo que buscamos el contenido directamente en document.body.
+        detachedModalEl = document.body.querySelector('.modal');
+
+        // Verificar que se renderizó el total pendiente
+        const totalEl = document.body.querySelector('.fs-2');
+        assert(totalEl !== null, 'UC6: debe mostrar el total pendiente prominente');
+
+        // Verificar que la tabla de montos tiene las filas correctas
+        const tbody = document.body.querySelector('#detail-montos-tbody');
+        assert(tbody !== null, 'UC6: debe existir tbody de montos');
+        assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de montos');
+
+        // Verificar que la tabla de montos NO tiene botones de acción (vista de solo lectura)
+        const actionBtns = document.body.querySelectorAll('#detail-montos-tbody app-button');
+        assert(actionBtns && actionBtns.length === 0, 'UC6: la vista detalle no debe mostrar botones de acción');
+    } finally {
+        if (detachedModalEl && detachedModalEl.parentNode) {
+            detachedModalEl.parentNode.removeChild(detachedModalEl);
+        }
+        if (modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+        await cleanup();
+    }
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
     testImportarConMerge,
     testEliminarDeudas,
-    testMultiplesDeudasMismoMes
+    testMultiplesDeudasMismoMes,
+    testDebtDetailModal
 ];
