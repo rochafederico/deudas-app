@@ -1,5 +1,4 @@
 import '../features/deudas/components/DebtModal.js';
-import '../features/ingresos/components/IngresoModal.js';
 import '../shared/components/AppInput.js';
 import './HeaderBar.js';
 
@@ -42,6 +41,7 @@ export class AppShell extends HTMLElement {
         // Usar el nuevo subcomponente HeaderBar
         const header = document.createElement('header-bar');
         header.month = this.month;
+        header.mode = 'deudas';
         header.addEventListener('month-change', (e) => {
             this.month = e.detail.mes;
             this.onMonthChange({ target: { value: this.month } });
@@ -54,16 +54,6 @@ export class AppShell extends HTMLElement {
             const modal = this.querySelector('#debtModal');
             modal.openCreate();
             modal.attachOpener(header.querySelector('#add-debt'));
-        });
-        header.addEventListener('add-income', () => {
-            let modal = this.querySelector('#ingresoModal');
-            if (!modal) {
-                modal = document.createElement('ingreso-modal');
-                modal.id = 'ingresoModal';
-                this.appendChild(modal);
-            }
-            modal.openCreate();
-            modal.attachOpener(header.querySelector('#add-income'));
         });
 
         const card = document.createElement('div');

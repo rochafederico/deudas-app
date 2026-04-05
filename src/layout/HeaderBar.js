@@ -7,6 +7,7 @@ export class HeaderBar extends HTMLElement {
     constructor() {
         super();
         this.month = new Date().toISOString().slice(0, 7);
+        this.mode = null; // 'deudas' | 'ingresos' | null (show both)
     }
 
     connectedCallback() {
@@ -76,6 +77,8 @@ export class HeaderBar extends HTMLElement {
 
     render() {
         const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+        const showDebt = !this.mode || this.mode === 'deudas';
+        const showIncome = !this.mode || this.mode === 'ingresos';
         this.innerHTML = `
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center p-2 gap-2">
             <div class="d-flex flex-wrap align-items-center gap-2" data-tour-step="navegacion-mes">
@@ -87,12 +90,12 @@ export class HeaderBar extends HTMLElement {
                 </app-input>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
+                ${showIncome ? `<app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
                 Nuevo ingreso
-                </app-button>
-                <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
+                </app-button>` : ''}
+                ${showDebt ? `<app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
-                </app-button>
+                </app-button>` : ''}
             </div>
             </div>
         `;

@@ -1,5 +1,6 @@
 // src/pages/Ingresos.js
 import '../features/stats/components/StatsCard.js';
+import '../features/ingresos/components/IngresoModal.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 
@@ -11,6 +12,7 @@ export default function Ingresos() {
     // Usar el header-bar como encabezado principal
     const headerBar = document.createElement('header-bar');
     headerBar.classList.add('mb-4');
+    headerBar.mode = 'ingresos';
     container.appendChild(headerBar);
 
     headerBar.month = currentMes;
@@ -41,6 +43,19 @@ export default function Ingresos() {
     headerBar.addEventListener('month-change', (e) => {
         currentMes = e.detail.mes;
         loadTotals(currentMes);
+    });
+
+    // Abrir modal al hacer click en "Nuevo ingreso"
+    headerBar.addEventListener('add-income', () => {
+        let modal = container.querySelector('#ingresoModal');
+        if (!modal) {
+            modal = document.createElement('ingreso-modal');
+            modal.id = 'ingresoModal';
+            container.appendChild(modal);
+        }
+        modal.openCreate();
+        const addIncomeBtn = headerBar.querySelector('#add-income');
+        if (addIncomeBtn) modal.attachOpener(addIncomeBtn);
     });
 
     // Escuchar eventos de cambios en ingresos y filtro global
