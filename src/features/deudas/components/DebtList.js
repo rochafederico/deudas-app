@@ -105,7 +105,7 @@ export class DebtList extends HTMLElement {
         const tableData = allMontos.map(row => ({
             ...row,
             _fmtMoneda: this.fmtMoneda.bind(this),
-            _onDetail: async (monto) => {
+            _onDetail: async (monto, opener) => {
                 let modal = null;
                 const appShell = document.querySelector('app-shell');
                 if (appShell) {
@@ -118,7 +118,7 @@ export class DebtList extends HTMLElement {
                     const { getDeuda } = await import('../deudaRepository.js');
                     const deudaActualizada = await getDeuda(monto.deudaId);
                     modal.openDetail(deudaActualizada);
-                    modal.attachOpener();
+                    modal.attachOpener(opener || null);
                 }
             },
             _onEdit: async (monto) => {

@@ -19,7 +19,7 @@ export const debtTableColumns = [
                 text: 'ℹ',
                 attrs: { title: 'Ver detalle' },
                 on: {
-                    click: () => row._onDetail(row)
+                    click: () => row._onDetail(row, btnDetalle)
                 }
             });
             // Botón editar

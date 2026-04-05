@@ -224,9 +224,9 @@ export class DebtDetailModal extends HTMLElement {
     async _openMontoDuplicate(monto) {
         this.duplicateModal.setTitle('Duplicar monto');
         this.duplicateModal.clearBody();
-        const duplicateForm = document.createElement('duplicate-monto-modal');
-        duplicateForm.monto = monto;
-        duplicateForm.addEventListener('duplicate:save', async (e) => {
+        const duplicateView = document.createElement('duplicate-monto-modal');
+        duplicateView.monto = monto;
+        duplicateView.addEventListener('duplicate:save', async (e) => {
             const { addMonto } = await import('../../montos/montoRepository.js');
             const nuevaFecha = e.detail.vencimiento;
             const nuevoPeriodo = nuevaFecha ? nuevaFecha.slice(0, 7) : '';
@@ -242,8 +242,8 @@ export class DebtDetailModal extends HTMLElement {
             await this._refreshDeuda();
             window.dispatchEvent(new CustomEvent('deuda:updated', { detail: this.deuda }));
         }, { once: true });
-        duplicateForm.addEventListener('duplicate:cancel', () => this.duplicateModal.close(), { once: true });
-        this.duplicateModal.appendChild(duplicateForm);
+        duplicateView.addEventListener('duplicate:cancel', () => this.duplicateModal.close(), { once: true });
+        this.duplicateModal.appendChild(duplicateView);
         this.duplicateModal.open();
     }
 
