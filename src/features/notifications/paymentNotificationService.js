@@ -81,7 +81,7 @@ export function sendPaymentNotification(payment, now = new Date()) {
 export function sendGroupedNotification(count) {
     if (!isNotificationSupported() || Notification.permission !== 'granted') return;
     const n = new Notification('Pagos próximos a vencer', {
-        body: `Tenés ${count} pagos próximos a vencer en los próximos 3 días. Abrí la app para ver el detalle.`,
+        body: `Tenés ${count} pagos próximos a vencer en los próximos ${DAYS_AHEAD} días. Abrí la app para ver el detalle.`,
         icon: '/favicon.ico'
     });
     n.onclick = () => window.focus();
