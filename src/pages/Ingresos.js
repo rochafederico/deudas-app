@@ -2,21 +2,14 @@
 import '../features/stats/components/StatsCard.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
+import { getSelectedMonth } from '../shared/MonthFilter.js';
 
 export default function Ingresos() {
-    let currentMes = new Date().toISOString().slice(0, 7);
     const container = document.createElement('div');
     container.className = 'd-grid gap-3';
 
-    // Usar el header-bar como encabezado principal
-    const headerBar = document.createElement('header-bar');
-    headerBar.classList.add('mb-4');
-    container.appendChild(headerBar);
-
-    headerBar.month = currentMes;
-
-    // Título y stats opcionales debajo del header-bar
-    const title = document.createElement('h1');
+    // Título de la sección
+    const title = document.createElement('h2');
     title.textContent = 'Ingresos del mes';
     title.className = 'h3 mb-2';
     container.appendChild(title);
@@ -25,8 +18,8 @@ export default function Ingresos() {
     container.appendChild(stats);
 
     // Cargar y mostrar totales
-    const loadTotals = async (mes) => {
-        const ingresos = await listIngresos({ mes: mes || currentMes });
+    const loadTotals = async () => {
+        const ingresos = await listIngresos({ mes: getSelectedMonth() });
         let table = container.querySelector('app-table');
         if (!table) {
             table = document.createElement('app-table');
@@ -38,14 +31,10 @@ export default function Ingresos() {
 
     // Cargar totales iniciales
     loadTotals();
-    headerBar.addEventListener('month-change', (e) => {
-        currentMes = e.detail.mes;
-        loadTotals(currentMes);
-    });
 
-    // Escuchar eventos de cambios en ingresos y filtro global
+    // Escuchar eventos de cambios en ingresos y filtro global de mes
     const handleIngresoAdded = () => loadTotals();
-    const handleMonthChange = (event) => loadTotals(event.detail.mes);
+    const handleMonthChange = () => loadTotals();
     window.addEventListener('ingreso:added', handleIngresoAdded);
     window.addEventListener('ui:month', handleMonthChange);
 

@@ -2,6 +2,7 @@
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
+import ResumenHeader from './layout/ResumenHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
@@ -13,6 +14,9 @@ document.body.classList.add('bg-body-tertiary');
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
 wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
+
+// Global title row: "Resumen" + month selector + subtitle
+wrapper.appendChild(ResumenHeader());
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');

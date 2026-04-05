@@ -2,12 +2,13 @@ import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppTable.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
+import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 export class DebtList extends HTMLElement {
     constructor() {
         super();
         this.debts = [];
-        this.mes = new Date().toISOString().slice(0, 7); // mes actual por defecto
+        this.mes = getSelectedMonth();
         this.groupBy = 'none'; // agrupamiento por defecto
     }
 
