@@ -28,6 +28,7 @@ export class AppButton extends HTMLElement {
         if (variant === 'delete') btnClass = 'btn btn-danger btn-sm';
         else if (variant === 'success') btnClass = 'btn btn-success btn-sm';
         else if (variant === 'secondary') btnClass = 'btn btn-secondary btn-sm';
+        else if (variant === 'light') btnClass = 'btn btn-light btn-sm';
 
         this.innerHTML = `<button type="${type}" class="${btnClass}" ${disabled ? 'disabled' : ''} aria-label="${ariaLabel}" ${title ? `title="${title}"` : ''} tabindex="0">${text}</button>`;
     }

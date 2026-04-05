@@ -17,15 +17,15 @@ export const debtTableColumns = [
             // Botón ver detalle
             const btnDetalle = el('app-button', {
                 text: 'ℹ',
-                attrs: { title: 'Ver detalle' },
+                attrs: { title: 'Ver detalle', variant: 'light' },
                 on: {
                     click: () => row._onDetail(row, btnDetalle)
                 }
             });
             // Botón editar
             const btn = el('app-button', {
-                text: '✎',
-                attrs: { title: 'Editar deuda' },
+                text: '✏️',
+                attrs: { title: 'Editar deuda', variant: 'light' },
                 on: {
                     click: () => row._onEdit(row)
                 }
