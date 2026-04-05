@@ -26,7 +26,7 @@ export class AppHeader extends HTMLElement {
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
-    this.querySelectorAll('.tour-btn').forEach(btn => btn.addEventListener('click', this._onTourClick));
+    this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav').addEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav').addEventListener('click', this._onImportClick);
     this.querySelector('#delete-all-nav').addEventListener('click', this._onDeleteAllClick);
@@ -36,7 +36,7 @@ export class AppHeader extends HTMLElement {
 
   disconnectedCallback() {
     this.querySelector('.navbar-brand')?.removeEventListener('click', this._onBrandClick);
-    this.querySelectorAll('.tour-btn').forEach(btn => btn.removeEventListener('click', this._onTourClick));
+    this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav')?.removeEventListener('click', this._onImportClick);
     this.querySelector('#delete-all-nav')?.removeEventListener('click', this._onDeleteAllClick);
@@ -149,7 +149,7 @@ export class AppHeader extends HTMLElement {
       <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
-          <button class="tour-btn btn btn-outline-light btn-sm d-lg-none ms-auto me-2" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">❓</button>
+          <button id="tour-btn" class="btn btn-light btn-sm d-lg-none ms-auto me-2" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">❓</button>
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-lg-center gap-2">
@@ -181,9 +181,6 @@ export class AppHeader extends HTMLElement {
                     </a>
                   </li>
                 </ul>
-              </li>
-              <li class="nav-item py-1 py-lg-0 d-flex align-items-center">
-                <button class="tour-btn btn btn-light btn-sm px-2" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">❓</button>
               </li>
             </ul>
           </div>
