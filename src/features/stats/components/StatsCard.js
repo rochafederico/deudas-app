@@ -2,24 +2,34 @@
 // Utiliza clases Bootstrap para las tarjetas de estadísticas
 export default function StatsCard({ title = '', items = [], color = 'secondary' } = {}) {
   const card = document.createElement('div');
-  card.className = `card h-100 border border-${color}`;
+  card.className = `card h-100 rounded-4 shadow-sm border-0 bg-${color}-subtle`;
 
-  const header = document.createElement('div');
-  header.className = `card-header bg-${color} text-white text-center text-uppercase small fw-semibold py-1 px-2`;
-  header.textContent = title;
+  const body = document.createElement('div');
+  body.className = 'card-body p-3';
 
-  const ul = document.createElement('ul');
-  ul.className = 'list-group list-group-flush text-center';
+  const titleEl = document.createElement('div');
+  titleEl.className = `fw-bold text-uppercase small text-${color} mb-2`;
+  titleEl.textContent = title;
+  body.appendChild(titleEl);
 
-  items.forEach(item => {
-    const li = document.createElement('li');
-    li.className = `list-group-item border-0 fw-bold text-${color} py-1 px-2 small`;
-    li.textContent = item;
-    ul.appendChild(li);
-  });
+  const valuesEl = document.createElement('div');
 
-  card.appendChild(header);
-  card.appendChild(ul);
+  if (items.length > 0) {
+    const arsEl = document.createElement('div');
+    arsEl.className = `fs-2 fw-bold text-${color} lh-sm`;
+    arsEl.textContent = items[0];
+    valuesEl.appendChild(arsEl);
+  }
+
+  if (items.length > 1) {
+    const usdEl = document.createElement('div');
+    usdEl.className = 'fs-5 text-muted mt-1';
+    usdEl.textContent = items[1];
+    valuesEl.appendChild(usdEl);
+  }
+
+  body.appendChild(valuesEl);
+  card.appendChild(body);
 
   return card;
 }
