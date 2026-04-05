@@ -1,4 +1,5 @@
 import '../features/deudas/components/DebtModal.js';
+import '../features/deudas/components/DebtDetailModal.js';
 import '../shared/components/AppInput.js';
 import './HeaderBar.js';
 
@@ -61,7 +62,7 @@ export class AppShell extends HTMLElement {
 
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body p-3';
-        cardBody.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-list></debt-list>`;
+        cardBody.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-detail-modal id="debtDetailModal"></debt-detail-modal><debt-list></debt-list>`;
 
         card.appendChild(header);
         card.appendChild(cardBody);
