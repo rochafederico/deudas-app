@@ -31,10 +31,10 @@ export const debtTableColumns = [
     },
     { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'd-none d-md-table-cell' } },
     { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'd-none d-md-table-cell' } },
-    { key: 'monedaymonto', label: 'Moneda/Monto', render: row => formatMoneda(row.monto, row.moneda) },
+    { key: 'monedaymonto', label: 'Monto', render: row => formatMoneda(row.monto, row.moneda) },
     {
         key: 'acciones',
-        label: 'Acciones',
+        label: 'Pagado',
         render: row => {
             // Checkbox pagado
             const id = `app-checkbox-${row.id != null ? row.id : 'row'}`;
