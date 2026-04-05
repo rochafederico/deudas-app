@@ -6,9 +6,28 @@ import { formatMoneda } from '../monedas.js';
 import '../../components/AppCheckbox.js';
 
 export const debtTableColumns = [
-    { key: 'acreedor', label: 'Acreedor'},
-    { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'hidden-mobile' } },
-    { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'hidden-mobile' } },
+    {
+        key: 'acreedor',
+        label: 'Acreedor',
+        render: row => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex flex-column';
+
+            const acreedorSpan = document.createElement('span');
+            acreedorSpan.className = 'fw-semibold';
+            acreedorSpan.textContent = row.acreedor ?? '';
+
+            const badge = document.createElement('span');
+            badge.className = 'badge rounded-pill text-bg-light d-md-none mt-1';
+            badge.textContent = row.tipoDeuda ?? '';
+
+            wrapper.appendChild(acreedorSpan);
+            wrapper.appendChild(badge);
+            return wrapper;
+        }
+    },
+    { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'd-none d-md-table-cell' } },
+    { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'd-none d-md-table-cell' } },
     { key: 'monedaymonto', label: 'Moneda/Monto', render: row => formatMoneda(row.monto, row.moneda) },
     {
         key: 'acciones',
