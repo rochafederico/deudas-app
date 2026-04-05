@@ -15,15 +15,15 @@ export default function Ingresos() {
 
     const header = document.createElement('header-bar');
     header.mode = 'ingresos';
+
+    const ingresoModal = document.createElement('ingreso-modal');
+    ingresoModal.id = 'ingresoModal';
+    container.appendChild(ingresoModal);
+
     header.addEventListener('add-income', () => {
-        let modal = container.querySelector('#ingresoModal');
-        if (!modal) {
-            modal = document.createElement('ingreso-modal');
-            modal.id = 'ingresoModal';
-            container.appendChild(modal);
-        }
-        modal.openCreate();
-        modal.attachOpener(header.querySelector('#add-income'));
+        ingresoModal.openCreate();
+        const btn = header.querySelector('#add-income');
+        if (btn) ingresoModal.attachOpener(btn);
     });
 
     const cardBody = document.createElement('div');
