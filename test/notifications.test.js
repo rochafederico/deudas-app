@@ -375,7 +375,7 @@ async function testBuildUpcomingPaymentsHTML() {
 // UC13: checkAndNotify – localStorage deduplication
 // ===================================================================
 async function testCheckAndNotifyDeduplication() {
-    console.log('  UC13: checkAndNotify only shows panel when new upcoming payments exist');
+    console.log('  UC13: checkAndNotify always shows panel; deduplication only applies to native notifications');
 
     const NOTIFIED_KEY = 'nivva_notified_payments';
     localStorage.removeItem(NOTIFIED_KEY);
@@ -399,18 +399,18 @@ async function testCheckAndNotifyDeduplication() {
     await can([deuda], new Date('2026-04-03'));
     assert(panelEvents.length === 1, 'Primera llamada debe mostrar el panel');
 
-    // Second call: same payment (already in localStorage) → panel should NOT appear
+    // Second call: same payment (already in localStorage) → panel still updates (always shown)
     await can([deuda], new Date('2026-04-03'));
-    assert(panelEvents.length === 1, 'Segunda llamada con misma deuda no debe repetir el panel');
+    assert(panelEvents.length === 2, 'Segunda llamada actualiza el panel siempre que haya vencimientos');
 
-    // Add a new debt → panel should appear again (new payment detected)
+    // Add a new debt → panel should appear again
     const deuda2 = {
         id: 2,
         acreedor: 'NewBank',
         montos: [{ monto: 300, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
     };
     await can([deuda, deuda2], new Date('2026-04-03'));
-    assert(panelEvents.length === 2, 'Nueva deuda debe volver a mostrar el panel');
+    assert(panelEvents.length === 3, 'Nueva deuda también muestra el panel');
 
     window.removeEventListener('app:upcoming-panel', handler);
     global.Notification = originalNotification;
