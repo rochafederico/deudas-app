@@ -33,9 +33,10 @@ export function formatDate(dateStr) {
  * @returns {string} 'hoy', 'mañana', or 'en N días'
  */
 export function formatRelativeDate(dateStr, now = new Date()) {
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const venc = new Date(dateStr + 'T00:00:00');
-    const diffDays = Math.round((venc - todayStart) / (1000 * 60 * 60 * 24));
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const vencUTC = Date.UTC(y, m - 1, d);
+    const diffDays = (vencUTC - todayUTC) / (1000 * 60 * 60 * 24);
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'mañana';
     return `en ${diffDays} días`;
@@ -108,12 +109,13 @@ function renderUpcomingSection(payments) {
  * @returns {string} HTML string for the alert body
  */
 export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
     const today = [], tomorrow = [], rest = [];
 
     for (const p of payments) {
-        const venc = new Date(p.vencimiento + 'T00:00:00');
-        const diffDays = Math.round((venc - todayStart) / (1000 * 60 * 60 * 24));
+        const [y, m, d] = p.vencimiento.split('-').map(Number);
+        const vencUTC = Date.UTC(y, m - 1, d);
+        const diffDays = (vencUTC - todayUTC) / (1000 * 60 * 60 * 24);
         if (diffDays === 0) today.push(p);
         else if (diffDays === 1) tomorrow.push(p);
         else rest.push(p);
