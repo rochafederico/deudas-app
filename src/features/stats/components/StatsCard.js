@@ -20,8 +20,8 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
     const arsBadge = document.createElement('span');
     arsBadge.className = `badge bg-${color} me-1`;
     arsBadge.textContent = items[0].currency;
-    arsEl.appendChild(arsBadge);
     arsEl.appendChild(document.createTextNode(items[0].value));
+    arsEl.appendChild(arsBadge);
     valuesEl.appendChild(arsEl);
   }
 
@@ -31,8 +31,8 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
     const usdBadge = document.createElement('span');
     usdBadge.className = 'badge bg-secondary me-1';
     usdBadge.textContent = items[1].currency;
-    usdEl.appendChild(usdBadge);
     usdEl.appendChild(document.createTextNode(items[1].value));
+    usdEl.appendChild(usdBadge);
     valuesEl.appendChild(usdEl);
   }
 
