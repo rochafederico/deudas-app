@@ -310,9 +310,8 @@ async function testDebtDetailModal() {
     // Abrir el detalle de la deuda
     await modal.openDetail(deuda);
 
-    // UiModal mueve su .modal a document.body al abrirse.
-    // Los sub-modales internos (editar/duplicar) también tienen .modal-body en el DOM,
-    // por lo que buscamos directamente el contenido en document.body.
+    // UiModal mueve su .modal a document.body al abrirse,
+    // por lo que buscamos el contenido directamente en document.body.
 
     // Verificar que se renderizó el total pendiente
     const totalEl = document.body.querySelector('.fs-2');
@@ -323,9 +322,9 @@ async function testDebtDetailModal() {
     assert(tbody !== null, 'UC6: debe existir tbody de montos');
     assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de montos');
 
-    // Verificar que los botones de acciones están presentes en cada fila
+    // Verificar que la tabla de montos NO tiene botones de acción (vista de solo lectura)
     const actionBtns = document.body.querySelectorAll('#detail-montos-tbody app-button');
-    assert(actionBtns && actionBtns.length >= 6, 'UC6: cada monto debe tener al menos 3 botones de acción');
+    assert(actionBtns && actionBtns.length === 0, 'UC6: la vista detalle no debe mostrar botones de acción');
 
     document.body.removeChild(modal);
     await cleanup();

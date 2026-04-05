@@ -2,10 +2,6 @@
 // Web Component <debt-detail-modal> - Modal para ver el detalle de una deuda
 
 import '../../../shared/components/UiModal.js';
-import '../../../shared/components/AppButton.js';
-import '../../../shared/components/AppCheckbox.js';
-import '../../montos/components/MontoForm.js';
-import '../../montos/components/DuplicateMontoModal.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
 
@@ -19,8 +15,6 @@ export class DebtDetailModal extends HTMLElement {
         this.classList.add('d-block');
         this.render();
         this.ui = this.querySelector('ui-modal');
-        this.montoEditModal = this.querySelector('#detailMontoEditModal');
-        this.duplicateModal = this.querySelector('#detailDuplicateModal');
 
         // Use larger dialog for detail view
         const dialog = this.ui && this.ui.querySelector('.modal-dialog');
@@ -125,8 +119,7 @@ export class DebtDetailModal extends HTMLElement {
                 children: [
                     el('th', { text: 'Monto' }),
                     el('th', { text: 'Moneda' }),
-                    el('th', { text: 'Vencimiento' }),
-                    el('th', { text: 'Acciones' })
+                    el('th', { text: 'Vencimiento' })
                 ]
             })]
         });
@@ -155,119 +148,19 @@ export class DebtDetailModal extends HTMLElement {
     }
 
     _renderMontoRow(monto) {
-        const id = `detail-chk-${monto.id}`;
-        const appCheckbox = document.createElement('app-checkbox');
-        appCheckbox.inputId = id;
-        appCheckbox.checked = !!monto.pagado;
-        appCheckbox.title = 'Marcar como pagado';
-        appCheckbox.addEventListener('checkbox-change', async (e) => {
-            const { setPagado } = await import('../../montos/montoRepository.js');
-            await setPagado(monto.id, e.detail.checked);
-            await this._refreshDeuda();
-            window.dispatchEvent(new CustomEvent('deuda:updated', { detail: this.deuda }));
-        });
-
-        const actionsDiv = el('div', {
-            className: 'd-flex gap-1 align-items-center',
-            children: [
-                el('app-button', {
-                    text: '✎',
-                    attrs: { title: 'Editar monto' },
-                    on: { click: () => this._openMontoEdit(monto) }
-                }),
-                el('app-button', {
-                    text: '×',
-                    attrs: { variant: 'delete', title: 'Eliminar monto' },
-                    on: { click: () => this._deleteMonto(monto) }
-                }),
-                el('app-button', {
-                    text: '⧉',
-                    attrs: { variant: 'success', title: 'Duplicar monto' },
-                    on: { click: () => this._openMontoDuplicate(monto) }
-                }),
-                appCheckbox
-            ]
-        });
-
         return el('tr', {
             children: [
                 el('td', { text: formatMoneda(monto.monto, monto.moneda) }),
                 el('td', { text: monto.moneda }),
-                el('td', { text: monto.vencimiento || '—' }),
-                el('td', { children: [actionsDiv] })
+                el('td', { text: monto.vencimiento || '—' })
             ]
         });
     }
 
-    async _openMontoEdit(monto) {
-        this.montoEditModal.setTitle('Editar monto');
-        this.montoEditModal.clearBody();
-        const montoForm = document.createElement('monto-form');
-        montoForm.monto = monto;
-        montoForm.addEventListener('monto:save', async (e) => {
-            const { getDeuda, updateDeuda } = await import('../deudaRepository.js');
-            const deudaFull = await getDeuda(this.deuda.id);
-            const idx = deudaFull.montos.findIndex(m => m.id === monto.id);
-            if (idx !== -1) {
-                deudaFull.montos[idx] = { ...deudaFull.montos[idx], ...e.detail };
-            }
-            await updateDeuda(deudaFull);
-            this.montoEditModal.close();
-            await this._refreshDeuda();
-            window.dispatchEvent(new CustomEvent('deuda:updated', { detail: this.deuda }));
-        }, { once: true });
-        montoForm.addEventListener('monto:cancel', () => this.montoEditModal.close(), { once: true });
-        this.montoEditModal.appendChild(montoForm);
-        this.montoEditModal.open();
-    }
-
-    async _openMontoDuplicate(monto) {
-        this.duplicateModal.setTitle('Duplicar monto');
-        this.duplicateModal.clearBody();
-        const duplicateView = document.createElement('duplicate-monto-modal');
-        duplicateView.monto = monto;
-        duplicateView.addEventListener('duplicate:save', async (e) => {
-            const { addMonto } = await import('../../montos/montoRepository.js');
-            const nuevaFecha = e.detail.vencimiento;
-            const nuevoPeriodo = nuevaFecha ? nuevaFecha.slice(0, 7) : '';
-            await addMonto({
-                deudaId: monto.deudaId,
-                monto: monto.monto,
-                moneda: monto.moneda,
-                vencimiento: nuevaFecha,
-                periodo: nuevoPeriodo,
-                pagado: false
-            });
-            this.duplicateModal.close();
-            await this._refreshDeuda();
-            window.dispatchEvent(new CustomEvent('deuda:updated', { detail: this.deuda }));
-        }, { once: true });
-        duplicateView.addEventListener('duplicate:cancel', () => this.duplicateModal.close(), { once: true });
-        this.duplicateModal.appendChild(duplicateView);
-        this.duplicateModal.open();
-    }
-
-    async _deleteMonto(monto) {
-        if (!confirm(`¿Eliminar el monto de ${formatMoneda(monto.monto, monto.moneda)} con vencimiento ${monto.vencimiento}?`)) return;
-        const { deleteMonto } = await import('../../montos/montoRepository.js');
-        await deleteMonto(monto.id);
-        await this._refreshDeuda();
-        window.dispatchEvent(new CustomEvent('deuda:updated', { detail: this.deuda }));
-    }
-
-    async _refreshDeuda() {
-        const { getDeuda } = await import('../deudaRepository.js');
-        this.deuda = await getDeuda(this.deuda.id);
-        this._renderContent();
-    }
-
     render() {
-        this.innerHTML = `
-        <ui-modal></ui-modal>
-        <ui-modal id="detailMontoEditModal"></ui-modal>
-        <ui-modal id="detailDuplicateModal"></ui-modal>
-        `;
+        this.innerHTML = `<ui-modal></ui-modal>`;
     }
 }
 
 customElements.define('debt-detail-modal', DebtDetailModal);
+
