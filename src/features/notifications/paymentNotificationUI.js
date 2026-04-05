@@ -119,11 +119,14 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
         else rest.push(p);
     }
 
-    return [
-        renderTodaySection(today),
-        renderTomorrowSection(tomorrow),
-        renderUpcomingSection(rest)
-    ].join('');
+    return {
+        html: [
+            renderTodaySection(today),
+            renderTomorrowSection(tomorrow),
+            renderUpcomingSection(rest)
+        ].join(''),
+        todayCount: today.length,
+    };
 }
 
 // ── Event dispatch ────────────────────────────────────────────────────────────
@@ -136,8 +139,8 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
  */
 export function showInAppPanel(payments, now = new Date()) {
     if (typeof window === 'undefined') return;
-    const html = buildUpcomingPaymentsHTML(payments, now);
-    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html } }));
+    const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
+    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html, todayCount } }));
 }
 
 /**

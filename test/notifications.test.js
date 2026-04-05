@@ -341,7 +341,7 @@ async function testBuildUpcomingPaymentsHTML() {
         { acreedor: 'MercadoPago', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest (6th → truncated)
     ];
 
-    const html = buildUpcomingPaymentsHTML(payments, now);
+    const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
 
     // Today section
     assert(html.includes('Hoy'), 'Incluye sección Hoy');
@@ -357,7 +357,10 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(html.includes('Personal'), 'Lista rest incluye Personal');
     assert(html.includes('y 1 más'), 'Trunca con "y 1 más" cuando rest > 5');
 
-    // showInAppPanel dispatches app:upcoming-panel with the html
+    // todayCount reflects the number of payments due today
+    assert(todayCount === 2, 'todayCount es 2 (NaranjaX y Brubank vencen hoy)');
+
+    // showInAppPanel dispatches app:upcoming-panel with the html and todayCount
     const events = [];
     const handler = (e) => events.push(e.detail);
     window.addEventListener('app:upcoming-panel', handler);
@@ -367,6 +370,7 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(events.length === 1, 'showInAppPanel despacha 1 evento app:upcoming-panel');
     assert(typeof events[0].html === 'string', 'El evento incluye html como string');
     assert(events[0].html.includes('NaranjaX'), 'El html del evento incluye datos de los pagos');
+    assert(events[0].todayCount === 2, 'El evento incluye todayCount correcto');
 
     window.removeEventListener('app:upcoming-panel', handler);
 }
