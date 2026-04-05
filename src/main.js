@@ -50,12 +50,12 @@ initDB().then(async (db) => {
 
     await runNotificationCheck();
 
-    // Volver a verificar cuando el usuario regresa a la pestaña (sólo una vez)
+    // Volver a verificar cada vez que el usuario regresa a la pestaña
     document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
             runNotificationCheck();
         }
-    }, { once: false });
+    });
 
     // Iniciar tour guiado en la primera visita (con delay para que el DOM esté listo)
     setTimeout(() => {

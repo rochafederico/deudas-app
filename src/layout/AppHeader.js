@@ -102,7 +102,7 @@ export class AppHeader extends HTMLElement {
             <app-nav></app-nav>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
               <li class="nav-item me-1">
-                <button id="notifications-btn" class="btn btn-link text-light fs-5 p-2 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
+                <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
                   🔔
                 </button>
               </li>
