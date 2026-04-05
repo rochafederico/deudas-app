@@ -8,7 +8,7 @@
     "lint": "eslint src test --ext .js"
   },
   "devDependencies": {
-    "bootstrap": "^5.3.3",
+    "bootstrap": "5.3.8",
     "eslint": "^8.57.1",
     "fake-indexeddb": "^3.0.0",
     "happy-dom": "^20.8.4",
