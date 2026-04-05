@@ -48,12 +48,7 @@ async function testStatsCardItemClasses() {
     assert(arsBadge !== null, 'valor ARS debe tener un badge con la moneda');
     assert(arsBadge.textContent === 'ARS', 'badge de ARS debe mostrar "ARS"');
 
-    const usdEl = body.querySelector('.h6');
-    assert(usdEl !== null, 'card debe renderizar un elemento con clase "h6" para USD');
-    assert(usdEl.classList.contains('text-muted'), 'valor USD debe tener clase "text-muted"');
-    const usdBadge = usdEl.querySelector('.badge');
-    assert(usdBadge !== null, 'valor USD debe tener un badge con la moneda');
-    assert(usdBadge.textContent === 'USD', 'badge de USD debe mostrar "USD"');
+    assert(body.querySelector('.h6') === null, 'card no debe renderizar una segunda fila USD');
 }
 
 // ===================================================================
@@ -65,7 +60,7 @@ async function testStatsCardEmptyItems() {
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body incluso sin items');
     assert(body.querySelector('.h5') === null, 'card sin items no debe renderizar elemento h5 para ARS');
-    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar elemento h6 para USD');
+    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar ningún elemento de tipografía');
 }
 
 // ===================================================================
