@@ -42,6 +42,7 @@ async function testStatsCardItemClasses() {
 
     const arsEl = body.querySelector('.fs-2');
     assert(arsEl !== null, 'card debe renderizar un elemento con clase "fs-2" para ARS');
+    assert(arsEl.classList.contains('kpi-main-value'), 'valor ARS debe tener clase "kpi-main-value" para responsive typography');
     assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
     assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
     assert(arsEl.textContent === 'ARS: $ 500.00', 'valor ARS debe mostrar el texto correcto');
