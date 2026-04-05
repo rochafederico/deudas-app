@@ -15,8 +15,8 @@ async function testStatsCardBootstrapClasses() {
     assert(card.classList.contains('h-100'), 'card debe tener clase "h-100"');
     assert(card.classList.contains('rounded-4'), 'card debe tener clase "rounded-4"');
     assert(card.classList.contains('shadow-sm'), 'card debe tener clase "shadow-sm"');
-    assert(card.classList.contains('border-0'), 'card debe tener clase "border-0"');
-    assert(card.classList.contains('bg-success-subtle'), 'card debe tener clase "bg-success-subtle"');
+    assert(card.classList.contains('border'), 'card debe tener clase "border"');
+    assert(card.classList.contains('border-success'), 'card debe tener clase "border-success"');
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
@@ -69,7 +69,7 @@ async function testStatsCardEmptyItems() {
 async function testStatsCardDefaultColor() {
     console.log('  UC4: StatsCard usa color "secondary" por defecto');
     const card = StatsCard({ title: 'Test' });
-    assert(card.classList.contains('bg-secondary-subtle'), 'card debe tener clase "bg-secondary-subtle" por defecto');
+    assert(card.classList.contains('border-secondary'), 'card deve tener clase "border-secondary" por defecto');
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body con color por defecto');
     const titleEl = body.querySelector('div');

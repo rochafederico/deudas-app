@@ -4,7 +4,7 @@ import { KPI_CURRENCY } from '../../../shared/config/monedas.js';
 
 export default function StatsCard({ title = '', items = [], color = 'secondary' } = {}) {
   const card = document.createElement('div');
-  card.className = `card h-100 rounded-4 shadow-sm border-0 bg-${color}-subtle`;
+  card.className = `card h-100 rounded-4 shadow-sm border border-${color}`;
 
   const body = document.createElement('div');
   body.className = 'card-body p-3';
@@ -21,7 +21,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
     const arsEl = document.createElement('p');
     arsEl.className = `h6 fw-bold text-${color} lh-sm mb-0`;
     const arsBadge = document.createElement('span');
-    arsBadge.className = `badge bg-${color} me-1`;
+    arsBadge.className = `badge bg-${color} ms-1`;
     arsBadge.textContent = mainItem.currency;
     arsEl.appendChild(document.createTextNode(mainItem.value));
     arsEl.appendChild(arsBadge);
