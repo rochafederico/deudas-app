@@ -149,11 +149,6 @@ export class AppHeader extends HTMLElement {
       <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
-          <button class="navbar-toggler" type="button"
-            data-bs-toggle="collapse" data-bs-target="#main-nav-collapse"
-            aria-controls="main-nav-collapse" aria-expanded="false" aria-label="Abrir menú">
-            <span class="navbar-toggler-icon"></span>
-          </button>
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-lg-center gap-2">

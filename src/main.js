@@ -2,6 +2,7 @@
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
+import BottomNav from './layout/BottomNav.js';
 import ResumenHeader from './layout/ResumenHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
@@ -10,6 +11,8 @@ import { listDeudas } from './features/deudas/deudaRepository.js';
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
 document.body.classList.add('bg-body-tertiary');
+// Add bottom padding on mobile so content is not hidden behind the fixed bottom nav
+document.body.classList.add('pb-5', 'pb-lg-0');
 
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
@@ -26,6 +29,7 @@ wrapper.appendChild(app);
 
 
 document.body.appendChild(wrapper);
+document.body.appendChild(BottomNav());
 
 // Initialize the IndexedDB and only after DB is ready render indicators + initial route
 initDB().then(async (db) => {
