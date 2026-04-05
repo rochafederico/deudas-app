@@ -14,6 +14,14 @@ export const debtTableColumns = [
         key: 'acciones',
         label: 'Acciones',
         render: row => {
+            // Botón ver detalle
+            const btnDetalle = el('app-button', {
+                text: 'ℹ',
+                attrs: { title: 'Ver detalle' },
+                on: {
+                    click: () => row._onDetail(row)
+                }
+            });
             // Botón editar
             const btn = el('app-button', {
                 text: '✎',
@@ -36,6 +44,7 @@ export const debtTableColumns = [
             // Contenedor flex
             const container = document.createElement('div');
             container.className = 'd-flex align-items-center justify-content-end gap-3';
+            container.appendChild(btnDetalle);
             container.appendChild(btn);
             container.appendChild(appCheckbox);
             return container;
