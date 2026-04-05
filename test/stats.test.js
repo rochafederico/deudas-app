@@ -13,49 +13,55 @@ async function testStatsCardBootstrapClasses() {
 
     assert(card.classList.contains('card'), 'card debe tener clase "card"');
     assert(card.classList.contains('h-100'), 'card debe tener clase "h-100"');
-    assert(card.classList.contains('border-success'), 'card debe tener clase "border-success"');
+    assert(card.classList.contains('rounded-4'), 'card debe tener clase "rounded-4"');
+    assert(card.classList.contains('shadow-sm'), 'card debe tener clase "shadow-sm"');
+    assert(card.classList.contains('border-0'), 'card debe tener clase "border-0"');
+    assert(card.classList.contains('bg-success-subtle'), 'card debe tener clase "bg-success-subtle"');
 
-    const header = card.querySelector('.card-header');
-    assert(header !== null, 'card debe renderizar .card-header');
-    assert(header.classList.contains('bg-success'), 'header debe tener clase "bg-success"');
-    assert(header.classList.contains('py-1'), 'header debe tener clase "py-1" para padding compacto');
-    assert(header.classList.contains('px-2'), 'header debe tener clase "px-2" para padding compacto');
-    assert(header.textContent === 'Ingresos', 'header debe mostrar el título');
+    const body = card.querySelector('.card-body');
+    assert(body !== null, 'card debe renderizar .card-body');
+    assert(body.classList.contains('p-3'), 'body debe tener clase "p-3" para padding');
 
-    const ul = card.querySelector('ul');
-    assert(ul !== null, 'card debe renderizar ul');
-    assert(ul.classList.contains('list-group'), 'ul debe tener clase "list-group"');
-    assert(ul.classList.contains('list-group-flush'), 'ul debe tener clase "list-group-flush"');
+    const titleEl = body.querySelector('div');
+    assert(titleEl !== null, 'card-body debe contener un div de título');
+    assert(titleEl.classList.contains('fw-bold'), 'título debe tener clase "fw-bold"');
+    assert(titleEl.classList.contains('text-uppercase'), 'título debe tener clase "text-uppercase"');
+    assert(titleEl.classList.contains('text-success'), 'título debe tener clase "text-success"');
+    assert(titleEl.textContent === 'Ingresos', 'título debe mostrar el texto correcto');
 }
 
 // ===================================================================
-// UC2: StatsCard renders items with compact classes
+// UC2: StatsCard renders items with modern typography classes
 // ===================================================================
 async function testStatsCardItemClasses() {
-    console.log('  UC2: StatsCard renderiza items con clases compactas');
+    console.log('  UC2: StatsCard renderiza items con clases de tipografía modernas');
     const card = StatsCard({ title: 'Gastos', items: ['ARS: $ 500.00', 'USD: -'], color: 'danger' });
 
-    const items = card.querySelectorAll('li');
-    assert(items.length === 2, 'card debe renderizar 2 items');
+    const body = card.querySelector('.card-body');
+    assert(body !== null, 'card debe renderizar .card-body');
 
-    const li = items[0];
-    assert(li.classList.contains('list-group-item'), 'li debe tener clase "list-group-item"');
-    assert(li.classList.contains('border-0'), 'li debe tener clase "border-0"');
-    assert(li.classList.contains('py-1'), 'li debe tener clase "py-1" para padding compacto');
-    assert(li.classList.contains('px-2'), 'li debe tener clase "px-2" para padding compacto');
-    assert(li.classList.contains('small'), 'li debe tener clase "small" para texto compacto');
-    assert(li.classList.contains('text-danger'), 'li debe tener clase "text-danger"');
-    assert(li.textContent === 'ARS: $ 500.00', 'item debe mostrar el texto correcto');
+    const arsEl = body.querySelector('.fs-2');
+    assert(arsEl !== null, 'card debe renderizar un elemento con clase "fs-2" para ARS');
+    assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
+    assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
+    assert(arsEl.textContent === 'ARS: $ 500.00', 'valor ARS debe mostrar el texto correcto');
+
+    const usdEl = body.querySelector('.fs-5');
+    assert(usdEl !== null, 'card debe renderizar un elemento con clase "fs-5" para USD');
+    assert(usdEl.classList.contains('text-muted'), 'valor USD debe tener clase "text-muted"');
+    assert(usdEl.textContent === 'USD: -', 'valor USD debe mostrar el texto correcto');
 }
 
 // ===================================================================
-// UC3: StatsCard renders empty list when no items
+// UC3: StatsCard renders empty values container when no items
 // ===================================================================
 async function testStatsCardEmptyItems() {
-    console.log('  UC3: StatsCard con lista vacía no muestra items');
+    console.log('  UC3: StatsCard con lista vacía no muestra valores');
     const card = StatsCard({ title: 'Balance', items: [], color: 'primary' });
-    const items = card.querySelectorAll('li');
-    assert(items.length === 0, 'card sin items no debe renderizar li elementos');
+    const body = card.querySelector('.card-body');
+    assert(body !== null, 'card debe renderizar .card-body incluso sin items');
+    assert(body.querySelector('.fs-2') === null, 'card sin items no debe renderizar elemento fs-2 para ARS');
+    assert(body.querySelector('.fs-5') === null, 'card sin items no debe renderizar elemento fs-5 para USD');
 }
 
 // ===================================================================
@@ -64,9 +70,11 @@ async function testStatsCardEmptyItems() {
 async function testStatsCardDefaultColor() {
     console.log('  UC4: StatsCard usa color "secondary" por defecto');
     const card = StatsCard({ title: 'Test' });
-    assert(card.classList.contains('border-secondary'), 'card debe tener clase "border-secondary" por defecto');
-    const header = card.querySelector('.card-header');
-    assert(header.classList.contains('bg-secondary'), 'header debe tener clase "bg-secondary" por defecto');
+    assert(card.classList.contains('bg-secondary-subtle'), 'card debe tener clase "bg-secondary-subtle" por defecto');
+    const body = card.querySelector('.card-body');
+    assert(body !== null, 'card debe renderizar .card-body con color por defecto');
+    const titleEl = body.querySelector('div');
+    assert(titleEl.classList.contains('text-secondary'), 'título debe tener clase "text-secondary" por defecto');
 }
 
 // ===================================================================
