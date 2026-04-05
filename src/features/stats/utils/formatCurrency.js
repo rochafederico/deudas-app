@@ -25,17 +25,18 @@ function compactFormat(n) {
 }
 
 /**
- * Given a { ARS: number, USD: number } object, returns an array of display strings
- * for every currency in CURRENCIES. Missing or zero values render as "-".
+ * Given a { ARS: number, USD: number } object, returns an array of
+ * { currency, value } objects for every currency in CURRENCIES.
+ * Missing or zero values render value as "-".
  * Amounts are shown in compact Spanish format (mil / Millones).
  * @param {Object|null} obj
- * @returns {string[]}
+ * @returns {{ currency: string, value: string }[]}
  */
 export function addValue(obj) {
     return CURRENCIES.map(moneda => {
         const monto = obj ? obj[moneda] : undefined;
-        const val = (monto == null || monto === 0) ? '-' : `$ ${compactFormat(monto)}`;
-        return `${moneda}: ${val}`;
+        const value = (monto == null || monto === 0) ? '-' : `$ ${compactFormat(monto)}`;
+        return { currency: moneda, value };
     });
 }
 

@@ -16,15 +16,23 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
 
   if (items.length > 0) {
     const arsEl = document.createElement('div');
-    arsEl.className = `h5 fw-bold text-${color} lh-sm mb-0`;
-    arsEl.textContent = items[0];
+    arsEl.className = `h6 fw-bold text-${color} lh-sm mb-0`;
+    const arsBadge = document.createElement('span');
+    arsBadge.className = `badge bg-${color} me-1`;
+    arsBadge.textContent = items[0].currency;
+    arsEl.appendChild(arsBadge);
+    arsEl.appendChild(document.createTextNode(items[0].value));
     valuesEl.appendChild(arsEl);
   }
 
   if (items.length > 1) {
     const usdEl = document.createElement('div');
     usdEl.className = 'fs-5 text-muted mt-1';
-    usdEl.textContent = items[1];
+    const usdBadge = document.createElement('span');
+    usdBadge.className = 'badge bg-secondary me-1';
+    usdBadge.textContent = items[1].currency;
+    usdEl.appendChild(usdBadge);
+    usdEl.appendChild(document.createTextNode(items[1].value));
     valuesEl.appendChild(usdEl);
   }
 
