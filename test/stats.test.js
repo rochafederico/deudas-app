@@ -58,10 +58,10 @@ async function testStatsCardItemClasses() {
 async function testStatsCardEmptyItems() {
     console.log('  UC3: StatsCard con lista vacía no muestra valores');
     const card = StatsCard({ title: 'Balance', items: [], color: 'primary' });
-    const items = card.querySelectorAll('li');
-    assert(items.length === 0, 'card sin items no debe renderizar li elementos');
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body incluso sin items');
+    assert(body.querySelector('.fs-2') === null, 'card sin items no debe renderizar elemento fs-2 para ARS');
+    assert(body.querySelector('.fs-5') === null, 'card sin items no debe renderizar elemento fs-5 para USD');
 }
 
 // ===================================================================
