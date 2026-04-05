@@ -2,7 +2,7 @@
 // Tests for StatsCard and StatsIndicators components
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
-import { addValue } from '../src/features/stats/utils/formatCurrency.js';
+import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
 // UC1: StatsCard renders with correct Bootstrap classes
@@ -84,7 +84,7 @@ async function testAddValueZeroDisplaysAsDash() {
     console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
     const result = addValue({ ARS: 0, USD: 2500 });
     assert(result[0] === 'ARS: -', 'valor 0 debe mostrarse como "ARS: -" sin símbolo $');
-    assert(result[1] === 'USD: $ 2.500,00', 'valor positivo debe mostrarse con símbolo $');
+    assert(result[1] === 'USD: $ 2,5 mil', 'valor 2500 debe mostrarse como "USD: $ 2,5 mil"');
 }
 
 // ===================================================================
@@ -120,6 +120,46 @@ async function testAddValueAlwaysShowsBothCurrencies() {
     assert(resultNull[1] === 'USD: -', 'USD debe mostrarse como "-" cuando obj es null');
 }
 
+// ===================================================================
+// UC8: compactFormat — values >= 1.000 display in "mil" format
+// ===================================================================
+async function testCompactFormatMil() {
+    console.log('  UC8: compactFormat muestra formato "mil" para valores >= 1.000');
+    assert(compactFormat(850000) === '850 mil', '850000 debe mostrarse como "850 mil"');
+    assert(compactFormat(1000) === '1 mil', '1000 debe mostrarse como "1 mil"');
+    assert(compactFormat(1200) === '1,2 mil', '1200 debe mostrarse como "1,2 mil"');
+    assert(compactFormat(500000) === '500 mil', '500000 debe mostrarse como "500 mil"');
+}
+
+// ===================================================================
+// UC9: compactFormat — values >= 1.000.000 display in "Millones" format
+// ===================================================================
+async function testCompactFormatMillones() {
+    console.log('  UC9: compactFormat muestra formato "Millones" para valores >= 1.000.000');
+    assert(compactFormat(1200000) === '1,2 Millones', '1200000 debe mostrarse como "1,2 Millones"');
+    assert(compactFormat(3450000) === '3,45 Millones', '3450000 debe mostrarse como "3,45 Millones"');
+    assert(compactFormat(1000000) === '1 Millones', '1000000 debe mostrarse como "1 Millones"');
+}
+
+// ===================================================================
+// UC10: compactFormat — small values use normal es-AR format
+// ===================================================================
+async function testCompactFormatSmall() {
+    console.log('  UC10: compactFormat usa formato normal para valores < 1.000');
+    assert(compactFormat(500) === '500,00', '500 debe mostrarse como "500,00"');
+    assert(compactFormat(999) === '999,00', '999 debe mostrarse como "999,00"');
+    assert(compactFormat(0) === '0,00', '0 debe mostrarse como "0,00"');
+}
+
+// ===================================================================
+// UC11: compactFormat — null/undefined returns "-"
+// ===================================================================
+async function testCompactFormatNull() {
+    console.log('  UC11: compactFormat muestra "-" para null o undefined');
+    assert(compactFormat(null) === '-', 'null debe retornar "-"');
+    assert(compactFormat(undefined) === '-', 'undefined debe retornar "-"');
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
     testStatsCardItemClasses,
@@ -128,4 +168,8 @@ export const tests = [
     testAddValueZeroDisplaysAsDash,
     testAddValueNullDisplaysAsDash,
     testAddValueAlwaysShowsBothCurrencies,
+    testCompactFormatMil,
+    testCompactFormatMillones,
+    testCompactFormatSmall,
+    testCompactFormatNull,
 ];
