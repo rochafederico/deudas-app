@@ -17,7 +17,7 @@ export const debtTableColumns = [
             // Botón ver detalle
             const btnDetalle = el('app-button', {
                 text: 'ℹ',
-                attrs: { title: 'Ver detalle', variant: 'light' },
+                attrs: { title: 'Ver detalle', 'aria-label': 'Ver detalle', variant: 'light' },
                 on: {
                     click: () => row._onDetail(row, btnDetalle)
                 }
@@ -25,7 +25,7 @@ export const debtTableColumns = [
             // Botón editar
             const btn = el('app-button', {
                 text: '✏️',
-                attrs: { title: 'Editar deuda', variant: 'light' },
+                attrs: { title: 'Editar deuda', 'aria-label': 'Editar deuda', variant: 'light' },
                 on: {
                     click: () => row._onEdit(row)
                 }

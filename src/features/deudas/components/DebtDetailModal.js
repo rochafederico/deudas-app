@@ -107,8 +107,23 @@ export class DebtDetailModal extends HTMLElement {
         // Montos section — priority visual section
         const montosSection = this._renderMontosSection(montos);
 
+        const closeButton = el('button', {
+            className: 'btn btn-secondary mt-3',
+            text: 'Cerrar',
+            attrs: { type: 'button' }
+        });
+        closeButton.addEventListener('click', () => this.close());
+
         const content = el('div', {
-            children: [headerSection, infoSection, montosSection]
+            children: [
+                headerSection,
+                infoSection,
+                montosSection,
+                el('div', {
+                    className: 'd-flex justify-content-end',
+                    children: [closeButton]
+                })
+            ]
         });
         this.ui.appendChild(content);
     }

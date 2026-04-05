@@ -307,27 +307,36 @@ async function testDebtDetailModal() {
     const modal = document.createElement('debt-detail-modal');
     document.body.appendChild(modal);
 
-    // Abrir el detalle de la deuda
-    await modal.openDetail(deuda);
+    let detachedModalEl = null;
+    try {
+        // Abrir el detalle de la deuda
+        await modal.openDetail(deuda);
 
-    // UiModal mueve su .modal a document.body al abrirse,
-    // por lo que buscamos el contenido directamente en document.body.
+        // UiModal mueve su .modal a document.body al abrirse,
+        // por lo que buscamos el contenido directamente en document.body.
+        detachedModalEl = document.body.querySelector('.modal');
 
-    // Verificar que se renderizó el total pendiente
-    const totalEl = document.body.querySelector('.fs-2');
-    assert(totalEl !== null, 'UC6: debe mostrar el total pendiente prominente');
+        // Verificar que se renderizó el total pendiente
+        const totalEl = document.body.querySelector('.fs-2');
+        assert(totalEl !== null, 'UC6: debe mostrar el total pendiente prominente');
 
-    // Verificar que la tabla de montos tiene las filas correctas
-    const tbody = document.body.querySelector('#detail-montos-tbody');
-    assert(tbody !== null, 'UC6: debe existir tbody de montos');
-    assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de montos');
+        // Verificar que la tabla de montos tiene las filas correctas
+        const tbody = document.body.querySelector('#detail-montos-tbody');
+        assert(tbody !== null, 'UC6: debe existir tbody de montos');
+        assert(tbody && tbody.children.length === 2, 'UC6: debe mostrar 2 filas de montos');
 
-    // Verificar que la tabla de montos NO tiene botones de acción (vista de solo lectura)
-    const actionBtns = document.body.querySelectorAll('#detail-montos-tbody app-button');
-    assert(actionBtns && actionBtns.length === 0, 'UC6: la vista detalle no debe mostrar botones de acción');
-
-    document.body.removeChild(modal);
-    await cleanup();
+        // Verificar que la tabla de montos NO tiene botones de acción (vista de solo lectura)
+        const actionBtns = document.body.querySelectorAll('#detail-montos-tbody app-button');
+        assert(actionBtns && actionBtns.length === 0, 'UC6: la vista detalle no debe mostrar botones de acción');
+    } finally {
+        if (detachedModalEl && detachedModalEl.parentNode) {
+            detachedModalEl.parentNode.removeChild(detachedModalEl);
+        }
+        if (modal.parentNode) {
+            modal.parentNode.removeChild(modal);
+        }
+        await cleanup();
+    }
 }
 
 export const tests = [
