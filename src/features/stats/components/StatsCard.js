@@ -16,7 +16,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
 
   if (items.length > 0) {
     const arsEl = document.createElement('div');
-    arsEl.className = `kpi-main-value fs-2 fw-bold text-${color} lh-sm`;
+    arsEl.className = `h5 fw-bold text-${color} lh-sm mb-0`;
     arsEl.textContent = items[0];
     valuesEl.appendChild(arsEl);
   }

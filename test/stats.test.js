@@ -40,9 +40,8 @@ async function testStatsCardItemClasses() {
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
 
-    const arsEl = body.querySelector('.fs-2');
-    assert(arsEl !== null, 'card debe renderizar un elemento con clase "fs-2" para ARS');
-    assert(arsEl.classList.contains('kpi-main-value'), 'valor ARS debe tener clase "kpi-main-value" para responsive typography');
+    const arsEl = body.querySelector('.h5');
+    assert(arsEl !== null, 'card debe renderizar un elemento con clase "h5" para ARS');
     assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
     assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
     assert(arsEl.textContent === 'ARS: $ 500.00', 'valor ARS debe mostrar el texto correcto');
