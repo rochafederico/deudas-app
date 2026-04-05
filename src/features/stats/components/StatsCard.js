@@ -4,7 +4,7 @@ import { KPI_CURRENCY } from '../../../shared/config/monedas.js';
 
 export default function StatsCard({ title = '', items = [], color = 'secondary' } = {}) {
   const card = document.createElement('div');
-  card.className = `card h-100 rounded-4 shadow-sm border border-${color}`;
+  card.className = `card h-100 rounded-4 shadow-sm border border-2 border-${color}`;
 
   const body = document.createElement('div');
   body.className = 'card-body p-3';

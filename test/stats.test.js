@@ -16,6 +16,7 @@ async function testStatsCardBootstrapClasses() {
     assert(card.classList.contains('rounded-4'), 'card debe tener clase "rounded-4"');
     assert(card.classList.contains('shadow-sm'), 'card debe tener clase "shadow-sm"');
     assert(card.classList.contains('border'), 'card debe tener clase "border"');
+    assert(card.classList.contains('border-2'), 'card debe tener clase "border-2"');
     assert(card.classList.contains('border-success'), 'card debe tener clase "border-success"');
 
     const body = card.querySelector('.card-body');
