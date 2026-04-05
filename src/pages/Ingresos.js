@@ -2,7 +2,6 @@
 import '../features/stats/components/StatsCard.js';
 import '../features/ingresos/components/IngresoModal.js';
 import '../layout/HeaderBar.js';
-import '../layout/HeaderBar.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
