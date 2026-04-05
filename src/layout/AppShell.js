@@ -33,6 +33,7 @@ export class AppShell extends HTMLElement {
     async render() {
         // Usar el nuevo subcomponente HeaderBar
         const header = document.createElement('header-bar');
+        header.mode = 'deudas';
         header.addEventListener('group-change', (e) => {
             this.groupBy = e.detail.groupBy;
             this.onGroupChange(this.groupBy);
