@@ -49,6 +49,14 @@ export function getAll() {
     });
 }
 
+export function deleteAllIngresos() {
+    return _withIngresosStore('readwrite', (store, resolve, reject) => {
+        const req = store.clear();
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(new Error('Error clearing ingresos: ' + e.target.errorCode));
+    });
+}
+
 export function sumIngresosByMonth({ mes } = {}) {
     return _withIngresosStore('readonly', (store, resolve, reject) => {
         const index = store.index('by_periodo');
