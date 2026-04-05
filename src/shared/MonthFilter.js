@@ -1,29 +1,11 @@
 // src/shared/MonthFilter.js
-// Global month filter state — shared across all screens
-
-const STORAGE_KEY = 'app:selectedMonth';
+// Global month filter state — shared across all screens (in-memory only)
 
 function _getCurrentMonth() {
     return new Date().toISOString().slice(0, 7);
 }
 
-function _loadFromStorage() {
-    try {
-        return localStorage.getItem(STORAGE_KEY) || _getCurrentMonth();
-    } catch {
-        return _getCurrentMonth();
-    }
-}
-
-function _saveToStorage(month) {
-    try {
-        localStorage.setItem(STORAGE_KEY, month);
-    } catch {
-        // ignore — storage unavailable (e.g. in tests)
-    }
-}
-
-let _selectedMonth = _loadFromStorage();
+let _selectedMonth = _getCurrentMonth();
 
 export function getSelectedMonth() {
     return _selectedMonth;
@@ -31,7 +13,6 @@ export function getSelectedMonth() {
 
 export function setSelectedMonth(month) {
     _selectedMonth = month;
-    _saveToStorage(month);
     window.dispatchEvent(new CustomEvent('ui:month', { detail: { mes: month } }));
 }
 
@@ -51,4 +32,11 @@ export function formatMonthLabel(month) {
     const [year, mon] = month.split('-');
     const date = new Date(parseInt(year), parseInt(mon) - 1, 1);
     return date.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+}
+
+export function formatMonthTitleParts(month) {
+    const [year, mon] = month.split('-');
+    const date = new Date(parseInt(year), parseInt(mon) - 1, 1);
+    const mes = date.toLocaleDateString('es-AR', { month: 'long' });
+    return { mes, year };
 }

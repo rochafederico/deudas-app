@@ -1,17 +1,17 @@
 // src/layout/MonthSelector.js
-// Compact global month selector web component — < abril 2026 >
+// Compact global month selector web component — Bootstrap Input Group with input[type=month]
 import {
     getSelectedMonth,
+    setSelectedMonth,
     goToPreviousMonth,
     goToNextMonth,
-    formatMonthLabel,
 } from '../shared/MonthFilter.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
         this.classList.add('d-inline-flex', 'align-items-center');
         this._render();
-        this._onUiMonth = () => this._updateLabel();
+        this._onUiMonth = (e) => this._syncInput(e.detail.mes);
         window.addEventListener('ui:month', this._onUiMonth);
     }
 
@@ -21,20 +21,24 @@ export class MonthSelector extends HTMLElement {
 
     _render() {
         this.innerHTML = `
-            <div class="d-flex align-items-center gap-1" data-tour-step="navegacion-mes">
-                <button id="ms-prev" class="btn btn-outline-secondary btn-sm px-2 py-1 lh-1" type="button" title="Mes anterior" aria-label="Mes anterior">&#8249;</button>
-                <span id="ms-label" class="fw-semibold small px-1 text-nowrap">${formatMonthLabel(getSelectedMonth())}</span>
-                <button id="ms-next" class="btn btn-outline-secondary btn-sm px-2 py-1 lh-1" type="button" title="Mes siguiente" aria-label="Mes siguiente">&#8250;</button>
+            <div class="input-group input-group-sm" data-tour-step="navegacion-mes">
+                <button id="ms-prev" class="btn btn-outline-secondary" type="button" title="Mes anterior" aria-label="Mes anterior">&#8249;</button>
+                <input id="ms-input" type="month" class="form-control text-center" value="${getSelectedMonth()}" aria-label="Seleccionar mes">
+                <button id="ms-next" class="btn btn-outline-secondary" type="button" title="Mes siguiente" aria-label="Mes siguiente">&#8250;</button>
             </div>
         `;
         this.querySelector('#ms-prev').addEventListener('click', () => goToPreviousMonth());
         this.querySelector('#ms-next').addEventListener('click', () => goToNextMonth());
+        this.querySelector('#ms-input').addEventListener('change', (e) => {
+            if (e.target.value) setSelectedMonth(e.target.value);
+        });
     }
 
-    _updateLabel() {
-        const label = this.querySelector('#ms-label');
-        if (label) label.textContent = formatMonthLabel(getSelectedMonth());
+    _syncInput(month) {
+        const input = this.querySelector('#ms-input');
+        if (input && input.value !== month) input.value = month;
     }
 }
 
 customElements.define('month-selector', MonthSelector);
+
