@@ -1,7 +1,8 @@
-// src/config/tables/debtTableColumns.js
+// src/shared/config/tables/debtTableColumns.js
 // Configuración de columnas para la tabla de deudas
 
 import { formatMoneda } from '../monedas.js';
+import '../../components/AppCheckbox.js';
 
 export const debtTableColumns = [
     {
@@ -15,12 +16,16 @@ export const debtTableColumns = [
             acreedorSpan.className = 'fw-semibold';
             acreedorSpan.textContent = row.acreedor ?? '';
 
-            const badge = document.createElement('span');
-            badge.className = 'badge rounded-pill text-bg-light d-md-none mt-1';
-            badge.textContent = row.tipoDeuda ?? '';
-
             wrapper.appendChild(acreedorSpan);
-            wrapper.appendChild(badge);
+
+            const tipoDeuda = String(row.tipoDeuda ?? '').trim();
+            if (tipoDeuda !== '') {
+                const badge = document.createElement('span');
+                badge.className = 'badge rounded-pill text-bg-light d-md-none mt-1';
+                badge.textContent = tipoDeuda;
+                wrapper.appendChild(badge);
+            }
+
             return wrapper;
         }
     },
@@ -31,68 +36,24 @@ export const debtTableColumns = [
         key: 'acciones',
         label: 'Acciones',
         render: row => {
-            // Contenedor dropdown
-            const wrapper = document.createElement('div');
-            wrapper.className = 'dropdown d-flex justify-content-end';
-
-            // Botón trigger ⋮
-            const toggle = document.createElement('button');
-            toggle.className = 'btn btn-light btn-sm';
-            toggle.type = 'button';
-            toggle.setAttribute('data-bs-toggle', 'dropdown');
-            toggle.setAttribute('aria-expanded', 'false');
-            toggle.setAttribute('aria-label', 'Acciones');
-            toggle.textContent = '⋮';
-
-            // Menú desplegable
-            const menu = document.createElement('ul');
-            menu.className = 'dropdown-menu dropdown-menu-end';
-
-            // Ver detalle
-            const liDetalle = document.createElement('li');
-            const aDetalle = document.createElement('a');
-            aDetalle.className = 'dropdown-item';
-            aDetalle.href = '#';
-            aDetalle.textContent = 'Ver detalle';
-            aDetalle.addEventListener('click', (e) => {
-                e.preventDefault();
-                row._onDetail(row, toggle);
-            });
-            liDetalle.appendChild(aDetalle);
-
-            // Editar
-            const liEditar = document.createElement('li');
-            const aEditar = document.createElement('a');
-            aEditar.className = 'dropdown-item';
-            aEditar.href = '#';
-            aEditar.textContent = 'Editar';
-            aEditar.addEventListener('click', (e) => {
-                e.preventDefault();
-                row._onEdit(row);
-            });
-            liEditar.appendChild(aEditar);
-
-            // Marcar pagado
-            const liPagado = document.createElement('li');
-            const aPagado = document.createElement('a');
-            aPagado.className = 'dropdown-item';
-            aPagado.href = '#';
-            aPagado.textContent = 'Marcar pagado';
-            aPagado.addEventListener('click', async (e) => {
-                e.preventDefault();
+            // Checkbox pagado
+            const id = `app-checkbox-${row.id}`;
+            const appCheckbox = document.createElement('app-checkbox');
+            appCheckbox.inputId = id;
+            appCheckbox.checked = !!row.pagado;
+            appCheckbox.title = 'Marcar como pagado';
+            appCheckbox.addEventListener('checkbox-change', async (e) => {
                 const { setPagado } = await import('../../../features/montos/montoRepository.js');
-                await setPagado(row.id, !row.pagado);
+                await setPagado(row.id, e.detail.checked);
                 if (typeof row._reload === 'function') row._reload();
             });
-            liPagado.appendChild(aPagado);
 
-            menu.appendChild(liDetalle);
-            menu.appendChild(liEditar);
-            menu.appendChild(liPagado);
-
-            wrapper.appendChild(toggle);
-            wrapper.appendChild(menu);
-            return wrapper;
+            // Contenedor — stopPropagation para no activar el click de fila
+            const container = document.createElement('div');
+            container.className = 'd-flex align-items-center justify-content-end';
+            container.addEventListener('click', e => e.stopPropagation());
+            container.appendChild(appCheckbox);
+            return container;
         }
     }
 ];

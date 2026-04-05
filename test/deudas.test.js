@@ -369,8 +369,18 @@ async function testAcreedorColumnMobileRender() {
 
     const tipoCol = debtTableColumns.find(col => col.key === 'tipoDeuda');
     assert(tipoCol !== undefined, 'Debe existir columna tipoDeuda');
-    assert(tipoCol.opts && tipoCol.opts.classCss === 'd-none d-md-table-cell',
-        'Columna Tipo debe tener clase d-none d-md-table-cell para ocultarse en mobile');
+    assert(tipoCol.opts && typeof tipoCol.opts.classCss === 'string',
+        'Columna Tipo debe definir classCss');
+    assert(tipoCol.opts.classCss.includes('d-none'),
+        'Columna Tipo debe incluir clase d-none para ocultarse en mobile');
+    assert(tipoCol.opts.classCss.includes('d-md-table-cell'),
+        'Columna Tipo debe incluir clase d-md-table-cell para mostrarse desde md');
+
+    // Badge no debe renderizarse cuando tipoDeuda está vacío
+    const rowSinTipo = { acreedor: 'Banco Sin Tipo', tipoDeuda: '' };
+    const nodeSinTipo = acreedorCol.render(rowSinTipo);
+    const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
+    assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
 }
 
 export const tests = [

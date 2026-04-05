@@ -23,8 +23,9 @@ export class DebtDetailModal extends HTMLElement {
         }
     }
 
-    async openDetail(deuda) {
+    async openDetail(deuda, onEdit) {
         this.deuda = deuda;
+        this._onEdit = onEdit || null;
         this.ui.setTitle('Detalle de deuda');
         this._renderContent();
         this.ui.open();
@@ -108,11 +109,25 @@ export class DebtDetailModal extends HTMLElement {
         const montosSection = this._renderMontosSection(montos);
 
         const closeButton = el('button', {
-            className: 'btn btn-secondary mt-3',
+            className: 'btn btn-secondary',
             text: 'Cerrar',
             attrs: { type: 'button' }
         });
         closeButton.addEventListener('click', () => this.close());
+
+        const actions = [closeButton];
+        if (this._onEdit) {
+            const editButton = el('button', {
+                className: 'btn btn-primary',
+                text: 'Editar',
+                attrs: { type: 'button' }
+            });
+            editButton.addEventListener('click', () => {
+                this.close();
+                this._onEdit();
+            });
+            actions.unshift(editButton);
+        }
 
         const content = el('div', {
             children: [
@@ -120,8 +135,8 @@ export class DebtDetailModal extends HTMLElement {
                 infoSection,
                 montosSection,
                 el('div', {
-                    className: 'd-flex justify-content-end',
-                    children: [closeButton]
+                    className: 'd-flex justify-content-end gap-2 mt-3',
+                    children: actions
                 })
             ]
         });
