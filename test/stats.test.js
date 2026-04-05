@@ -40,16 +40,16 @@ async function testStatsCardItemClasses() {
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
 
-    const arsEl = body.querySelector('.h6');
-    assert(arsEl !== null, 'card debe renderizar un elemento con clase "h6" para ARS');
+    const arsEl = body.querySelector('.h5');
+    assert(arsEl !== null, 'card debe renderizar un elemento con clase "h5" para ARS');
     assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
     assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
     const arsBadge = arsEl.querySelector('.badge');
     assert(arsBadge !== null, 'valor ARS debe tener un badge con la moneda');
     assert(arsBadge.textContent === 'ARS', 'badge de ARS debe mostrar "ARS"');
 
-    const usdEl = body.querySelector('.fs-5');
-    assert(usdEl !== null, 'card debe renderizar un elemento con clase "fs-5" para USD');
+    const usdEl = body.querySelector('.h6');
+    assert(usdEl !== null, 'card debe renderizar un elemento con clase "h6" para USD');
     assert(usdEl.classList.contains('text-muted'), 'valor USD debe tener clase "text-muted"');
     const usdBadge = usdEl.querySelector('.badge');
     assert(usdBadge !== null, 'valor USD debe tener un badge con la moneda');
@@ -64,8 +64,8 @@ async function testStatsCardEmptyItems() {
     const card = StatsCard({ title: 'Balance', items: [], color: 'primary' });
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body incluso sin items');
-    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar elemento h6 para ARS');
-    assert(body.querySelector('.fs-5') === null, 'card sin items no debe renderizar elemento fs-5 para USD');
+    assert(body.querySelector('.h5') === null, 'card sin items no debe renderizar elemento h5 para ARS');
+    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar elemento h6 para USD');
 }
 
 // ===================================================================

@@ -15,8 +15,8 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   const valuesEl = document.createElement('div');
 
   if (items.length > 0) {
-    const arsEl = document.createElement('div');
-    arsEl.className = `h6 fw-bold text-${color} lh-sm mb-0`;
+    const arsEl = document.createElement('p');
+    arsEl.className = `h5 fw-bold text-${color} lh-sm mb-0`;
     const arsBadge = document.createElement('span');
     arsBadge.className = `badge bg-${color} me-1`;
     arsBadge.textContent = items[0].currency;
@@ -26,8 +26,8 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   }
 
   if (items.length > 1) {
-    const usdEl = document.createElement('div');
-    usdEl.className = 'fs-5 text-muted mt-1';
+    const usdEl = document.createElement('p');
+    usdEl.className = 'h6 text-muted mt-1';
     const usdBadge = document.createElement('span');
     usdBadge.className = 'badge bg-secondary me-1';
     usdBadge.textContent = items[1].currency;
