@@ -21,7 +21,7 @@ async function testStatsCardBootstrapClasses() {
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
-    assert(body.classList.contains('p-3'), 'body debe tener clase "p-3" para padding');
+    assert(body.classList.contains('p-2'), 'body debe tener clase "p-2" para padding');
 
     const titleEl = body.querySelector('div');
     assert(titleEl !== null, 'card-body debe contener un div de título');

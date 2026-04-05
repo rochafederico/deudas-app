@@ -7,7 +7,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   card.className = `card h-100 rounded-4 shadow-sm border border-2 border-${color}`;
 
   const body = document.createElement('div');
-  body.className = 'card-body p-3';
+  body.className = 'card-body p-2';
 
   const titleEl = document.createElement('div');
   titleEl.className = `fw-semibold text-uppercase small text-${color} mb-2`;
