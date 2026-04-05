@@ -32,7 +32,7 @@ export default function StatsIndicators({ mes } = {}) {
 
       const totalCol = document.createElement('div');
       totalCol.className = 'col-6 col-md-6';
-      totalCol.appendChild(StatsCard({ title: '💳 Total a pagar', items: addValue(summary.byCurrency.pendientes), color: 'warning' }));
+      totalCol.appendChild(StatsCard({ title: '💳 Falta pagar', items: addValue(summary.byCurrency.pendientes), color: 'warning' }));
       row1.appendChild(totalCol);
 
       // Row 2: Ingresos + Gastos + Inversiones
