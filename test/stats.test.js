@@ -88,7 +88,7 @@ async function testAddValueZeroDisplaysAsDash() {
     console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
     const result = addValue({ ARS: 0, USD: 2500 });
     assert(result[0].currency === 'ARS' && result[0].value === '-', 'valor 0 debe tener currency "ARS" y value "-" sin símbolo $');
-    assert(result[1].currency === 'USD' && result[1].value === '$ 2,5 mil', 'valor 2500 debe tener currency "USD" y value "$ 2,5 mil"');
+    assert(result[1].currency === 'USD' && result[1].value === '2,5 mil', 'valor 2500 debe tener currency "USD" y value "2,5 mil"');
 }
 
 // ===================================================================
@@ -136,13 +136,13 @@ async function testCompactFormatMil() {
 }
 
 // ===================================================================
-// UC9: compactFormat — values >= 1.000.000 display in "Millones" format
+// UC9: compactFormat — values >= 1.000.000 display in "M" format
 // ===================================================================
 async function testCompactFormatMillones() {
-    console.log('  UC9: compactFormat muestra formato "Millones" para valores >= 1.000.000');
-    assert(compactFormat(1200000) === '1,2 Millones', '1200000 debe mostrarse como "1,2 Millones"');
-    assert(compactFormat(3450000) === '3,45 Millones', '3450000 debe mostrarse como "3,45 Millones"');
-    assert(compactFormat(1000000) === '1 Millones', '1000000 debe mostrarse como "1 Millones"');
+    console.log('  UC9: compactFormat muestra formato "M" para valores >= 1.000.000');
+    assert(compactFormat(1200000) === '1,2 M', '1200000 debe mostrarse como "1,2 M"');
+    assert(compactFormat(3450000) === '3,45 M', '3450000 debe mostrarse como "3,45 M"');
+    assert(compactFormat(1000000) === '1 M', '1000000 debe mostrarse como "1 M"');
 }
 
 // ===================================================================

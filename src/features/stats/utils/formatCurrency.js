@@ -3,7 +3,7 @@ import CURRENCIES from '../../../shared/config/monedas.js';
 
 /**
  * Formats a number in compact Spanish notation:
- *   >= 1,000,000 → "X,XX Millones"
+ *   >= 1,000,000 → "X,XX M"
  *   >= 1,000     → "XXX mil"
  *   otherwise    → full number with 2 decimal places (es-AR)
  * Null/undefined values return '-'.
@@ -15,7 +15,7 @@ function compactFormat(n) {
     const abs = Math.abs(n);
     if (abs >= 1_000_000) {
         const millones = n / 1_000_000;
-        return Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(millones) + ' Millones';
+        return Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(millones) + ' M';
     }
     if (abs >= 1_000) {
         const miles = n / 1_000;
@@ -28,14 +28,14 @@ function compactFormat(n) {
  * Given a { ARS: number, USD: number } object, returns an array of
  * { currency, value } objects for every currency in CURRENCIES.
  * Missing or zero values render value as "-".
- * Amounts are shown in compact Spanish format (mil / Millones).
+ * Amounts are shown in compact Spanish format (mil / M). No currency sign is included.
  * @param {Object|null} obj
  * @returns {{ currency: string, value: string }[]}
  */
 export function addValue(obj) {
     return CURRENCIES.map(moneda => {
         const monto = obj ? obj[moneda] : undefined;
-        const value = (monto == null || monto === 0) ? '-' : `$ ${compactFormat(monto)}`;
+        const value = (monto == null || monto === 0) ? '-' : compactFormat(monto);
         return { currency: moneda, value };
     });
 }
