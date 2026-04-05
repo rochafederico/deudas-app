@@ -1,4 +1,6 @@
 // src/pages/Ingresos.js
+import '../layout/HeaderBar.js';
+import '../features/ingresos/components/IngresoModal.js';
 import '../features/stats/components/StatsCard.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
@@ -8,22 +10,45 @@ export default function Ingresos() {
     const container = document.createElement('div');
     container.className = 'd-grid gap-3';
 
+    const card = document.createElement('div');
+    card.className = 'card shadow-sm';
+
+    const header = document.createElement('header-bar');
+    header.mode = 'ingresos';
+
+    const ingresoModal = document.createElement('ingreso-modal');
+    ingresoModal.id = 'ingresoModal';
+    container.appendChild(ingresoModal);
+
+    header.addEventListener('add-income', () => {
+        ingresoModal.openCreate();
+        const btn = header.querySelector('#add-income');
+        if (btn) ingresoModal.attachOpener(btn);
+    });
+
+    const cardBody = document.createElement('div');
+    cardBody.className = 'card-body p-3 d-grid gap-3';
+
     // Título de la sección
     const title = document.createElement('h2');
     title.textContent = 'Ingresos del mes';
     title.className = 'h3 mb-2';
-    container.appendChild(title);
+    cardBody.appendChild(title);
 
     const stats = document.createElement('stats-card');
-    container.appendChild(stats);
+    cardBody.appendChild(stats);
+
+    card.appendChild(header);
+    card.appendChild(cardBody);
+    container.appendChild(card);
 
     // Cargar y mostrar totales
     const loadTotals = async () => {
         const ingresos = await listIngresos({ mes: getSelectedMonth() });
-        let table = container.querySelector('app-table');
+        let table = cardBody.querySelector('app-table');
         if (!table) {
             table = document.createElement('app-table');
-            container.appendChild(table);
+            cardBody.appendChild(table);
         }
         table.columnsConfig = ingresosColumns;
         table.tableData = ingresos;

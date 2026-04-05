@@ -1,9 +1,18 @@
-// src/components/HeaderBar.js
+// src/layout/HeaderBar.js
 import '../shared/components/AppInput.js';
 import { groupOptions } from '../shared/config/tables/groupOptions.js';
 import '../shared/components/AppButton.js';
 
 export class HeaderBar extends HTMLElement {
+    set mode(val) {
+        this._mode = val;
+        if (this.isConnected) this._updateButtonVisibility();
+    }
+
+    get mode() {
+        return this._mode || this.getAttribute('mode');
+    }
+
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
@@ -33,6 +42,15 @@ export class HeaderBar extends HTMLElement {
             window.history.pushState({}, '', '/');
             window.dispatchEvent(new PopStateEvent('popstate'));
         });
+        this._updateButtonVisibility();
+    }
+
+    _updateButtonVisibility() {
+        const addDebtBtn = this.querySelector('#add-debt');
+        const addIncomeBtn = this.querySelector('#add-income');
+        const mode = this.mode;
+        if (addDebtBtn) addDebtBtn.classList.toggle('d-none', mode === 'ingresos');
+        if (addIncomeBtn) addIncomeBtn.classList.toggle('d-none', mode === 'deudas');
     }
 
     emitGroupChange(groupBy) {
