@@ -22,12 +22,14 @@ export class AppHeader extends HTMLElement {
     this._onTourClick = () => window.dispatchEvent(new CustomEvent('tour:start'));
     this._onExportClick = (e) => { e.preventDefault(); this._openExportModal(e.currentTarget); };
     this._onImportClick = (e) => { e.preventDefault(); this._openImportModal(e.currentTarget); };
+    this._onDeleteAllClick = (e) => { e.preventDefault(); this._deleteAllData(); };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav').addEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav').addEventListener('click', this._onImportClick);
+    this.querySelector('#delete-all-nav').addEventListener('click', this._onDeleteAllClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
   }
@@ -37,6 +39,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
     this.querySelector('#export-data-nav')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#import-data-nav')?.removeEventListener('click', this._onImportClick);
+    this.querySelector('#delete-all-nav')?.removeEventListener('click', this._onDeleteAllClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     this._popover?.dispose();
@@ -71,6 +74,59 @@ export class AppHeader extends HTMLElement {
     }
   }
 
+  async _deleteAllData() {
+    const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
+    if (!confirmed) return;
+
+    let stores;
+    try {
+      const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
+      const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
+      const { listInversiones, deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
+      stores = [
+        { name: 'Deudas', list: listDeudas, del: deleteDeudas },
+        { name: 'Ingresos', list: getAll, del: deleteAllIngresos },
+        { name: 'Inversiones', list: listInversiones, del: deleteAllInversiones },
+      ];
+    } catch (error) {
+      console.error('Error al cargar módulos de datos:', error);
+      window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al cargar los módulos de datos.', type: 'danger' } }));
+      return;
+    }
+
+    const results = await Promise.allSettled(stores.map(async (store) => {
+      const items = await store.list();
+      if (!items.length) return { name: store.name, status: 'empty' };
+      await store.del();
+      return { name: store.name, status: 'deleted' };
+    }));
+
+    window.dispatchEvent(new CustomEvent('ui:refresh'));
+
+    const deleted = results
+      .filter(r => r.status === 'fulfilled' && r.value.status === 'deleted')
+      .map(r => r.value.name);
+    const empty = results
+      .filter(r => r.status === 'fulfilled' && r.value.status === 'empty')
+      .map(r => r.value.name);
+    const failed = results
+      .map((r, i) => r.status === 'rejected' ? stores[i].name : null)
+      .filter(Boolean);
+
+    if (deleted.length === 0 && failed.length === 0) {
+      window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '⚠️ No había datos para borrar.', type: 'warning' } }));
+      return;
+    }
+
+    const parts = [];
+    if (deleted.length) parts.push(`✅ Eliminado: ${deleted.join(', ')}.`);
+    if (empty.length) parts.push(`ℹ️ Sin registros: ${empty.join(', ')}.`);
+    if (failed.length) parts.push(`❌ Error al eliminar: ${failed.join(', ')}.`);
+
+    const type = failed.length ? 'warning' : 'success';
+    window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: parts.join(' '), type } }));
+  }
+
   _openExportModal(opener) {
     if (!this._exportModal) {
       this._exportModal = document.createElement('export-data-modal');
@@ -100,14 +156,14 @@ export class AppHeader extends HTMLElement {
           </button>
           <div class="collapse navbar-collapse" id="main-nav-collapse" data-tour-step="menu-navegacion">
             <app-nav></app-nav>
-            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
-              <li class="nav-item me-1">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-lg-center gap-2">
+              <li class="nav-item">
                 <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
                   🔔
                 </button>
               </li>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" role="button"
+                <a class="nav-link dropdown-toggle px-2" href="#" role="button"
                   data-bs-toggle="dropdown" aria-expanded="false">
                   💾 Datos
                 </a>
@@ -122,10 +178,16 @@ export class AppHeader extends HTMLElement {
                       📥 Importar
                     </a>
                   </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <a class="dropdown-item text-danger" href="#" id="delete-all-nav">
+                      🗑️ Eliminar todo
+                    </a>
+                  </li>
                 </ul>
               </li>
-              <li class="nav-item">
-                <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
+              <li class="nav-item py-1 py-lg-0 d-flex align-items-center">
+                <button id="tour-btn" class="btn btn-light btn-sm px-3" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">
                   ❓ Tour
                 </button>
               </li>

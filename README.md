@@ -62,7 +62,74 @@ Cada componente y módulo está pensado para ser reutilizable y fácil de manten
 
 Importante:
 - La importación/exportación de datos está implementada. La función de importación fusiona deudas por **Acreedor + Tipo de Deuda** para evitar duplicados y agrega montos que no estén ya presentes (comparación por monto, moneda y periodo/vencimiento). Esto permite combinar backups sin crear grupos duplicados.
-- Las operaciones de acceso a datos están centralizadas en la carpeta `src/repository/` y usan `IndexedDB` con transacciones para consistencia.
+- Las operaciones de acceso a datos se organizan en los módulos de `src/features/**`, mientras que la infraestructura de `IndexedDB` se encuentra en `src/shared/database`, usando transacciones para consistencia.
 
 ## Licencia
 MIT
+
+---
+
+## 🗺️ Mapa del sitio
+
+> Estado relevado del código real. Última revisión: 2026-04-04.
+
+- ✅ **Nivva**
+
+  - 🚧 **Inicio / Dashboard** *(la home es Egresos, no existe dashboard dedicado)*
+    - ✅ KPIs
+      - ✅ Ingresos
+      - ✅ Gastos
+      - ✅ Balance
+      - ✅ Total a pagar
+      - ✅ Inversiones
+    - 🚧 Resumen mensual *(los KPIs muestran datos del mes, pero no hay una sección de resumen independiente)*
+    - ⏳ Próximos vencimientos *(panel flotante con alertas en PR #75)*
+    - ⏳ Alertas / recordatorios
+
+  - ✅ **Movimientos**
+
+    - ✅ Ingresos (`/ingresos`)
+      - ✅ Nuevo ingreso
+      - ✅ Historial
+      - 🚧 Filtros por mes / categoría *(filtro por mes implementado; sin filtro por categoría)*
+
+    - ✅ Gastos / Deudas (`/` — home)
+      - ✅ Nueva deuda
+      - 🚧 Próximas cuotas *(navegación por mes implementada; panel de próximos vencimientos en PR #75)*
+      - ✅ Acreedores *(agrupamiento por acreedor disponible)*
+      - ✅ Estado de pago *(marca pagado/pendiente por cuota)*
+
+    - ✅ Inversiones (`/inversiones`)
+      - ✅ Nuevo registro
+      - ✅ Historial de valores
+      - 🚧 Rendimiento *(muestra valor actual vs. inicial; sin gráficos ni % de retorno)*
+
+  - 🚧 **Gestión de datos**
+    - Desde el menú **Datos** del header:
+      - ✅ Importar datos *(con previsualización y fusión inteligente por acreedor+tipo)*
+      - ✅ Exportar datos *(JSON descargable con deudas, ingresos e inversiones)*
+      - 🚧 Backup / restaurar *(exportar/importar cumple la función; sin flujo dedicado de backup)*
+    - Desde el menú de opciones **⚙️** del `header-bar`:
+      - 🚧 Reiniciar información *("Eliminar todo" borra deudas y montos; ingresos e inversiones no se borran)*
+
+  - ⏳ **Configuración** *(no existe página ni sección de configuración)*
+    - ⏳ Moneda *(ARS/USD están hardcodeados en `monedas.js`)*
+    - ⏳ Formato ARS / USD
+    - ⏳ Preferencias visuales *(existe `DarkToggle.js` pero no está integrado en la UI)*
+    - ⏳ Notificaciones
+
+  - 🚧 **Ayuda**
+    - ✅ Tour guiado *(9 pasos; se lanza automáticamente en el primer acceso y manualmente desde el header)*
+    - 🚧 Cómo usar la app *(cubierto por el tour; sin página de ayuda independiente)*
+    - ⏳ Preguntas frecuentes
+    - ⏳ Contacto / feedback
+
+### Funcionalidades adicionales encontradas en el código
+
+- ✅ Duplicar cuotas / montos *(modal dedicado con selección de nueva fecha)*
+- ✅ Agrupamiento de deudas *(por acreedor, tipo, moneda o vencimiento)*
+- ✅ Múltiples cuotas por deuda *(modelo Deuda → Montos 1:N)*
+- ✅ Notificaciones toast (`AppToast`)
+- ✅ Persistencia 100 % local en IndexedDB *(sin backend)*
+- ✅ Fusión inteligente al importar *(deduplica por acreedor+tipo y por monto+moneda+periodo)*
+- ✅ Navegación por teclado en el tour *(flechas y Escape)*

@@ -58,9 +58,8 @@ export class ExportDataModal extends HTMLElement {
         if (!this._rendered) this.render();
         this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Exportar datos');
-        this.modal.open();
         this.modal.returnFocusTo(opener);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await this.modal.open();
         try {
             const { listDeudas } = await import('../../deudas/deudaRepository.js');
             const { getAll } = await import('../../ingresos/ingresoRepository.js');

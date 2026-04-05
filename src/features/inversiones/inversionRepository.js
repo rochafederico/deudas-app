@@ -53,6 +53,14 @@ export function addValorToInversion(id, { fecha, valor }) {
   });
 }
 
+export function deleteAllInversiones() {
+  return _withInversionesStore('readwrite', (store, resolve, reject) => {
+    const req = store.clear();
+    req.onsuccess = () => resolve();
+    req.onerror = (e) => reject(new Error('Error clearing inversiones: ' + e.target.errorCode));
+  });
+}
+
 export function deleteInversion(id) {
   return getInversionById(id).then(inv => {
     if (!inv) throw new Error('Inversión no encontrada');

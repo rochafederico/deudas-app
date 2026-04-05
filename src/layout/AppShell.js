@@ -65,18 +65,6 @@ export class AppShell extends HTMLElement {
             modal.openCreate();
             modal.attachOpener(header.querySelector('#add-income'));
         });
-        header.addEventListener('delete-data', async () => {
-            const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
-            if (confirmed) {
-                try {
-                    const { deleteDeudas } = await import('../features/deudas/deudaRepository.js');
-                    await deleteDeudas();
-                } catch (error) {
-                    console.error('Error al eliminar los datos:', error);
-                }
-                window.dispatchEvent(new CustomEvent('ui:refresh'));
-            }
-        });
 
         const card = document.createElement('div');
         card.className = 'card shadow-sm';

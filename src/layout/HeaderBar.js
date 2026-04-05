@@ -18,7 +18,6 @@ export class HeaderBar extends HTMLElement {
         const groupFilter = this.querySelector('#group-filter');
         const addDebtBtn = this.querySelector('#add-debt');
         const addIncomeBtn = this.querySelector('#add-income');
-        const deleteBtn = this.querySelector('#delete-data');
         const dashboardBtn = this.querySelector('#dashboard-btn');
 
         if (monthFilter) monthFilter.value = this.month;
@@ -44,10 +43,6 @@ export class HeaderBar extends HTMLElement {
                 this.dispatchEvent(new CustomEvent('add-income', { bubbles: true, composed: true }));
             });
         }
-        if (deleteBtn) deleteBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.dispatchEvent(new CustomEvent('delete-data', { bubbles: true, composed: true }));
-        });
         if (dashboardBtn) dashboardBtn.addEventListener('click', (e) => {
             e.preventDefault();
             window.history.pushState({}, '', '/');
@@ -98,18 +93,6 @@ export class HeaderBar extends HTMLElement {
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
                 Nueva deuda
                 </app-button>
-                <div class="dropdown">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Opciones">
-                        ⚙️
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <button id="delete-data" class="dropdown-item text-danger" type="button">
-                                🗑️ Eliminar todo
-                            </button>
-                        </li>
-                    </ul>
-                </div>
             </div>
             </div>
         `;
