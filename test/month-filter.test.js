@@ -7,7 +7,6 @@ import {
     goToPreviousMonth,
     goToNextMonth,
     formatMonthLabel,
-    formatMonthTitleParts,
 } from '../src/shared/MonthFilter.js';
 
 // ===================================================================
@@ -101,17 +100,6 @@ async function testNavigationDispatchesEvents() {
     assert(nextReceived === '2026-06', 'goToNextMonth debe disparar ui:month con el mes siguiente');
 }
 
-// ===================================================================
-// UC7: formatMonthTitleParts returns separate mes and year strings
-// ===================================================================
-async function testFormatMonthTitleParts() {
-    console.log('  UC7: formatMonthTitleParts retorna mes y año por separado');
-    const { mes, year } = formatMonthTitleParts('2026-04');
-    assert(typeof mes === 'string' && mes.length > 0, 'mes debe ser un string no vacío');
-    assert(year === '2026', 'year debe ser el año como string');
-    assert(!mes.includes('2026'), 'mes no debe contener el año');
-}
-
 export const tests = [
     testGetSelectedMonthReturnsValidFormat,
     testSetSelectedMonthDispatchesEvent,
@@ -119,5 +107,4 @@ export const tests = [
     testGoToNextMonth,
     testFormatMonthLabel,
     testNavigationDispatchesEvents,
-    testFormatMonthTitleParts,
 ];

@@ -33,10 +33,3 @@ export function formatMonthLabel(month) {
     const date = new Date(parseInt(year), parseInt(mon) - 1, 1);
     return date.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
 }
-
-export function formatMonthTitleParts(month) {
-    const [year, mon] = month.split('-');
-    const date = new Date(parseInt(year), parseInt(mon) - 1, 1);
-    const mes = date.toLocaleDateString('es-AR', { month: 'long' });
-    return { mes, year };
-}

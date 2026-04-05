@@ -2,8 +2,7 @@
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
-import './layout/MonthSelector.js';
-import { formatMonthTitleParts, getSelectedMonth } from './shared/MonthFilter.js';
+import ResumenHeader from './layout/ResumenHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
@@ -16,29 +15,8 @@ const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
 wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
 
-// Global title row: dynamic "Resumen de abril 2026" + month selector
-const titleRow = document.createElement('div');
-titleRow.className = 'd-flex justify-content-between align-items-start mb-3 gap-3';
-
-const titleBlock = document.createElement('div');
-const { mes: initMes, year: initYear } = formatMonthTitleParts(getSelectedMonth());
-titleBlock.innerHTML = `
-    <h1 id="app-title" class="h3 fw-bold mb-1">Resumen de ${initMes} ${initYear}</h1>
-    <p class="text-body-secondary mb-0">Tu panorama financiero del mes.</p>
-`;
-titleRow.appendChild(titleBlock);
-
-const monthSelector = document.createElement('month-selector');
-titleRow.appendChild(monthSelector);
-wrapper.appendChild(titleRow);
-
-// Update title when month changes
-window.addEventListener('ui:month', (e) => {
-    const title = document.getElementById('app-title');
-    if (!title) return;
-    const { mes, year } = formatMonthTitleParts(e.detail.mes);
-    title.textContent = `Resumen de ${mes} ${year}`;
-});
+// Global title row: "Resumen" + month selector + subtitle
+wrapper.appendChild(ResumenHeader());
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');
