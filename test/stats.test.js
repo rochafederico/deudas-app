@@ -2,29 +2,30 @@
 // Tests for StatsCard and StatsIndicators components
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
-import { addValue } from '../src/features/stats/utils/formatCurrency.js';
+import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
 // UC1: StatsCard renders with correct Bootstrap classes
 // ===================================================================
 async function testStatsCardBootstrapClasses() {
     console.log('  UC1: StatsCard renderiza clases Bootstrap correctas');
-    const card = StatsCard({ title: 'Ingresos', items: ['ARS: $ 1,000.00'], color: 'success' });
+    const card = StatsCard({ title: 'Ingresos', items: [{ currency: 'ARS', value: '$ 1.000,00' }], color: 'success' });
 
     assert(card.classList.contains('card'), 'card debe tener clase "card"');
     assert(card.classList.contains('h-100'), 'card debe tener clase "h-100"');
     assert(card.classList.contains('rounded-4'), 'card debe tener clase "rounded-4"');
     assert(card.classList.contains('shadow-sm'), 'card debe tener clase "shadow-sm"');
-    assert(card.classList.contains('border-0'), 'card debe tener clase "border-0"');
-    assert(card.classList.contains('bg-success-subtle'), 'card debe tener clase "bg-success-subtle"');
+    assert(card.classList.contains('border'), 'card debe tener clase "border"');
+    assert(card.classList.contains('border-2'), 'card debe tener clase "border-2"');
+    assert(card.classList.contains('border-success'), 'card debe tener clase "border-success"');
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
-    assert(body.classList.contains('p-3'), 'body debe tener clase "p-3" para padding');
+    assert(body.classList.contains('p-2'), 'body debe tener clase "p-2" para padding');
 
     const titleEl = body.querySelector('div');
     assert(titleEl !== null, 'card-body debe contener un div de título');
-    assert(titleEl.classList.contains('fw-bold'), 'título debe tener clase "fw-bold"');
+    assert(titleEl.classList.contains('fw-semibold'), 'título debe tener clase "fw-semibold"');
     assert(titleEl.classList.contains('text-uppercase'), 'título debe tener clase "text-uppercase"');
     assert(titleEl.classList.contains('text-success'), 'título debe tener clase "text-success"');
     assert(titleEl.textContent === 'Ingresos', 'título debe mostrar el texto correcto');
@@ -35,21 +36,20 @@ async function testStatsCardBootstrapClasses() {
 // ===================================================================
 async function testStatsCardItemClasses() {
     console.log('  UC2: StatsCard renderiza items con clases de tipografía modernas');
-    const card = StatsCard({ title: 'Gastos', items: ['ARS: $ 500.00', 'USD: -'], color: 'danger' });
+    const card = StatsCard({ title: 'Gastos', items: [{ currency: 'ARS', value: '$ 500,00' }, { currency: 'USD', value: '-' }], color: 'danger' });
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
 
-    const arsEl = body.querySelector('.fs-2');
-    assert(arsEl !== null, 'card debe renderizar un elemento con clase "fs-2" para ARS');
+    const arsEl = body.querySelector('h6');
+    assert(arsEl !== null, 'card debe renderizar un elemento h6 para ARS');
     assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
     assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
-    assert(arsEl.textContent === 'ARS: $ 500.00', 'valor ARS debe mostrar el texto correcto');
+    const arsBadge = arsEl.querySelector('.badge');
+    assert(arsBadge !== null, 'valor ARS debe tener un badge con la moneda');
+    assert(arsBadge.textContent === 'ARS', 'badge de ARS debe mostrar "ARS"');
 
-    const usdEl = body.querySelector('.fs-5');
-    assert(usdEl !== null, 'card debe renderizar un elemento con clase "fs-5" para USD');
-    assert(usdEl.classList.contains('text-muted'), 'valor USD debe tener clase "text-muted"');
-    assert(usdEl.textContent === 'USD: -', 'valor USD debe mostrar el texto correcto');
+    assert(body.querySelector('h5') === null, 'card no debe renderizar ningún elemento h5');
 }
 
 // ===================================================================
@@ -60,8 +60,8 @@ async function testStatsCardEmptyItems() {
     const card = StatsCard({ title: 'Balance', items: [], color: 'primary' });
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body incluso sin items');
-    assert(body.querySelector('.fs-2') === null, 'card sin items no debe renderizar elemento fs-2 para ARS');
-    assert(body.querySelector('.fs-5') === null, 'card sin items no debe renderizar elemento fs-5 para USD');
+    assert(body.querySelector('h6') === null, 'card sin items no debe renderizar elemento h6 para ARS');
+    assert(body.querySelector('.h5') === null, 'card sin items no debe renderizar ningún elemento de tipografía');
 }
 
 // ===================================================================
@@ -70,7 +70,7 @@ async function testStatsCardEmptyItems() {
 async function testStatsCardDefaultColor() {
     console.log('  UC4: StatsCard usa color "secondary" por defecto');
     const card = StatsCard({ title: 'Test' });
-    assert(card.classList.contains('bg-secondary-subtle'), 'card debe tener clase "bg-secondary-subtle" por defecto');
+    assert(card.classList.contains('border-secondary'), 'card deve tener clase "border-secondary" por defecto');
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body con color por defecto');
     const titleEl = body.querySelector('div');
@@ -83,8 +83,8 @@ async function testStatsCardDefaultColor() {
 async function testAddValueZeroDisplaysAsDash() {
     console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
     const result = addValue({ ARS: 0, USD: 2500 });
-    assert(result[0] === 'ARS: -', 'valor 0 debe mostrarse como "ARS: -" sin símbolo $');
-    assert(result[1] === 'USD: $ 2.500,00', 'valor positivo debe mostrarse con símbolo $');
+    assert(result[0].currency === 'ARS' && result[0].value === '-', 'valor 0 debe tener currency "ARS" y value "-" sin símbolo $');
+    assert(result[1].currency === 'USD' && result[1].value === '2,5 mil', 'valor 2500 debe tener currency "USD" y value "2,5 mil"');
 }
 
 // ===================================================================
@@ -93,14 +93,14 @@ async function testAddValueZeroDisplaysAsDash() {
 async function testAddValueNullDisplaysAsDash() {
     console.log('  UC6: addValue muestra "-" para valores null o undefined');
     const resultNull = addValue({ ARS: null });
-    assert(resultNull[0] === 'ARS: -', 'valor null debe mostrarse como "ARS: -"');
-    assert(resultNull[1] === 'USD: -', 'USD ausente debe mostrarse como "USD: -"');
+    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '-', 'valor null debe tener value "-"');
+    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '-', 'USD ausente debe tener value "-"');
 
     const resultUndefined = addValue({ USD: undefined });
-    assert(resultUndefined[1] === 'USD: -', 'valor undefined debe mostrarse como "USD: -"');
+    assert(resultUndefined[1].currency === 'USD' && resultUndefined[1].value === '-', 'valor undefined debe tener value "-"');
 
     const resultBoth = addValue({ ARS: null, USD: null });
-    assert(resultBoth.every(r => r.endsWith(': -')), 'todos los valores null deben mostrarse como "-"');
+    assert(resultBoth.every(r => r.value === '-'), 'todos los valores null deben tener value "-"');
 }
 
 // ===================================================================
@@ -111,13 +111,53 @@ async function testAddValueAlwaysShowsBothCurrencies() {
 
     const resultEmpty = addValue({});
     assert(resultEmpty.length === 2, 'addValue debe retornar siempre 2 filas');
-    assert(resultEmpty[0] === 'ARS: -', 'ARS debe mostrarse como "-" cuando no hay datos');
-    assert(resultEmpty[1] === 'USD: -', 'USD debe mostrarse como "-" cuando no hay datos');
+    assert(resultEmpty[0].currency === 'ARS' && resultEmpty[0].value === '-', 'ARS debe tener value "-" cuando no hay datos');
+    assert(resultEmpty[1].currency === 'USD' && resultEmpty[1].value === '-', 'USD debe tener value "-" cuando no hay datos');
 
     const resultNull = addValue(null);
     assert(resultNull.length === 2, 'addValue debe retornar 2 filas cuando obj es null');
-    assert(resultNull[0] === 'ARS: -', 'ARS debe mostrarse como "-" cuando obj es null');
-    assert(resultNull[1] === 'USD: -', 'USD debe mostrarse como "-" cuando obj es null');
+    assert(resultNull[0].currency === 'ARS' && resultNull[0].value === '-', 'ARS debe tener value "-" cuando obj es null');
+    assert(resultNull[1].currency === 'USD' && resultNull[1].value === '-', 'USD debe tener value "-" cuando obj es null');
+}
+
+// ===================================================================
+// UC8: compactFormat — values >= 1.000 display in "mil" format
+// ===================================================================
+async function testCompactFormatMil() {
+    console.log('  UC8: compactFormat muestra formato "mil" para valores >= 1.000');
+    assert(compactFormat(850000) === '850 mil', '850000 debe mostrarse como "850 mil"');
+    assert(compactFormat(1000) === '1 mil', '1000 debe mostrarse como "1 mil"');
+    assert(compactFormat(1200) === '1,2 mil', '1200 debe mostrarse como "1,2 mil"');
+    assert(compactFormat(500000) === '500 mil', '500000 debe mostrarse como "500 mil"');
+}
+
+// ===================================================================
+// UC9: compactFormat — values >= 1.000.000 display in "M" format
+// ===================================================================
+async function testCompactFormatMillones() {
+    console.log('  UC9: compactFormat muestra formato "M" para valores >= 1.000.000');
+    assert(compactFormat(1200000) === '1,2 M', '1200000 debe mostrarse como "1,2 M"');
+    assert(compactFormat(3450000) === '3,45 M', '3450000 debe mostrarse como "3,45 M"');
+    assert(compactFormat(1000000) === '1 M', '1000000 debe mostrarse como "1 M"');
+}
+
+// ===================================================================
+// UC10: compactFormat — small values use normal es-AR format
+// ===================================================================
+async function testCompactFormatSmall() {
+    console.log('  UC10: compactFormat usa formato normal para valores < 1.000');
+    assert(compactFormat(500) === '500,00', '500 debe mostrarse como "500,00"');
+    assert(compactFormat(999) === '999,00', '999 debe mostrarse como "999,00"');
+    assert(compactFormat(0) === '0,00', '0 debe mostrarse como "0,00"');
+}
+
+// ===================================================================
+// UC11: compactFormat — null/undefined returns "-"
+// ===================================================================
+async function testCompactFormatNull() {
+    console.log('  UC11: compactFormat muestra "-" para null o undefined');
+    assert(compactFormat(null) === '-', 'null debe retornar "-"');
+    assert(compactFormat(undefined) === '-', 'undefined debe retornar "-"');
 }
 
 export const tests = [
@@ -128,4 +168,8 @@ export const tests = [
     testAddValueZeroDisplaysAsDash,
     testAddValueNullDisplaysAsDash,
     testAddValueAlwaysShowsBothCurrencies,
+    testCompactFormatMil,
+    testCompactFormatMillones,
+    testCompactFormatSmall,
+    testCompactFormatNull,
 ];
