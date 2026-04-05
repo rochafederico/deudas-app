@@ -19,7 +19,7 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   if (items.length > 0) {
     const mainItem = items.find(i => i.currency === KPI_CURRENCY) || items[0];
     const arsEl = document.createElement('p');
-    arsEl.className = `h5 fw-bold text-${color} lh-sm mb-0`;
+    arsEl.className = `h6 fw-bold text-${color} lh-sm mb-0`;
     const arsBadge = document.createElement('span');
     arsBadge.className = `badge bg-${color} me-1`;
     arsBadge.textContent = mainItem.currency;

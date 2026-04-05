@@ -40,15 +40,15 @@ async function testStatsCardItemClasses() {
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
 
-    const arsEl = body.querySelector('.h5');
-    assert(arsEl !== null, 'card debe renderizar un elemento con clase "h5" para ARS');
+    const arsEl = body.querySelector('.h6');
+    assert(arsEl !== null, 'card debe renderizar un elemento con clase "h6" para ARS');
     assert(arsEl.classList.contains('fw-bold'), 'valor ARS debe tener clase "fw-bold"');
     assert(arsEl.classList.contains('text-danger'), 'valor ARS debe tener clase "text-danger"');
     const arsBadge = arsEl.querySelector('.badge');
     assert(arsBadge !== null, 'valor ARS debe tener un badge con la moneda');
     assert(arsBadge.textContent === 'ARS', 'badge de ARS debe mostrar "ARS"');
 
-    assert(body.querySelector('.h6') === null, 'card no debe renderizar una segunda fila USD');
+    assert(body.querySelector('.h5') === null, 'card no debe renderizar ningún elemento h5');
 }
 
 // ===================================================================
@@ -59,8 +59,8 @@ async function testStatsCardEmptyItems() {
     const card = StatsCard({ title: 'Balance', items: [], color: 'primary' });
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body incluso sin items');
-    assert(body.querySelector('.h5') === null, 'card sin items no debe renderizar elemento h5 para ARS');
-    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar ningún elemento de tipografía');
+    assert(body.querySelector('.h6') === null, 'card sin items no debe renderizar elemento h6 para ARS');
+    assert(body.querySelector('.h5') === null, 'card sin items no debe renderizar ningún elemento de tipografía');
 }
 
 // ===================================================================
