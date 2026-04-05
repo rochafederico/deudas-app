@@ -13,6 +13,7 @@ import { tests as bootstrapStylesTests } from './bootstrap-styles.test.js';
 import { tests as tourTests } from './tour.test.js';
 import { tests as notificationsTests } from './notifications.test.js';
 import { tests as statsTests } from './stats.test.js';
+import { tests as monthFilterTests } from './month-filter.test.js';
 
 async function run() {
     try {
@@ -45,6 +46,9 @@ async function run() {
 
         console.log('\n--- Stats ---');
         for (const test of statsTests) { await test(); }
+
+        console.log('\n--- Month Filter ---');
+        for (const test of monthFilterTests) { await test(); }
 
         printResults();
         process.exit(0);

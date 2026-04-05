@@ -2,6 +2,7 @@
 import StatsCard from './StatsCard.js';
 import { getMonthlySummary } from '../statsService.js';
 import { addValue } from '../utils/formatCurrency.js';
+import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
@@ -42,13 +43,13 @@ export default function StatsIndicators({ mes } = {}) {
     }
   }
 
-  const initialPeriodo = mes || new Date().toISOString().slice(0, 7);
+  const initialPeriodo = mes || getSelectedMonth();
   render(initialPeriodo);
 
   // Avoid adding multiple global listeners if this module is imported more than once
   if (!window.__statsIndicatorsMonthListenerAdded) {
-    window.addEventListener('month-change', (e) => {
-      const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : new Date().toISOString().slice(0, 7);
+    window.addEventListener('ui:month', (e) => {
+      const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : getSelectedMonth();
       render(nuevo);
     });
     window.__statsIndicatorsMonthListenerAdded = true;

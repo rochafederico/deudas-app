@@ -2,6 +2,7 @@
 import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
+import './layout/MonthSelector.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
@@ -13,6 +14,14 @@ document.body.classList.add('bg-body-tertiary');
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
 wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
+
+// Global title + month selector row
+const titleRow = document.createElement('div');
+titleRow.className = 'd-flex justify-content-between align-items-center mb-3';
+titleRow.innerHTML = '<h1 class="h4 fw-bold mb-0">Resumen</h1>';
+const monthSelector = document.createElement('month-selector');
+titleRow.appendChild(monthSelector);
+wrapper.appendChild(titleRow);
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');
