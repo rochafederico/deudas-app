@@ -70,7 +70,7 @@ export class AppTable extends HTMLElement {
             const tr = document.createElement('tr');
             if (typeof row._onRowClick === 'function') {
                 tr.style.cursor = 'pointer';
-                tr.addEventListener('click', () => row._onRowClick(row));
+                tr.addEventListener('click', () => row._onRowClick(row, tr));
             }
             this.columns.forEach(col => {
                 const td = document.createElement('td');

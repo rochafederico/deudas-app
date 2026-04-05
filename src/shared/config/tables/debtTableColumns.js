@@ -37,7 +37,7 @@ export const debtTableColumns = [
         label: 'Acciones',
         render: row => {
             // Checkbox pagado
-            const id = `app-checkbox-${row.id}`;
+            const id = `app-checkbox-${row.id != null ? row.id : 'row'}`;
             const appCheckbox = document.createElement('app-checkbox');
             appCheckbox.inputId = id;
             appCheckbox.checked = !!row.pagado;

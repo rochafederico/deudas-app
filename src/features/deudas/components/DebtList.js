@@ -134,7 +134,7 @@ export class DebtList extends HTMLElement {
                 },
                 _reload: this.loadDebts.bind(this)
             };
-            entry._onRowClick = (monto) => entry._onDetail(monto, null);
+            entry._onRowClick = (monto, opener) => entry._onDetail(monto, opener || null);
             return entry;
         });
 
