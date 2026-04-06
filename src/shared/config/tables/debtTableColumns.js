@@ -36,7 +36,7 @@ export const debtTableColumns = [
         label: 'Monto',
         render: row => {
             const wrapper = document.createElement('div');
-            wrapper.className = 'd-flex flex-column';
+            wrapper.className = 'd-flex flex-column align-items-start';
 
             const montoSpan = document.createElement('span');
             montoSpan.textContent = formatMoneda(row.monto, row.moneda);
@@ -45,7 +45,7 @@ export const debtTableColumns = [
             const vencimiento = String(row.vencimiento ?? '').trim();
             if (vencimiento !== '') {
                 const badge = document.createElement('span');
-                badge.className = 'badge bg-dark d-md-none mt-1';
+                badge.className = 'text-muted d-md-none mt-1';
                 badge.textContent = vencimiento;
                 wrapper.appendChild(badge);
             }

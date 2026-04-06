@@ -390,16 +390,16 @@ async function testAcreedorColumnMobileRender() {
     const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
     const montoNode = montoCol.render(rowConVenc);
     assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
-    const vencBadge = montoNode.querySelector('span.badge');
-    assert(vencBadge !== null, 'Debe existir badge de vencimiento en columna Monto');
-    assert(vencBadge.classList.contains('d-md-none'), 'Badge de vencimiento debe ser solo visible en mobile (d-md-none)');
-    assert(vencBadge.textContent === '2026-06-01', 'Badge debe mostrar la fecha de vencimiento');
+    const vencBadge = montoNode.querySelector('span.d-md-none');
+    assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Monto');
+    assert(vencBadge.classList.contains('d-md-none'), 'Elemento de vencimiento debe ser solo visible en mobile (d-md-none)');
+    assert(vencBadge.textContent === '2026-06-01', 'Elemento debe mostrar la fecha de vencimiento');
 
     // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
     const rowSinVenc = { monto: 500, moneda: 'ARS', vencimiento: '' };
     const montoNodeSinVenc = montoCol.render(rowSinVenc);
-    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.badge');
-    assert(vencBadgeSinVenc === null, 'No debe renderizarse badge de vencimiento cuando está vacío');
+    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.d-md-none');
+    assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
 }
 
 export const tests = [
