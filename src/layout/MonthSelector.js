@@ -6,7 +6,7 @@ import {
     goToPreviousMonth,
     goToNextMonth,
 } from '../shared/MonthFilter.js';
-import { trackEvent } from '../shared/analytics/clarity.service.js';
+import { trackEvent } from '../shared/observability/index.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {

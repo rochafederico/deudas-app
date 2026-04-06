@@ -6,7 +6,7 @@ import {
     trackFlowStart,
     trackFlowComplete,
     trackFlowError
-} from '../../../shared/analytics/clarity.service.js';
+} from '../../../shared/observability/index.js';
 
 export class ExportDataModal extends HTMLElement {
     constructor() {

@@ -10,7 +10,7 @@ import {
     trackFlowComplete,
     trackFlowAbandoned,
     updateFlowStep
-} from '../../shared/analytics/clarity.service.js';
+} from '../../shared/observability/index.js';
 
 export class TourManager {
     constructor() {

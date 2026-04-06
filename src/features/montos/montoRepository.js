@@ -3,7 +3,7 @@
 import { getDB } from '../../shared/database/initDB.js';
 import { MONTOS_STORE } from '../../shared/database/schema.js';
 import { MontoEntity } from './MontoEntity.js';
-import { trackEvent, trackFlowError } from '../../shared/analytics/clarity.service.js';
+import { trackEvent, trackFlowError } from '../../shared/observability/index.js';
 
 function _getMontosStore(mode = 'readonly') {
     const db = getDB();

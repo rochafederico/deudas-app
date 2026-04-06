@@ -3,7 +3,7 @@
 
 import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
 import { navItems } from './navConfig.js';
-import { trackEvent } from '../shared/analytics/clarity.service.js';
+import { trackEvent } from '../shared/observability/index.js';
 
 export class BottomNav extends HTMLElement {
   connectedCallback() {

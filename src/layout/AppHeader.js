@@ -2,7 +2,7 @@ import './Menu.js';
 import './DarkToggle.js';
 import '../shared/components/AppToast.js';
 import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
-import { trackEvent } from '../shared/analytics/clarity.service.js';
+import { trackEvent } from '../shared/observability/index.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {

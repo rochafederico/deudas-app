@@ -5,7 +5,7 @@ import {
     trackFlowComplete,
     trackFlowError,
     trackFlowAbandoned
-} from '../src/shared/analytics/clarity.service.js';
+} from '../src/shared/observability/index.js';
 import { setPagado, listMontos } from '../src/features/montos/montoRepository.js';
 import { addDeuda, deleteDeudas } from '../src/features/deudas/deudaRepository.js';
 import '../src/features/deudas/components/DebtForm.js';

@@ -11,7 +11,7 @@ import {
     trackFlowError,
     trackFlowAbandoned,
     updateFlowStep
-} from '../../../shared/analytics/clarity.service.js';
+} from '../../../shared/observability/index.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
