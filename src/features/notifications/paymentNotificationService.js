@@ -29,8 +29,8 @@ function saveNotifiedKeys(payments) {
     }
 }
 
-function isSameMonth(date, now) {
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+function isSameMonth(paymentDate, now) {
+    return paymentDate.getFullYear() === now.getFullYear() && paymentDate.getMonth() === now.getMonth();
 }
 
 /**

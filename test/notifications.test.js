@@ -47,7 +47,7 @@ async function testGetUpcomingPayments() {
 
     const upcoming = getUpcomingPayments(deudas, 3, now);
 
-    assert(upcoming.length === 5, `Debe haber 5 pagos a contemplar, encontrados: ${upcoming.length}`);
+    assert(upcoming.length === 5, `Debe haber 5 pagos a considerar, encontrados: ${upcoming.length}`);
     assert(upcoming.some(p => p.monto === 1000), 'Incluye pago de hoy');
     assert(upcoming.some(p => p.monto === 2000), 'Incluye pago en 2 días');
     assert(upcoming.some(p => p.monto === 3000), 'Incluye pago en 3 días (límite)');
