@@ -6,6 +6,13 @@ import '../../../shared/components/AppInput.js';
 import '../../../shared/components/AppForm.js';
 import '../../montos/components/MontoForm.js';
 import '../../montos/components/DuplicateMontoModal.js';
+import {
+    trackFlowStart,
+    trackFlowComplete,
+    trackFlowError,
+    trackFlowAbandoned,
+    updateFlowStep
+} from '../../../shared/observability/index.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {
@@ -13,6 +20,10 @@ export class DebtForm extends HTMLElement {
         this.montos = [];
         this.editing = false;
         this.deudaId = null;
+        this._analyticsFlow = null;
+        this._analyticsStep = 'form';
+        this._analyticsCompleted = false;
+        this._analyticsStartedFor = null;
     }
 
     connectedCallback() {
@@ -23,17 +34,33 @@ export class DebtForm extends HTMLElement {
             this.montoModal = this.querySelector('#montoModal');
             this.duplicateModal = this.querySelector('#duplicateMontoModal');
             this.montosTbody = this.querySelector('#montos-tbody');
-            this.querySelector('#add-monto').addEventListener('click', (event) => {
-                event.stopPropagation();
-                this.openMontoModal();
-            });
         }
+        this._addMontoBtn = this.querySelector('#add-monto');
+        this._onAddMontoClick = (event) => {
+            event.stopPropagation();
+            this.startAnalyticsFlow(this._getFlowName(), { step: 'monto_list' });
+            this.openMontoModal();
+        };
+        this._addMontoBtn.removeEventListener('click', this._onAddMontoClick);
+        this._addMontoBtn.addEventListener('click', this._onAddMontoClick);
         // Re-attach form listeners on every (re)connect so they survive DOM moves
         this.form = this.querySelector('app-form');
         this._onSubmit = this.handleSubmit.bind(this);
         this._onCancel = () => this.reset();
+        this._onValidationError = (event) => {
+            const flowName = this._analyticsFlow || this._getFlowName();
+            this.startAnalyticsFlow(flowName, { step: this._analyticsStep });
+            trackFlowError(flowName, {
+                step: this._analyticsStep,
+                errors: event.detail.errors
+            });
+        };
+        this._onInteraction = () => this.startAnalyticsFlow(this._getFlowName(), { step: this._analyticsStep });
         this.form.addEventListener('deuda:submit', this._onSubmit);
         this.form.addEventListener('form:cancel', this._onCancel);
+        this.form.addEventListener('form:validation-error', this._onValidationError);
+        this.form.addEventListener('input', this._onInteraction);
+        this.form.addEventListener('change', this._onInteraction);
         this.renderMontosList();
     }
 
@@ -41,6 +68,12 @@ export class DebtForm extends HTMLElement {
         if (this.form) {
             this.form.removeEventListener('deuda:submit', this._onSubmit);
             this.form.removeEventListener('form:cancel', this._onCancel);
+            this.form.removeEventListener('form:validation-error', this._onValidationError);
+            this.form.removeEventListener('input', this._onInteraction);
+            this.form.removeEventListener('change', this._onInteraction);
+        }
+        if (this._addMontoBtn) {
+            this._addMontoBtn.removeEventListener('click', this._onAddMontoClick);
         }
     }
 
@@ -107,6 +140,8 @@ export class DebtForm extends HTMLElement {
     }
 
     openMontoModal(monto = null, index = null) {
+        this._analyticsStep = monto ? 'edit_installment' : 'add_installment';
+        updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
         this.montoEditIndex = index;
         this.montoModal.setTitle(monto ? 'Editar monto' : 'Agregar monto');
         this.montoModal.clearBody();
@@ -128,6 +163,11 @@ export class DebtForm extends HTMLElement {
     }
 
     openDuplicateMontoModal(monto, idx) {
+        trackFlowStart('duplicate_installment', {
+            step: 'duplicate_modal',
+            deudaId: this.deudaId,
+            source: 'DebtForm'
+        });
         this.duplicateMontoIndex = idx;
         this.duplicateModal.setTitle('Duplicar monto');
         this.duplicateModal.clearBody();
@@ -141,9 +181,16 @@ export class DebtForm extends HTMLElement {
             const nuevoMonto = { ...monto, vencimiento: nuevaFecha, periodo: nuevoPeriodo, id: undefined };
             this.montos.push(nuevoMonto);
             this.renderMontosList();
+            trackFlowComplete('duplicate_installment', {
+                deudaId: this.deudaId,
+                period: nuevoPeriodo
+            });
             this.duplicateModal.close();
         }, { once: true });
-        duplicateForm.addEventListener('duplicate:cancel', () => this.duplicateModal.close(), { once: true });
+        duplicateForm.addEventListener('duplicate:cancel', () => {
+            trackFlowAbandoned('duplicate_installment', 'duplicate_modal', { deudaId: this.deudaId });
+            this.duplicateModal.close();
+        }, { once: true });
         this.duplicateModal.appendChild(duplicateForm);
         this.duplicateModal.open();
     }
@@ -216,6 +263,7 @@ export class DebtForm extends HTMLElement {
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
         this.renderMontosList();
+        this.startAnalyticsFlow('edit_debt', { step: 'form', deudaId: deuda.id });
         // Precarga los valores en <app-form>
         const form = this.querySelector('app-form');
         if (form) {
@@ -227,7 +275,13 @@ export class DebtForm extends HTMLElement {
         }
     }
 
-    reset() {
+    reset(options = {}) {
+        const { trackAbandonment = true, reason = 'cancel' } = options;
+        if (trackAbandonment) {
+            this.abandonAnalyticsFlow(reason);
+        } else {
+            this.clearAnalyticsFlow();
+        }
         this.editing = false;
         this.deudaId = null;
         this.montos = [];
@@ -242,11 +296,17 @@ export class DebtForm extends HTMLElement {
 
     async handleSubmit(e) {
         e.preventDefault();
+        const flowName = this._analyticsFlow || this._getFlowName();
+        this.startAnalyticsFlow(flowName, { step: 'submit' });
         // Los datos del formulario ya están validados por AppForm
         const values = e.detail;
         // Validar que haya al menos un monto
         if (!this.montos || this.montos.length === 0) {
             this.showFormError('Debe agregar al menos un monto antes de guardar.');
+            trackFlowError(flowName, {
+                step: 'submit',
+                errors: { montos: 'Debe agregar al menos un monto antes de guardar.' }
+            });
             return;
         }
         this.clearFormError();
@@ -261,12 +321,16 @@ export class DebtForm extends HTMLElement {
             const { updateDeuda } = await import('../deudaRepository.js');
             await updateDeuda(deuda);
             this.dispatchEvent(new CustomEvent('deuda:updated', { detail: deuda, bubbles: true, composed: true }));
+            await trackFlowComplete('edit_debt', { deudaId: this.deudaId, montosCount: this.montos.length });
         } else {
             const { addDeuda } = await import('../deudaRepository.js');
-            await addDeuda(deuda);
+            const deudaId = await addDeuda(deuda);
+            deuda.id = deudaId;
             this.dispatchEvent(new CustomEvent('deuda:saved', { detail: deuda, bubbles: true, composed: true }));
+            await trackFlowComplete('create_debt', { deudaId, montosCount: this.montos.length });
         }
-        this.reset();
+        this._analyticsCompleted = true;
+        this.reset({ trackAbandonment: false });
     }
 
     showFormError(msg) {
@@ -285,6 +349,37 @@ export class DebtForm extends HTMLElement {
     clearFormError() {
         const err = this.querySelector('#form-error');
         if (err) err.textContent = '';
+    }
+
+    startAnalyticsFlow(flowName, metadata = {}) {
+        if (!flowName) return;
+        this._analyticsFlow = flowName;
+        this._analyticsStep = metadata.step || this._analyticsStep || 'form';
+        updateFlowStep(flowName, this._analyticsStep, metadata);
+        if (this._analyticsStartedFor === flowName) return;
+        this._analyticsStartedFor = flowName;
+        this._analyticsCompleted = false;
+        trackFlowStart(flowName, metadata);
+    }
+
+    abandonAnalyticsFlow(reason = 'cancel') {
+        if (!this._analyticsFlow || this._analyticsCompleted) {
+            this.clearAnalyticsFlow();
+            return;
+        }
+        trackFlowAbandoned(this._analyticsFlow, this._analyticsStep, { deudaId: this.deudaId, reason });
+        this.clearAnalyticsFlow();
+    }
+
+    clearAnalyticsFlow() {
+        this._analyticsFlow = null;
+        this._analyticsStep = 'form';
+        this._analyticsCompleted = false;
+        this._analyticsStartedFor = null;
+    }
+
+    _getFlowName() {
+        return this.editing ? 'edit_debt' : 'create_debt';
     }
 }
 customElements.define('debt-form', DebtForm);

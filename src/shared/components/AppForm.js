@@ -1,6 +1,6 @@
 // src/components/AppForm.js
 // Formulario reutilizable que usa Bootstrap directamente (sin Shadow DOM)
-import { el, getFormValuesAndValidate } from '../utils/dom.js';
+import { getFormValuesAndValidate } from '../utils/dom.js';
 
 export class AppForm extends HTMLElement {
     constructor() {
@@ -160,6 +160,11 @@ export class AppForm extends HTMLElement {
         this.form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
         this.form.querySelectorAll('.invalid-feedback').forEach(el => { el.textContent = ''; });
         if (!valid) {
+            this.dispatchEvent(new CustomEvent('form:validation-error', {
+                detail: { values, errors },
+                bubbles: true,
+                composed: true
+            }));
             Object.entries(errors).forEach(([name, msg]) => {
                 const input = this.form.querySelector(`[name="${name}"]`);
                 if (input) {

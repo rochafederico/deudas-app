@@ -3,6 +3,7 @@
 import { getDB } from '../../shared/database/initDB.js';
 import { MONTOS_STORE } from '../../shared/database/schema.js';
 import { MontoEntity } from './MontoEntity.js';
+import { trackEvent, trackFlowError } from '../../shared/observability/index.js';
 
 function _getMontosStore(mode = 'readonly') {
     const db = getDB();
@@ -67,13 +68,34 @@ export function setPagado(id, pagado) {
         const getRequest = montosStore.get(id);
         getRequest.onsuccess = () => {
             const monto = getRequest.result;
-            if (!monto) return reject(new Error('Monto no encontrado'));
+            if (!monto) {
+                trackFlowError('payment', { montoId: id, reason: 'monto_not_found' });
+                return reject(new Error('Monto no encontrado'));
+            }
             monto.pagado = pagado;
             const putRequest = montosStore.put(monto);
-            putRequest.onsuccess = () => resolve(monto);
-            putRequest.onerror = (event) => reject(new Error('Error actualizando pagado: ' + event.target.errorCode));
+            putRequest.onsuccess = () => {
+                if (pagado) {
+                    trackEvent('payment_registered', {
+                        flow: 'register_payment',
+                        status: 'completed',
+                        montoId: id,
+                        deudaId: monto.deudaId,
+                        moneda: monto.moneda,
+                        amount: monto.monto
+                    });
+                }
+                resolve(monto);
+            };
+            putRequest.onerror = (event) => {
+                trackFlowError('payment', { montoId: id, reason: 'update_failed' });
+                reject(new Error('Error actualizando pagado: ' + event.target.errorCode));
+            };
         };
-        getRequest.onerror = (event) => reject(new Error('Error obteniendo monto: ' + event.target.errorCode));
+        getRequest.onerror = (event) => {
+            trackFlowError('payment', { montoId: id, reason: 'read_failed' });
+            reject(new Error('Error obteniendo monto: ' + event.target.errorCode));
+        };
     });
 }
 

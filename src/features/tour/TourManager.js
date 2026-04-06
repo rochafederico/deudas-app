@@ -5,6 +5,12 @@ import { tourSteps } from './tourConfig.js';
 import { isTourCompleted, markTourCompleted } from './tourState.js';
 import './components/TourOverlay.js';
 import './components/TourTooltip.js';
+import {
+    trackFlowStart,
+    trackFlowComplete,
+    trackFlowAbandoned,
+    updateFlowStep
+} from '../../shared/observability/index.js';
 
 export class TourManager {
     constructor() {
@@ -29,6 +35,7 @@ export class TourManager {
      */
     forceStart() {
         this._currentIndex = 0;
+        trackFlowStart('tour', { step: tourSteps[0]?.id || 'start', totalSteps: tourSteps.length });
         this._createElements();
         this._attachListeners();
         this._showStep();
@@ -48,7 +55,7 @@ export class TourManager {
     _attachListeners() {
         this._tooltip.addEventListener('tour:next', () => this._next());
         this._tooltip.addEventListener('tour:prev', () => this._prev());
-        this._tooltip.addEventListener('tour:skip', () => this._end());
+        this._tooltip.addEventListener('tour:skip', () => this._end('skipped'));
 
         // Reposicionar en resize
         this._resizeHandler = () => this._showStep();
@@ -58,7 +65,7 @@ export class TourManager {
         this._keydownHandler = (e) => {
             if (e.key === 'Escape') {
                 e.preventDefault();
-                this._end();
+                this._end('escape');
             } else if (e.key === 'ArrowRight') {
                 e.preventDefault();
                 this._next();
@@ -73,9 +80,10 @@ export class TourManager {
     _showStep() {
         const step = tourSteps[this._currentIndex];
         if (!step) {
-            this._end();
+            this._end('completed');
             return;
         }
+        updateFlowStep('tour', step.id, { totalSteps: tourSteps.length });
 
         const target = step.getTarget();
         const rect = target ? target.getBoundingClientRect() : null;
@@ -95,7 +103,7 @@ export class TourManager {
             this._currentIndex++;
             this._showStep();
         } else {
-            this._end();
+            this._end('completed');
         }
     }
 
@@ -106,7 +114,13 @@ export class TourManager {
         }
     }
 
-    _end() {
+    _end(reason = 'completed') {
+        const currentStep = tourSteps[this._currentIndex];
+        if (reason === 'completed') {
+            trackFlowComplete('tour', { step: currentStep?.id || 'completed', totalSteps: tourSteps.length });
+        } else {
+            trackFlowAbandoned('tour', currentStep?.id || 'unknown', { reason });
+        }
         markTourCompleted();
         this._cleanup();
     }

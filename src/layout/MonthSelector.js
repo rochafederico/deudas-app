@@ -6,6 +6,7 @@ import {
     goToPreviousMonth,
     goToNextMonth,
 } from '../shared/MonthFilter.js';
+import { trackEvent } from '../shared/observability/index.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
@@ -20,17 +21,61 @@ export class MonthSelector extends HTMLElement {
     }
 
     _render() {
-        this.innerHTML = `
-            <div class="input-group input-group-sm" data-tour-step="navegacion-mes">
-                <button id="ms-prev" class="btn btn-outline-secondary" type="button" title="Mes anterior" aria-label="Mes anterior">&#8249;</button>
-                <input id="ms-input" type="month" class="form-control text-center" value="${getSelectedMonth()}" aria-label="Seleccionar mes">
-                <button id="ms-next" class="btn btn-outline-secondary" type="button" title="Mes siguiente" aria-label="Mes siguiente">&#8250;</button>
-            </div>
-        `;
-        this.querySelector('#ms-prev').addEventListener('click', () => goToPreviousMonth());
-        this.querySelector('#ms-next').addEventListener('click', () => goToNextMonth());
+        const group = document.createElement('div');
+        group.className = 'input-group input-group-sm';
+        group.dataset.tourStep = 'navegacion-mes';
+
+        const prev = document.createElement('button');
+        prev.id = 'ms-prev';
+        prev.className = 'btn btn-outline-secondary';
+        prev.type = 'button';
+        prev.title = 'Mes anterior';
+        prev.setAttribute('aria-label', 'Mes anterior');
+        prev.textContent = '‹';
+
+        const input = document.createElement('input');
+        input.id = 'ms-input';
+        input.type = 'month';
+        input.className = 'form-control text-center';
+        input.value = getSelectedMonth();
+        input.setAttribute('aria-label', 'Seleccionar mes');
+
+        const next = document.createElement('button');
+        next.id = 'ms-next';
+        next.className = 'btn btn-outline-secondary';
+        next.type = 'button';
+        next.title = 'Mes siguiente';
+        next.setAttribute('aria-label', 'Mes siguiente');
+        next.textContent = '›';
+
+        group.appendChild(prev);
+        group.appendChild(input);
+        group.appendChild(next);
+
+        this.innerHTML = '';
+        this.appendChild(group);
+        this.querySelector('#ms-prev').addEventListener('click', () => {
+            goToPreviousMonth();
+            trackEvent('monthly_navigation_used', {
+                direction: 'previous',
+                month: getSelectedMonth()
+            });
+        });
+        this.querySelector('#ms-next').addEventListener('click', () => {
+            goToNextMonth();
+            trackEvent('monthly_navigation_used', {
+                direction: 'next',
+                month: getSelectedMonth()
+            });
+        });
         this.querySelector('#ms-input').addEventListener('change', (e) => {
-            if (e.target.value) setSelectedMonth(e.target.value);
+            if (e.target.value) {
+                setSelectedMonth(e.target.value);
+                trackEvent('monthly_navigation_used', {
+                    direction: 'direct_select',
+                    month: e.target.value
+                });
+            }
         });
     }
 
@@ -41,4 +86,3 @@ export class MonthSelector extends HTMLElement {
 }
 
 customElements.define('month-selector', MonthSelector);
-

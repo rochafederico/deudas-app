@@ -6,6 +6,7 @@ import { getDB } from '../../shared/database/initDB.js';
 import { DEUDAS_STORE, MONTOS_STORE } from '../../shared/database/schema.js';
 import { DeudaEntity } from './DeudaEntity.js';
 import { MontoEntity } from '../montos/MontoEntity.js';
+import { trackEvent } from '../../shared/observability/index.js';
 
 export function addDeuda(deudaModel) {
     const db = getDB();
@@ -206,6 +207,12 @@ export function deleteDeuda(id) {
             getMontos.onsuccess = () => {
                 const keys = getMontos.result;
                 keys.forEach(key => montosStore.delete(key));
+                trackEvent('delete_debt_completed', {
+                    flow: 'delete_debt',
+                    status: 'completed',
+                    deudaId: id,
+                    deletedMontos: keys.length
+                });
                 resolve();
             };
                 getMontos.onerror = (event) => {
