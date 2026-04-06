@@ -48,7 +48,7 @@ Usar estos nombres para filtros, segmentos, dashboards y análisis en Clarity.
 
 - `<device>_delete_debt_completed`
 
-#### Duplicar cuota / monto
+#### Duplicar cuota
 
 - `<device>_duplicate_installment_started`
 - `<device>_duplicate_installment_completed`
@@ -80,15 +80,15 @@ Tanto en:
 #### Exportar datos
 
 - `<device>_export_data_started`
-- `<device>_export_data_used` (exportación efectivamente ejecutada)
-- `<device>_export_data_completed`
+- `<device>_export_data_used` (la descarga/exportación se ejecutó)
+- `<device>_export_data_completed` (el flujo cerró correctamente)
 - `<device>_export_data_validation_error`
 
 #### Importar datos
 
 - `<device>_import_data_started`
-- `<device>_import_data_used` (importación efectivamente ejecutada)
-- `<device>_import_data_completed`
+- `<device>_import_data_used` (la importación se ejecutó)
+- `<device>_import_data_completed` (el flujo cerró correctamente)
 - `<device>_import_data_validation_error`
 - `<device>_import_data_abandoned`
 
