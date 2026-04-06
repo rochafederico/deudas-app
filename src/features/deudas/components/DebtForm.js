@@ -12,7 +12,7 @@ import {
     trackFlowError,
     trackFlowAbandoned,
     updateFlowStep
-} from '../../../shared/analytics/analytics.service.js';
+} from '../../../shared/analytics/clarity.service.js';
 
 export class DebtForm extends HTMLElement {
     constructor() {

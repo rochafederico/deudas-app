@@ -11,7 +11,7 @@ import {
     trackFlowError,
     trackFlowAbandoned,
     updateFlowStep
-} from '../../../shared/analytics/analytics.service.js';
+} from '../../../shared/analytics/clarity.service.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
@@ -58,12 +58,6 @@ export class ImportDataModal extends HTMLElement {
         } else {
             updateFlowStep('import_data', 'file_picker');
         }
-        trackEvent('shortcut_used', {
-            flow: 'shortcut',
-            status: 'completed',
-            shortcut: 'import_data',
-            location: 'import_modal'
-        });
         this.fileInput.click();
     }
 
@@ -285,6 +279,12 @@ export class ImportDataModal extends HTMLElement {
                 bubbles: true,
                 detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
             }));
+            trackEvent('import_data_used', {
+                deudasImported: importedCount,
+                ingresosImported,
+                inversionesImported,
+                errors: totalErrors
+            });
             await trackFlowComplete('import_data', {
                 deudasImported: importedCount,
                 ingresosImported,

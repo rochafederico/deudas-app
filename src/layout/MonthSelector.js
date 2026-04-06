@@ -6,7 +6,7 @@ import {
     goToPreviousMonth,
     goToNextMonth,
 } from '../shared/MonthFilter.js';
-import { trackEvent } from '../shared/analytics/analytics.service.js';
+import { trackEvent } from '../shared/analytics/clarity.service.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
@@ -56,7 +56,7 @@ export class MonthSelector extends HTMLElement {
         this.appendChild(group);
         this.querySelector('#ms-prev').addEventListener('click', () => {
             goToPreviousMonth();
-            trackEvent('month_navigation_used', {
+            trackEvent('monthly_navigation_used', {
                 flow: 'month_navigation',
                 status: 'completed',
                 direction: 'previous',
@@ -65,7 +65,7 @@ export class MonthSelector extends HTMLElement {
         });
         this.querySelector('#ms-next').addEventListener('click', () => {
             goToNextMonth();
-            trackEvent('month_navigation_used', {
+            trackEvent('monthly_navigation_used', {
                 flow: 'month_navigation',
                 status: 'completed',
                 direction: 'next',
@@ -75,7 +75,7 @@ export class MonthSelector extends HTMLElement {
         this.querySelector('#ms-input').addEventListener('change', (e) => {
             if (e.target.value) {
                 setSelectedMonth(e.target.value);
-                trackEvent('month_navigation_used', {
+                trackEvent('monthly_navigation_used', {
                     flow: 'month_navigation',
                     status: 'completed',
                     direction: 'direct_select',

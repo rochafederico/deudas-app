@@ -6,7 +6,7 @@ import { getDB } from '../../shared/database/initDB.js';
 import { DEUDAS_STORE, MONTOS_STORE } from '../../shared/database/schema.js';
 import { DeudaEntity } from './DeudaEntity.js';
 import { MontoEntity } from '../montos/MontoEntity.js';
-import { trackEvent } from '../../shared/analytics/analytics.service.js';
+import { trackEvent } from '../../shared/analytics/clarity.service.js';
 
 export function addDeuda(deudaModel) {
     const db = getDB();

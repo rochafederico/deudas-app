@@ -5,5 +5,4 @@ export const DEUDAS_STORE = 'deudas';
 export const MONTOS_STORE = 'montos';
 export const INGRESOS_STORE = 'ingresos';
 export const INVERSIONES_STORE = 'inversiones';
-export const ANALYTICS_EVENTS_STORE = 'analytics_events';
-export const VERSION = 5;
+export const VERSION = 4; // Incrementar versión para migración
