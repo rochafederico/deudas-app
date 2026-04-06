@@ -57,8 +57,6 @@ export class MonthSelector extends HTMLElement {
         this.querySelector('#ms-prev').addEventListener('click', () => {
             goToPreviousMonth();
             trackEvent('monthly_navigation_used', {
-                flow: 'month_navigation',
-                status: 'completed',
                 direction: 'previous',
                 month: getSelectedMonth()
             });
@@ -66,8 +64,6 @@ export class MonthSelector extends HTMLElement {
         this.querySelector('#ms-next').addEventListener('click', () => {
             goToNextMonth();
             trackEvent('monthly_navigation_used', {
-                flow: 'month_navigation',
-                status: 'completed',
                 direction: 'next',
                 month: getSelectedMonth()
             });
@@ -76,8 +72,6 @@ export class MonthSelector extends HTMLElement {
             if (e.target.value) {
                 setSelectedMonth(e.target.value);
                 trackEvent('monthly_navigation_used', {
-                    flow: 'month_navigation',
-                    status: 'completed',
                     direction: 'direct_select',
                     month: e.target.value
                 });
