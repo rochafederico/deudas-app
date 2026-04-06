@@ -29,8 +29,13 @@ function saveNotifiedKeys(payments) {
     }
 }
 
+function isSameMonth(date, now) {
+    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+}
+
 /**
- * Returns montos that are unpaid and due within the next `days` days.
+ * Returns montos that are unpaid and either overdue in the current month or
+ * due within the next `days` days.
  * @param {Array<{id?: number, acreedor: string, montos: Array}>} deudas
  * @param {number} [days=DAYS_AHEAD]
  * @param {Date} [now=new Date()]
@@ -46,7 +51,9 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
         for (const monto of (deuda.montos || [])) {
             if (monto.pagado || !monto.vencimiento) continue;
             const venc = new Date(monto.vencimiento + 'T00:00:00');
-            if (venc >= todayStart && venc <= limitDate) {
+            const isOverdueThisMonth = venc < todayStart && isSameMonth(venc, todayStart);
+            const isUpcoming = venc >= todayStart && venc <= limitDate;
+            if (isOverdueThisMonth || isUpcoming) {
                 upcoming.push({
                     deudaId: deuda.id,
                     acreedor: deuda.acreedor,

@@ -30,7 +30,7 @@ export function formatDate(dateStr) {
  * Returns a human-readable relative label for a vencimiento date.
  * @param {string} dateStr - ISO date string (YYYY-MM-DD)
  * @param {Date} [now=new Date()]
- * @returns {string} 'hoy', 'mañana', or 'en N días'
+ * @returns {string} 'hoy', 'mañana', 'ayer', 'hace N días', or 'en N días'
  */
 export function formatRelativeDate(dateStr, now = new Date()) {
     const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
@@ -39,6 +39,8 @@ export function formatRelativeDate(dateStr, now = new Date()) {
     const diffDays = (vencUTC - todayUTC) / (1000 * 60 * 60 * 24);
     if (diffDays === 0) return 'hoy';
     if (diffDays === 1) return 'mañana';
+    if (diffDays === -1) return 'ayer';
+    if (diffDays < 0) return `hace ${Math.abs(diffDays)} días`;
     return `en ${diffDays} días`;
 }
 
@@ -64,6 +66,11 @@ function renderPaymentItem(p) {
  */
 function renderItemDetail(titulo, html) {
     return `<p class="mb-1 fw-semibold small">📅 ${titulo}</p>${html}`;
+}
+
+function renderOverdueSection(payments) {
+    if (payments.length === 0) return '';
+    return renderItemDetail('Vencidos del mes', `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`);
 }
 
 /**
@@ -103,26 +110,28 @@ function renderUpcomingSection(payments) {
 
 /**
  * Builds the inner HTML for the structured upcoming-payments alert panel.
- * Groups payments into: Hoy / Mañana / Próximos días.
+ * Groups payments into: Vencidos del mes / Hoy / Mañana / Próximos días.
  * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string, deudaId?: number}>} payments
  * @param {Date} [now=new Date()]
  * @returns {string} HTML string for the alert body
  */
 export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
     const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-    const today = [], tomorrow = [], rest = [];
+    const overdue = [], today = [], tomorrow = [], rest = [];
 
     for (const p of payments) {
         const [y, m, d] = p.vencimiento.split('-').map(Number);
         const vencUTC = Date.UTC(y, m - 1, d);
         const diffDays = (vencUTC - todayUTC) / (1000 * 60 * 60 * 24);
-        if (diffDays === 0) today.push(p);
+        if (diffDays < 0) overdue.push(p);
+        else if (diffDays === 0) today.push(p);
         else if (diffDays === 1) tomorrow.push(p);
         else rest.push(p);
     }
 
     return {
         html: [
+            renderOverdueSection(overdue),
             renderTodaySection(today),
             renderTomorrowSection(tomorrow),
             renderUpcomingSection(rest)
@@ -176,5 +185,4 @@ export function showGroupedInAppNotification(count) {
     const message = `⚠️ Tenés <strong>${count} pagos próximos a vencer</strong> en los próximos 3 días. <a href="/" class="alert-link">Ver detalle</a>`;
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
 }
-
 

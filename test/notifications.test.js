@@ -17,10 +17,10 @@ import {
 } from '../src/features/notifications/NotificationService.js';
 
 // ===================================================================
-// UC1: getUpcomingPayments – filters payments due in the next 3 days
+// UC1: getUpcomingPayments – filters payments due in the next 3 days and overdue in current month
 // ===================================================================
 async function testGetUpcomingPayments() {
-    console.log('  UC1: getUpcomingPayments returns only unpaid payments in the next 3 days');
+    console.log('  UC1: getUpcomingPayments returns upcoming payments plus overdue payments in the current month');
 
     const now = new Date('2026-04-03');
 
@@ -33,7 +33,8 @@ async function testGetUpcomingPayments() {
                 { monto: 3000, moneda: 'ARS', vencimiento: '2026-04-06', pagado: false }, // 3 days ahead (limit)
                 { monto: 4000, moneda: 'ARS', vencimiento: '2026-04-07', pagado: false }, // 4 days ahead (out)
                 { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: true },  // paid (excluded)
-                { monto: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // past (excluded)
+                { monto: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // overdue this month (included)
+                { monto: 7000, moneda: 'ARS', vencimiento: '2026-03-31', pagado: false }, // past previous month (excluded)
             ]
         },
         {
@@ -46,14 +47,15 @@ async function testGetUpcomingPayments() {
 
     const upcoming = getUpcomingPayments(deudas, 3, now);
 
-    assert(upcoming.length === 4, `Debe haber 4 pagos próximos, encontrados: ${upcoming.length}`);
+    assert(upcoming.length === 5, `Debe haber 5 pagos a contemplar, encontrados: ${upcoming.length}`);
     assert(upcoming.some(p => p.monto === 1000), 'Incluye pago de hoy');
     assert(upcoming.some(p => p.monto === 2000), 'Incluye pago en 2 días');
     assert(upcoming.some(p => p.monto === 3000), 'Incluye pago en 3 días (límite)');
     assert(upcoming.some(p => p.monto === 100 && p.moneda === 'USD'), 'Incluye pago USD');
+    assert(upcoming.some(p => p.monto === 6000), 'Incluye pago vencido del mes actual');
     assert(!upcoming.some(p => p.monto === 4000), 'Excluye pago fuera de rango');
     assert(!upcoming.some(p => p.monto === 5000), 'Excluye pago ya pagado');
-    assert(!upcoming.some(p => p.monto === 6000), 'Excluye pago pasado');
+    assert(!upcoming.some(p => p.monto === 7000), 'Excluye pago vencido de otro mes');
 }
 
 // ===================================================================
@@ -319,17 +321,20 @@ async function testFormatHelpers() {
     assert(formatRelativeDate('2026-04-03', now) === 'hoy', 'formatRelativeDate: misma fecha → hoy');
     assert(formatRelativeDate('2026-04-04', now) === 'mañana', 'formatRelativeDate: día siguiente → mañana');
     assert(formatRelativeDate('2026-04-06', now) === 'en 3 días', 'formatRelativeDate: 3 días después');
+    assert(formatRelativeDate('2026-04-02', now) === 'ayer', 'formatRelativeDate: día previo → ayer');
+    assert(formatRelativeDate('2026-04-01', now) === 'hace 2 días', 'formatRelativeDate: días previos del mes');
 }
 
 // ===================================================================
-// UC12: buildUpcomingPaymentsHTML – groups by today/tomorrow/rest, truncates rest>5
+// UC12: buildUpcomingPaymentsHTML – groups by overdue/today/tomorrow/rest, truncates rest>5
 // ===================================================================
 async function testBuildUpcomingPaymentsHTML() {
-    console.log('  UC12: buildUpcomingPaymentsHTML groups payments and truncates rest list');
+    console.log('  UC12: buildUpcomingPaymentsHTML groups overdue and upcoming payments and truncates rest list');
 
     const now = new Date('2026-04-03');
 
     const payments = [
+        { acreedor: 'Cable',    monto: 1500,   moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue
         { acreedor: 'NaranjaX', monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
         { acreedor: 'Brubank',  monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
         { acreedor: 'Juli',     monto: 598646, moneda: 'ARS', vencimiento: '2026-04-04' }, // tomorrow
@@ -342,6 +347,9 @@ async function testBuildUpcomingPaymentsHTML() {
     ];
 
     const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
+
+    assert(html.includes('Vencidos del mes'), 'Incluye sección Vencidos del mes');
+    assert(html.includes('Cable'), 'Incluye pagos vencidos del mes actual');
 
     // Today section
     assert(html.includes('Hoy'), 'Incluye sección Hoy');
