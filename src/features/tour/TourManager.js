@@ -12,6 +12,8 @@ import {
     updateFlowStep
 } from '../../shared/observability/index.js';
 
+const SCROLL_ANIMATION_DURATION_MS = 350;
+
 export class TourManager {
     constructor() {
         this._currentIndex = 0;
@@ -77,7 +79,7 @@ export class TourManager {
         window.addEventListener('keydown', this._keydownHandler);
     }
 
-    _showStep() {
+    async _showStep() {
         const step = tourSteps[this._currentIndex];
         if (!step) {
             this._end('completed');
@@ -86,7 +88,24 @@ export class TourManager {
         updateFlowStep('tour', step.id, { totalSteps: tourSteps.length });
 
         const target = step.getTarget();
-        const rect = target ? target.getBoundingClientRect() : null;
+
+        // Scroll target into view if it is visible but outside the viewport
+        if (target) {
+            const rawRect = target.getBoundingClientRect();
+            const isVisible = rawRect.width > 0 && rawRect.height > 0;
+            const inViewport = rawRect.top >= 0 && rawRect.bottom <= window.innerHeight;
+            if (isVisible && !inViewport) {
+                target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                await new Promise(r => setTimeout(r, SCROLL_ANIMATION_DURATION_MS));
+            }
+        }
+
+        // Guard: tour may have been closed during the async scroll wait
+        if (!this._overlay || !this._tooltip) return;
+
+        const rawRect = target ? target.getBoundingClientRect() : null;
+        // Treat zero-size rect (hidden / display:none element) as no target
+        const rect = (rawRect && rawRect.width > 0 && rawRect.height > 0) ? rawRect : null;
 
         // Actualizar overlay
         this._overlay.highlight(rect);
