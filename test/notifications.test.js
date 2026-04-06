@@ -16,13 +16,17 @@ import {
     showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
 
+function localDate(year, month, day) {
+    return new Date(year, month - 1, day, 12, 0, 0);
+}
+
 // ===================================================================
-// UC1: getUpcomingPayments – filters payments due in the next 3 days
+// UC1: getUpcomingPayments – filters payments due in the next 3 days and overdue in current month
 // ===================================================================
 async function testGetUpcomingPayments() {
-    console.log('  UC1: getUpcomingPayments returns only unpaid payments in the next 3 days');
+    console.log('  UC1: getUpcomingPayments returns upcoming payments plus overdue payments in the current month');
 
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
 
     const deudas = [
         {
@@ -33,7 +37,8 @@ async function testGetUpcomingPayments() {
                 { monto: 3000, moneda: 'ARS', vencimiento: '2026-04-06', pagado: false }, // 3 days ahead (limit)
                 { monto: 4000, moneda: 'ARS', vencimiento: '2026-04-07', pagado: false }, // 4 days ahead (out)
                 { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-03', pagado: true },  // paid (excluded)
-                { monto: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // past (excluded)
+                { monto: 6000, moneda: 'ARS', vencimiento: '2026-04-02', pagado: false }, // overdue this month (included)
+                { monto: 7000, moneda: 'ARS', vencimiento: '2026-03-31', pagado: false }, // past previous month (excluded)
             ]
         },
         {
@@ -46,14 +51,15 @@ async function testGetUpcomingPayments() {
 
     const upcoming = getUpcomingPayments(deudas, 3, now);
 
-    assert(upcoming.length === 4, `Debe haber 4 pagos próximos, encontrados: ${upcoming.length}`);
+    assert(upcoming.length === 5, `Debe haber 5 pagos a considerar, encontrados: ${upcoming.length}`);
     assert(upcoming.some(p => p.monto === 1000), 'Incluye pago de hoy');
     assert(upcoming.some(p => p.monto === 2000), 'Incluye pago en 2 días');
     assert(upcoming.some(p => p.monto === 3000), 'Incluye pago en 3 días (límite)');
     assert(upcoming.some(p => p.monto === 100 && p.moneda === 'USD'), 'Incluye pago USD');
+    assert(upcoming.some(p => p.monto === 6000), 'Incluye pago vencido del mes actual');
     assert(!upcoming.some(p => p.monto === 4000), 'Excluye pago fuera de rango');
     assert(!upcoming.some(p => p.monto === 5000), 'Excluye pago ya pagado');
-    assert(!upcoming.some(p => p.monto === 6000), 'Excluye pago pasado');
+    assert(!upcoming.some(p => p.monto === 7000), 'Excluye pago vencido de otro mes');
 }
 
 // ===================================================================
@@ -62,7 +68,7 @@ async function testGetUpcomingPayments() {
 async function testGetUpcomingPaymentsShape() {
     console.log('  UC2: getUpcomingPayments returns correct data shape');
 
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
     const deudas = [{
         id: 42,
         acreedor: 'Visa',
@@ -86,7 +92,7 @@ async function testGetUpcomingPaymentsShape() {
 async function testGetUpcomingPaymentsEmpty() {
     console.log('  UC3: getUpcomingPayments returns empty array for no deudas');
 
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
     const upcoming = getUpcomingPayments([], 3, now);
     assert(upcoming.length === 0, 'Sin deudas: lista vacía');
 }
@@ -146,7 +152,7 @@ async function testRequestPermissionDeniedSkipsPrompt() {
 async function testCheckAndNotifySendsNotifications() {
     console.log('  UC6: checkAndNotify sends notifications when permission granted');
 
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
     const notificationsSent = [];
 
     const originalNotification = global.Notification;
@@ -183,6 +189,35 @@ async function testCheckAndNotifySendsNotifications() {
     // Restore
     global.Notification = originalNotification;
     localStorage.removeItem('nivva_notifications_permission');
+}
+
+// ===================================================================
+// UC6b: sendPaymentNotification – overdue payments use pending wording
+// ===================================================================
+async function testCheckAndNotifySendsOverdueNotifications() {
+    console.log('  UC6b: sendPaymentNotification uses overdue wording when payment is already vencido');
+
+    const now = localDate(2026, 4, 3);
+    const notificationsSent = [];
+
+    const originalNotification = global.Notification;
+
+    global.Notification = class {
+        static get permission() { return 'granted'; }
+        static requestPermission() { return Promise.resolve('granted'); }
+        constructor(title, opts) {
+            notificationsSent.push({ title, body: opts?.body });
+        }
+    };
+
+    const { sendPaymentNotification: spn } = await import('../src/features/notifications/NotificationService.js');
+    spn({ acreedor: 'MiCredito', monto: 800, moneda: 'ARS', vencimiento: '2026-04-02' }, now);
+
+    assert(notificationsSent.length === 1, 'Debe enviar 1 notificación vencida');
+    assert(notificationsSent[0].title === '⚠️ Vencimiento pendiente: MiCredito', 'Título vencido correcto');
+    assert(notificationsSent[0].body.includes('Venció ayer'), 'Cuerpo usa copy de pago vencido');
+
+    global.Notification = originalNotification;
 }
 
 // ===================================================================
@@ -227,7 +262,7 @@ async function testShowInAppNotification() {
     // Pass a fixed `now` so the relative-date label is deterministic
     showInAppNotification(
         { acreedor: 'Pago Test', monto: 999, moneda: 'ARS', vencimiento: '2026-04-05' },
-        new Date('2026-04-04')
+        localDate(2026, 4, 4)
     );
 
     assert(events.length === 1, 'Debe despachar 1 evento app:notify');
@@ -237,6 +272,28 @@ async function testShowInAppNotification() {
     assert(events[0].message.includes('05/04/2026'), 'El mensaje incluye la fecha en formato DD/MM/YYYY');
     assert(events[0].message.includes('mañana'), 'El mensaje incluye la etiqueta relativa de fecha');
     assert(events[0].message.includes('Ver detalle'), 'El mensaje incluye la acción Ver detalle');
+
+    window.removeEventListener('app:notify', handler);
+}
+
+// ===================================================================
+// UC8b: showInAppNotification – overdue payments use pending wording
+// ===================================================================
+async function testShowInAppNotificationOverdue() {
+    console.log('  UC8b: showInAppNotification uses overdue wording for payments already vencidos');
+
+    const events = [];
+    const handler = (e) => events.push(e.detail);
+    window.addEventListener('app:notify', handler);
+
+    showInAppNotification(
+        { acreedor: 'Pago Vencido', monto: 999, moneda: 'ARS', vencimiento: '2026-04-02' },
+        localDate(2026, 4, 3)
+    );
+
+    assert(events.length === 1, 'Debe despachar 1 evento app:notify');
+    assert(events[0].message.includes('Vencimiento pendiente'), 'El mensaje usa título de vencimiento pendiente');
+    assert(events[0].message.includes('Venció ayer'), 'El mensaje usa copy de pago vencido');
 
     window.removeEventListener('app:notify', handler);
 }
@@ -263,7 +320,7 @@ async function testCheckAndNotifyGroupedNative() {
 
     // Use getUpcomingPayments + sendGroupedNotification directly with a fixed date
     const { getUpcomingPayments: gup, sendGroupedNotification: sgn } = await import('../src/features/notifications/NotificationService.js');
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
     const montos = Array.from({ length: 6 }, (_, i) => ({
         monto: (i + 1) * 100,
         moneda: 'ARS',
@@ -273,12 +330,13 @@ async function testCheckAndNotifyGroupedNative() {
     const deudas = [{ acreedor: 'Banco Test', montos }];
     const upcoming = gup(deudas, 3, now);
 
-    assert(upcoming.length === 6, `Deben haber 6 pagos próximos, encontrados: ${upcoming.length}`);
+    assert(upcoming.length === 6, `Deben haber 6 pagos pendientes, encontrados: ${upcoming.length}`);
     sgn(upcoming.length);
 
     assert(notificationsSent.length === 1, `Debe enviar 1 notificación agrupada, enviadas: ${notificationsSent.length}`);
-    assert(notificationsSent[0].title === 'Pagos próximos a vencer', 'Título de notificación agrupada correcto');
+    assert(notificationsSent[0].title === 'Pagos vencidos o por vencer', 'Título de notificación agrupada correcto');
     assert(notificationsSent[0].body.includes('6'), 'Cuerpo incluye la cantidad de pagos');
+    assert(notificationsSent[0].body.includes('vencidos o por vencer'), 'Cuerpo usa copy consistente con pagos vencidos');
 
     global.Notification = originalNotification;
     localStorage.removeItem('nivva_notifications_permission');
@@ -299,6 +357,7 @@ async function testShowGroupedInAppNotification() {
     assert(events.length === 1, 'Debe despachar 1 evento app:notify');
     assert(events[0].type === 'warning', 'El tipo de toast es warning');
     assert(events[0].message.includes('6'), 'El mensaje incluye la cantidad de pagos');
+    assert(events[0].message.includes('vencidos o por vencer'), 'El mensaje usa copy consistente con pagos vencidos');
     assert(events[0].message.includes('href="/"'), 'El mensaje incluye un enlace al detalle');
 
     window.removeEventListener('app:notify', handler);
@@ -315,21 +374,25 @@ async function testFormatHelpers() {
     assert(formatDate('2026-01-01') === '01/01/2026', 'formatDate: maneja mes y día con ceros');
 
     // formatRelativeDate
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
     assert(formatRelativeDate('2026-04-03', now) === 'hoy', 'formatRelativeDate: misma fecha → hoy');
     assert(formatRelativeDate('2026-04-04', now) === 'mañana', 'formatRelativeDate: día siguiente → mañana');
     assert(formatRelativeDate('2026-04-06', now) === 'en 3 días', 'formatRelativeDate: 3 días después');
+    assert(formatRelativeDate('2026-04-02', now) === 'ayer', 'formatRelativeDate: día previo → ayer');
+    assert(formatRelativeDate('2026-04-01', now) === 'hace 2 días', 'formatRelativeDate: días previos del mes');
 }
 
 // ===================================================================
-// UC12: buildUpcomingPaymentsHTML – groups by today/tomorrow/rest, truncates rest>5
+// UC12: buildUpcomingPaymentsHTML – groups by overdue/today/tomorrow/rest, truncates rest>5
 // ===================================================================
 async function testBuildUpcomingPaymentsHTML() {
-    console.log('  UC12: buildUpcomingPaymentsHTML groups payments and truncates rest list');
+    console.log('  UC12: buildUpcomingPaymentsHTML groups overdue and upcoming payments and truncates rest list');
 
-    const now = new Date('2026-04-03');
+    const now = localDate(2026, 4, 3);
 
     const payments = [
+        { acreedor: 'Cable',    monto: 1500,   moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue
+        { acreedor: 'Patente',  monto: 2100,   moneda: 'ARS', vencimiento: '2026-03-31' }, // old overdue (excluded)
         { acreedor: 'NaranjaX', monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
         { acreedor: 'Brubank',  monto: 212776, moneda: 'ARS', vencimiento: '2026-04-03' }, // today
         { acreedor: 'Juli',     monto: 598646, moneda: 'ARS', vencimiento: '2026-04-04' }, // tomorrow
@@ -342,6 +405,10 @@ async function testBuildUpcomingPaymentsHTML() {
     ];
 
     const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
+
+    assert(html.includes('Vencidos del mes'), 'Incluye sección Vencidos del mes');
+    assert(html.includes('Cable'), 'Incluye pagos vencidos del mes actual');
+    assert(!html.includes('Patente'), 'No incluye pagos vencidos de meses anteriores');
 
     // Today section
     assert(html.includes('Hoy'), 'Incluye sección Hoy');
@@ -400,11 +467,11 @@ async function testCheckAndNotifyDeduplication() {
     const { checkAndNotify: can } = await import('../src/features/notifications/NotificationService.js');
 
     // First call: new payment → panel should appear
-    await can([deuda], new Date('2026-04-03'));
+    await can([deuda], localDate(2026, 4, 3));
     assert(panelEvents.length === 1, 'Primera llamada debe mostrar el panel');
 
     // Second call: same payment (already in localStorage) → panel still updates (always shown)
-    await can([deuda], new Date('2026-04-03'));
+    await can([deuda], localDate(2026, 4, 3));
     assert(panelEvents.length === 2, 'Segunda llamada actualiza el panel siempre que haya vencimientos');
 
     // Add a new debt → panel should appear again
@@ -413,7 +480,7 @@ async function testCheckAndNotifyDeduplication() {
         acreedor: 'NewBank',
         montos: [{ monto: 300, moneda: 'ARS', vencimiento: '2026-04-04', pagado: false }]
     };
-    await can([deuda, deuda2], new Date('2026-04-03'));
+    await can([deuda, deuda2], localDate(2026, 4, 3));
     assert(panelEvents.length === 3, 'Nueva deuda también muestra el panel');
 
     window.removeEventListener('app:upcoming-panel', handler);
@@ -428,8 +495,10 @@ export const tests = [
     testStoredPermission,
     testRequestPermissionDeniedSkipsPrompt,
     testCheckAndNotifySendsNotifications,
+    testCheckAndNotifySendsOverdueNotifications,
     testCheckAndNotifyUnsupported,
     testShowInAppNotification,
+    testShowInAppNotificationOverdue,
     testCheckAndNotifyGroupedNative,
     testShowGroupedInAppNotification,
     testFormatHelpers,
