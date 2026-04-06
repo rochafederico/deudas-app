@@ -4,6 +4,14 @@ import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppSpinner.js';
 import { DeudaModel } from '../../deudas/DeudaModel.js';
 import { MontoModel } from '../../montos/MontoModel.js';
+import {
+    trackEvent,
+    trackFlowStart,
+    trackFlowComplete,
+    trackFlowError,
+    trackFlowAbandoned,
+    updateFlowStep
+} from '../../../shared/analytics/analytics.service.js';
 
 export class ImportDataModal extends HTMLElement {
     constructor() {
@@ -44,6 +52,18 @@ export class ImportDataModal extends HTMLElement {
     }
 
     selectFile() {
+        if (!this._analyticsStarted) {
+            this._analyticsStarted = true;
+            trackFlowStart('import_data', { step: 'file_picker' });
+        } else {
+            updateFlowStep('import_data', 'file_picker');
+        }
+        trackEvent('shortcut_used', {
+            flow: 'shortcut',
+            status: 'completed',
+            shortcut: 'import_data',
+            location: 'import_modal'
+        });
         this.fileInput.click();
     }
 
@@ -57,15 +77,18 @@ export class ImportDataModal extends HTMLElement {
 
             // Validar estructura del archivo
             if (!this.#validateImportData(data)) {
+                trackFlowError('import_data', { step: 'file_validation', reason: 'invalid_structure' });
                 this.#showError('❌ Archivo JSON no válido. Asegúrate de que sea un backup de DeudasApp.');
                 return;
             }
 
             this.importData = data;
+            updateFlowStep('import_data', 'preview_ready');
             this.#showPreview(data);
 
         } catch (error) {
             console.error('Error al leer archivo:', error);
+            trackFlowError('import_data', { step: 'file_read', reason: 'invalid_json' });
             this.#showError('❌ Error al leer el archivo. Asegúrate de que sea un JSON válido.');
         }
     }
@@ -171,6 +194,12 @@ export class ImportDataModal extends HTMLElement {
 
         try {
             this.#showLoading('Importando datos...');
+            if (!this._analyticsStarted) {
+                this._analyticsStarted = true;
+                trackFlowStart('import_data', { step: 'import' });
+            } else {
+                updateFlowStep('import_data', 'import');
+            }
 
             const { addOrMergeDeuda } = await import('../../deudas/deudaRepository.js');
             const { addIngreso } = await import('../../ingresos/ingresoRepository.js');
@@ -256,10 +285,18 @@ export class ImportDataModal extends HTMLElement {
                 bubbles: true,
                 detail: { deudasImported: importedCount, deudasErrors: errorCount, ingresosImported, ingresosErrors, inversionesImported, inversionesErrors }
             }));
-            this.close();
+            await trackFlowComplete('import_data', {
+                deudasImported: importedCount,
+                ingresosImported,
+                inversionesImported,
+                errors: totalErrors
+            });
+            this._analyticsStarted = false;
+            await this.close();
 
         } catch (error) {
             console.error('Error en importación:', error);
+            trackFlowError('import_data', { step: 'import', reason: error.message });
             this.#showError('❌ Error durante la importación');
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error durante la importación', type: 'danger' } }));
         }
@@ -280,6 +317,7 @@ export class ImportDataModal extends HTMLElement {
     open(opener) {
         this.modal = this.querySelector('ui-modal');
         this.modal.setTitle('Importar datos');
+        this._analyticsStarted = false;
 
         // Reset state before opening (elements are moved to document.body on open)
         this.importData = null;
@@ -293,8 +331,13 @@ export class ImportDataModal extends HTMLElement {
         this.modal.returnFocusTo(opener);
     }
 
-    close() {
-        this.modal.close();
+    async close() {
+        if (this._analyticsStarted) {
+            await trackFlowAbandoned('import_data', 'modal_close', { reason: 'close' });
+            this._analyticsStarted = false;
+        }
+        this.modal = this.modal || this.querySelector('ui-modal');
+        this.modal?.close();
     }
 
     render() {

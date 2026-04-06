@@ -2,6 +2,7 @@ import './Menu.js';
 import './DarkToggle.js';
 import '../shared/components/AppToast.js';
 import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
+import { trackEvent } from '../shared/analytics/analytics.service.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {
@@ -12,19 +13,25 @@ export class AppHeader extends HTMLElement {
       window.history.pushState({}, '', '/');
       window.dispatchEvent(new PopStateEvent('popstate'));
     };
-    this._onTourClick = () => window.dispatchEvent(new CustomEvent('tour:start'));
+    this._onTourClick = () => {
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'tour', location: 'header' });
+      window.dispatchEvent(new CustomEvent('tour:start'));
+    };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
     this._onDesktopExportClick = (e) => {
       e.preventDefault();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'header' });
       openExportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
     };
     this._onDesktopImportClick = (e) => {
       e.preventDefault();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'import_data', location: 'header' });
       openImportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
     };
     this._onDesktopDeleteClick = (e) => {
       e.preventDefault();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'header' });
       deleteAllData();
     };
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);

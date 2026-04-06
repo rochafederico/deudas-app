@@ -1,6 +1,12 @@
 // src/components/ExportDataModal.js
 import '../../../shared/components/AppForm.js';
 import '../../../shared/components/UiModal.js';
+import {
+    trackEvent,
+    trackFlowStart,
+    trackFlowComplete,
+    trackFlowError
+} from '../../../shared/analytics/analytics.service.js';
 
 export class ExportDataModal extends HTMLElement {
     constructor() {
@@ -60,6 +66,7 @@ export class ExportDataModal extends HTMLElement {
         this.modal.setTitle('Exportar datos');
         this.modal.returnFocusTo(opener);
         await this.modal.open();
+        trackFlowStart('export_data', { step: 'modal_open' });
         try {
             const { listDeudas } = await import('../../deudas/deudaRepository.js');
             const { getAll } = await import('../../ingresos/ingresoRepository.js');
@@ -71,9 +78,22 @@ export class ExportDataModal extends HTMLElement {
             const inversionesMapped = this.#mapInversionesForExport(inversiones);
             this.#createAndDownloadJsonFile(deudas, ingresos, inversionesMapped);
             this.close();
+            trackEvent('export_data_used', {
+                flow: 'export_data',
+                status: 'completed',
+                deudas: deudas.length,
+                ingresos: ingresos.length,
+                inversiones: inversionesMapped.length
+            });
+            await trackFlowComplete('export_data', {
+                deudas: deudas.length,
+                ingresos: ingresos.length,
+                inversiones: inversionesMapped.length
+            });
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
         } catch (error) {
             console.error('Error al exportar:', error);
+            trackFlowError('export_data', { step: 'export', reason: error.message });
             window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
             this.close();
         }

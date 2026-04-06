@@ -3,6 +3,7 @@
 
 import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
 import { navItems } from './navConfig.js';
+import { trackEvent } from '../shared/analytics/analytics.service.js';
 
 export class BottomNav extends HTMLElement {
   connectedCallback() {
@@ -23,17 +24,20 @@ export class BottomNav extends HTMLElement {
       e.preventDefault();
       const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
       this._closeOffcanvas();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'bottom_nav' });
       openExportModal(returnFocus);
     };
     this._onImportClick = (e) => {
       e.preventDefault();
       const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
       this._closeOffcanvas();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'import_data', location: 'bottom_nav' });
       openImportModal(returnFocus);
     };
     this._onDeleteAllClick = (e) => {
       e.preventDefault();
       this._closeOffcanvas();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'bottom_nav' });
       deleteAllData();
     };
     this.querySelector('#bottom-nav-list').addEventListener('click', this._onNavClick);

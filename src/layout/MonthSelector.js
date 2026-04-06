@@ -6,6 +6,7 @@ import {
     goToPreviousMonth,
     goToNextMonth,
 } from '../shared/MonthFilter.js';
+import { trackEvent } from '../shared/analytics/analytics.service.js';
 
 export class MonthSelector extends HTMLElement {
     connectedCallback() {
@@ -27,10 +28,34 @@ export class MonthSelector extends HTMLElement {
                 <button id="ms-next" class="btn btn-outline-secondary" type="button" title="Mes siguiente" aria-label="Mes siguiente">&#8250;</button>
             </div>
         `;
-        this.querySelector('#ms-prev').addEventListener('click', () => goToPreviousMonth());
-        this.querySelector('#ms-next').addEventListener('click', () => goToNextMonth());
+        this.querySelector('#ms-prev').addEventListener('click', () => {
+            goToPreviousMonth();
+            trackEvent('month_navigation_used', {
+                flow: 'month_navigation',
+                status: 'completed',
+                direction: 'previous',
+                month: getSelectedMonth()
+            });
+        });
+        this.querySelector('#ms-next').addEventListener('click', () => {
+            goToNextMonth();
+            trackEvent('month_navigation_used', {
+                flow: 'month_navigation',
+                status: 'completed',
+                direction: 'next',
+                month: getSelectedMonth()
+            });
+        });
         this.querySelector('#ms-input').addEventListener('change', (e) => {
-            if (e.target.value) setSelectedMonth(e.target.value);
+            if (e.target.value) {
+                setSelectedMonth(e.target.value);
+                trackEvent('month_navigation_used', {
+                    flow: 'month_navigation',
+                    status: 'completed',
+                    direction: 'direct_select',
+                    month: e.target.value
+                });
+            }
         });
     }
 
@@ -41,4 +66,3 @@ export class MonthSelector extends HTMLElement {
 }
 
 customElements.define('month-selector', MonthSelector);
-
