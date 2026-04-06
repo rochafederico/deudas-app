@@ -22,7 +22,7 @@ export default function StatsIndicators({ mes } = {}) {
       container.innerHTML = '';
 
       const row = document.createElement('div');
-      row.className = 'row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3';
+      row.className = 'row row-cols-2 row-cols-md-2 row-cols-lg-5 g-3';
 
       const cards = [
         { title: '💼 Balance',      items: addValue(summary.byCurrency.saldo),      color: 'primary' },
