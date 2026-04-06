@@ -1,5 +1,5 @@
 // src/layout/Menu.js
-import routes from '../routes.js';
+import { navItems } from './navConfig.js';
 import '../shared/components/AppLink.js';
 
 export class AppNav extends HTMLElement {
@@ -19,13 +19,9 @@ export class AppNav extends HTMLElement {
   }
 
   render() {
-    const routeArray = Array.isArray(routes)
-      ? routes
-      : Object.entries(routes).map(([path, component]) => ({ path, label: path === '/' ? 'Dashboard' : path.replace('/', ''), component }));
-
     this.innerHTML = `
       <ul class="navbar-nav me-auto mb-2 mb-lg-0" aria-label="Navegación principal" data-tour-step="menu-navegacion">
-        ${routeArray.map(r => {
+        ${navItems.map(r => {
           const isActive = window.location.pathname === r.path;
           return `
           <li class="nav-item${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}>

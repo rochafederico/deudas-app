@@ -2,12 +2,7 @@
 // Fixed bottom navigation bar for mobile screens (hidden on lg+)
 
 import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
-
-const bottomNavItems = [
-  { label: 'Egresos', icon: '💸', path: '/', key: 'egresos' },
-  { label: 'Ingresos', icon: '💰', path: '/ingresos', key: 'ingresos' },
-  { label: 'Inversiones', icon: '📈', path: '/inversiones', key: 'inversiones' },
-];
+import { navItems } from './navConfig.js';
 
 export class BottomNav extends HTMLElement {
   connectedCallback() {
@@ -77,7 +72,7 @@ export class BottomNav extends HTMLElement {
   }
 
   render() {
-    const navItems = bottomNavItems.map(item => `
+    const navItemsHtml = navItems.map(item => `
       <button type="button" class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
         data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}">
         <span class="fs-5 lh-1">${item.icon}</span>
@@ -89,7 +84,7 @@ export class BottomNav extends HTMLElement {
       <nav class="navbar fixed-bottom bg-primary d-lg-none py-0 border-top border-primary-subtle shadow"
         aria-label="Navegación móvil">
         <div id="bottom-nav-list" class="container-fluid justify-content-around px-0">
-          ${navItems}
+          ${navItemsHtml}
           <button type="button"
             class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
             data-bs-toggle="offcanvas" data-bs-target="#mas-offcanvas"
