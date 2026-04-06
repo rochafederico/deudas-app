@@ -18,13 +18,6 @@ function isSameMonthAndYear(year, month, now) {
     return year === now.getFullYear() && month === now.getMonth() + 1;
 }
 
-function isPastDue(dateStr, now) {
-    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-    const [y, m, d] = dateStr.split('-').map(Number);
-    const dueUTC = Date.UTC(y, m - 1, d);
-    return dueUTC < todayUTC;
-}
-
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
 /**
@@ -186,7 +179,7 @@ export function showInAppNotification(payment, now = new Date()) {
     const formattedDate = formatDate(vencimiento);
     const safeAcreedor = escapeHtml(acreedor);
     const safeMoneda = escapeHtml(moneda);
-    const overdue = isPastDue(vencimiento, now);
+    const overdue = relDate === 'ayer' || relDate.startsWith('hace ');
     const title = overdue ? '⚠️ Vencimiento pendiente' : '⚠️ Próximo vencimiento';
     const verb = overdue ? 'Venció' : 'Vence';
     const message = [
