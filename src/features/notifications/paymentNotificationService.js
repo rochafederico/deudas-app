@@ -29,6 +29,12 @@ function saveNotifiedKeys(payments) {
     }
 }
 
+/**
+ * Checks whether a payment date belongs to the same month and year as `now`.
+ * @param {Date} paymentDate
+ * @param {Date} now
+ * @returns {boolean}
+ */
 function isSameMonth(paymentDate, now) {
     return paymentDate.getFullYear() === now.getFullYear() && paymentDate.getMonth() === now.getMonth();
 }

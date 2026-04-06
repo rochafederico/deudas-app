@@ -68,6 +68,11 @@ function renderItemDetail(titulo, html) {
     return `<p class="mb-1 fw-semibold small">📅 ${titulo}</p>${html}`;
 }
 
+/**
+ * Renders the "Vencidos del mes" section (payments overdue in the current month).
+ * @param {Array} payments
+ * @returns {string} HTML string or empty string
+ */
 function renderOverdueSection(payments) {
     if (payments.length === 0) return '';
     return renderItemDetail('Vencidos del mes', `<ul class="list-unstyled ms-2 mb-2">${payments.map(renderPaymentItem).join('')}</ul>`);
@@ -185,4 +190,3 @@ export function showGroupedInAppNotification(count) {
     const message = `⚠️ Tenés <strong>${count} pagos próximos a vencer</strong> en los próximos 3 días. <a href="/" class="alert-link">Ver detalle</a>`;
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
 }
-
