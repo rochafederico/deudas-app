@@ -12,9 +12,6 @@ export function initDB() {
         const request = indexedDB.open(DB_NAME, VERSION);
         request.onupgradeneeded = (event) => {
             db = event.target.result;
-            if (db.objectStoreNames.contains('analytics_events')) {
-                db.deleteObjectStore('analytics_events');
-            }
             if (!db.objectStoreNames.contains(DEUDAS_STORE)) {
                 db.createObjectStore(DEUDAS_STORE, { keyPath: 'id', autoIncrement: true });
             }
