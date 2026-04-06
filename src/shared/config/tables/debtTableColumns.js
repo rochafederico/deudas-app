@@ -45,7 +45,7 @@ export const debtTableColumns = [
             const vencimiento = String(row.vencimiento ?? '').trim();
             if (vencimiento !== '') {
                 const badge = document.createElement('span');
-                badge.className = 'text-muted d-md-none mt-1';
+                badge.className = 'text-muted fw-lighter d-md-none mt-1';
                 badge.textContent = vencimiento;
                 wrapper.appendChild(badge);
             }
