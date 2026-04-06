@@ -1,32 +1,13 @@
 # Microsoft Clarity: eventos y flujos
 
-| Tipo | Flujo | Dispositivo | Evento en Clarity |
-| --- | --- | --- | --- |
-| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_started` |
-| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_completed` |
-| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_validation_error` |
-| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_abandoned` |
-| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_started` |
-| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_completed` |
-| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_validation_error` |
-| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_abandoned` |
-| Flujo | Eliminar deuda | `mobile` / `desktop` | `*_delete_debt_completed` |
-| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_started` |
-| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_completed` |
-| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_abandoned` |
-| Flujo | Registrar pago | `mobile` / `desktop` | `*_payment_registered` |
-| Flujo | Registrar pago | `mobile` / `desktop` | `*_payment_validation_error` |
-| Evento | Shortcut | `mobile` / `desktop` | `*_shortcut_used` |
-| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_started` |
-| Evento | Exportar datos | `mobile` / `desktop` | `*_export_data_used` |
-| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_completed` |
-| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_validation_error` |
-| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_started` |
-| Evento | Importar datos | `mobile` / `desktop` | `*_import_data_used` |
-| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_completed` |
-| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_validation_error` |
-| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_abandoned` |
-| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_started` |
-| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_completed` |
-| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_abandoned` |
-| Evento | Navegación mensual | `mobile` / `desktop` | `*_monthly_navigation_used` |
+| Flujo | Eventos en Clarity |
+| --- | --- |
+| Crear deuda | `create_debt_started`, `create_debt_completed`, `create_debt_validation_error`, `create_debt_abandoned` |
+| Editar deuda | `edit_debt_started`, `edit_debt_completed`, `edit_debt_validation_error`, `edit_debt_abandoned` |
+| Eliminar deuda | `delete_debt_completed` |
+| Duplicar cuota | `duplicate_installment_started`, `duplicate_installment_completed`, `duplicate_installment_abandoned` |
+| Registrar pago | `payment_registered`, `payment_validation_error` |
+| Exportar datos | `shortcut_used` (`shortcut=export_data`), `export_data_started`, `export_data_used`, `export_data_completed`, `export_data_validation_error` |
+| Importar datos | `shortcut_used` (`shortcut=import_data`), `import_data_started`, `import_data_used`, `import_data_completed`, `import_data_validation_error`, `import_data_abandoned` |
+| Eliminar todo | `shortcut_used` (`shortcut=delete_all_data`) |
+| Tour guiado | `shortcut_used` (`shortcut=tour`), `tour_started`, `tour_completed`, `tour_abandoned` |
