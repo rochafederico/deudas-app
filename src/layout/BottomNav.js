@@ -107,10 +107,10 @@ export class BottomNav extends HTMLElement {
         </div>
         <div class="offcanvas-body pb-4">
           <div class="list-group list-group-flush">
-            <a href="#" id="bottom-nav-export" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <a href="#" id="bottom-nav-export" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-tour-step="exportar">
               📤 Exportar datos
             </a>
-            <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+            <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-tour-step="importar">
               📥 Importar datos
             </a>
             <a href="#" id="bottom-nav-delete" class="list-group-item list-group-item-action text-danger d-flex align-items-center gap-2">
