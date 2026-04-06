@@ -130,3 +130,8 @@ La API de tracking acepta metadata para uso interno del flujo, pero hoy Clarity 
 - `*_completed`: el flujo cerró correctamente.
 
 En importación/exportación hoy conviven `used` y `completed`, por lo que en dashboards conviene tratarlos como eventos complementarios y no como sinónimos.
+
+En la implementación actual de import/export, ambos pueden aparecer en la misma operación exitosa:
+
+- `used` mide la ejecución de la acción principal de negocio.
+- `completed` mantiene la métrica de cierre exitoso del flujo.
