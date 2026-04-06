@@ -71,65 +71,79 @@ MIT
 
 ## 🗺️ Mapa del sitio
 
-> Estado relevado del código real. Última revisión: 2026-04-04.
+> Estado relevado del código real. Última revisión: 2026-04-06.
 
-- ✅ **Nivva**
+- ✅ **Shell de navegación Bootstrap**
+  - ✅ **Header desktop (`AppHeader`)**
+    - ✅ Marca **Nivva** → redirige a `/`
+    - ✅ Navegación principal: **Egresos**, **Ingresos**, **Inversiones**
+    - ✅ Acciones secundarias: **⚙️ Config**, **🔔 vencimientos próximos**, **❓ tour**
+  - ✅ **Bottom navbar mobile (`BottomNav`)**
+    - ✅ Secciones primarias visibles: **Egresos** (`/`), **Ingresos** (`/ingresos`), **Inversiones** (`/inversiones`)
+    - ✅ Acceso secundario: **⚙️ Config** abre un offcanvas, no una ruta
 
-  - 🚧 **Inicio / Dashboard** *(la home es Egresos, no existe dashboard dedicado)*
-    - ✅ KPIs
-      - ✅ Ingresos
-      - ✅ Gastos
-      - ✅ Balance
-      - ✅ Total a pagar
-      - ✅ Inversiones
-    - 🚧 Resumen mensual *(los KPIs muestran datos del mes, pero no hay una sección de resumen independiente)*
-    - ⏳ Próximos vencimientos *(panel flotante con alertas en PR #75)*
-    - ⏳ Alertas / recordatorios
+### Rutas primarias implementadas
 
-  - ✅ **Movimientos**
+- ✅ **Egresos** (`/`)
+  - ✅ Vista inicial de la app
+  - ✅ Indicadores globales arriba del contenido
+  - ✅ Encabezado **Resumen** + selector global de mes
+  - ✅ Lista/tablas de cuotas del mes
+  - ✅ Agrupación por acreedor, tipo, moneda o vencimiento
+  - ✅ Alta/edición de deuda en modal
+  - ✅ Detalle de deuda en modal
+  - ✅ Marcar cuotas como pagadas
+  - ✅ Duplicar cuotas / montos
+  - ⏳ Dashboard dedicado
 
-    - ✅ Ingresos (`/ingresos`)
-      - ✅ Nuevo ingreso
-      - ✅ Historial
-      - 🚧 Filtros por mes / categoría *(filtro por mes implementado; sin filtro por categoría)*
+- ✅ **Ingresos** (`/ingresos`)
+  - ✅ Alta de ingreso en modal
+  - ✅ Totales del mes
+  - ✅ Historial/listado en tabla
+  - ✅ Usa el selector global de mes
+  - ⏳ Filtro por categoría
 
-    - ✅ Gastos / Deudas (`/` — home)
-      - ✅ Nueva deuda
-      - 🚧 Próximas cuotas *(navegación por mes implementada; panel de próximos vencimientos en PR #75)*
-      - ✅ Acreedores *(agrupamiento por acreedor disponible)*
-      - ✅ Estado de pago *(marca pagado/pendiente por cuota)*
+- ✅ **Inversiones** (`/inversiones`)
+  - ✅ Alta de inversión
+  - ✅ Registro de nuevos valores
+  - ✅ Listado e historial de valores
+  - ✅ Total invertido por moneda
+  - 🚧 Rendimiento básico *(hay comparación de valores, pero no gráficos ni analytics dedicados)*
 
-    - ✅ Inversiones (`/inversiones`)
-      - ✅ Nuevo registro
-      - ✅ Historial de valores
-      - 🚧 Rendimiento *(muestra valor actual vs. inicial; sin gráficos ni % de retorno)*
+### Rutas secundarias
 
-  - 🚧 **Gestión de datos**
-    - Desde el menú **Datos** del header:
-      - ✅ Importar datos *(con previsualización y fusión inteligente por acreedor+tipo)*
-      - ✅ Exportar datos *(JSON descargable con deudas, ingresos e inversiones)*
-      - 🚧 Backup / restaurar *(exportar/importar cumple la función; sin flujo dedicado de backup)*
-    - Desde el menú de opciones **⚙️** del `header-bar`:
-      - 🚧 Reiniciar información *("Eliminar todo" borra deudas y montos; ingresos e inversiones no se borran)*
+- ✅ No hay rutas secundarias implementadas además de `/`, `/ingresos` y `/inversiones`
+- 🚧 `src/pages/Dashboard.js` existe como placeholder, pero no está conectado al router ni a la navegación Bootstrap
+- ⏳ No existen rutas dedicadas para configuración, ayuda, notificaciones o reportes
 
-  - ⏳ **Configuración** *(no existe página ni sección de configuración)*
-    - ⏳ Moneda *(ARS/USD están hardcodeados en `monedas.js`)*
-    - ⏳ Formato ARS / USD
-    - ⏳ Preferencias visuales *(existe `DarkToggle.js` pero no está integrado en la UI)*
-    - ⏳ Notificaciones
+### Acciones secundarias y modales (sin ruta propia)
 
-  - 🚧 **Ayuda**
-    - ✅ Tour guiado *(9 pasos; se lanza automáticamente en el primer acceso y manualmente desde el header)*
-    - 🚧 Cómo usar la app *(cubierto por el tour; sin página de ayuda independiente)*
-    - ⏳ Preguntas frecuentes
-    - ⏳ Contacto / feedback
+- ✅ **⚙️ Config** *(dropdown en desktop, offcanvas en mobile)*
+  - ✅ Exportar datos
+  - ✅ Importar datos
+  - ✅ Eliminar todo *(borra deudas, ingresos e inversiones)*
+- ✅ **🔔 Vencimientos próximos**
+  - ✅ Popover/panel desde el header
+  - ✅ Notificaciones nativas + aviso in-app
+  - 🚧 Centro de notificaciones como pantalla independiente
+- ✅ **❓ Tour guiado**
+  - ✅ Inicio automático en primera visita
+  - ✅ Inicio manual desde el header
+  - ✅ Navegación por teclado
+- ✅ **Otros modales implementados**
+  - ✅ Deuda (alta/edición)
+  - ✅ Detalle de deuda
+  - ✅ Ingreso
+  - ✅ Exportación / importación
+  - ✅ Alta de inversión / nuevo valor
 
-### Funcionalidades adicionales encontradas en el código
+### Funcionalidades implementadas vs. pendientes
 
-- ✅ Duplicar cuotas / montos *(modal dedicado con selección de nueva fecha)*
-- ✅ Agrupamiento de deudas *(por acreedor, tipo, moneda o vencimiento)*
-- ✅ Múltiples cuotas por deuda *(modelo Deuda → Montos 1:N)*
+- ✅ Persistencia 100 % local en IndexedDB
+- ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
+- ✅ Resumen mensual con KPIs de ingresos, gastos, balance, total a pagar e inversiones
 - ✅ Notificaciones toast (`AppToast`)
-- ✅ Persistencia 100 % local en IndexedDB *(sin backend)*
-- ✅ Fusión inteligente al importar *(deduplica por acreedor+tipo y por monto+moneda+periodo)*
-- ✅ Navegación por teclado en el tour *(flechas y Escape)*
+- ⏳ Página de configuración
+- ⏳ Página de ayuda / FAQ
+- ⏳ Dashboard analítico real
+- ⏳ Rutas adicionales para reportes o vistas detalladas
