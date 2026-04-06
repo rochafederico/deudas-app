@@ -41,6 +41,7 @@ async function testTrackEventSendsDevicePrefixedClarityEvent() {
     assert(events.length === 1, 'Should send 1 Clarity event');
     assert(events[0][0] === 'event', 'Clarity should be called with event type');
     assert(events[0][1] === 'mobile_shortcut_used', 'Should prefix event names with the device');
+    assert(!events[0][1].includes('tour'), 'Metadata should not alter the Clarity event name');
 }
 
 async function testFlowLifecycleSendsExpectedClarityEvents() {

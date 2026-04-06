@@ -58,7 +58,8 @@ export function updateFlowStep(flowName, step, metadata = {}) {
     });
 }
 
-export function trackEvent(name, _metadata = {}) {
+export function trackEvent(name, metadata = {}) {
+    void metadata;
     registerLifecycleListeners();
     return sendClarityEvent(name);
 }
@@ -72,7 +73,8 @@ export function trackFlowStart(flowName, metadata = {}) {
     return sendClarityEvent(`${flowName}_started`);
 }
 
-export function trackFlowComplete(flowName, _metadata = {}) {
+export function trackFlowComplete(flowName, metadata = {}) {
+    void metadata;
     registerLifecycleListeners();
     activeFlows.delete(flowName);
     return sendClarityEvent(`${flowName}_completed`);
@@ -84,7 +86,9 @@ export function trackFlowError(flowName, errorData = {}) {
     return sendClarityEvent(`${flowName}_validation_error`);
 }
 
-export function trackFlowAbandoned(flowName, _step, _metadata = {}) {
+export function trackFlowAbandoned(flowName, step, metadata = {}) {
+    void step;
+    void metadata;
     registerLifecycleListeners();
     activeFlows.delete(flowName);
     return sendClarityEvent(`${flowName}_abandoned`);
