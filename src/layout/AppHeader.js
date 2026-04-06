@@ -94,7 +94,7 @@ export class AppHeader extends HTMLElement {
             <ul class="navbar-nav align-items-center ms-auto">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle px-2" href="#" id="desktop-datos-toggle" role="button"
-                  data-bs-toggle="dropdown" aria-expanded="false">⚙️ Config</a>
+                  data-bs-toggle="dropdown" aria-expanded="false">⚙️ Gestión de datos</a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><a class="dropdown-item" href="#" id="desktop-export">📤 Exportar datos</a></li>
                   <li><a class="dropdown-item" href="#" id="desktop-import">📥 Importar datos</a></li>
@@ -106,7 +106,7 @@ export class AppHeader extends HTMLElement {
           </div>
           <div class="ms-auto ms-lg-3 d-flex align-items-center gap-2">
             <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">🔔</button>
-            <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">❓</button>
+            <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Abrir guía rápida" aria-label="Abrir guía rápida">❓</button>
           </div>
         </div>
       </nav>
