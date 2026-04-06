@@ -1,16 +1,20 @@
 // src/routes.js
 
+import { navItems } from './layout/navConfig.js';
 import Home from '/src/pages/Home.js';
 import Ingresos from '/src/pages/Ingresos.js';
 import Inversiones from '/src/pages/Inversiones.js';
 
+const componentMap = {
+  '/': Home,
+  '/ingresos': Ingresos,
+  '/inversiones': Inversiones,
+};
 
-const routes = [
-  { path: '/', label: 'Egresos', component: Home },
-  { path: '/ingresos', label: 'Ingresos', component: Ingresos },
-  { path: '/inversiones', label: 'Inversiones', component: Inversiones },
-  // { path: '/deudas', label: 'Deudas', component: Home },
-  // ...otras rutas...
-];
+const routes = navItems.map(item => ({
+  path: item.path,
+  label: item.label,
+  component: componentMap[item.path],
+}));
 
 export default routes;
