@@ -132,7 +132,7 @@ MIT
 - ✅ **❓ Tour guiado**
   - ✅ Inicio automático en primera visita *(HU #21)*
   - ✅ Omitir/cerrar en cualquier momento *(HU #22)*
-  - 🚧 Relanzar manualmente *(existe botón en header, pero la HU #23 lo pide dentro de `Menu.js`)*
+  - 🚧 Relanzar manualmente *(existe botón en header, pero la HU #23 lo pide dentro de `src/layout/Menu.js`)*
   - ⏳ Indicador de progreso *(HU #24)*
   - ✅ Navegación por teclado
 - ✅ **Otros modales implementados**
