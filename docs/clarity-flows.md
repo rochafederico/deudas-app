@@ -80,14 +80,14 @@ Tanto en:
 #### Exportar datos
 
 - `<device>_export_data_started`
-- `<device>_export_data_used`
+- `<device>_export_data_used` (exportación efectivamente ejecutada)
 - `<device>_export_data_completed`
 - `<device>_export_data_validation_error`
 
 #### Importar datos
 
 - `<device>_import_data_started`
-- `<device>_import_data_used`
+- `<device>_import_data_used` (importación efectivamente ejecutada)
 - `<device>_import_data_completed`
 - `<device>_import_data_validation_error`
 - `<device>_import_data_abandoned`
@@ -122,3 +122,11 @@ Armar al menos estos filtros o segmentos:
 ## Nota sobre metadata
 
 La API de tracking acepta metadata para uso interno del flujo, pero hoy Clarity recibe únicamente el **nombre del evento**.
+
+## Cómo leer `started`, `used` y `completed`
+
+- `*_started`: el usuario abrió o inició el flujo.
+- `*_used`: la acción principal del flujo se ejecutó.
+- `*_completed`: el flujo cerró correctamente.
+
+En importación/exportación hoy conviven `used` y `completed`, por lo que en dashboards conviene tratarlos como eventos complementarios y no como sinónimos.
