@@ -7,10 +7,10 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   card.className = `card h-100 rounded-4 shadow-sm border border-2 border-${color}`;
 
   const body = document.createElement('div');
-  body.className = 'card-body p-2';
+  body.className = 'card-body d-flex flex-column justify-content-between gap-2 p-3';
 
   const titleEl = document.createElement('div');
-  titleEl.className = `fw-semibold text-uppercase small text-${color} mb-2`;
+  titleEl.className = `d-flex align-items-center gap-2 fw-semibold text-uppercase small text-${color}`;
   titleEl.textContent = title;
   body.appendChild(titleEl);
 
@@ -19,9 +19,9 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
   if (items.length > 0) {
     const mainItem = items.find(i => i.currency === KPI_CURRENCY) || items[0];
     const arsEl = document.createElement('h6');
-    arsEl.className = `fw-bold text-${color} lh-sm mb-0`;
+    arsEl.className = `d-flex align-items-center gap-2 text-nowrap fw-bold text-${color} lh-sm mb-0`;
     const arsBadge = document.createElement('span');
-    arsBadge.className = `badge small bg-${color} ms-1`;
+    arsBadge.className = `badge small bg-${color}`;
     arsBadge.textContent = mainItem.currency;
     arsEl.appendChild(document.createTextNode(mainItem.value));
     arsEl.appendChild(arsBadge);
