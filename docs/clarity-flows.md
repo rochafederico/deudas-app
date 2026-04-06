@@ -7,7 +7,7 @@
 | Eliminar deuda | `delete_debt_completed` |
 | Duplicar cuota | `duplicate_installment_started`, `duplicate_installment_completed`, `duplicate_installment_abandoned` |
 | Registrar pago | `payment_registered`, `payment_validation_error` |
-| Exportar datos | `shortcut_used` (`shortcut=export_data`), `export_data_started`, `export_data_used`, `export_data_completed`, `export_data_validation_error` |
-| Importar datos | `shortcut_used` (`shortcut=import_data`), `import_data_started`, `import_data_used`, `import_data_completed`, `import_data_validation_error`, `import_data_abandoned` |
+| Exportar datos | `shortcut_used` (`shortcut=export_data`, apertura), `export_data_started`, `export_data_used` (ejecución), `export_data_completed`, `export_data_validation_error` |
+| Importar datos | `shortcut_used` (`shortcut=import_data`, apertura), `import_data_started`, `import_data_used` (ejecución), `import_data_completed`, `import_data_validation_error`, `import_data_abandoned` |
 | Eliminar todo | `shortcut_used` (`shortcut=delete_all_data`) |
 | Tour guiado | `shortcut_used` (`shortcut=tour`), `tour_started`, `tour_completed`, `tour_abandoned` |
