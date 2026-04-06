@@ -1,37 +1,64 @@
-// src/config/tables/debtTableColumns.js
+// src/shared/config/tables/debtTableColumns.js
 // Configuración de columnas para la tabla de deudas
 
-import { el } from '../../utils/dom.js';
 import { formatMoneda } from '../monedas.js';
 import '../../components/AppCheckbox.js';
 
 export const debtTableColumns = [
-    { key: 'acreedor', label: 'Acreedor'},
-    { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'hidden-mobile' } },
-    { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'hidden-mobile' } },
-    { key: 'monedaymonto', label: 'Moneda/Monto', render: row => formatMoneda(row.monto, row.moneda) },
+    {
+        key: 'acreedor',
+        label: 'Acreedor',
+        render: row => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex flex-column align-items-start';
+
+            const acreedorSpan = document.createElement('span');
+            acreedorSpan.className = 'fw-semibold';
+            acreedorSpan.textContent = row.acreedor ?? '';
+
+            wrapper.appendChild(acreedorSpan);
+
+            const tipoDeuda = String(row.tipoDeuda ?? '').trim();
+            if (tipoDeuda !== '') {
+                const badge = document.createElement('span');
+                badge.className = 'badge rounded-pill text-bg-light d-md-none mt-1';
+                badge.textContent = tipoDeuda;
+                wrapper.appendChild(badge);
+            }
+
+            return wrapper;
+        }
+    },
+    { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'd-none d-md-table-cell' } },
+    { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'd-none d-md-table-cell' } },
+    {
+        key: 'monedaymonto',
+        label: 'Monto',
+        render: row => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex flex-column align-items-start';
+
+            const montoSpan = document.createElement('span');
+            montoSpan.textContent = formatMoneda(row.monto, row.moneda);
+            wrapper.appendChild(montoSpan);
+
+            const vencimiento = String(row.vencimiento ?? '').trim();
+            if (vencimiento !== '') {
+                const badge = document.createElement('span');
+                badge.className = 'text-muted fw-lighter d-md-none mt-1';
+                badge.textContent = vencimiento;
+                wrapper.appendChild(badge);
+            }
+
+            return wrapper;
+        }
+    },
     {
         key: 'acciones',
-        label: 'Acciones',
+        label: 'Pagado',
         render: row => {
-            // Botón ver detalle
-            const btnDetalle = el('app-button', {
-                text: 'ℹ',
-                attrs: { title: 'Ver detalle', 'aria-label': 'Ver detalle', variant: 'light' },
-                on: {
-                    click: () => row._onDetail(row, btnDetalle)
-                }
-            });
-            // Botón editar
-            const btn = el('app-button', {
-                text: '✏️',
-                attrs: { title: 'Editar deuda', 'aria-label': 'Editar deuda', variant: 'light' },
-                on: {
-                    click: () => row._onEdit(row)
-                }
-            });
             // Checkbox pagado
-            const id = `app-checkbox-${row.id}`;
+            const id = `app-checkbox-${row.id != null ? row.id : 'row'}`;
             const appCheckbox = document.createElement('app-checkbox');
             appCheckbox.inputId = id;
             appCheckbox.checked = !!row.pagado;
@@ -41,11 +68,11 @@ export const debtTableColumns = [
                 await setPagado(row.id, e.detail.checked);
                 if (typeof row._reload === 'function') row._reload();
             });
-            // Contenedor flex
+
+            // Contenedor — stopPropagation para no activar el click de fila
             const container = document.createElement('div');
-            container.className = 'd-flex align-items-center justify-content-end gap-3';
-            container.appendChild(btnDetalle);
-            container.appendChild(btn);
+            container.className = 'd-flex align-items-center justify-content-end';
+            container.addEventListener('click', e => e.stopPropagation());
             container.appendChild(appCheckbox);
             return container;
         }

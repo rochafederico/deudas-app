@@ -68,6 +68,10 @@ export class AppTable extends HTMLElement {
         }
         this.data.forEach(row => {
             const tr = document.createElement('tr');
+            if (typeof row._onRowClick === 'function') {
+                tr.style.cursor = 'pointer';
+                tr.addEventListener('click', () => row._onRowClick(row, tr));
+            }
             this.columns.forEach(col => {
                 const td = document.createElement('td');
                 if (col.opts && col.opts.classCss) {

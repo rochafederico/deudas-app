@@ -3,6 +3,7 @@
 import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
+import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -339,11 +340,74 @@ async function testDebtDetailModal() {
     }
 }
 
+// ===================================================================
+// UC7: debtTableColumns acreedor render agrupa Acreedor y Tipo en mobile
+// Verifica que la columna Acreedor renderiza el nombre con fw-semibold
+// y un badge con el tipo de deuda visible solo en mobile (d-md-none).
+// ===================================================================
+async function testAcreedorColumnMobileRender() {
+    console.log('  UC7: acreedor column renderiza badge de tipo para mobile');
+
+    const acreedorCol = debtTableColumns.find(col => col.key === 'acreedor');
+    assert(acreedorCol !== undefined, 'Debe existir columna acreedor');
+    assert(typeof acreedorCol.render === 'function', 'Columna acreedor debe tener render function');
+
+    const row = { acreedor: 'Banco Galicia', tipoDeuda: 'Préstamo' };
+    const node = acreedorCol.render(row);
+    assert(node instanceof Node, 'render debe devolver un nodo DOM');
+
+    const acreedorSpan = node.querySelector('span.fw-semibold');
+    assert(acreedorSpan !== null, 'Debe existir span con clase fw-semibold para el acreedor');
+    assert(acreedorSpan.textContent === 'Banco Galicia', 'El span debe mostrar el nombre del acreedor');
+
+    const badge = node.querySelector('span.badge');
+    assert(badge !== null, 'Debe existir un badge para el tipo de deuda');
+    assert(badge.classList.contains('rounded-pill'), 'Badge debe tener clase rounded-pill');
+    assert(badge.classList.contains('text-bg-light'), 'Badge debe tener clase text-bg-light');
+    assert(badge.classList.contains('d-md-none'), 'Badge debe tener clase d-md-none (solo visible en mobile)');
+    assert(badge.textContent === 'Préstamo', 'Badge debe mostrar el tipo de deuda');
+
+    const tipoCol = debtTableColumns.find(col => col.key === 'tipoDeuda');
+    assert(tipoCol !== undefined, 'Debe existir columna tipoDeuda');
+    assert(tipoCol.opts && typeof tipoCol.opts.classCss === 'string',
+        'Columna Tipo debe definir classCss');
+    assert(tipoCol.opts.classCss.includes('d-none'),
+        'Columna Tipo debe incluir clase d-none para ocultarse en mobile');
+    assert(tipoCol.opts.classCss.includes('d-md-table-cell'),
+        'Columna Tipo debe incluir clase d-md-table-cell para mostrarse desde md');
+
+    // Badge no debe renderizarse cuando tipoDeuda está vacío
+    const rowSinTipo = { acreedor: 'Banco Sin Tipo', tipoDeuda: '' };
+    const nodeSinTipo = acreedorCol.render(rowSinTipo);
+    const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
+    assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
+
+    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
+    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
+    assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
+    assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
+
+    const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
+    const montoNode = montoCol.render(rowConVenc);
+    assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
+    const vencBadge = montoNode.querySelector('span.d-md-none');
+    assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Monto');
+    assert(vencBadge.classList.contains('d-md-none'), 'Elemento de vencimiento debe ser solo visible en mobile (d-md-none)');
+    assert(vencBadge.textContent === '2026-06-01', 'Elemento debe mostrar la fecha de vencimiento');
+
+    // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
+    const rowSinVenc = { monto: 500, moneda: 'ARS', vencimiento: '' };
+    const montoNodeSinVenc = montoCol.render(rowSinVenc);
+    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.d-md-none');
+    assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
     testImportarConMerge,
     testEliminarDeudas,
     testMultiplesDeudasMismoMes,
-    testDebtDetailModal
+    testDebtDetailModal,
+    testAcreedorColumnMobileRender
 ];
