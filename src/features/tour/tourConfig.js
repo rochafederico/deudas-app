@@ -35,6 +35,12 @@ function isVisibleTarget(element) {
     return true;
 }
 
+/**
+ * Busca el primer selector que tenga exactamente un target visible.
+ * Retorna null si no hay matches visibles o si todos los selectores resultan ambiguos.
+ * @param {string[]} selectors
+ * @returns {HTMLElement|null}
+ */
 export function findVisibleTourTarget(selectors = []) {
     for (const selector of selectors) {
         const matches = Array.from(document.querySelectorAll(selector)).filter(isVisibleTarget);

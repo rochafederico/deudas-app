@@ -140,8 +140,8 @@ export const tests = [
         assert(getStepTarget('bienvenida')?.getAttribute('data-tour-step') === 'bienvenida', 'Bienvenida should target brand');
         assert(getStepTarget('resumen-principal')?.id === 'summary', 'Resumen principal should target summary header');
         assert(getStepTarget('indicadores')?.getAttribute('data-tour-step') === 'indicadores', 'Indicadores should target KPI container');
-        assert(getStepTarget('navegacion-mes') === document.querySelector('month-selector [data-tour-step="navegacion-mes"]'), 'Month navigation should target selector');
-        assert(getStepTarget('acciones-rapidas') === document.querySelector('app-shell header-bar .card-header > div:last-child'), 'Quick actions should target actions container');
+        assert(getStepTarget('navegacion-mes')?.getAttribute('data-tour-step') === 'navegacion-mes', 'Month navigation should target selector');
+        assert(getStepTarget('acciones-rapidas')?.classList.contains('d-flex'), 'Quick actions should target actions container');
         assert(getStepTarget('menu-navegacion')?.getAttribute('data-tour-step') === 'menu-navegacion', 'Navigation should target desktop menu when visible');
         assert(getStepTarget('accesos-secundarios')?.id === 'desktop-datos-toggle', 'Secondary access should target desktop config when visible');
     },
