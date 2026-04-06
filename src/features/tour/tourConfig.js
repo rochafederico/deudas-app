@@ -18,6 +18,31 @@ export function findTourTarget(path) {
     return current;
 }
 
+function isVisibleTarget(element) {
+    let current = element;
+    while (current && current.nodeType === 1) {
+        const style = window.getComputedStyle(current);
+        if (
+            current.hidden ||
+            current.getAttribute('aria-hidden') === 'true' ||
+            style.display === 'none' ||
+            style.visibility === 'hidden'
+        ) {
+            return false;
+        }
+        current = current.parentElement;
+    }
+    return true;
+}
+
+export function findVisibleTourTarget(selectors = []) {
+    for (const selector of selectors) {
+        const matches = Array.from(document.querySelectorAll(selector)).filter(isVisibleTarget);
+        if (matches.length === 1) return matches[0];
+    }
+    return null;
+}
+
 /**
  * Cada paso tiene:
  * - id: Identificador unico
@@ -31,79 +56,64 @@ export const tourSteps = [
         id: 'bienvenida',
         title: 'Bienvenida',
         text: 'Organizá tus deudas y gastos fijos en un solo lugar',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="bienvenida"]' }
+        getTarget: () => findVisibleTourTarget([
+            'app-header [data-tour-step="bienvenida"]'
+        ]),
+        position: 'bottom'
+    },
+    {
+        id: 'resumen-principal',
+        title: 'Resumen principal',
+        text: 'Acá tenés el panorama general del mes antes de entrar al detalle',
+        getTarget: () => findVisibleTourTarget([
+            '#app-wrapper > :first-child'
         ]),
         position: 'bottom'
     },
     {
         id: 'indicadores',
-        title: 'Indicadores',
-        text: 'Acá vas a ver tu resumen mensual de un vistazo',
-        getTarget: () => document.querySelector('[data-tour-step="indicadores"]'),
+        title: 'Cards KPI',
+        text: 'Estas tarjetas resumen balance, gastos, ingresos, pendientes e inversiones',
+        getTarget: () => findVisibleTourTarget([
+            '[data-tour-step="indicadores"]'
+        ]),
         position: 'bottom'
     },
     {
         id: 'navegacion-mes',
         title: 'Navegación por mes',
         text: 'Navegá entre meses para ver tus pagos pasados y futuros',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="navegacion-mes"]' }
+        getTarget: () => findVisibleTourTarget([
+            'month-selector [data-tour-step="navegacion-mes"]'
         ]),
         position: 'bottom'
     },
     {
-        id: 'nueva-deuda',
-        title: 'Nueva deuda',
-        text: 'Cargá tus deudas: tarjeta, alquiler, préstamos, servicios',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="nueva-deuda"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
-        id: 'nuevo-ingreso',
-        title: 'Nuevo ingreso',
-        text: 'Registrá tus ingresos para ver si te alcanza el mes',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="nuevo-ingreso"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
-        id: 'exportar',
-        title: 'Exportar datos',
-        text: 'Descargá un backup de toda tu información en formato JSON para tener un respaldo',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="exportar"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
-        id: 'importar',
-        title: 'Importar datos',
-        text: 'Restaurá tus datos desde un archivo JSON exportado previamente',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="importar"]' }
+        id: 'acciones-rapidas',
+        title: 'Acciones rápidas',
+        text: 'Desde acá podés crear movimientos nuevos y acceder rápido a las acciones principales',
+        getTarget: () => findVisibleTourTarget([
+            'app-shell header-bar .card-header > div:last-child'
         ]),
         position: 'bottom'
     },
     {
         id: 'menu-navegacion',
         title: 'Menú de navegación',
-        text: 'Explorá las distintas secciones desde acá',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="menu-navegacion"]' }
+        text: 'Movete entre Egresos, Ingresos e Inversiones desde la navegación principal visible en tu dispositivo',
+        getTarget: () => findVisibleTourTarget([
+            'app-header app-nav [data-tour-step="menu-navegacion"]',
+            'bottom-nav nav[aria-label="Navegación móvil"]'
+        ]),
+        position: 'bottom'
+    },
+    {
+        id: 'accesos-secundarios',
+        title: 'Accesos secundarios',
+        text: 'En Config encontrás exportar, importar y otras acciones de mantenimiento de tus datos',
+        getTarget: () => findVisibleTourTarget([
+            'app-header #desktop-datos-toggle',
+            'bottom-nav [data-bs-target="#mas-offcanvas"]'
         ]),
         position: 'bottom'
     },

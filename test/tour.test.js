@@ -1,8 +1,10 @@
 // test/tour.test.js
 // Tests del tour guiado - flujo E2E desde estado hasta UI
 import { assert } from './setup.js';
+import '../src/layout/MonthSelector.js';
+import '../src/layout/HeaderBar.js';
 import { isTourCompleted, markTourCompleted, resetTourState } from '../src/features/tour/tourState.js';
-import { tourSteps, findTourTarget } from '../src/features/tour/tourConfig.js';
+import { tourSteps, findTourTarget, findVisibleTourTarget } from '../src/features/tour/tourConfig.js';
 
 // Provide localStorage polyfill for happy-dom if missing
 if (!global.localStorage) {
@@ -39,9 +41,9 @@ export const tests = [
     },
 
     // --- tourConfig ---
-    async function tourConfig_has9Steps() {
-        console.log('  tourConfig: has 9 steps');
-        assert(tourSteps.length === 9, `Expected 9 steps, got ${tourSteps.length}`);
+    async function tourConfig_has8Steps() {
+        console.log('  tourConfig: has 8 steps');
+        assert(tourSteps.length === 8, `Expected 8 steps, got ${tourSteps.length}`);
     },
 
     async function tourConfig_stepsHaveRequiredFields() {
@@ -64,7 +66,7 @@ export const tests = [
 
     async function tourConfig_stepsInCorrectOrder() {
         console.log('  tourConfig: steps are in the correct order');
-        const expectedOrder = ['bienvenida', 'indicadores', 'navegacion-mes', 'nueva-deuda', 'nuevo-ingreso', 'exportar', 'importar', 'menu-navegacion', 'privacidad'];
+        const expectedOrder = ['bienvenida', 'resumen-principal', 'indicadores', 'navegacion-mes', 'acciones-rapidas', 'menu-navegacion', 'accesos-secundarios', 'privacidad'];
         for (let i = 0; i < expectedOrder.length; i++) {
             assert(tourSteps[i].id === expectedOrder[i], `Step ${i} should be "${expectedOrder[i]}", got "${tourSteps[i].id}"`);
         }
@@ -99,5 +101,77 @@ export const tests = [
         console.log('  findTourTarget: returns null for empty path');
         const result = findTourTarget([]);
         assert(result === null, 'Should return null for empty path');
+    },
+
+    async function findVisibleTourTarget_skipsHiddenTargets() {
+        console.log('  findVisibleTourTarget: skips hidden targets');
+        document.body.innerHTML = `
+            <div id="hidden-target" style="display:none"></div>
+            <div id="visible-target"></div>
+        `;
+        const result = findVisibleTourTarget(['#hidden-target', '#visible-target']);
+        assert(result?.id === 'visible-target', 'Should return the visible target');
+    },
+
+    async function tourConfig_targetsDesktopElementsWhenVisible() {
+        console.log('  tourConfig: targets desktop selectors when visible');
+        document.body.innerHTML = `
+            <app-header>
+                <a data-tour-step="bienvenida">Nivva</a>
+                <app-nav><ul data-tour-step="menu-navegacion"></ul></app-nav>
+                <a id="desktop-datos-toggle" href="#">Config</a>
+            </app-header>
+            <div id="app-wrapper">
+                <section id="summary"></section>
+                <div data-tour-step="indicadores"></div>
+                <app-shell>
+                    <header-bar></header-bar>
+                </app-shell>
+            </div>
+            <month-selector></month-selector>
+            <bottom-nav>
+                <nav aria-label="Navegación móvil" style="display:none"></nav>
+                <button type="button" data-bs-target="#mas-offcanvas" style="display:none"></button>
+            </bottom-nav>
+        `;
+
+        const getStepTarget = (id) => tourSteps.find(step => step.id === id)?.getTarget();
+
+        assert(getStepTarget('bienvenida')?.getAttribute('data-tour-step') === 'bienvenida', 'Bienvenida should target brand');
+        assert(getStepTarget('resumen-principal')?.id === 'summary', 'Resumen principal should target summary header');
+        assert(getStepTarget('indicadores')?.getAttribute('data-tour-step') === 'indicadores', 'Indicadores should target KPI container');
+        assert(getStepTarget('navegacion-mes') === document.querySelector('month-selector [data-tour-step="navegacion-mes"]'), 'Month navigation should target selector');
+        assert(getStepTarget('acciones-rapidas') === document.querySelector('app-shell header-bar .card-header > div:last-child'), 'Quick actions should target actions container');
+        assert(getStepTarget('menu-navegacion')?.getAttribute('data-tour-step') === 'menu-navegacion', 'Navigation should target desktop menu when visible');
+        assert(getStepTarget('accesos-secundarios')?.id === 'desktop-datos-toggle', 'Secondary access should target desktop config when visible');
+    },
+
+    async function tourConfig_targetsMobileFallbacksWhenDesktopIsHidden() {
+        console.log('  tourConfig: targets mobile fallbacks when desktop is hidden');
+        document.body.innerHTML = `
+            <app-header>
+                <a data-tour-step="bienvenida">Nivva</a>
+                <app-nav style="display:none"><ul data-tour-step="menu-navegacion"></ul></app-nav>
+                <a id="desktop-datos-toggle" href="#" style="display:none">Config</a>
+            </app-header>
+            <div id="app-wrapper">
+                <section id="summary"></section>
+                <div data-tour-step="indicadores"></div>
+                <app-shell>
+                    <header-bar></header-bar>
+                </app-shell>
+            </div>
+            <month-selector></month-selector>
+            <bottom-nav>
+                <nav aria-label="Navegación móvil"></nav>
+                <button type="button" id="mobile-config" data-bs-target="#mas-offcanvas"></button>
+            </bottom-nav>
+        `;
+
+        const navigationTarget = tourSteps.find(step => step.id === 'menu-navegacion')?.getTarget();
+        const secondaryTarget = tourSteps.find(step => step.id === 'accesos-secundarios')?.getTarget();
+
+        assert(navigationTarget?.getAttribute('aria-label') === 'Navegación móvil', 'Navigation should fallback to mobile nav');
+        assert(secondaryTarget?.id === 'mobile-config', 'Secondary access should fallback to mobile config button');
     },
 ];
