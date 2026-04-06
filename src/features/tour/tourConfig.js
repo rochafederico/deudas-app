@@ -72,7 +72,7 @@ export const tourSteps = [
         title: 'Resumen principal',
         text: 'Acá tenés el panorama general del mes antes de entrar al detalle',
         getTarget: () => findVisibleTourTarget([
-            '#app-wrapper > :first-child'
+            '#app-wrapper > .mb-3'
         ]),
         position: 'bottom'
     },
@@ -99,7 +99,7 @@ export const tourSteps = [
         title: 'Acciones rápidas',
         text: 'Desde acá podés crear movimientos nuevos y acceder rápido a las acciones principales',
         getTarget: () => findVisibleTourTarget([
-            'app-shell header-bar .card-header > div:last-child'
+            'app-shell header-bar .card-header > .d-flex.gap-2.flex-wrap:not(.align-items-center)'
         ]),
         position: 'bottom'
     },

@@ -122,7 +122,7 @@ export const tests = [
                 <a id="desktop-datos-toggle" href="#">Config</a>
             </app-header>
             <div id="app-wrapper">
-                <section id="summary"></section>
+                <section id="summary" class="mb-3"></section>
                 <div data-tour-step="indicadores"></div>
                 <app-shell>
                     <header-bar></header-bar>
@@ -136,12 +136,14 @@ export const tests = [
         `;
 
         const getStepTarget = (id) => tourSteps.find(step => step.id === id)?.getTarget();
+        const quickActionsTarget = getStepTarget('acciones-rapidas');
 
         assert(getStepTarget('bienvenida')?.getAttribute('data-tour-step') === 'bienvenida', 'Bienvenida should target brand');
         assert(getStepTarget('resumen-principal')?.id === 'summary', 'Resumen principal should target summary header');
         assert(getStepTarget('indicadores')?.getAttribute('data-tour-step') === 'indicadores', 'Indicadores should target KPI container');
         assert(getStepTarget('navegacion-mes')?.getAttribute('data-tour-step') === 'navegacion-mes', 'Month navigation should target selector');
-        assert(getStepTarget('acciones-rapidas')?.classList.contains('d-flex'), 'Quick actions should target actions container');
+        assert(quickActionsTarget?.tagName === 'DIV', 'Quick actions should target a container element');
+        assert(quickActionsTarget === document.querySelector('app-shell header-bar .card-header > .d-flex.gap-2.flex-wrap:not(.align-items-center)'), 'Quick actions should target the header actions container');
         assert(getStepTarget('menu-navegacion')?.getAttribute('data-tour-step') === 'menu-navegacion', 'Navigation should target desktop menu when visible');
         assert(getStepTarget('accesos-secundarios')?.id === 'desktop-datos-toggle', 'Secondary access should target desktop config when visible');
     },
@@ -155,7 +157,7 @@ export const tests = [
                 <a id="desktop-datos-toggle" href="#" style="display:none">Config</a>
             </app-header>
             <div id="app-wrapper">
-                <section id="summary"></section>
+                <section id="summary" class="mb-3"></section>
                 <div data-tour-step="indicadores"></div>
                 <app-shell>
                     <header-bar></header-bar>
