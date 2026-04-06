@@ -10,7 +10,7 @@ export const debtTableColumns = [
         label: 'Acreedor',
         render: row => {
             const wrapper = document.createElement('div');
-            wrapper.className = 'd-flex flex-column';
+            wrapper.className = 'd-flex flex-column align-items-start';
 
             const acreedorSpan = document.createElement('span');
             acreedorSpan.className = 'fw-semibold';
