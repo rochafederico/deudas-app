@@ -23,9 +23,8 @@ export class DebtDetailModal extends HTMLElement {
         }
     }
 
-    async openDetail(deuda, onEdit) {
+    async openDetail(deuda) {
         this.deuda = deuda;
-        this._onEdit = onEdit || null;
         this.ui.setTitle('Detalle de deuda');
         this._renderContent();
         this.ui.open();
@@ -116,18 +115,16 @@ export class DebtDetailModal extends HTMLElement {
         closeButton.addEventListener('click', () => this.close());
 
         const actions = [closeButton];
-        if (this._onEdit) {
-            const editButton = el('button', {
-                className: 'btn btn-primary',
-                text: 'Editar',
-                attrs: { type: 'button' }
-            });
-            editButton.addEventListener('click', () => {
-                this.close();
-                this._onEdit();
-            });
-            actions.unshift(editButton);
-        }
+        const editButton = el('button', {
+            className: 'btn btn-primary',
+            text: 'Editar',
+            attrs: { type: 'button' }
+        });
+        editButton.addEventListener('click', () => {
+            this.close();
+            window.dispatchEvent(new CustomEvent('deuda:edit', { detail: this.deuda }));
+        });
+        actions.unshift(editButton);
 
         const content = el('div', {
             children: [

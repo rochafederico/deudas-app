@@ -381,6 +381,25 @@ async function testAcreedorColumnMobileRender() {
     const nodeSinTipo = acreedorCol.render(rowSinTipo);
     const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
     assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
+
+    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
+    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
+    assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
+    assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
+
+    const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
+    const montoNode = montoCol.render(rowConVenc);
+    assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
+    const vencBadge = montoNode.querySelector('span.badge');
+    assert(vencBadge !== null, 'Debe existir badge de vencimiento en columna Monto');
+    assert(vencBadge.classList.contains('d-md-none'), 'Badge de vencimiento debe ser solo visible en mobile (d-md-none)');
+    assert(vencBadge.textContent === '2026-06-01', 'Badge debe mostrar la fecha de vencimiento');
+
+    // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
+    const rowSinVenc = { monto: 500, moneda: 'ARS', vencimiento: '' };
+    const montoNodeSinVenc = montoCol.render(rowSinVenc);
+    const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.badge');
+    assert(vencBadgeSinVenc === null, 'No debe renderizarse badge de vencimiento cuando está vacío');
 }
 
 export const tests = [

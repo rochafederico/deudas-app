@@ -31,7 +31,28 @@ export const debtTableColumns = [
     },
     { key: 'tipoDeuda', label: 'Tipo' , opts: { classCss: 'd-none d-md-table-cell' } },
     { key: 'vencimiento', label: 'Vencimiento' , opts: { classCss: 'd-none d-md-table-cell' } },
-    { key: 'monedaymonto', label: 'Monto', render: row => formatMoneda(row.monto, row.moneda) },
+    {
+        key: 'monedaymonto',
+        label: 'Monto',
+        render: row => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'd-flex flex-column';
+
+            const montoSpan = document.createElement('span');
+            montoSpan.textContent = formatMoneda(row.monto, row.moneda);
+            wrapper.appendChild(montoSpan);
+
+            const vencimiento = String(row.vencimiento ?? '').trim();
+            if (vencimiento !== '') {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-dark d-md-none mt-1';
+                badge.textContent = vencimiento;
+                wrapper.appendChild(badge);
+            }
+
+            return wrapper;
+        }
+    },
     {
         key: 'acciones',
         label: 'Pagado',

@@ -32,6 +32,9 @@ export class DebtList extends HTMLElement {
         window.addEventListener('deuda:added', () => this.loadDebts());
         window.addEventListener('deuda:updated', () => this.loadDebts());
         window.addEventListener('deuda:deleted', () => this.loadDebts());
+        window.addEventListener('deuda:edit', (e) => {
+            this.editDebt(e.detail);
+        });
     }
 
     async loadDebts() {
@@ -113,24 +116,13 @@ export class DebtList extends HTMLElement {
                     if (!detailModal) return;
                     const { getDeuda } = await import('../deudaRepository.js');
                     const deudaActualizada = await getDeuda(monto.deudaId);
-                    const editModal = document.querySelector('app-shell #debtModal')
-                        || document.getElementById('debtModal');
-                    const onEdit = editModal ? async () => {
-                        const deuda = await getDeuda(monto.deudaId);
-                        editModal.openEdit(deuda);
-                        editModal.attachOpener();
-                    } : null;
-                    detailModal.openDetail(deudaActualizada, onEdit);
+                    detailModal.openDetail(deudaActualizada);
                     detailModal.attachOpener(opener || null);
                 },
                 _onEdit: async (monto) => {
-                    const editModal = document.querySelector('app-shell #debtModal')
-                        || document.getElementById('debtModal');
-                    if (!editModal) return;
                     const { getDeuda } = await import('../deudaRepository.js');
-                    const deudaActualizada = await getDeuda(monto.deudaId);
-                    editModal.openEdit(deudaActualizada);
-                    editModal.attachOpener();
+                    const deuda = await getDeuda(monto.deudaId);
+                    window.dispatchEvent(new CustomEvent('deuda:edit', { detail: deuda }));
                 },
                 _reload: this.loadDebts.bind(this)
             };
@@ -155,10 +147,12 @@ export class DebtList extends HTMLElement {
         this.renderTable();
     }
 
-    editDebt(id) {
-        const debt = this.debts.find(d => d.id === id);
-        // Logic to populate the form with debt data for editing
-        // Emit an event to open the form with debt data
+    async editDebt(deuda) {
+        const editModal = document.querySelector('app-shell #debtModal')
+            || document.getElementById('debtModal');
+        if (!editModal || !deuda) return;
+        editModal.openEdit(deuda);
+        editModal.attachOpener();
     }
 
     deleteDebt(id, acreedor, monto, vencimiento, periodo, moneda) {
