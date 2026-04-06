@@ -14,6 +14,17 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+function isSameMonthAndYear(year, month, now) {
+    return year === now.getFullYear() && month === now.getMonth() + 1;
+}
+
+function isPastDue(dateStr, now) {
+    const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dueUTC = Date.UTC(y, m - 1, d);
+    return dueUTC < todayUTC;
+}
+
 // ── Date helpers ──────────────────────────────────────────────────────────────
 
 /**
@@ -128,8 +139,11 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
         const [y, m, d] = p.vencimiento.split('-').map(Number);
         const vencUTC = Date.UTC(y, m - 1, d);
         const diffDays = (vencUTC - todayUTC) / (1000 * 60 * 60 * 24);
-        if (diffDays < 0) overdue.push(p);
-        else if (diffDays === 0) today.push(p);
+        if (diffDays < 0) {
+            if (isSameMonthAndYear(y, m, now)) overdue.push(p);
+            continue;
+        }
+        if (diffDays === 0) today.push(p);
         else if (diffDays === 1) tomorrow.push(p);
         else rest.push(p);
     }
@@ -160,7 +174,7 @@ export function showInAppPanel(payments, now = new Date()) {
 }
 
 /**
- * Shows an in-app toast alert for a single upcoming payment.
+ * Shows an in-app toast alert for a single payment.
  * Used as a fallback when the browser Notifications API is unavailable or denied.
  * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
  * @param {Date} [now=new Date()]
@@ -172,21 +186,24 @@ export function showInAppNotification(payment, now = new Date()) {
     const formattedDate = formatDate(vencimiento);
     const safeAcreedor = escapeHtml(acreedor);
     const safeMoneda = escapeHtml(moneda);
+    const overdue = isPastDue(vencimiento, now);
+    const title = overdue ? '⚠️ Vencimiento pendiente' : '⚠️ Próximo vencimiento';
+    const verb = overdue ? 'Venció' : 'Vence';
     const message = [
-        `<strong>⚠️ Próximo vencimiento</strong>`,
+        `<strong>${title}</strong>`,
         `💰 <strong>${safeAcreedor} — ${safeMoneda} ${monto.toLocaleString('es-AR')}</strong>`,
-        `📅 Vence ${relDate} (${formattedDate}) · <a href="/" class="alert-link">Ver detalle</a>`
+        `📅 ${verb} ${relDate} (${formattedDate}) · <a href="/" class="alert-link">Ver detalle</a>`
     ].join('<br>');
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
 }
 
 /**
- * Shows a single grouped in-app toast summarising all upcoming payments.
+ * Shows a single grouped in-app toast summarising all pending payments.
  * Used when there are more than MAX_INDIVIDUAL_NOTIFICATIONS payments due.
- * @param {number} count - Number of upcoming payments.
+ * @param {number} count - Number of pending payments.
  */
 export function showGroupedInAppNotification(count) {
     if (typeof window === 'undefined') return;
-    const message = `⚠️ Tenés <strong>${count} pagos próximos a vencer</strong> en los próximos 3 días. <a href="/" class="alert-link">Ver detalle</a>`;
+    const message = `⚠️ Tenés <strong>${count} pagos vencidos o por vencer</strong>. <a href="/" class="alert-link">Ver detalle</a>`;
     window.dispatchEvent(new CustomEvent('app:notify', { detail: { message, type: 'warning' } }));
 }

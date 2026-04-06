@@ -40,6 +40,18 @@ function isSameMonth(paymentDate, now) {
 }
 
 /**
+ * Checks whether a payment date is before today's date.
+ * @param {string} dueDate
+ * @param {Date} now
+ * @returns {boolean}
+ */
+function isOverdue(dueDate, now) {
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const paymentDate = new Date(dueDate + 'T00:00:00');
+    return paymentDate < todayStart;
+}
+
+/**
  * Returns montos that are unpaid and either overdue in the current month or
  * due within the next `days` days.
  * @param {Array<{id?: number, acreedor: string, montos: Array}>} deudas
@@ -75,26 +87,29 @@ export function getUpcomingPayments(deudas, days = DAYS_AHEAD, now = new Date())
 }
 
 /**
- * Sends a native browser notification for a single upcoming payment.
+ * Sends a native browser notification for a single payment.
  * @param {{acreedor: string, monto: number, moneda: string, vencimiento: string}} payment
  * @param {Date} [now=new Date()]
  */
 export function sendPaymentNotification(payment, now = new Date()) {
     if (!isNotificationSupported() || Notification.permission !== 'granted') return;
     const { acreedor, monto, moneda, vencimiento } = payment;
-    const body = `💰 ${moneda} ${monto.toLocaleString('es-AR')} · 📅 Vence ${formatRelativeDate(vencimiento, now)} (${formatDate(vencimiento)})`;
-    new Notification(`⚠️ Próximo vencimiento: ${acreedor}`, { body, icon: '/favicon.ico' });
+    const overdue = isOverdue(vencimiento, now);
+    const verb = overdue ? 'Venció' : 'Vence';
+    const title = overdue ? `⚠️ Vencimiento pendiente: ${acreedor}` : `⚠️ Próximo vencimiento: ${acreedor}`;
+    const body = `💰 ${moneda} ${monto.toLocaleString('es-AR')} · 📅 ${verb} ${formatRelativeDate(vencimiento, now)} (${formatDate(vencimiento)})`;
+    new Notification(title, { body, icon: '/favicon.ico' });
 }
 
 /**
- * Sends a single grouped browser notification summarising all upcoming payments.
+ * Sends a single grouped browser notification summarising all pending payments.
  * Used when there are more than MAX_INDIVIDUAL_NOTIFICATIONS payments due.
- * @param {number} count - Number of upcoming payments.
+ * @param {number} count - Number of pending payments.
  */
 export function sendGroupedNotification(count) {
     if (!isNotificationSupported() || Notification.permission !== 'granted') return;
-    const n = new Notification('Pagos próximos a vencer', {
-        body: `Tenés ${count} pagos próximos a vencer en los próximos ${DAYS_AHEAD} días. Abrí la app para ver el detalle.`,
+    const n = new Notification('Pagos vencidos o por vencer', {
+        body: `Tenés ${count} pagos vencidos o por vencer. Abrí la app para ver el detalle.`,
         icon: '/favicon.ico'
     });
     n.onclick = () => window.focus();
