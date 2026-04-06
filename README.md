@@ -72,6 +72,7 @@ MIT
 ## 🗺️ Mapa del sitio
 
 > Estado relevado del código real. Última revisión: 2026-04-06.
+> Se toma el código como fuente de verdad para lo implementado y las épicas/HU abiertas como referencia del backlog pendiente.
 
 - ✅ **Shell de navegación Bootstrap**
   - ✅ **Header desktop (`AppHeader`)**
@@ -94,21 +95,23 @@ MIT
   - ✅ Detalle de deuda en modal
   - ✅ Marcar cuotas como pagadas
   - ✅ Duplicar cuotas / montos
-  - ⏳ Dashboard dedicado
+  - ⏳ Dashboard visual y proyecciones *(Épica #3: HU #34–#38)*
+  - ⏳ Categorización avanzada y filtros persistentes *(Épica #8: HU #57–#60)*
 
 - ✅ **Ingresos** (`/ingresos`)
   - ✅ Alta de ingreso en modal
   - ✅ Totales del mes
   - ✅ Historial/listado en tabla
   - ✅ Usa el selector global de mes
-  - ⏳ Filtro por categoría
+  - ⏳ Ingresos recurrentes, proyección y categorización *(Épica #4: HU #39–#43)*
 
 - ✅ **Inversiones** (`/inversiones`)
-  - ✅ Alta de inversión
+  - ✅ Alta de inversión *(base alineada con HU #61)*
   - ✅ Registro de nuevos valores
   - ✅ Listado e historial de valores
   - ✅ Total invertido por moneda
-  - 🚧 Rendimiento básico *(hay comparación de valores, pero no gráficos ni analytics dedicados)*
+  - 🚧 Rendimiento básico *(hay comparación de valores, pero faltan cálculo porcentual y visualización más rica de HU #62)*
+  - ⏳ Patrimonio neto consolidado *(HU #63)*
 
 ### Rutas secundarias
 
@@ -121,14 +124,16 @@ MIT
 - ✅ **⚙️ Config** *(dropdown en desktop, offcanvas en mobile)*
   - ✅ Exportar datos
   - ✅ Importar datos
-  - ✅ Eliminar todo *(borra deudas, ingresos e inversiones)*
+  - 🚧 Eliminar todo *(la acción existe y borra deudas, ingresos e inversiones, pero la HU #47 pide doble confirmación y limpieza de localStorage)*
 - ✅ **🔔 Vencimientos próximos**
   - ✅ Popover/panel desde el header
-  - ✅ Notificaciones nativas + aviso in-app
-  - 🚧 Centro de notificaciones como pantalla independiente
+  - ✅ Notificaciones nativas + aviso in-app *(HU #29 implementada)*
+  - ⏳ Agenda/calendario, frecuencia configurable y resumen semanal *(HU #30–#33)*
 - ✅ **❓ Tour guiado**
-  - ✅ Inicio automático en primera visita
-  - ✅ Inicio manual desde el header
+  - ✅ Inicio automático en primera visita *(HU #21)*
+  - ✅ Omitir/cerrar en cualquier momento *(HU #22)*
+  - 🚧 Relanzar manualmente *(existe botón en header, pero la HU #23 lo pide dentro de `Menu.js`)*
+  - ⏳ Indicador de progreso *(HU #24)*
   - ✅ Navegación por teclado
 - ✅ **Otros modales implementados**
   - ✅ Deuda (alta/edición)
@@ -143,7 +148,7 @@ MIT
 - ✅ Fusión inteligente al importar *(acreedor+tipo y monto+moneda+periodo/vencimiento)*
 - ✅ Resumen mensual con KPIs de ingresos, gastos, balance, total a pagar e inversiones
 - ✅ Notificaciones toast (`AppToast`)
-- ⏳ Página de configuración
-- ⏳ Página de ayuda / FAQ
-- ⏳ Dashboard analítico real
-- ⏳ Rutas adicionales para reportes o vistas detalladas
+- ⏳ Privacidad, cifrado y acceso con PIN *(Épica #5: HU #44–#47, #67–#72)*
+- ⏳ Importación/exportación CSV, backups automáticos y multi-cuenta *(Épica #7: HU #53–#56)*
+- ⏳ Dashboard analítico real *(Épica #3)*
+- ⏳ Vistas adicionales de ayuda, agenda o patrimonio *(Épicas #1, #2 y #9)*
