@@ -2,26 +2,15 @@
 import CURRENCIES from '../../../shared/config/monedas.js';
 
 /**
- * Formats a number in compact Spanish notation:
- *   >= 1,000,000 → "X,XX M"
- *   >= 1,000     → "XXX mil"
- *   otherwise    → full number with 2 decimal places (es-AR)
+ * Formats a number using full Argentina locale notation (es-AR).
+ * Example: 2310000 → "2.310.000"
  * Null/undefined values return '-'.
  * @param {number|null|undefined} n
  * @returns {string}
  */
 function compactFormat(n) {
     if (n == null) return '-';
-    const abs = Math.abs(n);
-    if (abs >= 1_000_000) {
-        const millones = n / 1_000_000;
-        return Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(millones) + ' M';
-    }
-    if (abs >= 1_000) {
-        const miles = n / 1_000;
-        return Intl.NumberFormat('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(miles) + ' mil';
-    }
-    return Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+    return new Intl.NumberFormat('es-AR').format(n);
 }
 
 /**

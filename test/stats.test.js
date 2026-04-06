@@ -21,7 +21,7 @@ async function testStatsCardBootstrapClasses() {
 
     const body = card.querySelector('.card-body');
     assert(body !== null, 'card debe renderizar .card-body');
-    assert(body.classList.contains('p-2'), 'body debe tener clase "p-2" para padding');
+    assert(body.classList.contains('p-3'), 'body debe tener clase "p-3" para padding');
 
     const titleEl = body.querySelector('div');
     assert(titleEl !== null, 'card-body debe contener un div de título');
@@ -84,7 +84,7 @@ async function testAddValueZeroDisplaysAsDash() {
     console.log('  UC5: addValue muestra "-" para valores cero sin símbolo $');
     const result = addValue({ ARS: 0, USD: 2500 });
     assert(result[0].currency === 'ARS' && result[0].value === '-', 'valor 0 debe tener currency "ARS" y value "-" sin símbolo $');
-    assert(result[1].currency === 'USD' && result[1].value === '2,5 mil', 'valor 2500 debe tener currency "USD" y value "2,5 mil"');
+    assert(result[1].currency === 'USD' && result[1].value === '2.500', 'valor 2500 debe tener currency "USD" y value "2.500"');
 }
 
 // ===================================================================
@@ -121,34 +121,34 @@ async function testAddValueAlwaysShowsBothCurrencies() {
 }
 
 // ===================================================================
-// UC8: compactFormat — values >= 1.000 display in "mil" format
+// UC8: compactFormat — full es-AR numeric format for large values
 // ===================================================================
 async function testCompactFormatMil() {
-    console.log('  UC8: compactFormat muestra formato "mil" para valores >= 1.000');
-    assert(compactFormat(850000) === '850 mil', '850000 debe mostrarse como "850 mil"');
-    assert(compactFormat(1000) === '1 mil', '1000 debe mostrarse como "1 mil"');
-    assert(compactFormat(1200) === '1,2 mil', '1200 debe mostrarse como "1,2 mil"');
-    assert(compactFormat(500000) === '500 mil', '500000 debe mostrarse como "500 mil"');
+    console.log('  UC8: compactFormat muestra formato numérico completo para valores >= 1.000');
+    assert(compactFormat(850000) === '850.000', '850000 debe mostrarse como "850.000"');
+    assert(compactFormat(1000) === '1.000', '1000 debe mostrarse como "1.000"');
+    assert(compactFormat(1200) === '1.200', '1200 debe mostrarse como "1.200"');
+    assert(compactFormat(500000) === '500.000', '500000 debe mostrarse como "500.000"');
 }
 
 // ===================================================================
-// UC9: compactFormat — values >= 1.000.000 display in "M" format
+// UC9: compactFormat — full es-AR numeric format for million values
 // ===================================================================
 async function testCompactFormatMillones() {
-    console.log('  UC9: compactFormat muestra formato "M" para valores >= 1.000.000');
-    assert(compactFormat(1200000) === '1,2 M', '1200000 debe mostrarse como "1,2 M"');
-    assert(compactFormat(3450000) === '3,45 M', '3450000 debe mostrarse como "3,45 M"');
-    assert(compactFormat(1000000) === '1 M', '1000000 debe mostrarse como "1 M"');
+    console.log('  UC9: compactFormat muestra formato numérico completo para valores >= 1.000.000');
+    assert(compactFormat(1200000) === '1.200.000', '1200000 debe mostrarse como "1.200.000"');
+    assert(compactFormat(3450000) === '3.450.000', '3450000 debe mostrarse como "3.450.000"');
+    assert(compactFormat(1000000) === '1.000.000', '1000000 debe mostrarse como "1.000.000"');
 }
 
 // ===================================================================
-// UC10: compactFormat — small values use normal es-AR format
+// UC10: compactFormat — small values use es-AR format without decimals
 // ===================================================================
 async function testCompactFormatSmall() {
-    console.log('  UC10: compactFormat usa formato normal para valores < 1.000');
-    assert(compactFormat(500) === '500,00', '500 debe mostrarse como "500,00"');
-    assert(compactFormat(999) === '999,00', '999 debe mostrarse como "999,00"');
-    assert(compactFormat(0) === '0,00', '0 debe mostrarse como "0,00"');
+    console.log('  UC10: compactFormat usa formato es-AR para valores < 1.000');
+    assert(compactFormat(500) === '500', '500 debe mostrarse como "500"');
+    assert(compactFormat(999) === '999', '999 debe mostrarse como "999"');
+    assert(compactFormat(0) === '0', '0 debe mostrarse como "0"');
 }
 
 // ===================================================================

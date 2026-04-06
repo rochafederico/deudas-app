@@ -21,41 +21,25 @@ export default function StatsIndicators({ mes } = {}) {
       const summary = await getMonthlySummary(periodo);
       container.innerHTML = '';
 
-      // Row 1: Balance + Total a pagar
-      const row1 = document.createElement('div');
-      row1.className = 'row g-3 mb-3';
+      const row = document.createElement('div');
+      row.className = 'row row-cols-2 row-cols-md-2 row-cols-lg-5 g-3';
 
-      const balanceCol = document.createElement('div');
-      balanceCol.className = 'col-6 col-md-6';
-      balanceCol.appendChild(StatsCard({ title: '💼 Balance', items: addValue(summary.byCurrency.saldo), color: 'primary' }));
-      row1.appendChild(balanceCol);
+      const cards = [
+        { title: '💼 Balance',      items: addValue(summary.byCurrency.saldo),      color: 'primary' },
+        { title: '💳 Falta pagar',  items: addValue(summary.byCurrency.pendientes),  color: 'warning' },
+        { title: '📈 Ingresos',     items: addValue(summary.byCurrency.ingresos),    color: 'success' },
+        { title: '📉 Gastos',       items: addValue(summary.byCurrency.egresos),     color: 'danger' },
+        { title: '📊 Inversiones',  items: addValue(summary.inversiones),            color: 'info' },
+      ];
 
-      const totalCol = document.createElement('div');
-      totalCol.className = 'col-6 col-md-6';
-      totalCol.appendChild(StatsCard({ title: '💳 Falta pagar', items: addValue(summary.byCurrency.pendientes), color: 'warning' }));
-      row1.appendChild(totalCol);
+      for (const cardProps of cards) {
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.appendChild(StatsCard(cardProps));
+        row.appendChild(col);
+      }
 
-      // Row 2: Ingresos + Gastos + Inversiones
-      const row2 = document.createElement('div');
-      row2.className = 'row g-3';
-
-      const ingresosCol = document.createElement('div');
-      ingresosCol.className = 'col-6 col-md-4';
-      ingresosCol.appendChild(StatsCard({ title: '📈 Ingresos', items: addValue(summary.byCurrency.ingresos), color: 'success' }));
-      row2.appendChild(ingresosCol);
-
-      const gastosCol = document.createElement('div');
-      gastosCol.className = 'col-6 col-md-4';
-      gastosCol.appendChild(StatsCard({ title: '📉 Gastos', items: addValue(summary.byCurrency.egresos), color: 'danger' }));
-      row2.appendChild(gastosCol);
-
-      const inversionesCol = document.createElement('div');
-      inversionesCol.className = 'col-6 col-md-4';
-      inversionesCol.appendChild(StatsCard({ title: '📊 Inversiones', items: addValue(summary.inversiones), color: 'info' }));
-      row2.appendChild(inversionesCol);
-
-      container.appendChild(row1);
-      container.appendChild(row2);
+      container.appendChild(row);
     } catch (err) {
       container.innerHTML = '';
       const errEl = document.createElement('div');
