@@ -1,8 +1,7 @@
 // src/layout/BottomNav.js
 // Fixed bottom navigation bar for mobile screens (hidden on lg+)
 
-import '../features/import-export/components/ExportDataModal.js';
-import '../features/import-export/components/ImportDataModal.js';
+import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
 
 const bottomNavItems = [
   { label: 'Egresos', icon: '💸', path: '/', key: 'egresos' },
@@ -25,9 +24,23 @@ export class BottomNav extends HTMLElement {
       this._updateActive();
     };
     this._onPopState = () => this._updateActive();
-    this._onExportClick = (e) => { e.preventDefault(); this._openExportModal(e.currentTarget); };
-    this._onImportClick = (e) => { e.preventDefault(); this._openImportModal(e.currentTarget); };
-    this._onDeleteAllClick = (e) => { e.preventDefault(); this._deleteAllData(); };
+    this._onExportClick = (e) => {
+      e.preventDefault();
+      const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
+      this._closeOffcanvas();
+      openExportModal(returnFocus);
+    };
+    this._onImportClick = (e) => {
+      e.preventDefault();
+      const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
+      this._closeOffcanvas();
+      openImportModal(returnFocus);
+    };
+    this._onDeleteAllClick = (e) => {
+      e.preventDefault();
+      this._closeOffcanvas();
+      deleteAllData();
+    };
     this.querySelector('#bottom-nav-list').addEventListener('click', this._onNavClick);
     window.addEventListener('popstate', this._onPopState);
     this.querySelector('#bottom-nav-export')?.addEventListener('click', this._onExportClick);
@@ -42,10 +55,6 @@ export class BottomNav extends HTMLElement {
     this.querySelector('#bottom-nav-export')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#bottom-nav-import')?.removeEventListener('click', this._onImportClick);
     this.querySelector('#bottom-nav-delete')?.removeEventListener('click', this._onDeleteAllClick);
-    this._exportModal?.remove();
-    this._exportModal = null;
-    this._importModal?.remove();
-    this._importModal = null;
   }
 
   _closeOffcanvas() {
@@ -65,80 +74,6 @@ export class BottomNav extends HTMLElement {
       item.classList.toggle('active', isActive);
       item.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
-  }
-
-  _openExportModal() {
-    const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
-    if (!this._exportModal) {
-      this._exportModal = document.createElement('export-data-modal');
-      document.body.appendChild(this._exportModal);
-    }
-    this._closeOffcanvas();
-    this._exportModal.open(returnFocus);
-  }
-
-  _openImportModal() {
-    const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
-    if (!this._importModal) {
-      this._importModal = document.createElement('import-data-modal');
-      document.body.appendChild(this._importModal);
-    }
-    this._closeOffcanvas();
-    this._importModal.open(returnFocus);
-  }
-
-  async _deleteAllData() {
-    this._closeOffcanvas();
-    const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
-    if (!confirmed) return;
-
-    let stores;
-    try {
-      const { listDeudas, deleteDeudas } = await import('../features/deudas/deudaRepository.js');
-      const { getAll, deleteAllIngresos } = await import('../features/ingresos/ingresoRepository.js');
-      const { listInversiones, deleteAllInversiones } = await import('../features/inversiones/inversionRepository.js');
-      stores = [
-        { name: 'Deudas', list: listDeudas, del: deleteDeudas },
-        { name: 'Ingresos', list: getAll, del: deleteAllIngresos },
-        { name: 'Inversiones', list: listInversiones, del: deleteAllInversiones },
-      ];
-    } catch (error) {
-      console.error('Error al cargar módulos de datos:', error);
-      window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al cargar los módulos de datos.', type: 'danger' } }));
-      return;
-    }
-
-    const results = await Promise.allSettled(stores.map(async (store) => {
-      const items = await store.list();
-      if (!items.length) return { name: store.name, status: 'empty' };
-      await store.del();
-      return { name: store.name, status: 'deleted' };
-    }));
-
-    window.dispatchEvent(new CustomEvent('ui:refresh'));
-
-    const deleted = results
-      .filter(r => r.status === 'fulfilled' && r.value.status === 'deleted')
-      .map(r => r.value.name);
-    const empty = results
-      .filter(r => r.status === 'fulfilled' && r.value.status === 'empty')
-      .map(r => r.value.name);
-    const failed = results
-      .map((r, i) => r.status === 'rejected' ? stores[i].name : null)
-      .filter(Boolean);
-
-    if (deleted.length === 0 && failed.length === 0) {
-      window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '⚠️ No había datos para borrar.', type: 'warning' } }));
-      return;
-    }
-
-    const parts = [];
-    if (deleted.length) parts.push(`✅ Eliminado: ${deleted.join(', ')}.`);
-    if (empty.length) parts.push(`ℹ️ Sin registros: ${empty.join(', ')}.`);
-    if (failed.length) parts.push(`❌ Error al eliminar: ${failed.join(', ')}.`);
-
-    const type = failed.length ? 'warning' : 'success';
-    window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: parts.join(' '), type } }));
   }
 
   render() {

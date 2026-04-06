@@ -1,6 +1,7 @@
 import './Menu.js';
 import './DarkToggle.js';
 import '../shared/components/AppToast.js';
+import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {
@@ -14,8 +15,23 @@ export class AppHeader extends HTMLElement {
     this._onTourClick = () => window.dispatchEvent(new CustomEvent('tour:start'));
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
+    this._onDesktopExportClick = (e) => {
+      e.preventDefault();
+      openExportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
+    };
+    this._onDesktopImportClick = (e) => {
+      e.preventDefault();
+      openImportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
+    };
+    this._onDesktopDeleteClick = (e) => {
+      e.preventDefault();
+      deleteAllData();
+    };
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
+    this.querySelector('#desktop-export')?.addEventListener('click', this._onDesktopExportClick);
+    this.querySelector('#desktop-import')?.addEventListener('click', this._onDesktopImportClick);
+    this.querySelector('#desktop-delete')?.addEventListener('click', this._onDesktopDeleteClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
   }
@@ -23,6 +39,9 @@ export class AppHeader extends HTMLElement {
   disconnectedCallback() {
     this.querySelector('.navbar-brand')?.removeEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
+    this.querySelector('#desktop-export')?.removeEventListener('click', this._onDesktopExportClick);
+    this.querySelector('#desktop-import')?.removeEventListener('click', this._onDesktopImportClick);
+    this.querySelector('#desktop-delete')?.removeEventListener('click', this._onDesktopDeleteClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     this._popover?.dispose();
@@ -63,7 +82,22 @@ export class AppHeader extends HTMLElement {
       <nav class="navbar navbar-dark navbar-expand-lg bg-primary px-3 shadow-sm">
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
-          <div class="ms-auto d-flex align-items-center gap-2">
+          <div class="d-none d-lg-flex align-items-center flex-grow-1 ms-3">
+            <app-nav></app-nav>
+            <ul class="navbar-nav align-items-center ms-auto">
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle px-2" href="#" id="desktop-datos-toggle" role="button"
+                  data-bs-toggle="dropdown" aria-expanded="false">💾 Datos</a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#" id="desktop-export">📤 Exportar</a></li>
+                  <li><a class="dropdown-item" href="#" id="desktop-import">📥 Importar</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item text-danger" href="#" id="desktop-delete">🗑️ Eliminar todo</a></li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+          <div class="ms-auto ms-lg-3 d-flex align-items-center gap-2">
             <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">🔔</button>
             <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Iniciar tour guiado" aria-label="Iniciar tour guiado">❓</button>
           </div>
