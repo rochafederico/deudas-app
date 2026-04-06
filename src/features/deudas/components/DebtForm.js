@@ -325,6 +325,7 @@ export class DebtForm extends HTMLElement {
         } else {
             const { addDeuda } = await import('../deudaRepository.js');
             const deudaId = await addDeuda(deuda);
+            deuda.id = deudaId;
             this.dispatchEvent(new CustomEvent('deuda:saved', { detail: deuda, bubbles: true, composed: true }));
             await trackFlowComplete('create_debt', { deudaId, montosCount: this.montos.length });
         }
