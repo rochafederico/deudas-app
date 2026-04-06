@@ -75,7 +75,7 @@ Tanto en:
 - header
 - bottom nav
 
-`eliminar todo` hoy no tiene un flujo dedicado (`*_started`, `*_completed`, etc.). Sólo registra el evento genérico `<device>_shortcut_used`.
+`eliminar todo` hoy no tiene un flujo dedicado (`*_started`, `*_completed`, etc.). Solo registra el evento genérico `<device>_shortcut_used`.
 
 ### Importación y exportación
 
