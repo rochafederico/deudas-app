@@ -90,7 +90,7 @@ async function testDebtFormAndMonthNavigationUseClarityOnly() {
     const names = readClarityEvents().map(([, eventName]) => eventName);
     assert(names.includes('desktop_create_debt_validation_error'), 'DebtForm should send validation_error to Clarity');
     assert(names.includes('desktop_create_debt_completed'), 'DebtForm should send completed to Clarity');
-    assert(names.includes('desktop_monthly_navigation_used'), 'Month selector should send monthly_navigation_used');
+    assert(names.includes('desktop_monthly_navigation_used'), 'Month selector should send desktop_monthly_navigation_used');
 }
 
 async function testImportFlowAndPaymentErrorsSendClarityEvents() {

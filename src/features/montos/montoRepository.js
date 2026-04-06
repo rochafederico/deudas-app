@@ -3,7 +3,7 @@
 import { getDB } from '../../shared/database/initDB.js';
 import { MONTOS_STORE } from '../../shared/database/schema.js';
 import { MontoEntity } from './MontoEntity.js';
-import { trackEvent } from '../../shared/analytics/clarity.service.js';
+import { trackEvent, trackFlowError } from '../../shared/analytics/clarity.service.js';
 
 function _getMontosStore(mode = 'readonly') {
     const db = getDB();
@@ -69,7 +69,7 @@ export function setPagado(id, pagado) {
         getRequest.onsuccess = () => {
             const monto = getRequest.result;
             if (!monto) {
-                trackEvent('payment_validation_error', { montoId: id, reason: 'monto_not_found' });
+                trackFlowError('payment', { montoId: id, reason: 'monto_not_found' });
                 return reject(new Error('Monto no encontrado'));
             }
             monto.pagado = pagado;
@@ -88,12 +88,12 @@ export function setPagado(id, pagado) {
                 resolve(monto);
             };
             putRequest.onerror = (event) => {
-                trackEvent('payment_validation_error', { montoId: id, reason: 'update_failed' });
+                trackFlowError('payment', { montoId: id, reason: 'update_failed' });
                 reject(new Error('Error actualizando pagado: ' + event.target.errorCode));
             };
         };
         getRequest.onerror = (event) => {
-            trackEvent('payment_validation_error', { montoId: id, reason: 'read_failed' });
+            trackFlowError('payment', { montoId: id, reason: 'read_failed' });
             reject(new Error('Error obteniendo monto: ' + event.target.errorCode));
         };
     });
