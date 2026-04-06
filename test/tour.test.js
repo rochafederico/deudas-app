@@ -1,6 +1,7 @@
 // test/tour.test.js
 // Tests del tour guiado - flujo E2E desde estado hasta UI
 import { assert } from './setup.js';
+// Se importan por efecto lateral para registrar custom elements usados en los fixtures del tour.
 import '../src/layout/MonthSelector.js';
 import '../src/layout/HeaderBar.js';
 import { isTourCompleted, markTourCompleted, resetTourState } from '../src/features/tour/tourState.js';
@@ -137,13 +138,14 @@ export const tests = [
 
         const getStepTarget = (id) => tourSteps.find(step => step.id === id)?.getTarget();
         const quickActionsTarget = getStepTarget('acciones-rapidas');
+        const expectedQuickActionsTarget = document.querySelector('app-shell header-bar .card-header > .d-flex.gap-2.flex-wrap:not(.align-items-center)');
 
         assert(getStepTarget('bienvenida')?.getAttribute('data-tour-step') === 'bienvenida', 'Bienvenida should target brand');
         assert(getStepTarget('resumen-principal')?.id === 'summary', 'Resumen principal should target summary header');
         assert(getStepTarget('indicadores')?.getAttribute('data-tour-step') === 'indicadores', 'Indicadores should target KPI container');
         assert(getStepTarget('navegacion-mes')?.getAttribute('data-tour-step') === 'navegacion-mes', 'Month navigation should target selector');
         assert(quickActionsTarget?.tagName === 'DIV', 'Quick actions should target a container element');
-        assert(quickActionsTarget === document.querySelector('app-shell header-bar .card-header > .d-flex.gap-2.flex-wrap:not(.align-items-center)'), 'Quick actions should target the header actions container');
+        assert(quickActionsTarget === expectedQuickActionsTarget, 'Quick actions should target the header actions container');
         assert(getStepTarget('menu-navegacion')?.getAttribute('data-tour-step') === 'menu-navegacion', 'Navigation should target desktop menu when visible');
         assert(getStepTarget('accesos-secundarios')?.id === 'desktop-datos-toggle', 'Secondary access should target desktop config when visible');
     },
