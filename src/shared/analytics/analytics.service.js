@@ -5,6 +5,7 @@ const PENDING_EVENTS_KEY = 'analytics:pending-events';
 const activeFlows = new Map();
 let unloadListenersAttached = false;
 let flushingPendingEvents = null;
+let fallbackIdSequence = 0;
 
 function getStorage() {
     return typeof window !== 'undefined' ? window.localStorage : null;
@@ -18,7 +19,8 @@ function createId() {
     if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID();
     }
-    return `analytics-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    fallbackIdSequence += 1;
+    return `analytics-${Date.now()}-${fallbackIdSequence}-${Math.random().toString(16).slice(2)}`;
 }
 
 function sendToClarity(eventName) {
