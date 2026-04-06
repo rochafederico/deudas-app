@@ -1,139 +1,32 @@
-# Microsoft Clarity: flujos y eventos a monitorear
+# Microsoft Clarity: eventos y flujos
 
-## Configuración mínima
-
-Para que esta instrumentación funcione en Clarity hace falta:
-
-1. Crear un proyecto en Microsoft Clarity.
-2. Copiar el **Project ID**.
-3. Reemplazar en `index.html` el ID del snippet de Clarity por el del proyecto correspondiente.
-4. Publicar la app con ese snippet cargado en el dominio donde se va a usar.
-
-> Importante: los eventos **no se crean manualmente** en Clarity. Aparecen automáticamente cuando la app ejecuta `window.clarity('event', eventName)`.
-
-## Convención de nombres
-
-Todos los eventos se envían con prefijo por dispositivo:
-
-- `mobile_*` cuando `window.innerWidth < 768`
-- `desktop_*` cuando `window.innerWidth >= 768`
-
-Ejemplos:
-
-- `mobile_create_debt_started`
-- `desktop_create_debt_completed`
-- `mobile_shortcut_used`
-
-## Flujos/eventos instrumentados
-
-Usar estos nombres para filtros, segmentos, dashboards y análisis en Clarity.
-
-### Deudas
-
-#### Crear deuda
-
-- `<device>_create_debt_started`
-- `<device>_create_debt_completed`
-- `<device>_create_debt_validation_error`
-- `<device>_create_debt_abandoned`
-
-#### Editar deuda
-
-- `<device>_edit_debt_started`
-- `<device>_edit_debt_completed`
-- `<device>_edit_debt_validation_error`
-- `<device>_edit_debt_abandoned`
-
-#### Eliminar deuda
-
-- `<device>_delete_debt_completed`
-
-#### Duplicar cuota
-
-- `<device>_duplicate_installment_started`
-- `<device>_duplicate_installment_completed`
-- `<device>_duplicate_installment_abandoned`
-
-### Pagos
-
-- `<device>_payment_registered`
-- `<device>_payment_validation_error`
-
-### Shortcuts
-
-- `<device>_shortcut_used`
-
-Se dispara desde:
-
-- tour guiado
-- exportar datos
-- importar datos
-- eliminar todo
-
-Tanto en:
-
-- header
-- bottom nav
-
-`eliminar todo` hoy no tiene un flujo dedicado (`*_started`, `*_completed`, etc.). Solo registra el evento genérico `<device>_shortcut_used`.
-
-### Importación y exportación
-
-#### Exportar datos
-
-- `<device>_export_data_started`
-- `<device>_export_data_used` (la descarga/exportación se ejecutó)
-- `<device>_export_data_completed` (el flujo cerró correctamente)
-- `<device>_export_data_validation_error`
-
-#### Importar datos
-
-- `<device>_import_data_started`
-- `<device>_import_data_used` (la importación se ejecutó)
-- `<device>_import_data_completed` (el flujo cerró correctamente)
-- `<device>_import_data_validation_error`
-- `<device>_import_data_abandoned`
-
-### Tour guiado
-
-- `<device>_tour_started`
-- `<device>_tour_completed`
-- `<device>_tour_abandoned`
-
-### Navegación mensual
-
-- `<device>_monthly_navigation_used`
-
-## Recomendación de configuración en Clarity
-
-Armar al menos estos filtros o segmentos:
-
-1. **Dispositivo**
-   - `mobile_*`
-   - `desktop_*`
-2. **Alta fricción**
-   - `*_validation_error`
-   - `*_abandoned`
-3. **Flujos principales**
-   - `*_create_debt_*`
-   - `*_payment_*`
-   - `*_import_data_*`
-   - `*_export_data_*`
-   - `*_tour_*`
-
-## Nota sobre metadata
-
-La API de tracking acepta metadata para uso interno del flujo, pero hoy Clarity recibe únicamente el **nombre del evento**.
-
-## Cómo leer `started`, `used` y `completed`
-
-- `*_started`: el usuario abrió o inició el flujo.
-- `*_used`: la acción principal del flujo se ejecutó.
-- `*_completed`: el flujo cerró correctamente.
-
-En importación/exportación hoy conviven `used` y `completed`, por lo que en dashboards conviene tratarlos como eventos complementarios y no como sinónimos.
-
-En la implementación actual de import/export, ambos pueden aparecer en la misma operación exitosa:
-
-- `used` mide la ejecución de la acción principal de negocio.
-- `completed` mantiene la métrica de cierre exitoso del flujo.
+| Tipo | Flujo | Dispositivo | Evento en Clarity |
+| --- | --- | --- | --- |
+| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_started` |
+| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_completed` |
+| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_validation_error` |
+| Flujo | Crear deuda | `mobile` / `desktop` | `*_create_debt_abandoned` |
+| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_started` |
+| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_completed` |
+| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_validation_error` |
+| Flujo | Editar deuda | `mobile` / `desktop` | `*_edit_debt_abandoned` |
+| Flujo | Eliminar deuda | `mobile` / `desktop` | `*_delete_debt_completed` |
+| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_started` |
+| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_completed` |
+| Flujo | Duplicar cuota | `mobile` / `desktop` | `*_duplicate_installment_abandoned` |
+| Flujo | Registrar pago | `mobile` / `desktop` | `*_payment_registered` |
+| Flujo | Registrar pago | `mobile` / `desktop` | `*_payment_validation_error` |
+| Evento | Shortcut | `mobile` / `desktop` | `*_shortcut_used` |
+| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_started` |
+| Evento | Exportar datos | `mobile` / `desktop` | `*_export_data_used` |
+| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_completed` |
+| Flujo | Exportar datos | `mobile` / `desktop` | `*_export_data_validation_error` |
+| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_started` |
+| Evento | Importar datos | `mobile` / `desktop` | `*_import_data_used` |
+| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_completed` |
+| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_validation_error` |
+| Flujo | Importar datos | `mobile` / `desktop` | `*_import_data_abandoned` |
+| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_started` |
+| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_completed` |
+| Flujo | Tour guiado | `mobile` / `desktop` | `*_tour_abandoned` |
+| Evento | Navegación mensual | `mobile` / `desktop` | `*_monthly_navigation_used` |
