@@ -1,5 +1,6 @@
 const activeFlows = new Map();
 let lifecycleListenersAttached = false;
+let abandoningActiveFlows = false;
 
 function getDevice() {
     return typeof window !== 'undefined' && window.innerWidth < 768 ? 'mobile' : 'desktop';
@@ -21,6 +22,8 @@ function registerLifecycleListeners() {
     if (lifecycleListenersAttached || typeof window === 'undefined') return;
 
     const abandonActiveFlows = (reason) => {
+        if (abandoningActiveFlows || activeFlows.size === 0) return;
+        abandoningActiveFlows = true;
         Array.from(activeFlows.entries()).forEach(([flowName, flowData]) => {
             trackFlowAbandoned(
                 flowName,
@@ -28,6 +31,7 @@ function registerLifecycleListeners() {
                 { ...flowData.metadata, reason }
             );
         });
+        abandoningActiveFlows = false;
     };
 
     window.addEventListener('beforeunload', () => abandonActiveFlows('beforeunload'));
