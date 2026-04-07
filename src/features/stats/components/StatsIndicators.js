@@ -21,16 +21,18 @@ export default function StatsIndicators({ mes } = {}) {
       const summary = await getMonthlySummary(periodo);
       container.innerHTML = '';
 
-      const row = document.createElement('div');
-      row.className = 'row row-cols-2 row-cols-md-2 row-cols-lg-5 g-3';
-
+      const showInversiones = window.location.pathname === '/inversiones';
       const cards = [
-        { title: '💼 Balance',      items: addValue(summary.byCurrency.saldo),      color: 'primary' },
-        { title: '💳 Falta pagar',  items: addValue(summary.byCurrency.pendientes),  color: 'warning' },
         { title: '📈 Ingresos',     items: addValue(summary.byCurrency.ingresos),    color: 'success' },
         { title: '📉 Gastos',       items: addValue(summary.byCurrency.egresos),     color: 'danger' },
-        { title: '📊 Inversiones',  items: addValue(summary.inversiones),            color: 'info' },
+        { title: '💼 Balance',      items: addValue(summary.byCurrency.saldo),      color: 'primary' },
+        { title: '💳 Falta pagar',  items: addValue(summary.byCurrency.pendientes),  color: 'warning' },
+        ...( showInversiones ? [{ title: '📊 Inversiones', items: addValue(summary.inversiones), color: 'info' }] : []),
       ];
+
+      const row = document.createElement('div');
+      const lgCols = showInversiones ? 5 : 4;
+      row.className = `row row-cols-2 row-cols-md-2 row-cols-lg-${lgCols} g-3`;
 
       for (const cardProps of cards) {
         const col = document.createElement('div');
@@ -58,6 +60,9 @@ export default function StatsIndicators({ mes } = {}) {
     window.addEventListener('ui:month', (e) => {
       const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : getSelectedMonth();
       render(nuevo);
+    });
+    window.addEventListener('popstate', () => {
+      render(getSelectedMonth());
     });
     window.__statsIndicatorsMonthListenerAdded = true;
   }
