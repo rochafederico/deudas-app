@@ -4,6 +4,8 @@ import { getMonthlySummary } from '../statsService.js';
 import { addValue } from '../utils/formatCurrency.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
+const INVERSIONES_PATH = '/inversiones';
+
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
   container.className = 'mb-4';
@@ -21,7 +23,7 @@ export default function StatsIndicators({ mes } = {}) {
       const summary = await getMonthlySummary(periodo);
       container.innerHTML = '';
 
-      const showInversiones = window.location.pathname === '/inversiones';
+      const showInversiones = window.location.pathname === INVERSIONES_PATH;
       const cards = [
         { title: '📈 Ingresos',     items: addValue(summary.byCurrency.ingresos),    color: 'success' },
         { title: '📉 Gastos',       items: addValue(summary.byCurrency.egresos),     color: 'danger' },
