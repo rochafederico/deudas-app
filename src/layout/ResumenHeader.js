@@ -1,5 +1,5 @@
 // src/layout/ResumenHeader.js
-// Global page header: "Resumen" + month selector + subtitle
+// Global page header: page title + global month selector + subtitle
 import './MonthSelector.js';
 
 export default function ResumenHeader() {
