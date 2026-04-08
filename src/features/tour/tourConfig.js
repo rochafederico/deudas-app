@@ -48,11 +48,7 @@ export const tourSteps = [
         id: 'navegacion-mes',
         title: 'Navegación por mes',
         text: 'Navegá entre meses para ver tus pagos pasados y futuros',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="navegacion-mes"]' }
-        ]),
+        getTarget: () => document.querySelector('[data-tour-step="navegacion-mes"]'),
         position: 'bottom'
     },
     {
@@ -78,31 +74,21 @@ export const tourSteps = [
         position: 'bottom'
     },
     {
-        id: 'exportar',
-        title: 'Exportar datos',
-        text: 'Descargá un backup de toda tu información en formato JSON para tener un respaldo',
+        id: 'datos-backup',
+        title: 'Exportar e importar datos',
+        text: 'Desde Config podés hacer un backup de tu información o restaurarla desde un archivo JSON',
         getTarget: () =>
-            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="exportar"]' }]) ||
-            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="exportar"]' }]),
-        position: 'bottom'
-    },
-    {
-        id: 'importar',
-        title: 'Importar datos',
-        text: 'Restaurá tus datos desde un archivo JSON exportado previamente',
-        getTarget: () =>
-            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="importar"]' }]) ||
-            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="importar"]' }]),
+            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
+            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),
         position: 'bottom'
     },
     {
         id: 'menu-navegacion',
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="menu-navegacion"]' }
-        ]),
+        getTarget: () =>
+            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
+            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
         position: 'bottom'
     },
     {

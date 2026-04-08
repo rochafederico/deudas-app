@@ -87,12 +87,12 @@ export class BottomNav extends HTMLElement {
     this.innerHTML = `
       <nav class="navbar fixed-bottom bg-primary d-lg-none py-0 border-top border-primary-subtle shadow"
         aria-label="Navegación móvil">
-        <div id="bottom-nav-list" class="container-fluid justify-content-around px-0">
+        <div id="bottom-nav-list" class="container-fluid justify-content-around px-0" data-tour-step="menu-navegacion">
           ${navItemsHtml}
           <button type="button"
             class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
             data-bs-toggle="offcanvas" data-bs-target="#mas-offcanvas"
-            aria-controls="mas-offcanvas" aria-label="Configuración">
+            aria-controls="mas-offcanvas" aria-label="Configuración" data-tour-step="config">
             <span class="fs-5 lh-1">⚙️</span>
             <small class="d-block lh-1 mt-1">Config</small>
           </button>
@@ -107,10 +107,10 @@ export class BottomNav extends HTMLElement {
         </div>
         <div class="offcanvas-body pb-4">
           <div class="list-group list-group-flush">
-            <a href="#" id="bottom-nav-export" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-tour-step="exportar">
+            <a href="#" id="bottom-nav-export" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
               📤 Exportar datos
             </a>
-            <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2" data-tour-step="importar">
+            <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
               📥 Importar datos
             </a>
             <a href="#" id="bottom-nav-delete" class="list-group-item list-group-item-action text-danger d-flex align-items-center gap-2">
