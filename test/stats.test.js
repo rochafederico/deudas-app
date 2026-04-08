@@ -2,6 +2,7 @@
 // Tests for StatsCard and StatsIndicators components
 import { assert } from './setup.js';
 import StatsCard from '../src/features/stats/components/StatsCard.js';
+import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
 import { addValue, compactFormat } from '../src/features/stats/utils/formatCurrency.js';
 
 // ===================================================================
@@ -160,6 +161,27 @@ async function testCompactFormatNull() {
     assert(compactFormat(undefined) === '-', 'undefined debe retornar "-"');
 }
 
+// ===================================================================
+// UC12: StatsIndicators renders cards in the configured visual order
+// ===================================================================
+async function testStatsIndicatorsCardOrder() {
+    console.log('  UC12: StatsIndicators respeta el orden visual de tarjetas');
+
+    const originalListenerFlag = window.__statsIndicatorsMonthListenerAdded;
+    window.__statsIndicatorsMonthListenerAdded = true;
+
+    const indicators = StatsIndicators({ mes: '2030-01' });
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const titles = [...indicators.querySelectorAll('.card-body > div:first-child')].map((el) => el.textContent);
+    assert(
+        JSON.stringify(titles) === JSON.stringify(['📈 Ingresos', '📉 Gastos', '💼 Balance', '💳 Pendientes', '📊 Inversiones']),
+        'las tarjetas deben renderizar ingresos, gastos, balance, pendientes e inversiones en ese orden'
+    );
+
+    window.__statsIndicatorsMonthListenerAdded = originalListenerFlag;
+}
+
 export const tests = [
     testStatsCardBootstrapClasses,
     testStatsCardItemClasses,
@@ -172,4 +194,5 @@ export const tests = [
     testCompactFormatMillones,
     testCompactFormatSmall,
     testCompactFormatNull,
+    testStatsIndicatorsCardOrder,
 ];
