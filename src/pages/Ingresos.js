@@ -1,7 +1,6 @@
 // src/pages/Ingresos.js
 import '../layout/HeaderBar.js';
 import '../features/ingresos/components/IngresoModal.js';
-import '../features/stats/components/StatsCard.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
@@ -34,9 +33,6 @@ export default function Ingresos() {
     title.textContent = 'Ingresos del mes';
     title.className = 'h3 mb-2';
     cardBody.appendChild(title);
-
-    const stats = document.createElement('stats-card');
-    cardBody.appendChild(stats);
 
     card.appendChild(header);
     card.appendChild(cardBody);
