@@ -92,9 +92,9 @@ export class BottomNav extends HTMLElement {
           <button type="button"
             class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
             data-bs-toggle="offcanvas" data-bs-target="#mas-offcanvas"
-            aria-controls="mas-offcanvas" aria-label="Configuración" data-tour-step="config">
+            aria-controls="mas-offcanvas" aria-label="Ajustes" data-tour-step="config">
             <span class="fs-5 lh-1">⚙️</span>
-            <small class="d-block lh-1 mt-1">Config</small>
+            <small class="d-block lh-1 mt-1">Ajustes</small>
           </button>
         </div>
       </nav>
@@ -102,7 +102,7 @@ export class BottomNav extends HTMLElement {
       <div class="offcanvas offcanvas-bottom" id="mas-offcanvas" tabindex="-1"
         aria-labelledby="mas-offcanvas-label" style="height:auto">
         <div class="offcanvas-header bg-primary text-white">
-          <h5 class="offcanvas-title" id="mas-offcanvas-label">Configuración</h5>
+          <h5 class="offcanvas-title" id="mas-offcanvas-label">Ajustes</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
         </div>
         <div class="offcanvas-body pb-4">
