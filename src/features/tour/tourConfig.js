@@ -19,6 +19,20 @@ export function findTourTarget(path) {
 }
 
 /**
+ * Helper para buscar un elemento con data-tour-step dentro del DOM,
+ * verificando que el elemento sea visible (tamaño no nulo).
+ * @param {Array<{selector: string}>} path
+ * @returns {HTMLElement|null}
+ */
+export function findVisibleTourTarget(path) {
+    const el = findTourTarget(path);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return null;
+    return el;
+}
+
+/**
  * Cada paso tiene:
  * - id: Identificador unico
  * - title: Titulo del paso
@@ -63,23 +77,12 @@ export const tourSteps = [
         position: 'bottom'
     },
     {
-        id: 'nuevo-ingreso',
-        title: 'Nuevo ingreso',
-        text: 'Registrá tus ingresos para ver si te alcanza el mes',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="nuevo-ingreso"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
         id: 'datos-backup',
         title: 'Exportar e importar datos',
-        text: 'Desde Config podés hacer un backup de tu información o restaurarla desde un archivo JSON',
+        text: 'Desde Ajustes podés hacer un backup de tu información o restaurarla desde un archivo JSON',
         getTarget: () =>
-            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
-            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),
+            findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),
         position: 'bottom'
     },
     {
@@ -87,8 +90,8 @@ export const tourSteps = [
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
         getTarget: () =>
-            findTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
-            findTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
+            findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
         position: 'bottom'
     },
     {

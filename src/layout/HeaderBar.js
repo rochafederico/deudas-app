@@ -71,7 +71,7 @@ export class HeaderBar extends HTMLElement {
                 </app-input>
             </div>
             <div class="d-flex gap-2 flex-wrap">
-                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso" data-tour-step="nuevo-ingreso">
+                <app-button id="add-income" type="button" variant="success" title="Agregar ingreso" aria-label="Agregar ingreso">
                 Nuevo ingreso
                 </app-button>
                 <app-button id="add-debt" type="button" title="Agregar deuda" aria-label="Agregar deuda" data-tour-step="nueva-deuda">
