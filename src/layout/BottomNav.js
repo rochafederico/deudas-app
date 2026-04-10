@@ -87,12 +87,12 @@ export class BottomNav extends HTMLElement {
     this.innerHTML = `
       <nav class="navbar fixed-bottom bg-primary d-lg-none py-0 border-top border-primary-subtle shadow"
         aria-label="Navegación móvil">
-        <div id="bottom-nav-list" class="container-fluid justify-content-around px-0">
+        <div id="bottom-nav-list" class="container-fluid justify-content-around px-0" data-tour-step="menu-navegacion">
           ${navItemsHtml}
           <button type="button"
             class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
             data-bs-toggle="offcanvas" data-bs-target="#mas-offcanvas"
-            aria-controls="mas-offcanvas" aria-label="Ajustes">
+            aria-controls="mas-offcanvas" aria-label="Ajustes" data-tour-step="config">
             <span class="fs-5 lh-1">⚙️</span>
             <small class="d-block lh-1 mt-1">Ajustes</small>
           </button>

@@ -94,7 +94,7 @@ export class AppHeader extends HTMLElement {
             <ul class="navbar-nav align-items-center ms-auto">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle px-2" href="#" id="desktop-datos-toggle" role="button"
-                  data-bs-toggle="dropdown" aria-expanded="false">⚙️ Ajustes</a>
+                  data-bs-toggle="dropdown" aria-expanded="false" data-tour-step="config">⚙️ Ajustes</a>
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><a class="dropdown-item" href="#" id="desktop-export">📤 Exportar datos</a></li>
                   <li><a class="dropdown-item" href="#" id="desktop-import">📥 Importar datos</a></li>

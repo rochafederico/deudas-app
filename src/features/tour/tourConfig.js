@@ -19,6 +19,20 @@ export function findTourTarget(path) {
 }
 
 /**
+ * Helper para buscar un elemento con data-tour-step dentro del DOM,
+ * verificando que el elemento sea visible (tamaño no nulo).
+ * @param {Array<{selector: string}>} path
+ * @returns {HTMLElement|null}
+ */
+export function findVisibleTourTarget(path) {
+    const el = findTourTarget(path);
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    if (rect.width === 0 && rect.height === 0) return null;
+    return el;
+}
+
+/**
  * Cada paso tiene:
  * - id: Identificador unico
  * - title: Titulo del paso
@@ -48,11 +62,7 @@ export const tourSteps = [
         id: 'navegacion-mes',
         title: 'Navegación por mes',
         text: 'Navegá entre meses para ver tus pagos pasados y futuros',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="navegacion-mes"]' }
-        ]),
+        getTarget: () => document.querySelector('[data-tour-step="navegacion-mes"]'),
         position: 'bottom'
     },
     {
@@ -67,44 +77,21 @@ export const tourSteps = [
         position: 'bottom'
     },
     {
-        id: 'nuevo-ingreso',
-        title: 'Nuevo ingreso',
-        text: 'Registrá tus ingresos para ver si te alcanza el mes',
-        getTarget: () => findTourTarget([
-            { selector: 'app-shell' },
-            { selector: 'header-bar' },
-            { selector: '[data-tour-step="nuevo-ingreso"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
-        id: 'exportar',
-        title: 'Exportar datos',
-        text: 'Descargá un backup de toda tu información en formato JSON para tener un respaldo',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="exportar"]' }
-        ]),
-        position: 'bottom'
-    },
-    {
-        id: 'importar',
-        title: 'Importar datos',
-        text: 'Restaurá tus datos desde un archivo JSON exportado previamente',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="importar"]' }
-        ]),
+        id: 'datos-backup',
+        title: 'Exportar e importar datos',
+        text: 'Desde Ajustes podés hacer un backup de tu información o restaurarla desde un archivo JSON',
+        getTarget: () =>
+            findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),
         position: 'bottom'
     },
     {
         id: 'menu-navegacion',
         title: 'Menú de navegación',
         text: 'Explorá las distintas secciones desde acá',
-        getTarget: () => findTourTarget([
-            { selector: 'app-header' },
-            { selector: '[data-tour-step="menu-navegacion"]' }
-        ]),
+        getTarget: () =>
+            findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
         position: 'bottom'
     },
     {

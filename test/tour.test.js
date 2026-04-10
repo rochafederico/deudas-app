@@ -39,9 +39,9 @@ export const tests = [
     },
 
     // --- tourConfig ---
-    async function tourConfig_has9Steps() {
-        console.log('  tourConfig: has 9 steps');
-        assert(tourSteps.length === 9, `Expected 9 steps, got ${tourSteps.length}`);
+    async function tourConfig_has7Steps() {
+        console.log('  tourConfig: has 7 steps');
+        assert(tourSteps.length === 7, `Expected 7 steps, got ${tourSteps.length}`);
     },
 
     async function tourConfig_stepsHaveRequiredFields() {
@@ -64,7 +64,7 @@ export const tests = [
 
     async function tourConfig_stepsInCorrectOrder() {
         console.log('  tourConfig: steps are in the correct order');
-        const expectedOrder = ['bienvenida', 'indicadores', 'navegacion-mes', 'nueva-deuda', 'nuevo-ingreso', 'exportar', 'importar', 'menu-navegacion', 'privacidad'];
+        const expectedOrder = ['bienvenida', 'indicadores', 'navegacion-mes', 'nueva-deuda', 'datos-backup', 'menu-navegacion', 'privacidad'];
         for (let i = 0; i < expectedOrder.length; i++) {
             assert(tourSteps[i].id === expectedOrder[i], `Step ${i} should be "${expectedOrder[i]}", got "${tourSteps[i].id}"`);
         }
