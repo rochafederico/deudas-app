@@ -24,9 +24,11 @@ export class AppHeader extends HTMLElement {
       if (link) {
         e.preventDefault();
         this._popover?.hide();
-        const path = new URL(link.href).pathname;
-        window.history.pushState({}, '', path);
-        window.dispatchEvent(new PopStateEvent('popstate'));
+        const href = link.getAttribute('href');
+        if (href) {
+          window.history.pushState({}, '', href);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
         return;
       }
       if (e.target.closest('[data-notif-close]')) {
