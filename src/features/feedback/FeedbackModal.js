@@ -33,6 +33,7 @@ export class FeedbackModal extends HTMLElement {
         const form = this.querySelector('#feedback-form');
         if (form) form.reset();
         this._clearErrors();
+        this._updateLinks();
     }
 
     _clearErrors() {
@@ -57,25 +58,25 @@ export class FeedbackModal extends HTMLElement {
         };
     }
 
-    _onSend(channel) {
-        this._clearErrors();
+    /** Rebuilds the dropdown hrefs and toggles the send button disabled state live. */
+    _updateLinks() {
         const { tipo, comentario } = this._getFormValues();
-        const { valid, errors } = validateFeedback(tipo, comentario);
+        const { valid } = validateFeedback(tipo, comentario);
+        const sendBtn = this.querySelector('#feedback-send-btn');
+        const githubLink = this.querySelector('#feedback-link-github');
+        const whatsappLink = this.querySelector('#feedback-link-whatsapp');
 
-        if (!valid) {
-            if (errors.tipo) this._showError('tipo', errors.tipo);
-            if (errors.comentario) this._showError('comentario', errors.comentario);
-            return;
+        if (valid) {
+            const contexto = getContext();
+            const feedbackText = formatFeedback(tipo, comentario.trim(), contexto);
+            if (githubLink) githubLink.href = buildGitHubUrl(tipo, feedbackText);
+            if (whatsappLink) whatsappLink.href = buildWhatsAppUrl(feedbackText);
+            sendBtn?.removeAttribute('disabled');
+        } else {
+            if (githubLink) githubLink.href = '#';
+            if (whatsappLink) whatsappLink.href = '#';
+            sendBtn?.setAttribute('disabled', '');
         }
-
-        const contexto = getContext();
-        const feedbackText = formatFeedback(tipo, comentario.trim(), contexto);
-        const url = channel === 'github'
-            ? buildGitHubUrl(tipo, feedbackText)
-            : buildWhatsAppUrl(feedbackText);
-
-        window.open(url, '_blank', 'noopener,noreferrer');
-        this.close();
     }
 
     render() {
@@ -112,17 +113,30 @@ export class FeedbackModal extends HTMLElement {
                         ⚠️ Evitá incluir datos sensibles como montos u otros datos personales.
                     </p>
 
-                    <div class="d-flex gap-2 flex-wrap">
-                        <button type="button" id="feedback-send-github"
-                            class="btn btn-dark flex-fill">
-                            🐙 Enviar por GitHub
-                        </button>
-                        <button type="button" id="feedback-send-whatsapp"
-                            class="btn btn-success flex-fill">
-                            💬 Enviar por WhatsApp
-                        </button>
-                    </div>
-                    <div class="mt-2 text-center">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <div class="btn-group flex-fill">
+                            <button type="button" id="feedback-send-btn"
+                                class="btn btn-primary dropdown-toggle"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
+                                disabled>
+                                Enviar
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" id="feedback-link-github"
+                                        href="#" target="_blank" rel="noopener noreferrer">
+                                        🐙 GitHub
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" id="feedback-link-whatsapp"
+                                        href="#" target="_blank" rel="noopener noreferrer">
+                                        💬 WhatsApp
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                         <button type="button" id="feedback-cancel"
                             class="btn btn-link btn-sm text-muted">
                             Cancelar
@@ -132,17 +146,24 @@ export class FeedbackModal extends HTMLElement {
             </ui-modal>
         `;
 
-        // Wire up char counter
+        // Live update: rebuild URLs and toggle send button on every change
+        const tipo = this.querySelector('#feedback-tipo');
         const textarea = this.querySelector('#feedback-comentario');
         const counter = this.querySelector('#feedback-char-count');
+
+        tipo?.addEventListener('change', () => this._updateLinks());
         textarea?.addEventListener('input', () => {
             if (counter) counter.textContent = textarea.value.length;
+            this._updateLinks();
         });
 
-        // Wire up send buttons
-        this.querySelector('#feedback-send-github')?.addEventListener('click', () => this._onSend('github'));
-        this.querySelector('#feedback-send-whatsapp')?.addEventListener('click', () => this._onSend('whatsapp'));
+        // Close modal after a send link is followed
+        this.querySelector('#feedback-link-github')?.addEventListener('click', () => this.close());
+        this.querySelector('#feedback-link-whatsapp')?.addEventListener('click', () => this.close());
         this.querySelector('#feedback-cancel')?.addEventListener('click', () => this.close());
+
+        // Initial state
+        this._updateLinks();
     }
 }
 

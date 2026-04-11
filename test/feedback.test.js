@@ -146,6 +146,8 @@ export const tests = [
         document.body.appendChild(fab);
         const btn = fab.querySelector('#feedback-fab-btn');
         assert(btn !== null, 'Debe existir el botón FAB');
+        assert(btn.classList.contains('btn'), 'El FAB debe usar clase Bootstrap btn');
+        assert(btn.classList.contains('rounded-circle'), 'El FAB debe ser circular con rounded-circle');
         document.body.removeChild(fab);
     },
 
@@ -158,6 +160,60 @@ export const tests = [
         const comentario = modal.querySelector('#feedback-comentario');
         assert(tipoSelect !== null, 'Debe existir selector de tipo');
         assert(comentario !== null, 'Debe existir textarea de comentario');
+        document.body.removeChild(modal);
+    },
+
+    async function feedbackModal_sendButtonDisabledInitially() {
+        console.log('  FeedbackModal: send button is disabled when form is empty');
+        const modal = document.createElement('feedback-modal');
+        document.body.appendChild(modal);
+        modal.render();
+        const sendBtn = modal.querySelector('#feedback-send-btn');
+        assert(sendBtn !== null, 'Debe existir el botón Enviar');
+        assert(sendBtn.disabled || sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar desactivado al inicio');
+        document.body.removeChild(modal);
+    },
+
+    async function feedbackModal_sendButtonEnabledWhenValid() {
+        console.log('  FeedbackModal: send button enabled when tipo and comentario are filled');
+        const modal = document.createElement('feedback-modal');
+        document.body.appendChild(modal);
+        modal.render();
+
+        const tipoSelect = modal.querySelector('#feedback-tipo');
+        const comentario = modal.querySelector('#feedback-comentario');
+        tipoSelect.value = 'sugerencia';
+        comentario.value = 'Un comentario válido';
+
+        // Simulate change/input events to trigger live update
+        tipoSelect.dispatchEvent(new Event('change'));
+        comentario.dispatchEvent(new Event('input'));
+
+        const sendBtn = modal.querySelector('#feedback-send-btn');
+        assert(!sendBtn.disabled && !sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar activado con formulario válido');
+        document.body.removeChild(modal);
+    },
+
+    async function feedbackModal_linksUpdatedLive() {
+        console.log('  FeedbackModal: dropdown links are updated live with valid form');
+        const modal = document.createElement('feedback-modal');
+        document.body.appendChild(modal);
+        modal.render();
+
+        const tipoSelect = modal.querySelector('#feedback-tipo');
+        const comentario = modal.querySelector('#feedback-comentario');
+        tipoSelect.value = 'problema';
+        comentario.value = 'Algo no funciona';
+
+        tipoSelect.dispatchEvent(new Event('change'));
+        comentario.dispatchEvent(new Event('input'));
+
+        const githubLink = modal.querySelector('#feedback-link-github');
+        const whatsappLink = modal.querySelector('#feedback-link-whatsapp');
+        assert(githubLink.href && githubLink.href !== '#', 'GitHub link debe tener URL generada');
+        assert(githubLink.href.includes('github.com'), 'GitHub link debe apuntar a GitHub');
+        assert(whatsappLink.href && whatsappLink.href !== '#', 'WhatsApp link debe tener URL generada');
+        assert(whatsappLink.href.includes('wa.me'), 'WhatsApp link debe apuntar a wa.me');
         document.body.removeChild(modal);
     },
 
