@@ -18,7 +18,23 @@ export class AppHeader extends HTMLElement {
       window.dispatchEvent(new CustomEvent('tour:start'));
     };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
-    this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
+    this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount, e.detail.overdueCount);
+    this._onNotifPopoverClick = (e) => {
+      const link = e.target.closest('[data-notif-navigate]');
+      if (link) {
+        e.preventDefault();
+        this._popover?.hide();
+        const href = link.getAttribute('href');
+        if (href) {
+          window.history.pushState({}, '', href);
+          window.dispatchEvent(new PopStateEvent('popstate'));
+        }
+        return;
+      }
+      if (e.target.closest('[data-notif-close]')) {
+        this._popover?.hide();
+      }
+    };
     this._onDesktopExportClick = (e) => {
       e.preventDefault();
       trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'header' });
@@ -41,6 +57,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#desktop-delete')?.addEventListener('click', this._onDesktopDeleteClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
+    document.addEventListener('click', this._onNotifPopoverClick);
   }
 
   disconnectedCallback() {
@@ -51,17 +68,21 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#desktop-delete')?.removeEventListener('click', this._onDesktopDeleteClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
+    document.removeEventListener('click', this._onNotifPopoverClick);
     this._popover?.dispose();
     this._popover = null;
   }
 
-  _updateNotificationPopover(html, todayCount = 0) {
+  _updateNotificationPopover(html, _todayCount = 0, overdueCount = 0) {
     const btn = this.querySelector('#notifications-btn');
     if (!btn || !window.bootstrap?.Popover) return;
     if (this._popover) this._popover.dispose();
     this._popover = new window.bootstrap.Popover(btn, {
       html: true,
-      title: '<strong>⚠️ Vencimientos próximos</strong>',
+      title: '<div class="d-flex justify-content-between align-items-center w-100">' +
+        '<strong>⚠️ Vencimientos próximos</strong>' +
+        '<button type="button" class="btn-close btn-sm ms-3" data-notif-close aria-label="Cerrar"></button>' +
+        '</div>',
       content: html,
       trigger: 'click',
       placement: 'bottom',
@@ -74,8 +95,8 @@ export class AppHeader extends HTMLElement {
       badge.setAttribute('aria-label', 'Hay vencimientos próximos');
       btn.appendChild(badge);
     }
-    if (todayCount > 0) {
-      badge.textContent = todayCount;
+    if (overdueCount > 0) {
+      badge.textContent = overdueCount;
       badge.style.padding = '';
     } else {
       badge.textContent = '';

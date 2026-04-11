@@ -118,8 +118,38 @@ function renderUpcomingSection(payments) {
 }
 
 /**
+ * Renders a totals summary for overdue payments, grouped by currency.
+ * Uses Bootstrap d-flex / badge utilities.
+ * @param {Array} overduePayments
+ * @returns {string} HTML string or empty string
+ */
+function renderTotalsSection(overduePayments) {
+    if (overduePayments.length === 0) return '';
+    const totals = {};
+    const numberFormatter = new Intl.NumberFormat('es-AR');
+    for (const p of overduePayments) {
+        const numericMonto = Number(p.monto);
+        const safeMonto = Number.isFinite(numericMonto) ? numericMonto : 0;
+        totals[p.moneda] = (totals[p.moneda] || 0) + safeMonto;
+    }
+    const count = overduePayments.length;
+    const badges = Object.entries(totals)
+        .map(([moneda, total]) => {
+            const safeMoneda = escapeHtml(moneda);
+            const numericTotal = Number(total);
+            const formattedTotal = numberFormatter.format(Number.isFinite(numericTotal) ? numericTotal : 0);
+            return `<span class="badge text-bg-danger me-1">${safeMoneda} ${formattedTotal}</span>`;
+        })
+        .join('');
+    return `<hr class="my-2"><div class="d-flex justify-content-between align-items-center">` +
+        `<small class="text-muted">${count} vencido${count !== 1 ? 's' : ''}</small>` +
+        `<div>${badges}</div></div>`;
+}
+
+/**
  * Builds the inner HTML for the structured upcoming-payments alert panel.
  * Groups payments into: Vencidos del mes / Hoy / Mañana / Próximos días.
+ * Appends a totals-by-currency summary for overdue payments and a link to view debts.
  * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string, deudaId?: number}>} payments
  * @param {Date} [now=new Date()]
  * @returns {string} HTML string for the alert body
@@ -146,9 +176,12 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
             renderOverdueSection(overdue),
             renderTodaySection(today),
             renderTomorrowSection(tomorrow),
-            renderUpcomingSection(rest)
+            renderUpcomingSection(rest),
+            renderTotalsSection(overdue),
+            `<div class="text-end mt-2"><a href="/" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver gastos</a></div>`,
         ].join(''),
         todayCount: today.length,
+        overdueCount: overdue.length,
     };
 }
 
@@ -162,8 +195,8 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
  */
 export function showInAppPanel(payments, now = new Date()) {
     if (typeof window === 'undefined') return;
-    const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
-    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html, todayCount } }));
+    const { html, todayCount, overdueCount } = buildUpcomingPaymentsHTML(payments, now);
+    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html, todayCount, overdueCount } }));
 }
 
 /**

@@ -404,7 +404,7 @@ async function testBuildUpcomingPaymentsHTML() {
         { acreedor: 'MercadoPago', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-06' }, // rest (6th → truncated)
     ];
 
-    const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
+    const { html, todayCount, overdueCount } = buildUpcomingPaymentsHTML(payments, now);
 
     assert(html.includes('Vencidos del mes'), 'Incluye sección Vencidos del mes');
     assert(html.includes('Cable'), 'Incluye pagos vencidos del mes actual');
@@ -424,8 +424,19 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(html.includes('Personal'), 'Lista rest incluye Personal');
     assert(html.includes('y 1 más'), 'Trunca con "y 1 más" cuando rest > 5');
 
-    // todayCount reflects the number of payments due today
+    // todayCount reflects the number of payments due today; overdueCount reflects overdue
     assert(todayCount === 2, 'todayCount es 2 (NaranjaX y Brubank vencen hoy)');
+    assert(overdueCount === 1, 'overdueCount es 1 (Cable vencido este mes)');
+
+    // Totals section – 1 overdue payment (Cable ARS 1500)
+    assert(html.includes('1 vencido'), 'Incluye conteo de pagos vencidos');
+    assert(html.includes('text-bg-danger'), 'Usa badge Bootstrap text-bg-danger para totales');
+    assert(html.includes('1.500'), 'Incluye monto total del vencido en ARS');
+
+    // View link
+    assert(html.includes('Ver gastos'), 'Incluye link "Ver gastos"');
+    assert(html.includes('data-notif-navigate'), 'El link tiene atributo data-notif-navigate');
+    assert(html.includes('href="/"'), 'El link apunta al home /');
 
     // showInAppPanel dispatches app:upcoming-panel with the html and todayCount
     const events = [];
@@ -438,8 +449,36 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(typeof events[0].html === 'string', 'El evento incluye html como string');
     assert(events[0].html.includes('NaranjaX'), 'El html del evento incluye datos de los pagos');
     assert(events[0].todayCount === 2, 'El evento incluye todayCount correcto');
+    assert(events[0].overdueCount === 1, 'El evento incluye overdueCount correcto');
 
     window.removeEventListener('app:upcoming-panel', handler);
+}
+
+// ===================================================================
+// UC12b: buildUpcomingPaymentsHTML – totales multi-moneda en vencidos
+// ===================================================================
+async function testBuildUpcomingPaymentsHTMLMultiCurrencyTotals() {
+    console.log('  UC12b: buildUpcomingPaymentsHTML muestra totales por moneda para pagos vencidos');
+
+    const now = localDate(2026, 4, 3);
+
+    const payments = [
+        { acreedor: 'Banco A', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01' }, // overdue ARS
+        { acreedor: 'Banco B', monto: 2000, moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue ARS
+        { acreedor: 'Banco C', monto: 100,  moneda: 'USD', vencimiento: '2026-04-02' }, // overdue USD
+        { acreedor: 'Banco D', monto: 500,  moneda: 'ARS', vencimiento: '2026-04-04' }, // upcoming (not overdue)
+    ];
+
+    const { html } = buildUpcomingPaymentsHTML(payments, now);
+
+    // Should show "3 vencidos" (2 ARS + 1 USD overdue, upcoming not counted)
+    assert(html.includes('3 vencidos'), 'Muestra el conteo correcto de pagos vencidos');
+    // ARS total: 1000 + 2000 = 3000
+    assert(html.includes('ARS') && html.includes('3.000'), 'Incluye total ARS de vencidos');
+    // USD total: 100
+    assert(html.includes('USD') && html.includes('100'), 'Incluye total USD de vencidos');
+    // Should not include upcoming payment in totals (500 ARS)
+    assert(!html.includes('3.500'), 'No suma montos próximos en el total vencido');
 }
 
 // ===================================================================
@@ -488,6 +527,49 @@ async function testCheckAndNotifyDeduplication() {
     localStorage.removeItem(NOTIFIED_KEY);
 }
 
+// ===================================================================
+// UC14: AppHeader – popover con btn-close y badge con overdueCount
+// ===================================================================
+async function testNotificationPopoverCloseButtonAndBadge() {
+    console.log('  UC14: AppHeader crea el popover con btn-close y el badge muestra overdueCount');
+
+    // Mock bootstrap.Popover to capture the options without needing a real DOM render
+    let capturedTitle = null;
+    const originalBootstrap = window.bootstrap;
+    window.bootstrap = {
+        Popover: class {
+            constructor(_el, opts) { capturedTitle = opts?.title ?? null; }
+            dispose() {}
+            hide() {}
+        },
+    };
+
+    // Dynamically import AppHeader (registers 'app-header' custom element)
+    await import('../src/layout/AppHeader.js');
+
+    const header = document.createElement('app-header');
+    document.body.appendChild(header);
+
+    // Dispatch the panel event as the service would
+    window.dispatchEvent(new CustomEvent('app:upcoming-panel', {
+        detail: { html: '<p>test</p>', todayCount: 2, overdueCount: 3 },
+    }));
+
+    // Verify btn-close is in the popover title
+    assert(typeof capturedTitle === 'string', 'El popover recibió un título');
+    assert(capturedTitle.includes('btn-close'), 'El título del popover incluye btn-close');
+    assert(capturedTitle.includes('data-notif-close'), 'El título incluye data-notif-close para el handler de cierre');
+
+    // Verify badge shows overdueCount (3), not todayCount (2)
+    const btn = header.querySelector('#notifications-btn');
+    const badge = btn?.querySelector('.notif-badge');
+    assert(badge !== null, 'El botón de notificaciones tiene badge');
+    assert(badge.textContent === '3', 'El badge muestra el total de deudas vencidas (overdueCount)');
+
+    document.body.removeChild(header);
+    window.bootstrap = originalBootstrap;
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -503,5 +585,7 @@ export const tests = [
     testShowGroupedInAppNotification,
     testFormatHelpers,
     testBuildUpcomingPaymentsHTML,
-    testCheckAndNotifyDeduplication
+    testBuildUpcomingPaymentsHTMLMultiCurrencyTotals,
+    testCheckAndNotifyDeduplication,
+    testNotificationPopoverCloseButtonAndBadge,
 ];
