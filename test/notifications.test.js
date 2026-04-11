@@ -427,6 +427,16 @@ async function testBuildUpcomingPaymentsHTML() {
     // todayCount reflects the number of payments due today
     assert(todayCount === 2, 'todayCount es 2 (NaranjaX y Brubank vencen hoy)');
 
+    // Totals section – 1 overdue payment (Cable ARS 1500)
+    assert(html.includes('1 vencido'), 'Incluye conteo de pagos vencidos');
+    assert(html.includes('text-bg-danger'), 'Usa badge Bootstrap text-bg-danger para totales');
+    assert(html.includes('1.500'), 'Incluye monto total del vencido en ARS');
+
+    // View link
+    assert(html.includes('Ver gastos'), 'Incluye link "Ver gastos"');
+    assert(html.includes('data-notif-navigate'), 'El link tiene atributo data-notif-navigate');
+    assert(html.includes('/gastos'), 'El link apunta a /gastos');
+
     // showInAppPanel dispatches app:upcoming-panel with the html and todayCount
     const events = [];
     const handler = (e) => events.push(e.detail);
@@ -440,6 +450,33 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(events[0].todayCount === 2, 'El evento incluye todayCount correcto');
 
     window.removeEventListener('app:upcoming-panel', handler);
+}
+
+// ===================================================================
+// UC12b: buildUpcomingPaymentsHTML – totales multi-moneda en vencidos
+// ===================================================================
+async function testBuildUpcomingPaymentsHTMLMultiCurrencyTotals() {
+    console.log('  UC12b: buildUpcomingPaymentsHTML muestra totales por moneda para pagos vencidos');
+
+    const now = localDate(2026, 4, 3);
+
+    const payments = [
+        { acreedor: 'Banco A', monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01' }, // overdue ARS
+        { acreedor: 'Banco B', monto: 2000, moneda: 'ARS', vencimiento: '2026-04-02' }, // overdue ARS
+        { acreedor: 'Banco C', monto: 100,  moneda: 'USD', vencimiento: '2026-04-02' }, // overdue USD
+        { acreedor: 'Banco D', monto: 500,  moneda: 'ARS', vencimiento: '2026-04-04' }, // upcoming (not overdue)
+    ];
+
+    const { html } = buildUpcomingPaymentsHTML(payments, now);
+
+    // Should show "3 vencidos" (2 ARS + 1 USD overdue, upcoming not counted)
+    assert(html.includes('3 vencidos'), 'Muestra el conteo correcto de pagos vencidos');
+    // ARS total: 1000 + 2000 = 3000
+    assert(html.includes('ARS') && html.includes('3.000'), 'Incluye total ARS de vencidos');
+    // USD total: 100
+    assert(html.includes('USD') && html.includes('100'), 'Incluye total USD de vencidos');
+    // Should not include upcoming payment in totals (500 ARS)
+    assert(!html.includes('3.500'), 'No suma montos próximos en el total vencido');
 }
 
 // ===================================================================
@@ -503,5 +540,6 @@ export const tests = [
     testShowGroupedInAppNotification,
     testFormatHelpers,
     testBuildUpcomingPaymentsHTML,
+    testBuildUpcomingPaymentsHTMLMultiCurrencyTotals,
     testCheckAndNotifyDeduplication
 ];

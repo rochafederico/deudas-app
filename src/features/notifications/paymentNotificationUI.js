@@ -118,8 +118,33 @@ function renderUpcomingSection(payments) {
 }
 
 /**
+ * Renders a totals summary for overdue payments, grouped by currency.
+ * Uses Bootstrap d-flex / badge utilities.
+ * @param {Array} overduePayments
+ * @returns {string} HTML string or empty string
+ */
+function renderTotalsSection(overduePayments) {
+    if (overduePayments.length === 0) return '';
+    const totals = {};
+    for (const p of overduePayments) {
+        totals[p.moneda] = (totals[p.moneda] || 0) + p.monto;
+    }
+    const count = overduePayments.length;
+    const badges = Object.entries(totals)
+        .map(([moneda, total]) => {
+            const safeMoneda = escapeHtml(moneda);
+            return `<span class="badge text-bg-danger me-1">${safeMoneda} ${total.toLocaleString('es-AR')}</span>`;
+        })
+        .join('');
+    return `<hr class="my-2"><div class="d-flex justify-content-between align-items-center">` +
+        `<small class="text-muted">${count} vencido${count !== 1 ? 's' : ''}</small>` +
+        `<div>${badges}</div></div>`;
+}
+
+/**
  * Builds the inner HTML for the structured upcoming-payments alert panel.
  * Groups payments into: Vencidos del mes / Hoy / Mañana / Próximos días.
+ * Appends a totals-by-currency summary for overdue payments and a link to view debts.
  * @param {Array<{acreedor: string, monto: number, moneda: string, vencimiento: string, deudaId?: number}>} payments
  * @param {Date} [now=new Date()]
  * @returns {string} HTML string for the alert body
@@ -146,7 +171,9 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
             renderOverdueSection(overdue),
             renderTodaySection(today),
             renderTomorrowSection(tomorrow),
-            renderUpcomingSection(rest)
+            renderUpcomingSection(rest),
+            renderTotalsSection(overdue),
+            `<div class="text-end mt-2"><a href="/gastos" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver gastos</a></div>`,
         ].join(''),
         todayCount: today.length,
     };
