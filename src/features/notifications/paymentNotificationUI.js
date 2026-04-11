@@ -127,14 +127,19 @@ function renderTotalsSection(overduePayments) {
     if (overduePayments.length === 0) return '';
     const totals = {};
     for (const p of overduePayments) {
-        const amount = Number(p.monto) || 0;
-        totals[p.moneda] = (totals[p.moneda] || 0) + amount;
+    const numberFormatter = new Intl.NumberFormat('es-AR');
+    for (const p of overduePayments) {
+        const numericMonto = Number(p.monto);
+        const safeMonto = Number.isFinite(numericMonto) ? numericMonto : 0;
+        totals[p.moneda] = (totals[p.moneda] || 0) + safeMonto;
     }
     const count = overduePayments.length;
     const badges = Object.entries(totals)
         .map(([moneda, total]) => {
             const safeMoneda = escapeHtml(moneda);
-            return `<span class="badge text-bg-danger me-1">${safeMoneda} ${total.toLocaleString('es-AR')}</span>`;
+            const numericTotal = Number(total);
+            const formattedTotal = numberFormatter.format(Number.isFinite(numericTotal) ? numericTotal : 0);
+            return `<span class="badge text-bg-danger me-1">${safeMoneda} ${formattedTotal}</span>`;
         })
         .join('');
     return `<hr class="my-2"><div class="d-flex justify-content-between align-items-center">` +
