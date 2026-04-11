@@ -19,16 +19,16 @@ export class AppHeader extends HTMLElement {
     };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
-    this._onNotifClick = (e) => {
+    this._onNotifPopoverClick = (e) => {
       const link = e.target.closest('[data-notif-navigate]');
-      if (!link) return;
-      e.preventDefault();
-      this._popover?.hide();
-      const path = new URL(link.href).pathname;
-      window.history.pushState({}, '', path);
-      window.dispatchEvent(new PopStateEvent('popstate'));
-    };
-    this._onNotifCloseClick = (e) => {
+      if (link) {
+        e.preventDefault();
+        this._popover?.hide();
+        const path = new URL(link.href).pathname;
+        window.history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+        return;
+      }
       if (e.target.closest('[data-notif-close]')) {
         this._popover?.hide();
       }
@@ -55,8 +55,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#desktop-delete')?.addEventListener('click', this._onDesktopDeleteClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
-    document.addEventListener('click', this._onNotifClick);
-    document.addEventListener('click', this._onNotifCloseClick);
+    document.addEventListener('click', this._onNotifPopoverClick);
   }
 
   disconnectedCallback() {
@@ -67,8 +66,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#desktop-delete')?.removeEventListener('click', this._onDesktopDeleteClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
-    document.removeEventListener('click', this._onNotifClick);
-    document.removeEventListener('click', this._onNotifCloseClick);
+    document.removeEventListener('click', this._onNotifPopoverClick);
     this._popover?.dispose();
     this._popover = null;
   }
