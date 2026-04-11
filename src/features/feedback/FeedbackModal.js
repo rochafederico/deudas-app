@@ -60,7 +60,12 @@ export class FeedbackModal extends HTMLElement {
 
         this._onEmail = (e) => {
             e.preventDefault();
-            window.location.href = buildMailtoUrl(this._currentData);
+            const a = document.createElement('a');
+            a.href = buildMailtoUrl(this._currentData);
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         };
 
         this.querySelector('#feedback-form')?.addEventListener('submit', this._onSubmit);
