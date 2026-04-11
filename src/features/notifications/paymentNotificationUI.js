@@ -127,7 +127,8 @@ function renderTotalsSection(overduePayments) {
     if (overduePayments.length === 0) return '';
     const totals = {};
     for (const p of overduePayments) {
-        totals[p.moneda] = (totals[p.moneda] || 0) + p.monto;
+        const amount = Number(p.monto) || 0;
+        totals[p.moneda] = (totals[p.moneda] || 0) + amount;
     }
     const count = overduePayments.length;
     const badges = Object.entries(totals)
