@@ -126,7 +126,6 @@ function renderUpcomingSection(payments) {
 function renderTotalsSection(overduePayments) {
     if (overduePayments.length === 0) return '';
     const totals = {};
-    for (const p of overduePayments) {
     const numberFormatter = new Intl.NumberFormat('es-AR');
     for (const p of overduePayments) {
         const numericMonto = Number(p.monto);
@@ -179,9 +178,10 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
             renderTomorrowSection(tomorrow),
             renderUpcomingSection(rest),
             renderTotalsSection(overdue),
-            `<div class="text-end mt-2"><a href="/" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver detalle</a></div>`,
+            `<div class="text-end mt-2"><a href="/" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver gastos</a></div>`,
         ].join(''),
         todayCount: today.length,
+        overdueCount: overdue.length,
     };
 }
 
@@ -195,8 +195,8 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
  */
 export function showInAppPanel(payments, now = new Date()) {
     if (typeof window === 'undefined') return;
-    const { html, todayCount } = buildUpcomingPaymentsHTML(payments, now);
-    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html, todayCount } }));
+    const { html, todayCount, overdueCount } = buildUpcomingPaymentsHTML(payments, now);
+    window.dispatchEvent(new CustomEvent('app:upcoming-panel', { detail: { html, todayCount, overdueCount } }));
 }
 
 /**

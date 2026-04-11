@@ -18,7 +18,7 @@ export class AppHeader extends HTMLElement {
       window.dispatchEvent(new CustomEvent('tour:start'));
     };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
-    this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount);
+    this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount, e.detail.overdueCount);
     this._onNotifPopoverClick = (e) => {
       const link = e.target.closest('[data-notif-navigate]');
       if (link) {
@@ -73,7 +73,7 @@ export class AppHeader extends HTMLElement {
     this._popover = null;
   }
 
-  _updateNotificationPopover(html, todayCount = 0) {
+  _updateNotificationPopover(html, _todayCount = 0, overdueCount = 0) {
     const btn = this.querySelector('#notifications-btn');
     if (!btn || !window.bootstrap?.Popover) return;
     if (this._popover) this._popover.dispose();
@@ -95,8 +95,8 @@ export class AppHeader extends HTMLElement {
       badge.setAttribute('aria-label', 'Hay vencimientos próximos');
       btn.appendChild(badge);
     }
-    if (todayCount > 0) {
-      badge.textContent = todayCount;
+    if (overdueCount > 0) {
+      badge.textContent = overdueCount;
       badge.style.padding = '';
     } else {
       badge.textContent = '';
