@@ -433,9 +433,9 @@ async function testBuildUpcomingPaymentsHTML() {
     assert(html.includes('1.500'), 'Incluye monto total del vencido en ARS');
 
     // View link
-    assert(html.includes('Ver gastos'), 'Incluye link "Ver gastos"');
+    assert(html.includes('Ver detalle'), 'Incluye link "Ver detalle"');
     assert(html.includes('data-notif-navigate'), 'El link tiene atributo data-notif-navigate');
-    assert(html.includes('/gastos'), 'El link apunta a /gastos');
+    assert(html.includes('href="/"'), 'El link apunta al home /');
 
     // showInAppPanel dispatches app:upcoming-panel with the html and todayCount
     const events = [];

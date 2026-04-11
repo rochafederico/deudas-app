@@ -173,7 +173,7 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
             renderTomorrowSection(tomorrow),
             renderUpcomingSection(rest),
             renderTotalsSection(overdue),
-            `<div class="text-end mt-2"><a href="/gastos" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver gastos</a></div>`,
+            `<div class="text-end mt-2"><a href="/" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver detalle</a></div>`,
         ].join(''),
         todayCount: today.length,
     };
