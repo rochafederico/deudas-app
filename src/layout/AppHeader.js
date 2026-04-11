@@ -1,7 +1,7 @@
 import './Menu.js';
 import './DarkToggle.js';
 import '../shared/components/AppToast.js';
-import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
+import { openExportModal, openImportModal, deleteAllData, openFeedbackModal } from './dataActions.js';
 import { trackEvent } from '../shared/observability/index.js';
 
 export class AppHeader extends HTMLElement {
@@ -50,11 +50,17 @@ export class AppHeader extends HTMLElement {
       trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'header' });
       deleteAllData();
     };
+    this._onDesktopFeedbackClick = (e) => {
+      e.preventDefault();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'feedback', location: 'header' });
+      openFeedbackModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
+    };
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     this.querySelector('#desktop-export')?.addEventListener('click', this._onDesktopExportClick);
     this.querySelector('#desktop-import')?.addEventListener('click', this._onDesktopImportClick);
     this.querySelector('#desktop-delete')?.addEventListener('click', this._onDesktopDeleteClick);
+    this.querySelector('#desktop-feedback')?.addEventListener('click', this._onDesktopFeedbackClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.addEventListener('click', this._onNotifPopoverClick);
@@ -66,6 +72,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#desktop-export')?.removeEventListener('click', this._onDesktopExportClick);
     this.querySelector('#desktop-import')?.removeEventListener('click', this._onDesktopImportClick);
     this.querySelector('#desktop-delete')?.removeEventListener('click', this._onDesktopDeleteClick);
+    this.querySelector('#desktop-feedback')?.removeEventListener('click', this._onDesktopFeedbackClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.removeEventListener('click', this._onNotifPopoverClick);
@@ -119,6 +126,8 @@ export class AppHeader extends HTMLElement {
                 <ul class="dropdown-menu dropdown-menu-end">
                   <li><a class="dropdown-item" href="#" id="desktop-export">📤 Exportar datos</a></li>
                   <li><a class="dropdown-item" href="#" id="desktop-import">📥 Importar datos</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#" id="desktop-feedback">📝 Enviar feedback</a></li>
                   <li><hr class="dropdown-divider"></li>
                   <li><a class="dropdown-item text-danger" href="#" id="desktop-delete">🗑️ Eliminar todo</a></li>
                 </ul>

@@ -1,9 +1,11 @@
 // Shared data action helpers — used by AppHeader (desktop) and BottomNav (mobile)
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
+import '../features/feedback/FeedbackModal.js';
 
 let _exportModal = null;
 let _importModal = null;
+let _feedbackModal = null;
 
 export function openExportModal(returnFocus) {
   if (!_exportModal) {
@@ -19,6 +21,14 @@ export function openImportModal(returnFocus) {
     document.body.appendChild(_importModal);
   }
   _importModal.open(returnFocus);
+}
+
+export function openFeedbackModal(returnFocus) {
+  if (!_feedbackModal) {
+    _feedbackModal = document.createElement('feedback-modal');
+    document.body.appendChild(_feedbackModal);
+  }
+  _feedbackModal.open(returnFocus);
 }
 
 export async function deleteAllData() {

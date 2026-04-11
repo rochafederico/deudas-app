@@ -1,7 +1,7 @@
 // src/layout/BottomNav.js
 // Fixed bottom navigation bar for mobile screens (hidden on lg+)
 
-import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
+import { openExportModal, openImportModal, deleteAllData, openFeedbackModal } from './dataActions.js';
 import { navItems } from './navConfig.js';
 import { trackEvent } from '../shared/observability/index.js';
 
@@ -40,11 +40,19 @@ export class BottomNav extends HTMLElement {
       trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'bottom_nav' });
       deleteAllData();
     };
+    this._onFeedbackClick = (e) => {
+      e.preventDefault();
+      const returnFocus = this.querySelector('[data-bs-toggle="offcanvas"]') || document.activeElement;
+      this._closeOffcanvas();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'feedback', location: 'bottom_nav' });
+      openFeedbackModal(returnFocus);
+    };
     this.querySelector('#bottom-nav-list').addEventListener('click', this._onNavClick);
     window.addEventListener('popstate', this._onPopState);
     this.querySelector('#bottom-nav-export')?.addEventListener('click', this._onExportClick);
     this.querySelector('#bottom-nav-import')?.addEventListener('click', this._onImportClick);
     this.querySelector('#bottom-nav-delete')?.addEventListener('click', this._onDeleteAllClick);
+    this.querySelector('#bottom-nav-feedback')?.addEventListener('click', this._onFeedbackClick);
     this._updateActive();
   }
 
@@ -54,6 +62,7 @@ export class BottomNav extends HTMLElement {
     this.querySelector('#bottom-nav-export')?.removeEventListener('click', this._onExportClick);
     this.querySelector('#bottom-nav-import')?.removeEventListener('click', this._onImportClick);
     this.querySelector('#bottom-nav-delete')?.removeEventListener('click', this._onDeleteAllClick);
+    this.querySelector('#bottom-nav-feedback')?.removeEventListener('click', this._onFeedbackClick);
   }
 
   _closeOffcanvas() {
@@ -112,6 +121,9 @@ export class BottomNav extends HTMLElement {
             </a>
             <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
               📥 Importar datos
+            </a>
+            <a href="#" id="bottom-nav-feedback" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+              📝 Enviar feedback
             </a>
             <a href="#" id="bottom-nav-delete" class="list-group-item list-group-item-action text-danger d-flex align-items-center gap-2">
               🗑️ Eliminar todo

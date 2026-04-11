@@ -15,6 +15,7 @@ import { tests as notificationsTests } from './notifications.test.js';
 import { tests as statsTests } from './stats.test.js';
 import { tests as monthFilterTests } from './month-filter.test.js';
 import { tests as analyticsTests } from './analytics.test.js';
+import { tests as feedbackTests } from './feedback.test.js';
 
 async function run() {
     try {
@@ -53,6 +54,9 @@ async function run() {
 
         console.log('\n--- Analytics ---');
         for (const test of analyticsTests) { await test(); }
+
+        console.log('\n--- Feedback ---');
+        for (const test of feedbackTests) { await test(); }
 
         printResults();
         process.exit(0);
