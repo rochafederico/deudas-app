@@ -28,6 +28,11 @@ export class AppHeader extends HTMLElement {
       window.history.pushState({}, '', path);
       window.dispatchEvent(new PopStateEvent('popstate'));
     };
+    this._onNotifCloseClick = (e) => {
+      if (e.target.closest('[data-notif-close]')) {
+        this._popover?.hide();
+      }
+    };
     this._onDesktopExportClick = (e) => {
       e.preventDefault();
       trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'header' });
@@ -51,6 +56,7 @@ export class AppHeader extends HTMLElement {
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.addEventListener('click', this._onNotifClick);
+    document.addEventListener('click', this._onNotifCloseClick);
   }
 
   disconnectedCallback() {
@@ -62,6 +68,7 @@ export class AppHeader extends HTMLElement {
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.removeEventListener('click', this._onNotifClick);
+    document.removeEventListener('click', this._onNotifCloseClick);
     this._popover?.dispose();
     this._popover = null;
   }
@@ -72,7 +79,10 @@ export class AppHeader extends HTMLElement {
     if (this._popover) this._popover.dispose();
     this._popover = new window.bootstrap.Popover(btn, {
       html: true,
-      title: '<strong>⚠️ Vencimientos próximos</strong>',
+      title: '<div class="d-flex justify-content-between align-items-center w-100">' +
+        '<strong>⚠️ Vencimientos próximos</strong>' +
+        '<button type="button" class="btn-close btn-sm ms-3" data-notif-close aria-label="Cerrar"></button>' +
+        '</div>',
       content: html,
       trigger: 'click',
       placement: 'bottom',
