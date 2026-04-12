@@ -116,34 +116,30 @@ export class FeedbackModal extends HTMLElement {
                         </p>
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                     </div>
-
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <div class="btn-group flex-fill">
-                            <button type="button" id="feedback-send-btn"
-                                class="btn btn-primary dropdown-toggle"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                                disabled>
-                                Enviar
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li>
-                                    <a class="dropdown-item" id="feedback-link-github"
-                                        href="#" target="_blank" rel="noopener noreferrer">
-                                        🐙 GitHub
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" id="feedback-link-whatsapp"
-                                        href="#" target="_blank" rel="noopener noreferrer">
-                                        💬 WhatsApp
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                    </div>
                 </form>
+                <div id="feedback-actions" class="btn-group w-100">
+                    <button type="button" id="feedback-send-btn"
+                        class="btn btn-primary dropdown-toggle"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        disabled>
+                        Enviar
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" id="feedback-link-github"
+                                href="#" target="_blank" rel="noopener noreferrer">
+                                🐙 GitHub
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" id="feedback-link-whatsapp"
+                                href="#" target="_blank" rel="noopener noreferrer">
+                                💬 WhatsApp
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </ui-modal>
         `;
 
@@ -158,6 +154,11 @@ export class FeedbackModal extends HTMLElement {
         this._whatsappLinkEl = this.querySelector('#feedback-link-whatsapp');
         this._errorTipo = this.querySelector('#feedback-error-tipo');
         this._errorComentario = this.querySelector('#feedback-error-comentario');
+
+        // Move the actions div into the modal footer
+        const actionsEl = this.querySelector('#feedback-actions');
+        const footerEl = this.querySelector('.modal-footer');
+        if (actionsEl && footerEl) footerEl.appendChild(actionsEl);
 
         // Live update: rebuild URLs and toggle send button on every change
         this._tipoEl?.addEventListener('change', () => this._updateLinks());

@@ -22,6 +22,7 @@ export class UiModal extends HTMLElement {
         if (!modalEl) return;
         this._modalEl = modalEl;
         this._bodyEl = modalEl.querySelector('.modal-body');
+        this._footerEl = modalEl.querySelector('.modal-footer');
         this._titleEl = modalEl.querySelector('.modal-title');
         // Use Bootstrap Modal JS if available
         if (window.bootstrap && window.bootstrap.Modal) {
@@ -113,6 +114,7 @@ export class UiModal extends HTMLElement {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body"></div>
+                    <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
