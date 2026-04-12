@@ -27,8 +27,8 @@ export default function Home() {
       <h5 class="card-title">⚡ Acciones rápidas</h5>
       <p class="card-text">Elegí qué querés hacer hoy</p>
       <div class="d-flex justify-content-start flex-wrap gap-3 mt-3">
-        <a href="/gastos" class="btn btn-outline-primary">💳 Gestionar gastos</a>
         <a href="/ingresos" class="btn btn-outline-primary">💰 Registrar ingresos</a>
+        <a href="/gastos" class="btn btn-outline-primary">💳 Gestionar gastos</a>
         <a href="/inversiones" class="btn btn-outline-primary">📈 Seguimiento de inversiones</a>
       </div>
     </div>
