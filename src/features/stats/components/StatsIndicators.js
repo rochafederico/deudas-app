@@ -27,7 +27,7 @@ export default function StatsIndicators({ mes } = {}) {
       container.innerHTML = '';
 
       const row = document.createElement('div');
-      row.className = 'row row-cols-1 g-3';
+      row.className = 'row row-cols-1 row-cols-sm-2 row-cols-md-4 g-3';
 
       const cards = [
         { title: 'Ingresos',   icon: 'bi-cash-stack',     items: addValue(summary.byCurrency.ingresos),   color: 'success' },
