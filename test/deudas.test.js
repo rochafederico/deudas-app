@@ -390,9 +390,16 @@ async function testAcreedorColumnMobileRender() {
     const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
     const montoNode = montoCol.render(rowConVenc);
     assert(montoNode instanceof Node, 'monedaymonto render debe devolver un nodo DOM');
+
+    // El span del monto debe tener text-nowrap para evitar corte del símbolo de moneda en mobile
+    const montoSpan = montoNode.querySelector('span.text-nowrap');
+    assert(montoSpan !== null, 'El span del monto debe tener clase text-nowrap');
+
     const vencBadge = montoNode.querySelector('span.d-md-none');
     assert(vencBadge !== null, 'Debe existir elemento de vencimiento en columna Monto');
     assert(vencBadge.classList.contains('d-md-none'), 'Elemento de vencimiento debe ser solo visible en mobile (d-md-none)');
+    // El span de vencimiento también debe tener text-nowrap para evitar corte de fechas ISO en mobile
+    assert(vencBadge.classList.contains('text-nowrap'), 'Elemento de vencimiento debe tener clase text-nowrap');
     assert(vencBadge.textContent === '2026-06-01', 'Elemento debe mostrar la fecha de vencimiento');
 
     // Badge de vencimiento no debe renderizarse cuando vencimiento está vacío
