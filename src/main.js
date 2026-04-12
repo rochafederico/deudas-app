@@ -33,19 +33,11 @@ document.body.appendChild(wrapper);
 document.body.appendChild(BottomNav());
 document.body.appendChild(FeedbackFabComponent());
 
-// Initialize the IndexedDB and only after DB is ready render indicators + initial route
+// Initialize the IndexedDB and only after DB is ready render the initial route
 initDB().then(async (db) => {
     window.db = db;
 
-    try {
-      const { default: StatsIndicators } = await import('./features/stats/components/StatsIndicators.js');
-      const indicatorsNode = StatsIndicators();
-      // Insert indicators above the app container
-      wrapper.insertBefore(indicatorsNode, app);
-    } catch (err) {
-      console.warn('No se pudo cargar StatsIndicators:', err);
-    }
-    // Inicialización de rutas después que DB esté lista y los indicadores hayan pedido datos
+    // Inicialización de rutas después que DB esté lista
     renderRoute(window.location.pathname);
 
     // Verificar y enviar notificaciones de pagos próximos a vencer

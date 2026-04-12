@@ -167,9 +167,6 @@ async function testCompactFormatNull() {
 async function testStatsIndicatorsCardOrder() {
     console.log('  UC12: StatsIndicators respeta el orden visual de tarjetas');
 
-    const originalListenerFlag = window.__statsIndicatorsMonthListenerAdded;
-    window.__statsIndicatorsMonthListenerAdded = true;
-
     const indicators = StatsIndicators({ mes: '2030-01' });
     await new Promise(resolve => setTimeout(resolve, 50));
 
@@ -178,8 +175,6 @@ async function testStatsIndicatorsCardOrder() {
         JSON.stringify(titles) === JSON.stringify(['📈 Ingresos', '📉 Gastos', '💼 Balance', '💳 Pendientes', '📊 Inversiones']),
         'las tarjetas deben renderizar ingresos, gastos, balance, pendientes e inversiones en ese orden'
     );
-
-    window.__statsIndicatorsMonthListenerAdded = originalListenerFlag;
 }
 
 export const tests = [

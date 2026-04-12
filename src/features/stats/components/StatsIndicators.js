@@ -4,6 +4,11 @@ import { getMonthlySummary } from '../statsService.js';
 import { addValue } from '../utils/formatCurrency.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
+// Module-level ref so only one ui:month listener is active at a time.
+// Each call to StatsIndicators() replaces the previous listener with one
+// that renders into the current (newly created) container node.
+let _monthHandler = null;
+
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
   container.className = 'mb-4';
@@ -53,14 +58,16 @@ export default function StatsIndicators({ mes } = {}) {
   const initialPeriodo = mes || getSelectedMonth();
   render(initialPeriodo);
 
-  // Avoid adding multiple global listeners if this module is imported more than once
-  if (!window.__statsIndicatorsMonthListenerAdded) {
-    window.addEventListener('ui:month', (e) => {
-      const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : getSelectedMonth();
-      render(nuevo);
-    });
-    window.__statsIndicatorsMonthListenerAdded = true;
+  // Remove the previous listener (if any) so navigating away and back does
+  // not leave stale handlers that render into detached nodes.
+  if (_monthHandler) {
+    window.removeEventListener('ui:month', _monthHandler);
   }
+  _monthHandler = (e) => {
+    const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : getSelectedMonth();
+    render(nuevo);
+  };
+  window.addEventListener('ui:month', _monthHandler);
 
   return container;
 }
