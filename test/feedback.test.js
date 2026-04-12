@@ -156,10 +156,10 @@ export const tests = [
         const modal = document.createElement('feedback-modal');
         document.body.appendChild(modal);
         modal.render();
-        const tipoSelect = modal.querySelector('#feedback-tipo');
-        const comentario = modal.querySelector('#feedback-comentario');
-        assert(tipoSelect !== null, 'Debe existir selector de tipo');
-        assert(comentario !== null, 'Debe existir textarea de comentario');
+        assert(modal._tipoEl !== null && modal._tipoEl !== undefined, 'Debe existir referencia _tipoEl');
+        assert(modal._comentarioEl !== null && modal._comentarioEl !== undefined, 'Debe existir referencia _comentarioEl');
+        const alert = modal.querySelector('.alert.alert-warning');
+        assert(alert !== null, 'Debe existir bloque alert-warning con los avisos');
         document.body.removeChild(modal);
     },
 
@@ -168,8 +168,8 @@ export const tests = [
         const modal = document.createElement('feedback-modal');
         document.body.appendChild(modal);
         modal.render();
-        const sendBtn = modal.querySelector('#feedback-send-btn');
-        assert(sendBtn !== null, 'Debe existir el botón Enviar');
+        const sendBtn = modal._sendBtn;
+        assert(sendBtn !== null && sendBtn !== undefined, 'Debe existir el botón Enviar');
         assert(sendBtn.disabled || sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar desactivado al inicio');
         document.body.removeChild(modal);
     },
@@ -180,17 +180,14 @@ export const tests = [
         document.body.appendChild(modal);
         modal.render();
 
-        const tipoSelect = modal.querySelector('#feedback-tipo');
-        const comentario = modal.querySelector('#feedback-comentario');
-        tipoSelect.value = 'sugerencia';
-        comentario.value = 'Un comentario válido';
+        modal._tipoEl.value = 'sugerencia';
+        modal._comentarioEl.value = 'Un comentario válido';
 
         // Simulate change/input events to trigger live update
-        tipoSelect.dispatchEvent(new Event('change'));
-        comentario.dispatchEvent(new Event('input'));
+        modal._tipoEl.dispatchEvent(new Event('change'));
+        modal._comentarioEl.dispatchEvent(new Event('input'));
 
-        const sendBtn = modal.querySelector('#feedback-send-btn');
-        assert(!sendBtn.disabled && !sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar activado con formulario válido');
+        assert(!modal._sendBtn.disabled && !modal._sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar activado con formulario válido');
         document.body.removeChild(modal);
     },
 
@@ -200,20 +197,16 @@ export const tests = [
         document.body.appendChild(modal);
         modal.render();
 
-        const tipoSelect = modal.querySelector('#feedback-tipo');
-        const comentario = modal.querySelector('#feedback-comentario');
-        tipoSelect.value = 'problema';
-        comentario.value = 'Algo no funciona';
+        modal._tipoEl.value = 'problema';
+        modal._comentarioEl.value = 'Algo no funciona';
 
-        tipoSelect.dispatchEvent(new Event('change'));
-        comentario.dispatchEvent(new Event('input'));
+        modal._tipoEl.dispatchEvent(new Event('change'));
+        modal._comentarioEl.dispatchEvent(new Event('input'));
 
-        const githubLink = modal.querySelector('#feedback-link-github');
-        const whatsappLink = modal.querySelector('#feedback-link-whatsapp');
-        assert(githubLink.href && githubLink.href !== '#', 'GitHub link debe tener URL generada');
-        assert(githubLink.href.includes('github.com'), 'GitHub link debe apuntar a GitHub');
-        assert(whatsappLink.href && whatsappLink.href !== '#', 'WhatsApp link debe tener URL generada');
-        assert(whatsappLink.href.includes('wa.me'), 'WhatsApp link debe apuntar a wa.me');
+        assert(modal._githubLinkEl.href && modal._githubLinkEl.href !== '#', 'GitHub link debe tener URL generada');
+        assert(modal._githubLinkEl.href.includes('github.com'), 'GitHub link debe apuntar a GitHub');
+        assert(modal._whatsappLinkEl.href && modal._whatsappLinkEl.href !== '#', 'WhatsApp link debe tener URL generada');
+        assert(modal._whatsappLinkEl.href.includes('wa.me'), 'WhatsApp link debe apuntar a wa.me');
         document.body.removeChild(modal);
     },
 

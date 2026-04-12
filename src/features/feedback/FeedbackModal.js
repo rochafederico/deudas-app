@@ -30,21 +30,22 @@ export class FeedbackModal extends HTMLElement {
     }
 
     _resetForm() {
-        const form = this.querySelector('#feedback-form');
-        if (form) form.reset();
+        if (this._formEl) this._formEl.reset();
+        if (this._counterEl) this._counterEl.textContent = '0';
         this._clearErrors();
         this._updateLinks();
     }
 
     _clearErrors() {
-        this.querySelectorAll('.feedback-error').forEach(el => {
+        [this._errorTipo, this._errorComentario].forEach(el => {
+            if (!el) return;
             el.textContent = '';
             el.classList.add('d-none');
         });
     }
 
     _showError(field, message) {
-        const el = this.querySelector(`#feedback-error-${field}`);
+        const el = field === 'tipo' ? this._errorTipo : this._errorComentario;
         if (el) {
             el.textContent = message;
             el.classList.remove('d-none');
@@ -53,8 +54,8 @@ export class FeedbackModal extends HTMLElement {
 
     _getFormValues() {
         return {
-            tipo: this.querySelector('#feedback-tipo')?.value || '',
-            comentario: this.querySelector('#feedback-comentario')?.value || '',
+            tipo: this._tipoEl?.value || '',
+            comentario: this._comentarioEl?.value || '',
         };
     }
 
@@ -62,20 +63,17 @@ export class FeedbackModal extends HTMLElement {
     _updateLinks() {
         const { tipo, comentario } = this._getFormValues();
         const { valid } = validateFeedback(tipo, comentario);
-        const sendBtn = this.querySelector('#feedback-send-btn');
-        const githubLink = this.querySelector('#feedback-link-github');
-        const whatsappLink = this.querySelector('#feedback-link-whatsapp');
 
         if (valid) {
             const contexto = getContext();
             const feedbackText = formatFeedback(tipo, comentario.trim(), contexto);
-            if (githubLink) githubLink.href = buildGitHubUrl(tipo, feedbackText);
-            if (whatsappLink) whatsappLink.href = buildWhatsAppUrl(feedbackText);
-            sendBtn?.removeAttribute('disabled');
+            if (this._githubLinkEl) this._githubLinkEl.href = buildGitHubUrl(tipo, feedbackText);
+            if (this._whatsappLinkEl) this._whatsappLinkEl.href = buildWhatsAppUrl(feedbackText);
+            this._sendBtn?.removeAttribute('disabled');
         } else {
-            if (githubLink) githubLink.href = '#';
-            if (whatsappLink) whatsappLink.href = '#';
-            sendBtn?.setAttribute('disabled', '');
+            if (this._githubLinkEl) this._githubLinkEl.href = '#';
+            if (this._whatsappLinkEl) this._whatsappLinkEl.href = '#';
+            this._sendBtn?.setAttribute('disabled', '');
         }
     }
 
@@ -106,12 +104,15 @@ export class FeedbackModal extends HTMLElement {
                         <div id="feedback-error-comentario" class="feedback-error invalid-feedback d-none" role="alert"></div>
                     </div>
 
-                    <p class="text-muted small mb-1">
-                        💡 Si tenés imagen o video, adjuntalo luego en la plataforma.
-                    </p>
-                    <p class="text-warning small mb-3">
-                        ⚠️ Evitá incluir datos sensibles como montos u otros datos personales.
-                    </p>
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <p class="small mb-1">
+                            💡 Si tenés imagen o video, adjuntalo luego en la plataforma.
+                        </p>
+                        <p class="small mb-0">
+                            ⚠️ Evitá incluir datos sensibles como montos u otros datos personales.
+                        </p>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    </div>
 
                     <div class="d-flex align-items-center gap-2 flex-wrap">
                         <div class="btn-group flex-fill">
@@ -146,20 +147,28 @@ export class FeedbackModal extends HTMLElement {
             </ui-modal>
         `;
 
-        // Live update: rebuild URLs and toggle send button on every change
-        const tipo = this.querySelector('#feedback-tipo');
-        const textarea = this.querySelector('#feedback-comentario');
-        const counter = this.querySelector('#feedback-char-count');
+        // Store direct element references now, before ui-modal.open() can move
+        // the .modal element to document.body (which would break this.querySelector).
+        this._formEl = this.querySelector('#feedback-form');
+        this._tipoEl = this.querySelector('#feedback-tipo');
+        this._comentarioEl = this.querySelector('#feedback-comentario');
+        this._counterEl = this.querySelector('#feedback-char-count');
+        this._sendBtn = this.querySelector('#feedback-send-btn');
+        this._githubLinkEl = this.querySelector('#feedback-link-github');
+        this._whatsappLinkEl = this.querySelector('#feedback-link-whatsapp');
+        this._errorTipo = this.querySelector('#feedback-error-tipo');
+        this._errorComentario = this.querySelector('#feedback-error-comentario');
 
-        tipo?.addEventListener('change', () => this._updateLinks());
-        textarea?.addEventListener('input', () => {
-            if (counter) counter.textContent = textarea.value.length;
+        // Live update: rebuild URLs and toggle send button on every change
+        this._tipoEl?.addEventListener('change', () => this._updateLinks());
+        this._comentarioEl?.addEventListener('input', () => {
+            if (this._counterEl) this._counterEl.textContent = this._comentarioEl.value.length;
             this._updateLinks();
         });
 
         // Close modal after a send link is followed
-        this.querySelector('#feedback-link-github')?.addEventListener('click', () => this.close());
-        this.querySelector('#feedback-link-whatsapp')?.addEventListener('click', () => this.close());
+        this._githubLinkEl?.addEventListener('click', () => this.close());
+        this._whatsappLinkEl?.addEventListener('click', () => this.close());
         this.querySelector('#feedback-cancel')?.addEventListener('click', () => this.close());
 
         // Initial state
