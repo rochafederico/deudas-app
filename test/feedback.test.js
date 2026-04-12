@@ -165,7 +165,7 @@ export const tests = [
         assert(btn !== null, 'Debe existir el botón FAB');
         assert(btn.classList.contains('btn'), 'El FAB debe usar clase Bootstrap btn');
         assert(btn.classList.contains('rounded-circle'), 'El FAB debe ser circular con rounded-circle');
-        assert(btn.classList.contains('btn-outline-primary'), 'El FAB debe usar btn-outline-primary');
+        assert(btn.classList.contains('btn-dark'), 'El FAB debe usar btn-dark');
         document.body.removeChild(fab);
     },
 
