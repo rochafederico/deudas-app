@@ -662,6 +662,51 @@ async function testNoModalSecundarioEnDebtForm() {
     document.body.removeChild(form);
 }
 
+// ===================================================================
+// UC15: DebtForm no tiene botones dentro del formulario cuando hideButtons=true
+// Verifica que DebtForm usa hideButtons=true en AppForm (botones en footer del modal)
+// ===================================================================
+async function testDebtFormHideButtons() {
+    console.log('  UC15: DebtForm oculta los botones del AppForm (van al footer del modal)');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    const appForm = form.querySelector('app-form');
+    assert(appForm !== null, 'Debe existir app-form dentro de debt-form');
+    assert(appForm.hideButtons === true, 'AppForm debe tener hideButtons=true');
+    assert(appForm.querySelector('#cancelBtn') === null, 'No debe haber botón cancelar dentro de app-form');
+    assert(appForm.querySelector('button[type="submit"]') === null, 'No debe haber botón submit dentro de app-form');
+
+    document.body.removeChild(form);
+}
+
+// ===================================================================
+// UC16: showFormError muestra el error cerca de la sección de Montos
+// ===================================================================
+async function testShowFormErrorNearMontos() {
+    console.log('  UC16: showFormError inserta el mensaje cerca de la sección Montos');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.showFormError('Debe agregar al menos un monto antes de guardar.');
+
+    const errEl = form.querySelector('#form-error');
+    assert(errEl !== null, 'Debe existir el elemento #form-error');
+    assert(errEl.textContent === 'Debe agregar al menos un monto antes de guardar.', 'El mensaje de error debe ser correcto');
+
+    const montosList = form.querySelector('.montos-list');
+    assert(montosList !== null, 'Debe existir .montos-list');
+    // The error element must appear immediately before .montos-list in the DOM
+    assert(errEl.nextElementSibling === montosList, 'El error debe aparecer justo antes de .montos-list');
+    // The error must NOT appear before app-form (i.e. not at the top)
+    const appForm = form.querySelector('app-form');
+    assert(errEl.previousElementSibling === appForm, 'El error debe estar entre app-form y .montos-list');
+
+    document.body.removeChild(form);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -676,5 +721,7 @@ export const tests = [
     testCancelarEdicionInline,
     testSoloUnInlineAbierto,
     testDuplicarMontoInline,
-    testNoModalSecundarioEnDebtForm
+    testNoModalSecundarioEnDebtForm,
+    testDebtFormHideButtons,
+    testShowFormErrorNearMontos
 ];

@@ -57,6 +57,27 @@ export class DebtModal extends HTMLElement {
             const form = this.querySelector('debt-form');
             if (modal && form) {
                 modal.appendChild(form);
+                const appForm = form.querySelector('app-form');
+                const footerDiv = document.createElement('div');
+                footerDiv.className = 'd-flex justify-content-end gap-2';
+
+                const cancelBtn = document.createElement('button');
+                cancelBtn.type = 'button';
+                cancelBtn.className = 'btn btn-primary btn-sm';
+                cancelBtn.setAttribute('aria-label', 'Cancelar');
+                cancelBtn.textContent = 'Cancelar';
+                cancelBtn.addEventListener('click', () => appForm && appForm.triggerCancel());
+
+                const saveBtn = document.createElement('button');
+                saveBtn.type = 'button';
+                saveBtn.className = 'btn btn-success btn-sm';
+                saveBtn.setAttribute('aria-label', 'Guardar');
+                saveBtn.textContent = 'Guardar';
+                saveBtn.addEventListener('click', () => appForm && appForm.triggerSubmit());
+
+                footerDiv.appendChild(cancelBtn);
+                footerDiv.appendChild(saveBtn);
+                modal.addFooter(footerDiv);
             }
         }, 0);
     }

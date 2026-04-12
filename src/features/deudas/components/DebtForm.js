@@ -87,6 +87,7 @@ export class DebtForm extends HTMLElement {
         ];
         form.submitText = 'Guardar';
         form.cancelText = 'Cancelar';
+        form.hideButtons = true;
         // Usar evento personalizado para submit SOLO una vez
         form.addEventListener('form:submit', e => {
             form.dispatchEvent(new CustomEvent('deuda:submit', { detail: e.detail, bubbles: true, composed: true }));
@@ -426,10 +427,10 @@ export class DebtForm extends HTMLElement {
         if (!err) {
             err = el('div', {
                 attrs: { id: 'form-error' },
-                className: 'text-danger my-2'
+                className: 'text-danger mb-2'
             });
-            const form = this.querySelector('app-form');
-            if (form) form.parentNode.insertBefore(err, form);
+            const montosList = this.querySelector('.montos-list');
+            if (montosList) montosList.parentNode.insertBefore(err, montosList);
         }
         err.textContent = msg;
     }
