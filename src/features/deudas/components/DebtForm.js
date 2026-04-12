@@ -238,12 +238,12 @@ export class DebtForm extends HTMLElement {
         });
         const saveBtn = el('app-button', {
             className: 'save-inline', text: '✓',
-            attrs: { title: 'Guardar' },
+            attrs: { title: 'Guardar', 'aria-label': 'Guardar monto' },
             on: { click: () => this._saveInline() }
         });
         const cancelBtn = el('app-button', {
             className: 'cancel-inline', text: '✕',
-            attrs: { variant: 'secondary', title: 'Cancelar' },
+            attrs: { variant: 'secondary', title: 'Cancelar', 'aria-label': 'Cancelar' },
             on: { click: () => this._cancelInline() }
         });
         const tr = el('tr', { className: 'inline-edit-row' });
