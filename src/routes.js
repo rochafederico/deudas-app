@@ -2,11 +2,13 @@
 
 import { navItems } from './layout/navConfig.js';
 import Home from '/src/pages/Home.js';
+import Egresos from '/src/pages/Egresos.js';
 import Ingresos from '/src/pages/Ingresos.js';
 import Inversiones from '/src/pages/Inversiones.js';
 
 const componentMap = {
   '/': Home,
+  '/egresos': Egresos,
   '/ingresos': Ingresos,
   '/inversiones': Inversiones,
 };
