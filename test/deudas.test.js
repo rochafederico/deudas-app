@@ -500,8 +500,8 @@ async function testEdicionInlineGuardar() {
     // Editar el primer monto (idx=0 después de ordenar por vencimiento)
     form.openInlineEdit(form.montos[0], 0);
     assert(form._inlineEditIdx === 0, '_inlineEditIdx = 0');
-    assert(form._inlineEditOrig !== null, '_inlineEditOrig cargado');
-    assert(form._inlineEditOrig.monto === 1000, 'Original guardado: 1000');
+    assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
+    assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
 
     const tbody = form.querySelector('#montos-tbody');
     const inlineRow = tbody.querySelector('.inline-edit-row');

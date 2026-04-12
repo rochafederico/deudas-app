@@ -25,7 +25,7 @@ export class DebtForm extends HTMLElement {
         this._analyticsStartedFor = null;
         // Inline editing state: null = no inline open, 'new' = adding, number = editing existing
         this._inlineEditIdx = null;
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null; // direct reference to the monto object being edited
     }
 
     connectedCallback() {
@@ -141,12 +141,12 @@ export class DebtForm extends HTMLElement {
         if (this._inlineEditIdx !== null) {
             if (!confirm('¿Cancelar los cambios actuales?')) return;
             this._inlineEditIdx = null;
-            this._inlineEditOrig = null;
+            this._inlineEditRef = null;
         }
         this._analyticsStep = 'add_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
         this._inlineEditIdx = 'new';
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null;
         this.renderMontosList();
         this._focusFirstInlineInput();
     }
@@ -157,12 +157,12 @@ export class DebtForm extends HTMLElement {
         if (this._inlineEditIdx !== null) {
             if (!confirm('¿Cancelar los cambios actuales?')) return;
             this._inlineEditIdx = null;
-            this._inlineEditOrig = null;
+            this._inlineEditRef = null;
         }
         this._analyticsStep = 'edit_installment';
         updateFlowStep(this._analyticsFlow || this._getFlowName(), this._analyticsStep);
         this._inlineEditIdx = idx;
-        this._inlineEditOrig = { ...monto };
+        this._inlineEditRef = monto; // stable reference — survives sort/splice
         this.renderMontosList();
         this._focusFirstInlineInput();
     }
@@ -178,7 +178,7 @@ export class DebtForm extends HTMLElement {
         if (!montoInput.reportValidity() || !monedaSelect.reportValidity() || !vencimientoInput.reportValidity()) {
             return;
         }
-        const existing = this._inlineEditIdx !== 'new' ? this.montos[this._inlineEditIdx] : null;
+        const existing = this._inlineEditRef; // null when adding new
         const nuevoMonto = {
             monto: parseFloat(montoInput.value),
             moneda: monedaSelect.value,
@@ -189,10 +189,12 @@ export class DebtForm extends HTMLElement {
         if (this._inlineEditIdx === 'new') {
             this.montos.push(nuevoMonto);
         } else {
-            this.montos[this._inlineEditIdx] = nuevoMonto;
+            // Use indexOf on the stored reference to survive sort/splice shifts
+            const editIdx = this.montos.indexOf(this._inlineEditRef);
+            if (editIdx >= 0) this.montos[editIdx] = nuevoMonto;
         }
         this._inlineEditIdx = null;
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null;
         this.renderMontosList();
     }
 
@@ -200,7 +202,7 @@ export class DebtForm extends HTMLElement {
     _cancelInline() {
         // montos array was never modified during inline editing, just clear the UI state
         this._inlineEditIdx = null;
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null;
         this.renderMontosList();
     }
 
@@ -271,7 +273,7 @@ export class DebtForm extends HTMLElement {
         this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
         this.montos.forEach((monto, idx) => {
-            if (this._inlineEditIdx === idx) {
+            if (this._inlineEditRef !== null && monto === this._inlineEditRef) {
                 // Render inline edit row for this existing monto
                 this.montosTbody.appendChild(this._buildInlineRow(monto));
                 return;
@@ -345,7 +347,7 @@ export class DebtForm extends HTMLElement {
         this.deudaId = deuda.id;
         this.montos = deuda.montos.map(m => ({ ...m }));
         this._inlineEditIdx = null;
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null;
         this.renderMontosList();
         this.startAnalyticsFlow('edit_debt', { step: 'form', deudaId: deuda.id });
         // Precarga los valores en <app-form>
@@ -370,7 +372,7 @@ export class DebtForm extends HTMLElement {
         this.deudaId = null;
         this.montos = [];
         this._inlineEditIdx = null;
-        this._inlineEditOrig = null;
+        this._inlineEditRef = null;
         const form = this.querySelector('app-form');
         if (form) form.initialValues = {};
         this.renderMontosList();
