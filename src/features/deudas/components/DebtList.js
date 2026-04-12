@@ -32,6 +32,7 @@ export class DebtList extends HTMLElement {
         window.addEventListener('deuda:added', () => this.loadDebts());
         window.addEventListener('deuda:updated', () => this.loadDebts());
         window.addEventListener('deuda:deleted', () => this.loadDebts());
+        window.addEventListener('data-imported', () => this.loadDebts());
         window.addEventListener('deuda:edit', (e) => {
             this.editDebt(e.detail);
         });

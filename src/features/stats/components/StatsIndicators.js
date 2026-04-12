@@ -4,10 +4,11 @@ import { getMonthlySummary } from '../statsService.js';
 import { addValue } from '../utils/formatCurrency.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
-// Module-level ref so only one ui:month listener is active at a time.
-// Each call to StatsIndicators() replaces the previous listener with one
-// that renders into the current (newly created) container node.
+// Module-level refs so only one listener per event is active at a time.
+// Each call to StatsIndicators() replaces the previous listeners with ones
+// that render into the current (newly created) container node.
 let _monthHandler = null;
+let _importHandler = null;
 
 export default function StatsIndicators({ mes } = {}) {
   const container = document.createElement('div');
@@ -67,6 +68,12 @@ export default function StatsIndicators({ mes } = {}) {
     render(nuevo);
   };
   window.addEventListener('ui:month', _monthHandler);
+
+  if (_importHandler) {
+    window.removeEventListener('data-imported', _importHandler);
+  }
+  _importHandler = () => render(getSelectedMonth());
+  window.addEventListener('data-imported', _importHandler);
 
   return container;
 }
