@@ -54,3 +54,7 @@ $info:      #0dcaf0;
     height: 48px;
     z-index: $zindex-toast;
 }
+
+body.modal-open .feedback-fab {
+    display: none !important;
+}
