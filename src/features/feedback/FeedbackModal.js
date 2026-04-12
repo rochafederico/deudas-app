@@ -4,7 +4,8 @@
 import '../../shared/components/UiModal.js';
 import {
     validateFeedback,
-    formatFeedback,
+    formatFeedbackGitHub,
+    formatFeedbackWhatsApp,
     buildGitHubUrl,
     buildWhatsAppUrl,
     getContext,
@@ -16,10 +17,10 @@ export class FeedbackModal extends HTMLElement {
     }
 
     open(opener) {
-        if (!this._rendered) this.render();
-        // Capture context NOW, before the feedback modal is shown,
-        // so getContext() sees the previously open modal (if any), not this one.
+        // Capture context BEFORE render so getContext() sees whatever was open
+        // before the feedback modal itself appears.
         this._contexto = getContext();
+        if (!this._rendered) this.render();
         const ui = this.querySelector('ui-modal');
         ui.setTitle('Enviar feedback');
         this._resetForm();
@@ -69,9 +70,8 @@ export class FeedbackModal extends HTMLElement {
 
         if (valid) {
             const contexto = this._contexto || getContext();
-            const feedbackText = formatFeedback(tipo, comentario.trim(), contexto);
-            if (this._githubLinkEl) this._githubLinkEl.href = buildGitHubUrl(tipo, feedbackText);
-            if (this._whatsappLinkEl) this._whatsappLinkEl.href = buildWhatsAppUrl(feedbackText);
+            if (this._githubLinkEl) this._githubLinkEl.href = buildGitHubUrl(tipo, formatFeedbackGitHub(tipo, comentario.trim(), contexto));
+            if (this._whatsappLinkEl) this._whatsappLinkEl.href = buildWhatsAppUrl(formatFeedbackWhatsApp(tipo, comentario.trim(), contexto));
             this._sendBtn?.removeAttribute('disabled');
         } else {
             if (this._githubLinkEl) this._githubLinkEl.href = '#';

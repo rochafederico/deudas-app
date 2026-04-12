@@ -5,6 +5,8 @@
 import { assert } from './setup.js';
 import {
     formatFeedback,
+    formatFeedbackGitHub,
+    formatFeedbackWhatsApp,
     buildGitHubUrl,
     buildWhatsAppUrl,
     validateFeedback,
@@ -37,6 +39,46 @@ export const tests = [
         const text = formatFeedback('confusión', 'No entiendo', null);
         assert(text.includes('ruta: (sin ruta)'), 'ruta debe tener fallback con contexto null');
         assert(text.includes('modal: (ninguno)'), 'modal debe tener fallback con contexto null');
+    },
+
+    // --- formatFeedbackGitHub ---
+    async function formatFeedbackGitHub_markdownStructure() {
+        console.log('  formatFeedbackGitHub: uses bold headers and fenced code blocks');
+        const text = formatFeedbackGitHub('sugerencia', 'Mejorar el menú', { ruta: '/gastos', modal: 'ninguno' });
+        assert(text.includes('**Tipo:**'), 'Debe incluir header Tipo en negrita');
+        assert(text.includes('**Comentario:**'), 'Debe incluir header Comentario en negrita');
+        assert(text.includes('**ruta:**'), 'Debe incluir header ruta en negrita');
+        assert(text.includes('**modal:**'), 'Debe incluir header modal en negrita');
+        assert(text.includes('```'), 'Debe incluir bloques de código');
+        assert(text.includes('sugerencia'), 'Debe incluir el valor del tipo');
+        assert(text.includes('Mejorar el menú'), 'Debe incluir el comentario');
+    },
+
+    async function formatFeedbackGitHub_fallbacks() {
+        console.log('  formatFeedbackGitHub: fallbacks when context is missing');
+        const text = formatFeedbackGitHub('problema', 'Error', null);
+        assert(text.includes('(sin ruta)'), 'ruta debe tener fallback');
+        assert(text.includes('(ninguno)'), 'modal debe tener fallback');
+    },
+
+    // --- formatFeedbackWhatsApp ---
+    async function formatFeedbackWhatsApp_boldAndBlockquote() {
+        console.log('  formatFeedbackWhatsApp: uses WhatsApp bold and blockquote');
+        const text = formatFeedbackWhatsApp('problema', 'No funciona', { ruta: '/', modal: 'Editar deuda' });
+        assert(text.includes('*Tipo:*'), 'Debe incluir header Tipo en formato WhatsApp');
+        assert(text.includes('*Comentario:*'), 'Debe incluir header Comentario en formato WhatsApp');
+        assert(text.includes('*ruta:*'), 'Debe incluir header ruta en formato WhatsApp');
+        assert(text.includes('*modal:*'), 'Debe incluir header modal en formato WhatsApp');
+        assert(text.includes('> problema'), 'Tipo debe ir como blockquote');
+        assert(text.includes('> No funciona'), 'Comentario debe ir como blockquote');
+        assert(text.includes('> /'), 'ruta debe ir como blockquote');
+    },
+
+    async function formatFeedbackWhatsApp_fallbacks() {
+        console.log('  formatFeedbackWhatsApp: fallbacks when context is missing');
+        const text = formatFeedbackWhatsApp('confusión', 'No entiendo', {});
+        assert(text.includes('> (sin ruta)'), 'ruta debe tener fallback como blockquote');
+        assert(text.includes('> (ninguno)'), 'modal debe tener fallback como blockquote');
     },
 
     // --- buildGitHubUrl ---
@@ -148,6 +190,7 @@ export const tests = [
         assert(btn !== null, 'Debe existir el botón FAB');
         assert(btn.classList.contains('btn'), 'El FAB debe usar clase Bootstrap btn');
         assert(btn.classList.contains('rounded-circle'), 'El FAB debe ser circular con rounded-circle');
+        assert(btn.classList.contains('btn-outline-primary'), 'El FAB debe usar btn-outline-primary');
         document.body.removeChild(fab);
     },
 

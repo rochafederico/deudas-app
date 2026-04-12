@@ -58,7 +58,61 @@ export function validateFeedback(tipo, comentario) {
 }
 
 /**
- * Formats the standard feedback text in Spanish.
+ * Formats feedback as GitHub-flavoured Markdown (bold headers + fenced code blocks).
+ * @param {string} tipo
+ * @param {string} comentario
+ * @param {{ ruta: string, modal: string }} contexto
+ * @returns {string}
+ */
+export function formatFeedbackGitHub(tipo, comentario, contexto) {
+    const { ruta, modal } = contexto || {};
+    const r = ruta ?? '(sin ruta)';
+    const m = modal ?? '(ninguno)';
+    return [
+        '**Tipo:**',
+        '```',
+        tipo,
+        '```',
+        '**ruta:**',
+        '```',
+        r,
+        '```',
+        '**modal:**',
+        '```',
+        m,
+        '```',
+        '**Comentario:**',
+        '```',
+        comentario,
+        '```',
+    ].join('\n');
+}
+
+/**
+ * Formats feedback for WhatsApp (bold headers + blockquote lines).
+ * @param {string} tipo
+ * @param {string} comentario
+ * @param {{ ruta: string, modal: string }} contexto
+ * @returns {string}
+ */
+export function formatFeedbackWhatsApp(tipo, comentario, contexto) {
+    const { ruta, modal } = contexto || {};
+    const r = ruta ?? '(sin ruta)';
+    const m = modal ?? '(ninguno)';
+    return [
+        '*Tipo:*',
+        `> ${tipo}`,
+        '*ruta:*',
+        `> ${r}`,
+        '*modal:*',
+        `> ${m}`,
+        '*Comentario:*',
+        `> ${comentario}`,
+    ].join('\n');
+}
+
+/**
+ * Formats the standard feedback text in Spanish (generic, kept for compatibility).
  * @param {string} tipo
  * @param {string} comentario
  * @param {{ ruta: string, modal: string }} contexto
