@@ -24,11 +24,13 @@ export class FeedbackModal extends HTMLElement {
         const ui = this.querySelector('ui-modal');
         ui.setTitle('Enviar feedback');
         this._resetForm();
+        document.body.classList.add('feedback-modal-open');
         ui.open();
         if (opener) ui.returnFocusTo(opener);
     }
 
     close() {
+        document.body.classList.remove('feedback-modal-open');
         const ui = this.querySelector('ui-modal');
         ui?.close();
     }
@@ -133,6 +135,14 @@ export class FeedbackModal extends HTMLElement {
         this._sendBtn = this.querySelector('#feedback-send-btn');
         this._githubLinkEl = this.querySelector('#feedback-link-github');
         this._whatsappLinkEl = this.querySelector('#feedback-link-whatsapp');
+
+        // Remove feedback-modal-open class when the modal is closed via X or ESC
+        const modalInnerEl = this.querySelector('ui-modal .modal');
+        if (modalInnerEl) {
+            modalInnerEl.addEventListener('hidden.bs.modal', () => {
+                document.body.classList.remove('feedback-modal-open');
+            });
+        }
 
         // Move the actions div into the modal footer
         const actionsEl = this.querySelector('#feedback-actions');

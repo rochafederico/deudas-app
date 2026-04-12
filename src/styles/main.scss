@@ -55,6 +55,6 @@ $info:      #0dcaf0;
     z-index: $zindex-toast;
 }
 
-body.modal-open .feedback-fab {
+body.feedback-modal-open .feedback-fab {
     display: none !important;
 }
