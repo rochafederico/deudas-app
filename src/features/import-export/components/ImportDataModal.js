@@ -121,56 +121,47 @@ export class ImportDataModal extends HTMLElement {
         return true;
     }
 
+    #escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
         const inversiones = data.inversiones || (data.data && data.data.inversiones) || [];
         const totalMontos = deudas.reduce((sum, d) => sum + (d.montos?.length || 0), 0);
 
+        const renderCompactList = (items, renderItem) => {
+            if (!items.length) return '<span class="text-muted small">Ninguno</span>';
+            const visible = items.slice(0, 3).map(renderItem).join(', ');
+            const extra = items.length > 3 ? ` <span class="text-muted">+${items.length - 3} más</span>` : '';
+            return `<span class="small">${visible}${extra}</span>`;
+        };
+
+        const exportDate = data.metadata?.exportDate;
+        const exportDateStr = exportDate && !isNaN(new Date(exportDate).getTime())
+            ? `<span class="small text-muted">Exportado: ${new Date(exportDate).toLocaleDateString()}</span>`
+            : '';
+
         const previewHtml = `
             <div class="border rounded p-3">
-                <h3 class="h5 text-primary mb-3">📋 Vista previa del archivo</h3>
-                <div class="bg-body-tertiary rounded p-3 mb-3">
-                    <p class="mb-1"><strong>📊 Resumen:</strong></p>
-                    <p class="mb-1">• ${deudas.length} deudas</p>
-                    <p class="mb-1">• ${totalMontos} montos</p>
-                    <p class="mb-1">• ${ingresos.length} ingresos</p>
-                    <p class="mb-1">• ${inversiones.length} inversiones</p>
-                    ${data.metadata ? `<p>• Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</p>` : ''}
+                <h3 class="h6 text-primary mb-2">📋 Vista previa</h3>
+                <div class="d-flex flex-wrap gap-3 bg-body-tertiary rounded p-2 mb-3">
+                    <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalMontos}</strong> montos</span>
+                    ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
+                    ${inversiones.length ? `<span class="small"><strong>${inversiones.length}</strong> inversiones</span>` : ''}
+                    ${exportDateStr}
                 </div>
-                
-                <div class="mb-3">
-                    <h4 class="h6">Deudas a importar:</h4>
-                    ${deudas.slice(0, 3).map(deuda => `
-                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
-                            <strong>${deuda.acreedor}</strong> - ${deuda.tipoDeuda}
-                            ${deuda.montos?.length ? `(${deuda.montos.length} montos)` : ''}
-                        </div>
-                    `).join('')}
-                    ${deudas.length > 3 ? `<p>... y ${deudas.length - 3} más</p>` : ''}
+                <div class="d-grid gap-1">
+                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
+                    ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => this.#escapeHtml(i.descripcion || 'Ingreso'))}</div>` : ''}
+                    ${inversiones.length ? `<div><span class="fw-semibold small">Inversiones: </span>${renderCompactList(inversiones, inv => this.#escapeHtml(inv.nombre))}</div>` : ''}
                 </div>
-                
-                <div class="mb-3">
-                    <h4 class="h6">Ingresos a importar:</h4>
-                    ${ingresos.slice(0, 3).map(ingreso => `
-                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
-                            <strong>${ingreso.descripcion || 'Ingreso'} ${ingreso.fecha}</strong> - ${ingreso.monto} ${ingreso.moneda || 'ARS'}
-                        </div>
-                    `).join('')}
-                    ${ingresos.length > 3 ? `<p>... y ${ingresos.length - 3} más</p>` : ''}
-                </div>
-                
-                <div class="mb-0">
-                    <h4 class="h6">Inversiones a importar:</h4>
-                    ${inversiones.slice(0, 3).map(inv => `
-                        <div class="border-start border-primary border-3 rounded px-2 py-2 mb-2 bg-body-tertiary">
-                            <strong>${inv.nombre}</strong> - ${inv.valorInicial} ${inv.moneda || 'ARS'}
-                            ${inv.historialValores?.length ? `(${inv.historialValores.length} valores)` : ''}
-                        </div>
-                    `).join('')}
-                    ${inversiones.length > 3 ? `<p>... y ${inversiones.length - 3} más</p>` : ''}
-                </div>
-                
             </div>
         `;
 
@@ -350,36 +341,12 @@ export class ImportDataModal extends HTMLElement {
                             Seleccionar archivo
                         </app-button>
                     </div>
-                    <div class="import-warning alert alert-warning mb-0" role="alert">
-                        <p class="mb-2">⚠️ <strong>Importante:</strong></p>
-                        <ul>
-                            <li>La importación añade datos (no elimina):
-                                <ul>
-                                    <li>Por defecto no borra registros existentes.</li>
-                                </ul>
-                            </li>
-                            <li>Fusión por grupo (Acreedor + Tipo de Deuda):
-                                <ul>
-                                    <li>Si existe el mismo Acreedor y Tipo de Deuda (p. ej. <strong>Banco Galicia</strong> + <strong>Préstamo</strong>), las cuotas se agrupan en esa deuda en vez de crear otra.</li>
-                                </ul>
-                            </li>
-                            <li>Detección de montos duplicados:
-                                <ul>
-                                    <li>Se consideran iguales si coinciden: <strong>monto</strong>, <strong>moneda</strong> y <strong>periodo</strong>.</li>
-                                    <li>Fallback: si no hay periodo, se compara <em>vencimiento</em> exacto.</li>
-                                    <li>Mismo monto pero distinta fecha → se importa como monto distinto.</li>
-                                </ul>
-                            </li>
-                            <li>Forzar nuevo grupo:
-                                <ul>
-                                    <li>Cambia el <em>acreedor</em> o el <em>tipoDeuda</em> en el JSON antes de importar.</li>
-                                </ul>
-                            </li>
-                            <li>Nota técnica (breve):
-                                <ul>
-                                    <li>La fusión reutiliza las funciones de creación/actualización; puede ejecutarse en varias transacciones (muy raro que cause duplicados por concurrencia).</li>
-                                </ul>
-                            </li>
+                    <div class="import-warning alert alert-warning mb-0 py-2" role="alert">
+                        <p class="mb-1"><strong>⚠️ Importante:</strong></p>
+                        <ul class="mb-0 small ps-3">
+                            <li>Añade datos sin borrar los existentes.</li>
+                            <li>Fusión automática: mismo Acreedor + Tipo de Deuda → los montos se agrupan.</li>
+                            <li>Duplicados ignorados si coinciden monto, moneda y periodo.</li>
                         </ul>
                     </div>
                     
