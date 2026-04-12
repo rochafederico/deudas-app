@@ -141,10 +141,7 @@ export class FeedbackModal extends HTMLElement {
                                 </li>
                             </ul>
                         </div>
-                        <button type="button" id="feedback-cancel"
-                            class="btn btn-link btn-sm text-muted">
-                            Cancelar
-                        </button>
+
                     </div>
                 </form>
             </ui-modal>
@@ -172,7 +169,6 @@ export class FeedbackModal extends HTMLElement {
         // Close modal after a send link is followed
         this._githubLinkEl?.addEventListener('click', () => this.close());
         this._whatsappLinkEl?.addEventListener('click', () => this.close());
-        this.querySelector('#feedback-cancel')?.addEventListener('click', () => this.close());
 
         // Initial state
         this._updateLinks();
