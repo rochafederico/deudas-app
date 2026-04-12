@@ -46,6 +46,9 @@ $info:      #0dcaf0;
 @import "bootstrap/scss/helpers";
 @import "bootstrap/scss/utilities/api";
 
+// ─── Bootstrap Icons ──────────────────────────────────────────────────────────
+@import "bootstrap-icons/font/bootstrap-icons";
+
 // ─── Componentes propios ──────────────────────────────────────────────────────
 .feedback-fab {
     bottom: 80px;

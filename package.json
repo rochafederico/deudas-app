@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build:css": "sass --load-path=node_modules --silence-deprecation=import,global-builtin,color-functions,if-function src/styles/main.scss src/styles/bootstrap.css --no-source-map --style=compressed",
+    "build:css": "sass --load-path=node_modules --silence-deprecation=import,global-builtin,color-functions,if-function src/styles/main.scss src/styles/bootstrap.css --no-source-map --style=compressed && cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2 src/styles/fonts/ && cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff src/styles/fonts/",
     "test": "node --import ./test/globals.js ./test/run-repo-tests.js",
     "lint": "eslint src test --ext .js"
   },
   "devDependencies": {
     "bootstrap": "5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "eslint": "^8.57.1",
     "fake-indexeddb": "^3.0.0",
     "happy-dom": "^20.8.4",

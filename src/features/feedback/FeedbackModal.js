@@ -111,13 +111,13 @@ export class FeedbackModal extends HTMLElement {
                         <li>
                             <a class="dropdown-item" id="feedback-link-github"
                                 href="#" target="_blank" rel="noopener noreferrer">
-                                🐙 GitHub
+                                <i class="bi bi-github" aria-hidden="true"></i> GitHub
                             </a>
                         </li>
                         <li>
                             <a class="dropdown-item" id="feedback-link-whatsapp"
                                 href="#" target="_blank" rel="noopener noreferrer">
-                                💬 WhatsApp
+                                <i class="bi bi-whatsapp" aria-hidden="true"></i> WhatsApp
                             </a>
                         </li>
                     </ul>
