@@ -39,13 +39,14 @@ export const debtTableColumns = [
             wrapper.className = 'd-flex flex-column align-items-start';
 
             const montoSpan = document.createElement('span');
+            montoSpan.className = 'text-nowrap';
             montoSpan.textContent = formatMoneda(row.monto, row.moneda);
             wrapper.appendChild(montoSpan);
 
             const vencimiento = String(row.vencimiento ?? '').trim();
             if (vencimiento !== '') {
                 const badge = document.createElement('span');
-                badge.className = 'text-muted fw-lighter d-md-none mt-1';
+                badge.className = 'text-muted fw-lighter d-md-none mt-1 text-nowrap';
                 badge.textContent = vencimiento;
                 wrapper.appendChild(badge);
             }
