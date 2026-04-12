@@ -1,7 +1,8 @@
 // src/pages/Ingresos.js
-import '../layout/HeaderBar.js';
+import '../layout/PageSectionLayout.js';
 import '../features/ingresos/components/IngresoModal.js';
 import '../features/stats/components/StatsCard.js';
+import '../shared/components/AppButton.js';
 import { listIngresos } from '../features/ingresos/ingresoRepository.js';
 import { ingresosColumns } from '../shared/config/tables/debtTableColumns.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
@@ -10,45 +11,42 @@ export default function Ingresos() {
     const container = document.createElement('div');
     container.className = 'd-grid gap-3';
 
-    const card = document.createElement('div');
-    card.className = 'card shadow-sm';
-
-    const header = document.createElement('header-bar');
-    header.mode = 'ingresos';
-
     const ingresoModal = document.createElement('ingreso-modal');
     ingresoModal.id = 'ingresoModal';
     container.appendChild(ingresoModal);
 
-    header.addEventListener('add-income', () => {
+    const layout = document.createElement('page-section-layout');
+
+    // Toolbar: action button on the right
+    const addBtn = document.createElement('app-button');
+    addBtn.id = 'add-income';
+    addBtn.setAttribute('variant', 'success');
+    addBtn.setAttribute('aria-label', 'Agregar ingreso');
+    addBtn.textContent = 'Nuevo ingreso';
+    addBtn.addEventListener('click', () => {
         ingresoModal.openCreate();
-        const btn = header.querySelector('#add-income');
-        if (btn) ingresoModal.attachOpener(btn);
+        ingresoModal.attachOpener(addBtn);
     });
 
-    const cardBody = document.createElement('div');
-    cardBody.className = 'card-body p-3 d-grid gap-3';
+    layout.toolbarEnd = addBtn;
 
-    // Título de la sección
-    const title = document.createElement('h2');
-    title.textContent = 'Ingresos del mes';
-    title.className = 'h3 mb-2';
-    cardBody.appendChild(title);
+    // Content: stats card + table
+    const contentSlot = document.createElement('div');
+    contentSlot.className = 'd-grid gap-3';
 
     const stats = document.createElement('stats-card');
-    cardBody.appendChild(stats);
+    contentSlot.appendChild(stats);
 
-    card.appendChild(header);
-    card.appendChild(cardBody);
-    container.appendChild(card);
+    layout.content = contentSlot;
+    container.appendChild(layout);
 
     // Cargar y mostrar totales
     const loadTotals = async () => {
         const ingresos = await listIngresos({ mes: getSelectedMonth() });
-        let table = cardBody.querySelector('app-table');
+        let table = contentSlot.querySelector('app-table');
         if (!table) {
             table = document.createElement('app-table');
-            cardBody.appendChild(table);
+            contentSlot.appendChild(table);
         }
         table.columnsConfig = ingresosColumns;
         table.tableData = ingresos;
