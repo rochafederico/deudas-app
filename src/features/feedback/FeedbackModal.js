@@ -17,6 +17,9 @@ export class FeedbackModal extends HTMLElement {
 
     open(opener) {
         if (!this._rendered) this.render();
+        // Capture context NOW, before the feedback modal is shown,
+        // so getContext() sees the previously open modal (if any), not this one.
+        this._contexto = getContext();
         const ui = this.querySelector('ui-modal');
         ui.setTitle('Enviar feedback');
         this._resetForm();
@@ -65,7 +68,7 @@ export class FeedbackModal extends HTMLElement {
         const { valid } = validateFeedback(tipo, comentario);
 
         if (valid) {
-            const contexto = getContext();
+            const contexto = this._contexto || getContext();
             const feedbackText = formatFeedback(tipo, comentario.trim(), contexto);
             if (this._githubLinkEl) this._githubLinkEl.href = buildGitHubUrl(tipo, feedbackText);
             if (this._whatsappLinkEl) this._whatsappLinkEl.href = buildWhatsAppUrl(feedbackText);

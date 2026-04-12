@@ -53,8 +53,8 @@ export const tests = [
         console.log('  buildGitHubUrl: contains the label parameter');
         const url = buildGitHubUrl('problema', 'texto');
         assert(url.includes('labels='), 'URL contiene labels');
-        // Label "💬 feedbacl" should be encoded
-        assert(url.includes('feedbacl'), 'URL contiene el label feedbacl');
+        // Label "💬 feedback" should be encoded
+        assert(url.includes('feedback'), 'URL contiene el label feedback');
     },
 
     async function buildGitHubUrl_bodyContainsFeedbackText() {

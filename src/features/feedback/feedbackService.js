@@ -2,7 +2,7 @@
 // Pure business logic: text formatting, URL builders, context capture.
 
 const GITHUB_REPO = 'rochafederico/deudas-app';
-const GITHUB_LABEL = '💬 feedbacl';
+const GITHUB_LABEL = '💬 feedback';
 const WHATSAPP_NUMBER = '5491128382383';
 const MAX_COMMENT_LENGTH = 1000;
 
