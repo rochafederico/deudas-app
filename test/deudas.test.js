@@ -9,6 +9,7 @@ import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.j
 import '../src/features/deudas/components/DebtDetailModal.js';
 import '../src/features/montos/components/DuplicateMontoModal.js';
 import '../src/features/deudas/components/DebtForm.js';
+import '../src/features/deudas/components/DebtModal.js';
 
 async function cleanup() {
     try { await deleteDeudas(); } catch (e) { /* ignore */ }
@@ -707,6 +708,32 @@ async function testShowFormErrorNearMontos() {
     document.body.removeChild(form);
 }
 
+// ===================================================================
+// UC17: DebtModal cierra el modal al cancelar desde el footer
+// Verifica que form:cancel disparado desde app-form cierra el modal
+// ===================================================================
+async function testDebtModalCancelClosesModal() {
+    console.log('  UC17: DebtModal cierra el modal al dispararse form:cancel');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+
+    // Simulate form:cancel bubbling from app-form up through debt-form
+    const debtForm = modal.querySelector('debt-form');
+    assert(debtForm !== null, 'Debe existir debt-form dentro de debt-modal');
+
+    let closed = false;
+    const origClose = modal.ui.close.bind(modal.ui);
+    modal.ui.close = () => { closed = true; origClose(); };
+
+    debtForm.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
+
+    assert(closed === true, 'El modal debe cerrarse cuando se dispara form:cancel');
+
+    modal.ui.close = origClose;
+    document.body.removeChild(modal);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -723,5 +750,6 @@ export const tests = [
     testDuplicarMontoInline,
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,
-    testShowFormErrorNearMontos
+    testShowFormErrorNearMontos,
+    testDebtModalCancelClosesModal
 ];

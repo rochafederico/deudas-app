@@ -17,6 +17,7 @@ export class DebtModal extends HTMLElement {
         // Propagar eventos del formulario y cerrar modal
         this.form.addEventListener('deuda:saved', e => this._handleEvent(e, 'deuda:saved'));
         this.form.addEventListener('deuda:updated', e => this._handleEvent(e, 'deuda:updated'));
+        this.form.addEventListener('form:cancel', () => this.ui.close());
     }
 
     openCreate() {
