@@ -22,8 +22,14 @@ export class AppShell extends HTMLElement {
                 modal.attachOpener(opener);
             });
         }
-        window.addEventListener('deuda:saved', this.refreshList.bind(this));
-        window.addEventListener('deuda:updated', this.refreshList.bind(this));
+        this._onRefreshList = this.refreshList.bind(this);
+        window.addEventListener('deuda:saved', this._onRefreshList);
+        window.addEventListener('deuda:updated', this._onRefreshList);
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('deuda:saved', this._onRefreshList);
+        window.removeEventListener('deuda:updated', this._onRefreshList);
     }
 
     refreshList() {
