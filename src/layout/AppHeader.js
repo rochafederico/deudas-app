@@ -85,7 +85,7 @@ export class AppHeader extends HTMLElement {
         '</div>',
       content: html,
       trigger: 'click',
-      placement: 'bottom',
+      placement: 'bottom-end',
       container: 'body',
     });
     let badge = btn.querySelector('.notif-badge');
