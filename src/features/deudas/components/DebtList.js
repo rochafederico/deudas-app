@@ -17,25 +17,37 @@ export class DebtList extends HTMLElement {
         this.render();
         this.loadDebts();
         this.addEventListeners();
-        window.addEventListener('ui:group', (event) => {
-            this.groupBy = event.detail.groupBy || 'none';
-            this.renderTable();
-        });
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('ui:month', this._onMonth);
+        window.removeEventListener('ui:group', this._onGroup);
+        window.removeEventListener('deuda:added', this._onLoad);
+        window.removeEventListener('deuda:updated', this._onLoad);
+        window.removeEventListener('deuda:deleted', this._onLoad);
+        window.removeEventListener('data-imported', this._onLoad);
+        window.removeEventListener('deuda:edit', this._onEdit);
     }
 
     addEventListeners() {
-        window.addEventListener('ui:month', (event) => {
+        this._onMonth = (event) => {
             this.mes = event.detail.mes;
             this.loadDebts();
-        });
+        };
+        this._onGroup = (event) => {
+            this.groupBy = event.detail.groupBy || 'none';
+            this.renderTable();
+        };
+        this._onLoad = () => this.loadDebts();
+        this._onEdit = (e) => this.editDebt(e.detail);
 
-        window.addEventListener('deuda:added', () => this.loadDebts());
-        window.addEventListener('deuda:updated', () => this.loadDebts());
-        window.addEventListener('deuda:deleted', () => this.loadDebts());
-        window.addEventListener('data-imported', () => this.loadDebts());
-        window.addEventListener('deuda:edit', (e) => {
-            this.editDebt(e.detail);
-        });
+        window.addEventListener('ui:month', this._onMonth);
+        window.addEventListener('ui:group', this._onGroup);
+        window.addEventListener('deuda:added', this._onLoad);
+        window.addEventListener('deuda:updated', this._onLoad);
+        window.addEventListener('deuda:deleted', this._onLoad);
+        window.addEventListener('data-imported', this._onLoad);
+        window.addEventListener('deuda:edit', this._onEdit);
     }
 
     async loadDebts() {

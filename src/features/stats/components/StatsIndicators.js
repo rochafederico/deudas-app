@@ -64,6 +64,7 @@ export default function StatsIndicators({ mes } = {}) {
     window.removeEventListener('ui:month', _monthHandler);
   }
   _monthHandler = (e) => {
+    if (!container.isConnected) return;
     const nuevo = (e && e.detail && e.detail.mes) ? e.detail.mes : getSelectedMonth();
     render(nuevo);
   };
@@ -72,7 +73,10 @@ export default function StatsIndicators({ mes } = {}) {
   if (_importHandler) {
     window.removeEventListener('data-imported', _importHandler);
   }
-  _importHandler = () => render(getSelectedMonth());
+  _importHandler = () => {
+    if (!container.isConnected) return;
+    render(getSelectedMonth());
+  };
   window.addEventListener('data-imported', _importHandler);
 
   return container;

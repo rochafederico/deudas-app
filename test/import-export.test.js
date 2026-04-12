@@ -476,20 +476,43 @@ async function testDataImportedRefreshesStatsIndicators() {
     console.log('  UC7: data-imported actualiza StatsIndicators automáticamente');
     await cleanupAll();
 
+    const waitFor = async (predicate, timeout = 1000, interval = 25) => {
+        const start = Date.now();
+        while (Date.now() - start < timeout) {
+            if (predicate()) return;
+            await new Promise(r => setTimeout(r, interval));
+        }
+        assert(false, 'Timeout esperando actualización de StatsIndicators');
+    };
+
     // Create and attach StatsIndicators
     const indicators = StatsIndicators({ mes: '2026-05' });
     document.body.appendChild(indicators);
-    await new Promise(r => setTimeout(r, 100));
 
-    // Dispatch data-imported and wait for re-render
+    // Wait for the initial render to finish so we can detect a new render caused by the event
+    await waitFor(() =>
+        indicators.textContent.trim().length > 0 &&
+        !indicators.textContent.includes('Cargando resumen...')
+    );
+
+    const beforeEventHTML = indicators.innerHTML;
+
+    // Dispatch data-imported and verify it triggers a new loading/render cycle
     window.dispatchEvent(new CustomEvent('data-imported', {
         detail: { deudasImported: 1, ingresosImported: 0, inversionesImported: 0 }
     }));
-    await new Promise(r => setTimeout(r, 100));
 
-    // Verify the component re-rendered (it should show the loading then cards layout)
-    assert(indicators.querySelector('.row') !== null || indicators.children.length > 0,
-        'StatsIndicators debe re-renderizarse tras data-imported');
+    await waitFor(() => indicators.textContent.includes('Cargando resumen...'));
+    assert(
+        indicators.innerHTML !== beforeEventHTML,
+        'StatsIndicators debe cambiar el DOM al re-renderizarse tras data-imported'
+    );
+
+    // Wait for the re-render to finish
+    await waitFor(() =>
+        indicators.textContent.trim().length > 0 &&
+        !indicators.textContent.includes('Cargando resumen...')
+    );
 
     document.body.removeChild(indicators);
     await cleanupAll();
