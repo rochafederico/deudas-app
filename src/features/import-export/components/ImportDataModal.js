@@ -121,6 +121,15 @@ export class ImportDataModal extends HTMLElement {
         return true;
     }
 
+    #escapeHtml(str) {
+        return String(str ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     #showPreview(data) {
         const deudas = data.deudas || (data.data && data.data.deudas) || [];
         const ingresos = data.ingresos || (data.data && data.data.ingresos) || [];
@@ -134,6 +143,11 @@ export class ImportDataModal extends HTMLElement {
             return `<span class="small">${visible}${extra}</span>`;
         };
 
+        const exportDate = data.metadata?.exportDate;
+        const exportDateStr = exportDate && !isNaN(new Date(exportDate).getTime())
+            ? `<span class="small text-muted">Exportado: ${new Date(exportDate).toLocaleDateString()}</span>`
+            : '';
+
         const previewHtml = `
             <div class="border rounded p-3">
                 <h3 class="h6 text-primary mb-2">📋 Vista previa</h3>
@@ -141,12 +155,12 @@ export class ImportDataModal extends HTMLElement {
                     <span class="small"><strong>${deudas.length}</strong> deudas · <strong>${totalMontos}</strong> montos</span>
                     ${ingresos.length ? `<span class="small"><strong>${ingresos.length}</strong> ingresos</span>` : ''}
                     ${inversiones.length ? `<span class="small"><strong>${inversiones.length}</strong> inversiones</span>` : ''}
-                    ${data.metadata ? `<span class="small text-muted">Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</span>` : ''}
+                    ${exportDateStr}
                 </div>
                 <div class="d-grid gap-1">
-                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => d.acreedor)}</div>
-                    ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => i.descripcion || 'Ingreso')}</div>` : ''}
-                    ${inversiones.length ? `<div><span class="fw-semibold small">Inversiones: </span>${renderCompactList(inversiones, inv => inv.nombre)}</div>` : ''}
+                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => this.#escapeHtml(d.acreedor))}</div>
+                    ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => this.#escapeHtml(i.descripcion || 'Ingreso'))}</div>` : ''}
+                    ${inversiones.length ? `<div><span class="fw-semibold small">Inversiones: </span>${renderCompactList(inversiones, inv => this.#escapeHtml(inv.nombre))}</div>` : ''}
                 </div>
             </div>
         `;
