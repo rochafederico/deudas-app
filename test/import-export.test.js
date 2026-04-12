@@ -5,6 +5,9 @@ import { assert } from './setup.js';
 
 // Repositories for creating/verifying data
 import { addOrMergeDeuda, listDeudas, deleteDeudas } from '../src/features/deudas/deudaRepository.js';
+import '../src/features/deudas/components/DebtList.js';
+import StatsIndicators from '../src/features/stats/components/StatsIndicators.js';
+import { getSelectedMonth } from '../src/shared/MonthFilter.js';
 import { DeudaModel } from '../src/features/deudas/DeudaModel.js';
 import { MontoModel } from '../src/features/montos/MontoModel.js';
 import { addIngreso, getAll as getAllIngresos } from '../src/features/ingresos/ingresoRepository.js';
@@ -417,10 +420,110 @@ async function testImportarConMergeDuplicados() {
     await cleanupAll();
 }
 
+// ===================================================================
+// UC6: data-imported hace que DebtList recargue el listado
+// Flujo: importar datos → verificar que DebtList escucha el evento
+// data-imported y recarga loadDebts automáticamente.
+// ===================================================================
+async function testDataImportedRefreshesDebtList() {
+    console.log('  UC6: data-imported recarga DebtList automáticamente');
+    await cleanupAll();
+
+    // Use the current selected month so DebtList.listByMes picks up the imported data
+    const currentMes = getSelectedMonth(); // e.g. '2026-04'
+    const vencimiento = `${currentMes}-15`;
+
+    // Mount DebtList
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    await new Promise(r => setTimeout(r, 50));
+
+    // Initial state: no debts
+    assert(list.debts.length === 0, 'DebtList: 0 deudas antes del import');
+
+    // Import data (will dispatch data-imported when done)
+    const modal = document.createElement('import-data-modal');
+    document.body.appendChild(modal);
+    modal.importData = {
+        deudas: [{
+            acreedor: 'Acreedor Refresh',
+            tipoDeuda: 'Prestamo',
+            notas: '',
+            montos: [{ monto: 5000, moneda: 'ARS', vencimiento, periodo: currentMes, pagado: false }]
+        }],
+        ingresos: [],
+        inversiones: []
+    };
+    await modal.importDataToDb();
+
+    // Give DebtList time to react to data-imported event and finish loadDebts
+    await new Promise(r => setTimeout(r, 200));
+
+    assert(list.debts.length === 1, 'DebtList debe tener 1 deuda después del import');
+    assert(list.debts[0].acreedor === 'Acreedor Refresh', 'DebtList: acreedor correcto tras import');
+
+    document.body.removeChild(list);
+    document.body.removeChild(modal);
+    await cleanupAll();
+}
+
+// ===================================================================
+// UC7: data-imported hace que StatsIndicators se re-renderice
+// Flujo: crear StatsIndicators, importar datos → verificar que el
+// componente escucha data-imported y re-renderiza las tarjetas.
+// ===================================================================
+async function testDataImportedRefreshesStatsIndicators() {
+    console.log('  UC7: data-imported actualiza StatsIndicators automáticamente');
+    await cleanupAll();
+
+    const waitFor = async (predicate, timeout = 1000, interval = 25) => {
+        const start = Date.now();
+        while (Date.now() - start < timeout) {
+            if (predicate()) return;
+            await new Promise(r => setTimeout(r, interval));
+        }
+        assert(false, 'Timeout esperando actualización de StatsIndicators');
+    };
+
+    // Create and attach StatsIndicators
+    const indicators = StatsIndicators({ mes: '2026-05' });
+    document.body.appendChild(indicators);
+
+    // Wait for the initial render to finish so we can detect a new render caused by the event
+    await waitFor(() =>
+        indicators.textContent.trim().length > 0 &&
+        !indicators.textContent.includes('Cargando resumen...')
+    );
+
+    const beforeEventHTML = indicators.innerHTML;
+
+    // Dispatch data-imported and verify it triggers a new loading/render cycle
+    window.dispatchEvent(new CustomEvent('data-imported', {
+        detail: { deudasImported: 1, ingresosImported: 0, inversionesImported: 0 }
+    }));
+
+    await waitFor(() => indicators.textContent.includes('Cargando resumen...'));
+    assert(
+        indicators.innerHTML !== beforeEventHTML,
+        'StatsIndicators debe cambiar el DOM al re-renderizarse tras data-imported'
+    );
+
+    // Wait for the re-render to finish
+    await waitFor(() =>
+        indicators.textContent.trim().length > 0 &&
+        !indicators.textContent.includes('Cargando resumen...')
+    );
+
+    document.body.removeChild(indicators);
+    await cleanupAll();
+}
+
 export const tests = [
     testImportarDatosCompletos,
     testImportarSinInversiones,
     testExportarDatosCompletos,
     testRoundTripExportImport,
-    testImportarConMergeDuplicados
+    testImportarConMergeDuplicados,
+    testDataImportedRefreshesDebtList,
+    testDataImportedRefreshesStatsIndicators,
 ];
