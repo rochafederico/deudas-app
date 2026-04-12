@@ -314,7 +314,7 @@ export class DebtForm extends HTMLElement {
                                     }
                                 }),
                                 (() => {
-                                    const id = `app-checkbox-${monto.id || idx}`;
+                                    const id = `app-checkbox-${monto.id ?? monto.vencimiento ?? idx}`;
                                     const appCheckbox = document.createElement('app-checkbox');
                                     appCheckbox.inputId = id;
                                     appCheckbox.checked = !!monto.pagado;

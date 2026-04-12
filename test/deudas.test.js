@@ -630,7 +630,7 @@ async function testDuplicarMontoInline() {
     form.duplicateMonto(form.montos[0]);
 
     assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
-    const dupl = form.montos.find(m => m.id === undefined || m.id === null || !Object.prototype.hasOwnProperty.call(m, 'id'));
+    const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
     assert(dupl !== undefined, 'El duplicado no tiene id');
     assert(dupl.monto === 5000, 'Monto copiado: 5000');
     assert(dupl.moneda === 'USD', 'Moneda copiada: USD');
