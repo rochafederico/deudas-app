@@ -115,19 +115,19 @@ export class AppHeader extends HTMLElement {
             <ul class="navbar-nav align-items-center ms-auto">
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle px-2" href="#" id="desktop-datos-toggle" role="button"
-                  data-bs-toggle="dropdown" aria-expanded="false" data-tour-step="config">⚙️ Ajustes</a>
+                  data-bs-toggle="dropdown" aria-expanded="false" data-tour-step="config"><i class="bi bi-gear" aria-hidden="true"></i> Ajustes</a>
                 <ul class="dropdown-menu dropdown-menu-end">
-                  <li><a class="dropdown-item" href="#" id="desktop-export">📤 Exportar datos</a></li>
-                  <li><a class="dropdown-item" href="#" id="desktop-import">📥 Importar datos</a></li>
+                  <li><a class="dropdown-item" href="#" id="desktop-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
+                  <li><a class="dropdown-item" href="#" id="desktop-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item text-danger" href="#" id="desktop-delete">🗑️ Eliminar todo</a></li>
+                  <li><a class="dropdown-item text-danger" href="#" id="desktop-delete"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo</a></li>
                 </ul>
               </li>
             </ul>
           </div>
           <div class="ms-auto ms-lg-3 d-flex align-items-center gap-2">
-            <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">🔔</button>
-            <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Abrir guía rápida" aria-label="Abrir guía rápida">❓</button>
+            <button id="notifications-btn" class="btn btn-outline-light fs-5 p-1 position-relative" type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos"><i class="bi bi-bell" aria-hidden="true"></i></button>
+            <button id="tour-btn" class="btn btn-light btn-sm" type="button" title="Abrir guía rápida" aria-label="Abrir guía rápida"><i class="bi bi-question-circle" aria-hidden="true"></i></button>
           </div>
         </div>
       </nav>

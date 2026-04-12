@@ -25,7 +25,7 @@ export class AppNav extends HTMLElement {
           const isActive = window.location.pathname === r.path;
           return `
           <li class="nav-item${isActive ? ' active' : ''}"${isActive ? ' aria-current="page"' : ''}>
-            <app-link href="${r.path}" variant="light"><span class="fs-5 lh-1">${r.icon}</span> ${r.label}</app-link>
+            <app-link href="${r.path}" variant="light"><i class="bi ${r.icon} fs-5 lh-1" aria-hidden="true"></i> ${r.label}</app-link>
           </li>`;
         }).join('')}
       </ul>

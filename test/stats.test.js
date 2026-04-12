@@ -172,7 +172,7 @@ async function testStatsIndicatorsCardOrder() {
 
     const titles = [...indicators.querySelectorAll('.card-body > div:first-child')].map((el) => el.textContent);
     assert(
-        JSON.stringify(titles) === JSON.stringify(['📈 Ingresos', '📉 Gastos', '💼 Balance', '💳 Pendientes']),
+        JSON.stringify(titles) === JSON.stringify(['Ingresos', 'Gastos', 'Balance', 'Pendientes']),
         'las tarjetas deben renderizar ingresos, gastos, balance y pendientes en ese orden'
     );
 }

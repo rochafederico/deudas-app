@@ -2,7 +2,7 @@
 // Utiliza clases Bootstrap para las tarjetas de estadísticas
 import { KPI_CURRENCY } from '../../../shared/config/monedas.js';
 
-export default function StatsCard({ title = '', items = [], color = 'secondary' } = {}) {
+export default function StatsCard({ title = '', icon = '', items = [], color = 'secondary' } = {}) {
   const card = document.createElement('div');
   card.className = `card h-100 rounded-4 shadow-sm border border-2 border-${color}`;
 
@@ -11,7 +11,13 @@ export default function StatsCard({ title = '', items = [], color = 'secondary' 
 
   const titleEl = document.createElement('div');
   titleEl.className = `d-flex align-items-center gap-2 fw-semibold text-uppercase small text-${color}`;
-  titleEl.textContent = title;
+  if (icon) {
+    const iconEl = document.createElement('i');
+    iconEl.className = `bi ${icon}`;
+    iconEl.setAttribute('aria-hidden', 'true');
+    titleEl.appendChild(iconEl);
+  }
+  titleEl.appendChild(document.createTextNode(title));
   body.appendChild(titleEl);
 
   const valuesEl = document.createElement('div');

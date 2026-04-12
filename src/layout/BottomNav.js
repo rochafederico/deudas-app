@@ -79,7 +79,7 @@ export class BottomNav extends HTMLElement {
     const navItemsHtml = navItems.map(item => `
       <button type="button" class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
         data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}">
-        <span class="fs-5 lh-1">${item.icon}</span>
+        <i class="bi ${item.icon} fs-5 lh-1" aria-hidden="true"></i>
         <small class="d-block lh-1 mt-1">${item.label}</small>
       </button>
     `).join('');
@@ -93,7 +93,7 @@ export class BottomNav extends HTMLElement {
             class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
             data-bs-toggle="offcanvas" data-bs-target="#mas-offcanvas"
             aria-controls="mas-offcanvas" aria-label="Ajustes" data-tour-step="config">
-            <span class="fs-5 lh-1">⚙️</span>
+            <span class="fs-5 lh-1"><i class="bi bi-gear" aria-hidden="true"></i></span>
             <small class="d-block lh-1 mt-1">Ajustes</small>
           </button>
         </div>
@@ -108,13 +108,13 @@ export class BottomNav extends HTMLElement {
         <div class="offcanvas-body pb-4">
           <div class="list-group list-group-flush">
             <a href="#" id="bottom-nav-export" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-              📤 Exportar datos
+              <i class="bi bi-upload" aria-hidden="true"></i> Exportar datos
             </a>
             <a href="#" id="bottom-nav-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
-              📥 Importar datos
+              <i class="bi bi-download" aria-hidden="true"></i> Importar datos
             </a>
             <a href="#" id="bottom-nav-delete" class="list-group-item list-group-item-action text-danger d-flex align-items-center gap-2">
-              🗑️ Eliminar todo
+              <i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo
             </a>
           </div>
         </div>

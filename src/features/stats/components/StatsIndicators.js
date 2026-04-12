@@ -30,10 +30,10 @@ export default function StatsIndicators({ mes } = {}) {
       row.className = 'row row-cols-1 g-3';
 
       const cards = [
-        { title: '📈 Ingresos',   items: addValue(summary.byCurrency.ingresos),   color: 'success' },
-        { title: '📉 Gastos',     items: addValue(summary.byCurrency.egresos),    color: 'danger' },
-        { title: '💼 Balance',    items: addValue(summary.byCurrency.saldo),      color: 'primary' },
-        { title: '💳 Pendientes', items: addValue(summary.byCurrency.pendientes), color: 'warning' },
+        { title: 'Ingresos',   icon: 'bi-cash-stack',     items: addValue(summary.byCurrency.ingresos),   color: 'success' },
+        { title: 'Gastos',     icon: 'bi-wallet2',         items: addValue(summary.byCurrency.egresos),    color: 'danger' },
+        { title: 'Balance',    icon: 'bi-briefcase',       items: addValue(summary.byCurrency.saldo),      color: 'primary' },
+        { title: 'Pendientes', icon: 'bi-hourglass-split', items: addValue(summary.byCurrency.pendientes), color: 'warning' },
       ];
 
       for (const cardProps of cards) {
