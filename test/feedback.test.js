@@ -4,7 +4,6 @@
 
 import { assert } from './setup.js';
 import {
-    formatFeedback,
     formatFeedbackGitHub,
     formatFeedbackWhatsApp,
     buildGitHubUrl,
@@ -16,30 +15,6 @@ import {
 import '../src/features/feedback/FeedbackFab.js';
 
 export const tests = [
-
-    // --- formatFeedback ---
-    async function formatFeedback_includesAllFields() {
-        console.log('  formatFeedback: includes tipo, comentario, ruta, modal');
-        const text = formatFeedback('sugerencia', 'Mejorar el menú', { ruta: '/gastos', modal: 'editar deuda' });
-        assert(text.includes('Tipo: sugerencia'), 'Debe incluir Tipo');
-        assert(text.includes('Comentario: Mejorar el menú'), 'Debe incluir Comentario');
-        assert(text.includes('ruta: /gastos'), 'Debe incluir ruta');
-        assert(text.includes('modal: editar deuda'), 'Debe incluir modal');
-    },
-
-    async function formatFeedback_usesDefaultsWhenContextMissing() {
-        console.log('  formatFeedback: uses fallback when context fields are missing');
-        const text = formatFeedback('problema', 'Algo falla', {});
-        assert(text.includes('ruta: (sin ruta)'), 'ruta debe tener fallback');
-        assert(text.includes('modal: (ninguno)'), 'modal debe tener fallback');
-    },
-
-    async function formatFeedback_handlesNullContext() {
-        console.log('  formatFeedback: handles null/undefined context');
-        const text = formatFeedback('confusión', 'No entiendo', null);
-        assert(text.includes('ruta: (sin ruta)'), 'ruta debe tener fallback con contexto null');
-        assert(text.includes('modal: (ninguno)'), 'modal debe tener fallback con contexto null');
-    },
 
     // --- formatFeedbackGitHub ---
     async function formatFeedbackGitHub_markdownStructure() {
@@ -84,8 +59,8 @@ export const tests = [
     // --- buildGitHubUrl ---
     async function buildGitHubUrl_containsRepoAndTitle() {
         console.log('  buildGitHubUrl: contains repo path and title');
-        const text = formatFeedback('sugerencia', 'Comentario test', { ruta: '/ingresos', modal: '(ninguno)' });
-        const url = buildGitHubUrl('sugerencia', text);
+        const feedbackText = 'Tipo: sugerencia\nComentario: Comentario test\nruta: /ingresos\nmodal: (ninguno)';
+        const url = buildGitHubUrl('sugerencia', feedbackText);
         assert(url.includes('github.com/rochafederico/deudas-app/issues/new'), 'URL apunta al repo correcto');
         assert(url.includes('title='), 'URL contiene title');
         assert(url.includes('%5BFeedback%5D'), 'El título incluye [Feedback] codificado');

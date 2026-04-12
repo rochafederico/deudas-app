@@ -112,23 +112,6 @@ export function formatFeedbackWhatsApp(tipo, comentario, contexto) {
 }
 
 /**
- * Formats the standard feedback text in Spanish (generic, kept for compatibility).
- * @param {string} tipo
- * @param {string} comentario
- * @param {{ ruta: string, modal: string }} contexto
- * @returns {string}
- */
-export function formatFeedback(tipo, comentario, contexto) {
-    const { ruta, modal } = contexto || {};
-    return [
-        `Tipo: ${tipo}`,
-        `Comentario: ${comentario}`,
-        `ruta: ${ruta ?? '(sin ruta)'}`,
-        `modal: ${modal ?? '(ninguno)'}`,
-    ].join('\n');
-}
-
-/**
  * Builds the GitHub new-issue URL with prellenado title, body and label.
  * @param {string} tipo
  * @param {string} feedbackText  Full formatted feedback text (body).
