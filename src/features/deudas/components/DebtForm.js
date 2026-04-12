@@ -300,6 +300,7 @@ export class DebtForm extends HTMLElement {
                                     attrs: { variant: 'delete', title: 'Eliminar' },
                                     on: {
                                         click: () => {
+                                            if (!confirm('¿Seguro quiere eliminar el monto "' + monto.monto + '"?')) return;
                                             this.montos.splice(idx, 1);
                                             this.renderMontosList();
                                         }
