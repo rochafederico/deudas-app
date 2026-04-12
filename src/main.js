@@ -7,6 +7,7 @@ import ResumenHeader from './layout/ResumenHeader.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
+import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
 
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
@@ -30,6 +31,7 @@ wrapper.appendChild(app);
 
 document.body.appendChild(wrapper);
 document.body.appendChild(BottomNav());
+document.body.appendChild(FeedbackFabComponent());
 
 // Initialize the IndexedDB and only after DB is ready render indicators + initial route
 initDB().then(async (db) => {

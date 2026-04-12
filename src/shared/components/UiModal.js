@@ -22,6 +22,7 @@ export class UiModal extends HTMLElement {
         if (!modalEl) return;
         this._modalEl = modalEl;
         this._bodyEl = modalEl.querySelector('.modal-body');
+        this._footerEl = modalEl.querySelector('.modal-footer');
         this._titleEl = modalEl.querySelector('.modal-title');
         // Use Bootstrap Modal JS if available
         if (window.bootstrap && window.bootstrap.Modal) {
@@ -33,6 +34,17 @@ export class UiModal extends HTMLElement {
 
     clearBody() {
         if (this._bodyEl) this._bodyEl.innerHTML = '';
+    }
+
+    addFooter(el) {
+        if (!el) return;
+        if (!this._footerEl) {
+            this._footerEl = document.createElement('div');
+            this._footerEl.className = 'modal-footer';
+            const content = this._modalEl?.querySelector('.modal-content');
+            if (content) content.appendChild(this._footerEl);
+        }
+        this._footerEl.appendChild(el);
     }
 
     setTitle(text) {
