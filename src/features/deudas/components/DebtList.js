@@ -16,42 +16,44 @@ export class DebtList extends HTMLElement {
         this.classList.add('d-block');
         this.render();
         this.loadDebts();
-        this.addEventListeners();
-        window.addEventListener('ui:group', (event) => {
+        this._onGroup = (event) => {
             this.groupBy = event.detail.groupBy || 'none';
             this.renderTable();
-        });
+        };
+        window.addEventListener('ui:group', this._onGroup);
+        this.addEventListeners();
     }
 
     addEventListeners() {
-        window.addEventListener('ui:month', (event) => {
+        this._onMonth = (event) => {
             this.mes = event.detail.mes;
             this.loadDebts();
-        });
+        };
+        this._onDeudaAdded = () => this.loadDebts();
+        this._onDeudaUpdated = () => this.loadDebts();
+        this._onDeudaDeleted = () => this.loadDebts();
+        this._onDeudaEdit = (e) => this.editDebt(e.detail);
+        window.addEventListener('ui:month', this._onMonth);
+        window.addEventListener('deuda:added', this._onDeudaAdded);
+        window.addEventListener('deuda:updated', this._onDeudaUpdated);
+        window.addEventListener('deuda:deleted', this._onDeudaDeleted);
+        window.addEventListener('deuda:edit', this._onDeudaEdit);
+    }
 
-        window.addEventListener('deuda:added', () => this.loadDebts());
-        window.addEventListener('deuda:updated', () => this.loadDebts());
-        window.addEventListener('deuda:deleted', () => this.loadDebts());
-        window.addEventListener('deuda:edit', (e) => {
-            this.editDebt(e.detail);
-        });
+    disconnectedCallback() {
+        window.removeEventListener('ui:group', this._onGroup);
+        window.removeEventListener('ui:month', this._onMonth);
+        window.removeEventListener('deuda:added', this._onDeudaAdded);
+        window.removeEventListener('deuda:updated', this._onDeudaUpdated);
+        window.removeEventListener('deuda:deleted', this._onDeudaDeleted);
+        window.removeEventListener('deuda:edit', this._onDeudaEdit);
     }
 
     async loadDebts() {
         if (!this.mes) this.mes = new Date().toISOString().slice(0, 7);
         const debts = await this.listByMes(this.mes);
         this.debts = debts;
-        console.log('[DebtList] Deudas cargadas:', debts); // Debug: muestra las deudas recuperadas
-        await this.loadTotals();
         this.renderTable();
-    }
-
-    async loadTotals() {
-        // Consulta los montos originales desde el repository y calcula los totales
-        const { countMontosByMes } = await import('../../montos/montoRepository.js');
-        const { totalesPendientes, totalesPagados } = await countMontosByMes({ mes: this.mes });
-        this.totalesPendientes = totalesPendientes;
-        this.totalesPagados = totalesPagados;
     }
 
     async listByMes(mes) {
@@ -70,9 +72,6 @@ export class DebtList extends HTMLElement {
     }
 
     renderTable() {
-        // Totales por moneda
-        const totales = {};
-
         // Unificar todos los montos en un solo array con referencia a la deuda
         let allMontos = this.debts.reduce((arr, deuda) => {
             deuda.montos.forEach(monto => {
@@ -89,9 +88,18 @@ export class DebtList extends HTMLElement {
         // Ordenar por fecha de vencimiento ascendente
         allMontos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
 
-        // Calcular totales por moneda
+        // Calcular totales por moneda con desglose pagado/pendiente
+        const totalesPorMoneda = {};
         allMontos.forEach(monto => {
-            totales[monto.moneda] = (totales[monto.moneda] || 0) + (Number(monto.monto) || 0);
+            const m = monto.moneda;
+            if (!totalesPorMoneda[m]) totalesPorMoneda[m] = { total: 0, pagado: 0, pendiente: 0 };
+            const amount = Number(monto.monto) || 0;
+            totalesPorMoneda[m].total += amount;
+            if (monto.pagado) {
+                totalesPorMoneda[m].pagado += amount;
+            } else {
+                totalesPorMoneda[m].pendiente += amount;
+            }
         });
 
         // Definir columnas para AppTable, ocultando 'Acciones' y 'Pagado' si hay agrupamiento
@@ -137,14 +145,22 @@ export class DebtList extends HTMLElement {
             this.appendChild(table);
         }
         table.columnsConfig = columns;
+        table.footerRenderer = (cols) => {
+            const entries = Object.entries(totalesPorMoneda);
+            if (entries.length === 0) return null;
+            const tr = document.createElement('tr');
+            tr.className = 'table-secondary fw-bold';
+            const td = document.createElement('td');
+            td.colSpan = cols.length;
+            td.className = 'text-end small';
+            td.innerHTML = entries.map(([moneda, t]) => {
+                const fmt = (n) => this.fmtMoneda(moneda, n);
+                return `Total: ${fmt(t.total)} &mdash; Pagado: ${fmt(t.pagado)} / Pendiente: ${fmt(t.pendiente)}`;
+            }).join('<br>');
+            tr.appendChild(td);
+            return tr;
+        };
         table.tableData = tableData;
-    }
-
-    toggleEstado(id) {
-        const debt = this.debts.find(d => d.id === id);
-        debt.estadoPagada = !debt.estadoPagada;
-        window.db.updateDeuda(debt);
-        this.renderTable();
     }
 
     async editDebt(deuda) {

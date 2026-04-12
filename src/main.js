@@ -80,13 +80,19 @@ initDB().then(async (db) => {
 });
 
 
+let _currentNode = null;
+
 function renderRoute(path) {
   const root = document.getElementById('app');
   if (!root) return;
+  if (_currentNode && typeof _currentNode.cleanup === 'function') {
+    _currentNode.cleanup();
+  }
   root.innerHTML = '';
   const route = routes.find(r => r.path === path) || routes[0];
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;
+  _currentNode = node;
   root.appendChild(node);
 }
 

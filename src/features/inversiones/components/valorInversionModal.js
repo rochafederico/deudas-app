@@ -27,6 +27,7 @@ export class ValorInversionModal extends HTMLElement {
         this._form.initialValues = this._inversion || {};
         this._form.submitText = 'Guardar';
         this._form.cancelText = 'Cancelar';
+        const ui = this.querySelector('ui-modal');
         // Usar evento personalizado para submit SOLO una vez
         this._form.addEventListener('form:submit', async (e) => {
             e.preventDefault();
@@ -38,7 +39,6 @@ export class ValorInversionModal extends HTMLElement {
             this.onsave && this.onsave();
             ui.close();
         });
-        const ui = this.querySelector('ui-modal');
 
         ui.appendChild(this._form);
     }

@@ -6,11 +6,6 @@ import './HeaderBar.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
 
 export class AppShell extends HTMLElement {
-    constructor() {
-        super();
-        this.showForm = false;
-    }
-
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
@@ -22,8 +17,15 @@ export class AppShell extends HTMLElement {
                 modal.attachOpener(opener);
             });
         }
-        window.addEventListener('deuda:saved', this.refreshList.bind(this));
-        window.addEventListener('deuda:updated', this.refreshList.bind(this));
+        this._onDeudaSaved = this.refreshList.bind(this);
+        this._onDeudaUpdated = this.refreshList.bind(this);
+        window.addEventListener('deuda:saved', this._onDeudaSaved);
+        window.addEventListener('deuda:updated', this._onDeudaUpdated);
+    }
+
+    disconnectedCallback() {
+        window.removeEventListener('deuda:saved', this._onDeudaSaved);
+        window.removeEventListener('deuda:updated', this._onDeudaUpdated);
     }
 
     refreshList() {
@@ -70,11 +72,6 @@ export class AppShell extends HTMLElement {
 
     onGroupChange(groupBy) {
         window.dispatchEvent(new CustomEvent('ui:group', { detail: { groupBy } }));
-    }
-
-    updateFormVisibility() {
-        const container = this.querySelector('#form-container');
-        container.innerHTML = this.showForm ? '<debt-form></debt-form>' : '';
     }
 }
 
