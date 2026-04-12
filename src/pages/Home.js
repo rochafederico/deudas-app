@@ -14,14 +14,16 @@ export default function Home() {
   container.appendChild(StatsIndicators());
 
   const card = document.createElement('div');
-  card.className = 'card text-center';
+  card.className = 'card';
   card.innerHTML = `
     <div class="card-body">
       <h5 class="card-title">⚡ Acciones rápidas</h5>
       <p class="card-text">Elegí qué querés hacer hoy</p>
-      <a href="/egresos" class="btn btn-primary">💳 Gestionar gastos</a>
-      <a href="/ingresos" class="btn btn-primary">💰 Registrar ingresos</a>
-      <a href="/inversiones" class="btn btn-primary">📈 Seguimiento de inversiones</a>
+      <div class="d-flex justify-content-center gap-3 mt-3">
+        <a href="/gastos" class="btn btn-outline-primary">💳 Gestionar gastos</a>
+        <a href="/ingresos" class="btn btn-outline-primary">💰 Registrar ingresos</a>
+        <a href="/inversiones" class="btn btn-outline-primary">📈 Seguimiento de inversiones</a>
+      </div>
     </div>
   `;
   card.querySelectorAll('a[href]').forEach(link => {

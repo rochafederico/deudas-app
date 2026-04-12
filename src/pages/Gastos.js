@@ -1,5 +1,5 @@
 import '../layout/AppShell.js';
 
-export default function Egresos() {
+export default function Gastos() {
   return document.createElement('app-shell');
 }
