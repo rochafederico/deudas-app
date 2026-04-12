@@ -209,7 +209,7 @@ export const tests = [
 
         const cardHeader = layout.querySelector('.card-header');
         assert(
-            cardHeader.className.includes('justify-content-between'),
+            cardHeader.classList.contains('justify-content-between'),
             'El toolbar debe tener justify-content-between para alinear filtros a la izquierda y CTA a la derecha'
         );
 
