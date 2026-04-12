@@ -79,13 +79,16 @@ function renderRoute(path) {
   if (!root) return;
   root.innerHTML = '';
 
-  // Update page header based on current route
-  const navItem = navItems.find(item => item.path === path) || navItems[0];
+  const route = routes.find(r => r.path === path)
+    || routes.find(r => r.path === '/')
+    || routes[0];
+
+  // Update page header based on the resolved route instead of navItems order
+  const navItem = navItems.find(item => item.path === route.path)
+    || navItems.find(item => item.path === '/');
   if (navItem && pageHeader.update) {
     pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle });
   }
-
-  const route = routes.find(r => r.path === path) || routes[0];
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;
   root.appendChild(node);
