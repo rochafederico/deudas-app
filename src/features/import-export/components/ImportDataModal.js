@@ -144,7 +144,7 @@ export class ImportDataModal extends HTMLElement {
                     ${data.metadata ? `<span class="small text-muted">Exportado: ${new Date(data.metadata.exportDate).toLocaleDateString()}</span>` : ''}
                 </div>
                 <div class="d-grid gap-1">
-                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => `${d.acreedor}`)}</div>
+                    <div><span class="fw-semibold small">Deudas: </span>${renderCompactList(deudas, d => d.acreedor)}</div>
                     ${ingresos.length ? `<div><span class="fw-semibold small">Ingresos: </span>${renderCompactList(ingresos, i => i.descripcion || 'Ingreso')}</div>` : ''}
                     ${inversiones.length ? `<div><span class="fw-semibold small">Inversiones: </span>${renderCompactList(inversiones, inv => inv.nombre)}</div>` : ''}
                 </div>
