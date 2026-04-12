@@ -402,6 +402,266 @@ async function testAcreedorColumnMobileRender() {
     assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
 }
 
+// ===================================================================
+// UC8: Alta inline — openInlineAdd() inserta fila inline al final
+// Verifica que _inlineEditIdx = 'new' y hay una .inline-edit-row en el tbody.
+// Al guardar con datos válidos, form.montos crece en 1 y la fila vuelve a lectura.
+// ===================================================================
+async function testAltaInlineAgregarYGuardar() {
+    console.log('  UC8: Alta inline — agregar monto y guardar');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    assert(form._inlineEditIdx === null, 'Sin inline al iniciar');
+
+    // Abrir inline add
+    form.openInlineAdd();
+    assert(form._inlineEditIdx === 'new', '_inlineEditIdx debe ser "new"');
+
+    const tbody = form.querySelector('#montos-tbody');
+    assert(tbody !== null, 'tbody existe');
+    let inlineRow = tbody.querySelector('.inline-edit-row');
+    assert(inlineRow !== null, 'Debe haber una fila inline');
+
+    // Rellenar los inputs
+    const montoInput = inlineRow.querySelector('input[name="monto"]');
+    const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
+    const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
+    assert(montoInput !== null && monedaSelect !== null && vencInput !== null, 'Inputs del inline presentes');
+
+    montoInput.value = '7500';
+    monedaSelect.value = 'ARS';
+    vencInput.value = '2026-07-15';
+
+    // Guardar inline
+    form._saveInline();
+    assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
+    assert(form.montos.length === 1, 'montos debe tener 1 elemento tras guardar');
+    assert(form.montos[0].monto === 7500, 'Monto guardado: 7500');
+    assert(form.montos[0].moneda === 'ARS', 'Moneda guardada: ARS');
+    assert(form.montos[0].vencimiento === '2026-07-15', 'Vencimiento guardado');
+    assert(form.montos[0].pagado === false, 'pagado = false por defecto');
+
+    // La fila inline ya no debe estar presente
+    inlineRow = tbody.querySelector('.inline-edit-row');
+    assert(inlineRow === null, 'Fila inline desaparecida tras guardar');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC9: Cancel alta inline — no modifica form.montos ni deja fila basura
+// ===================================================================
+async function testCancelarAltaInline() {
+    console.log('  UC9: Cancel alta inline — no modifica montos');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    // Pre-cargar un monto ya confirmado
+    form.montos = [{ monto: 5000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
+    form.renderMontosList();
+
+    form.openInlineAdd();
+    assert(form._inlineEditIdx === 'new', 'Inline add abierto');
+
+    form._cancelInline();
+    assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
+    assert(form.montos.length === 1, 'montos sigue con 1 elemento (sin cambios)');
+    assert(form.montos[0].monto === 5000, 'El monto original no fue modificado');
+
+    const inlineRow = form.querySelector('.inline-edit-row');
+    assert(inlineRow === null, 'No hay fila inline tras cancelar');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC10: Edición inline — openInlineEdit() precarga valores y guardar actualiza montos
+// ===================================================================
+async function testEdicionInlineGuardar() {
+    console.log('  UC10: Edición inline — editar y guardar');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [
+        { monto: 1000, moneda: 'ARS', vencimiento: '2026-05-10', pagado: false },
+        { monto: 2000, moneda: 'USD', vencimiento: '2026-06-10', pagado: false }
+    ];
+    form.renderMontosList();
+
+    // Editar el primer monto (idx=0 después de ordenar por vencimiento)
+    form.openInlineEdit(form.montos[0], 0);
+    assert(form._inlineEditIdx === 0, '_inlineEditIdx = 0');
+    assert(form._inlineEditRef !== null, '_inlineEditRef cargado');
+    assert(form._inlineEditRef.monto === 1000, 'Original guardado: 1000');
+
+    const tbody = form.querySelector('#montos-tbody');
+    const inlineRow = tbody.querySelector('.inline-edit-row');
+    assert(inlineRow !== null, 'Fila inline presente para edición');
+
+    const montoInput = inlineRow.querySelector('input[name="monto"]');
+    assert(montoInput.value === '1000', 'Input monto precargado con 1000');
+
+    // Modificar el valor
+    montoInput.value = '1500';
+    const vencInput = inlineRow.querySelector('input[name="vencimiento"]');
+    vencInput.value = '2026-05-10';
+    const monedaSelect = inlineRow.querySelector('select[name="moneda"]');
+    monedaSelect.value = 'ARS';
+
+    form._saveInline();
+    assert(form._inlineEditIdx === null, 'Inline cerrado tras guardar');
+    assert(form.montos.length === 2, 'Sigue con 2 montos');
+
+    // Verificar que el monto fue actualizado
+    const montoActualizado = form.montos.find(m => m.vencimiento === '2026-05-10');
+    assert(montoActualizado !== undefined, 'Monto de mayo sigue presente');
+    assert(montoActualizado.monto === 1500, 'Monto actualizado a 1500');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC11: Cancelar edición inline — revierte valores, montos sin cambios
+// ===================================================================
+async function testCancelarEdicionInline() {
+    console.log('  UC11: Cancelar edición inline — revierte sin cambios');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [{ monto: 9000, moneda: 'ARS', vencimiento: '2026-08-01', pagado: false }];
+    form.renderMontosList();
+
+    form.openInlineEdit(form.montos[0], 0);
+
+    // Modificar inputs pero cancelar sin guardar
+    const tbody = form.querySelector('#montos-tbody');
+    const inlineRow = tbody.querySelector('.inline-edit-row');
+    inlineRow.querySelector('input[name="monto"]').value = '99999';
+
+    form._cancelInline();
+
+    assert(form._inlineEditIdx === null, 'Inline cerrado tras cancelar');
+    assert(form.montos.length === 1, 'Sigue con 1 monto');
+    assert(form.montos[0].monto === 9000, 'Monto original sin cambios: 9000');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC12: Regla "solo 1 inline" — confirm(true) descarta el actual y abre nuevo
+// ===================================================================
+async function testSoloUnInlineAbierto() {
+    console.log('  UC12: Regla solo 1 inline — confirm descarta y abre nuevo');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [
+        { monto: 100, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false },
+        { monto: 200, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
+    ];
+    form.renderMontosList();
+
+    // Abrir inline en el primer monto
+    form.openInlineEdit(form.montos[0], 0);
+    assert(form._inlineEditIdx === 0, 'Primer inline abierto en idx 0');
+
+    // Simular confirm = true (usuario acepta descartar cambios)
+    const origConfirm = global.confirm;
+    global.confirm = () => true;
+    try {
+        // Intentar abrir inline en el segundo monto
+        form.openInlineEdit(form.montos[1], 1);
+        assert(form._inlineEditIdx === 1, 'Con confirm=true, nuevo inline abierto en idx 1');
+    } finally {
+        global.confirm = origConfirm;
+    }
+
+    // Simular confirm = false (usuario rechaza descartar cambios)
+    form._cancelInline(); // cerrar el inline actual primero
+    form.openInlineEdit(form.montos[0], 0);
+    assert(form._inlineEditIdx === 0, 'Inline abierto en idx 0');
+
+    global.confirm = () => false;
+    try {
+        form.openInlineEdit(form.montos[1], 1);
+        assert(form._inlineEditIdx === 0, 'Con confirm=false, inline original sigue en idx 0');
+    } finally {
+        global.confirm = origConfirm;
+    }
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC13: Duplicar monto inline — copia datos, pagado=false, sin modal
+// ===================================================================
+async function testDuplicarMontoInline() {
+    console.log('  UC13: Duplicar monto inline — pagado=false, sin abrir modal');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [{
+        id: 42, monto: 5000, moneda: 'USD', vencimiento: '2026-09-01', pagado: true
+    }];
+    form.renderMontosList();
+
+    // No debe haber montoModal ni duplicateMontoModal en el DOM
+    assert(form.querySelector('#montoModal') === null, 'No hay #montoModal');
+    assert(form.querySelector('#duplicateMontoModal') === null, 'No hay #duplicateMontoModal');
+
+    form.duplicateMonto(form.montos[0]);
+
+    assert(form.montos.length === 2, 'Debe haber 2 montos tras duplicar');
+    const dupl = form.montos.find(m => !Object.prototype.hasOwnProperty.call(m, 'id'));
+    assert(dupl !== undefined, 'El duplicado no tiene id');
+    assert(dupl.monto === 5000, 'Monto copiado: 5000');
+    assert(dupl.moneda === 'USD', 'Moneda copiada: USD');
+    assert(dupl.vencimiento === '2026-09-01', 'Vencimiento copiado');
+    assert(dupl.pagado === false, 'pagado forzado a false en el duplicado');
+
+    document.body.removeChild(form);
+    await cleanup();
+}
+
+// ===================================================================
+// UC14: No se usan modales secundarios en el flujo Deuda → Montos
+// Verifica que DebtForm NO tiene montoModal ni duplicateMontoModal.
+// ===================================================================
+async function testNoModalSecundarioEnDebtForm() {
+    console.log('  UC14: DebtForm no abre modales para montos (sin modals apilados)');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    assert(form.querySelector('#montoModal') === null, 'No debe existir #montoModal en DebtForm');
+    assert(form.querySelector('#duplicateMontoModal') === null, 'No debe existir #duplicateMontoModal en DebtForm');
+    assert(typeof form.openInlineAdd === 'function', 'Debe existir método openInlineAdd');
+    assert(typeof form.openInlineEdit === 'function', 'Debe existir método openInlineEdit');
+    assert(typeof form.duplicateMonto === 'function', 'Debe existir método duplicateMonto');
+    assert(typeof form.openMontoModal === 'undefined', 'openMontoModal ya no debe existir');
+    assert(typeof form.openDuplicateMontoModal === 'undefined', 'openDuplicateMontoModal ya no debe existir');
+
+    document.body.removeChild(form);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -409,5 +669,12 @@ export const tests = [
     testEliminarDeudas,
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
-    testAcreedorColumnMobileRender
+    testAcreedorColumnMobileRender,
+    testAltaInlineAgregarYGuardar,
+    testCancelarAltaInline,
+    testEdicionInlineGuardar,
+    testCancelarEdicionInline,
+    testSoloUnInlineAbierto,
+    testDuplicarMontoInline,
+    testNoModalSecundarioEnDebtForm
 ];
