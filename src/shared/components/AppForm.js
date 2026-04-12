@@ -164,8 +164,9 @@ export class AppForm extends HTMLElement {
     }
 
     triggerSubmit() {
-        if (this.form) {
-            this.handleSubmit({ preventDefault: () => {} });
+        const formEl = this.querySelector('form');
+        if (formEl) {
+            formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         }
     }
 
