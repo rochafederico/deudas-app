@@ -45,3 +45,12 @@ $info:      #0dcaf0;
 // ─── Helpers y utilidades ─────────────────────────────────────────────────────
 @import "bootstrap/scss/helpers";
 @import "bootstrap/scss/utilities/api";
+
+// ─── Componentes propios ──────────────────────────────────────────────────────
+.feedback-fab {
+    bottom: 80px;
+    right: 16px;
+    width: 48px;
+    height: 48px;
+    z-index: 1040;
+}

@@ -19,8 +19,7 @@ export class FeedbackFab extends HTMLElement {
             <button
                 id="feedback-fab-btn"
                 type="button"
-                class="btn bg-white btn-outline-primary rounded-circle shadow d-flex align-items-center justify-content-center position-fixed fs-5"
-                style="bottom: 80px; right: 16px; width: 48px; height: 48px; z-index: 1040;"
+                class="btn bg-white btn-outline-primary rounded-circle shadow d-flex align-items-center justify-content-center position-fixed fs-5 feedback-fab"
                 aria-label="Enviar feedback"
                 title="Enviar feedback"
             >

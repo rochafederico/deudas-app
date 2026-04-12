@@ -36,24 +36,7 @@ export class FeedbackModal extends HTMLElement {
     _resetForm() {
         if (this._formEl) this._formEl.reset();
         if (this._counterEl) this._counterEl.textContent = '0';
-        this._clearErrors();
         this._updateLinks();
-    }
-
-    _clearErrors() {
-        [this._errorTipo, this._errorComentario].forEach(el => {
-            if (!el) return;
-            el.textContent = '';
-            el.classList.add('d-none');
-        });
-    }
-
-    _showError(field, message) {
-        const el = field === 'tipo' ? this._errorTipo : this._errorComentario;
-        if (el) {
-            el.textContent = message;
-            el.classList.remove('d-none');
-        }
     }
 
     _getFormValues() {
@@ -93,7 +76,6 @@ export class FeedbackModal extends HTMLElement {
                             <option value="problema">🐛 Problema</option>
                             <option value="confusión">❓ Confusión</option>
                         </select>
-                        <div id="feedback-error-tipo" class="feedback-error invalid-feedback d-none" role="alert"></div>
                     </div>
 
                     <div class="mb-3">
@@ -104,7 +86,6 @@ export class FeedbackModal extends HTMLElement {
                         <div class="form-text text-end">
                             <span id="feedback-char-count">0</span>/1000
                         </div>
-                        <div id="feedback-error-comentario" class="feedback-error invalid-feedback d-none" role="alert"></div>
                     </div>
 
                     <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -152,8 +133,6 @@ export class FeedbackModal extends HTMLElement {
         this._sendBtn = this.querySelector('#feedback-send-btn');
         this._githubLinkEl = this.querySelector('#feedback-link-github');
         this._whatsappLinkEl = this.querySelector('#feedback-link-whatsapp');
-        this._errorTipo = this.querySelector('#feedback-error-tipo');
-        this._errorComentario = this.querySelector('#feedback-error-comentario');
 
         // Move the actions div into the modal footer
         const actionsEl = this.querySelector('#feedback-actions');
