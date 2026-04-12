@@ -1,16 +1,41 @@
 // src/layout/ResumenHeader.js
 // Global page header: page title + global month selector + subtitle
 import './MonthSelector.js';
+import { DEFAULT_SUBTITLE } from './navConfig.js';
 
-export default function ResumenHeader() {
+export default function ResumenHeader({ title = 'Panorama financiero', subtitle = DEFAULT_SUBTITLE } = {}) {
     const el = document.createElement('div');
     el.className = 'mb-3';
-    el.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center gap-3 mb-1">
-            <h1 class="h3 fw-bold mb-0">Panorama financiero</h1>
-            <month-selector></month-selector>
-        </div>
-        <p class="text-body-secondary mb-0">Tu panorama financiero del mes.</p>
-    `;
+    el.id = 'resumen-header';
+
+    const titleEl = document.createElement('h1');
+    titleEl.className = 'h3 fw-bold mb-0';
+    titleEl.id = 'resumen-header-title';
+    titleEl.textContent = title;
+
+    const monthSelector = document.createElement('month-selector');
+
+    const topRow = document.createElement('div');
+    topRow.className = 'd-flex justify-content-between align-items-center gap-3 mb-1';
+    topRow.appendChild(titleEl);
+    topRow.appendChild(monthSelector);
+
+    const subtitleEl = document.createElement('p');
+    subtitleEl.className = 'text-body-secondary mb-0';
+    subtitleEl.id = 'resumen-header-subtitle';
+    subtitleEl.textContent = subtitle;
+
+    el.appendChild(topRow);
+    el.appendChild(subtitleEl);
+
+    el.update = ({ title: newTitle, subtitle: newSubtitle } = {}) => {
+        if (newTitle !== undefined) {
+            el.querySelector('#resumen-header-title').textContent = newTitle;
+        }
+        if (newSubtitle !== undefined) {
+            el.querySelector('#resumen-header-subtitle').textContent = newSubtitle;
+        }
+    };
+
     return el;
 }

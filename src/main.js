@@ -4,6 +4,7 @@ import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
 import BottomNav from './layout/BottomNav.js';
 import ResumenHeader from './layout/ResumenHeader.js';
+import { navItems } from './layout/navConfig.js';
 import { TourManager } from './features/tour/TourManager.js';
 import { checkAndNotify } from './features/notifications/NotificationService.js';
 import { listDeudas } from './features/deudas/deudaRepository.js';
@@ -19,8 +20,9 @@ const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
 wrapper.className = 'container-xl my-4 p-4 rounded-4 bg-body shadow-sm';
 
-// Global title row: "Resumen" + month selector + subtitle
-wrapper.appendChild(ResumenHeader());
+// Global title row: page title + month selector + subtitle
+const pageHeader = ResumenHeader();
+wrapper.appendChild(pageHeader);
 
 // Contenedor para rutas dinámicas
 const app = document.createElement('div');
@@ -76,7 +78,17 @@ function renderRoute(path) {
   const root = document.getElementById('app');
   if (!root) return;
   root.innerHTML = '';
-  const route = routes.find(r => r.path === path) || routes[0];
+
+  const route = routes.find(r => r.path === path)
+    || routes.find(r => r.path === '/')
+    || routes[0];
+
+  // Update page header based on the resolved route instead of navItems order
+  const navItem = navItems.find(item => item.path === route.path)
+    || navItems.find(item => item.path === '/');
+  if (navItem && pageHeader.update) {
+    pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle });
+  }
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;
   root.appendChild(node);

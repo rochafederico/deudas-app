@@ -1,8 +1,9 @@
 import '../features/deudas/components/DebtModal.js';
 import '../features/deudas/components/DebtDetailModal.js';
-import '../features/ingresos/components/IngresoModal.js';
 import '../shared/components/AppInput.js';
-import './HeaderBar.js';
+import '../shared/components/AppButton.js';
+import './PageSectionLayout.js';
+import { groupOptions } from '../shared/config/tables/groupOptions.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';
 
 export class AppShell extends HTMLElement {
@@ -37,41 +38,46 @@ export class AppShell extends HTMLElement {
     }
 
     async render() {
-        // Usar el nuevo subcomponente HeaderBar
-        const header = document.createElement('header-bar');
-        header.mode = 'deudas';
-        header.addEventListener('group-change', (e) => {
-            this.groupBy = e.detail.groupBy;
+        const layout = document.createElement('page-section-layout');
+
+        // Toolbar start: group filter
+        const optionsHtml = groupOptions.map(opt => `<option value="${opt.value}">${opt.label}</option>`).join('');
+        const groupFilter = document.createElement('app-input');
+        groupFilter.setAttribute('type', 'select');
+        groupFilter.setAttribute('id', 'group-filter');
+        groupFilter.setAttribute('name', 'group-filter');
+        groupFilter.setAttribute('title', 'Agrupar montos');
+        groupFilter.innerHTML = optionsHtml;
+        groupFilter.addEventListener('change', (e) => {
+            this.groupBy = e.target.value;
             this.onGroupChange(this.groupBy);
         });
-        header.addEventListener('add-debt', () => {
+
+        layout.toolbarStart = groupFilter;
+
+        // Toolbar end: add debt button
+        const addDebtBtn = document.createElement('app-button');
+        addDebtBtn.id = 'add-debt';
+        addDebtBtn.setAttribute('aria-label', 'Agregar deuda');
+        addDebtBtn.setAttribute('data-tour-step', 'nueva-deuda');
+        addDebtBtn.textContent = 'Nueva deuda';
+        addDebtBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             const modal = this.querySelector('#debtModal');
             modal.openCreate();
-            modal.attachOpener(header.querySelector('#add-debt'));
-        });
-        header.addEventListener('add-income', () => {
-            let modal = this.querySelector('#ingresoModal');
-            if (!modal) {
-                modal = document.createElement('ingreso-modal');
-                modal.id = 'ingresoModal';
-                this.appendChild(modal);
-            }
-            modal.openCreate();
-            modal.attachOpener(header.querySelector('#add-income'));
+            modal.attachOpener(addDebtBtn);
         });
 
-        const card = document.createElement('div');
-        card.className = 'card shadow-sm';
+        layout.toolbarEnd = addDebtBtn;
 
-        const cardBody = document.createElement('div');
-        cardBody.className = 'card-body p-3';
-        cardBody.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-detail-modal id="debtDetailModal"></debt-detail-modal><debt-list></debt-list>`;
+        // Content: debt list + modals
+        const contentDiv = document.createElement('div');
+        contentDiv.innerHTML = `<debt-modal id="debtModal"></debt-modal><debt-detail-modal id="debtDetailModal"></debt-detail-modal><debt-list></debt-list>`;
 
-        card.appendChild(header);
-        card.appendChild(cardBody);
+        layout.content = contentDiv;
 
         this.innerHTML = '';
-        this.appendChild(card);
+        this.appendChild(layout);
     }
 
     onGroupChange(groupBy) {

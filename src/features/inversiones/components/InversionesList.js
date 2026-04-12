@@ -4,6 +4,8 @@ import { listInversiones, deleteInversion } from '../inversionRepository.js';
 import { inversionTableColumns } from '../../../shared/config/tables/inversionTableColumns.js';
 import { el } from '../../../shared/utils/dom.js';
 import { formatMoneda } from '../../../shared/config/monedas.js';
+import '../../../layout/PageSectionLayout.js';
+import '../../../shared/components/AppButton.js';
 
 export class InversionesList extends HTMLElement {
   constructor() {
@@ -16,12 +18,31 @@ export class InversionesList extends HTMLElement {
   }
 
   async render() {
-    this.innerHTML = `
-    <h2 class="mb-3">Inversiones</h2>
-    <app-button id="add" aria-label="Agregar inversión">Agregar inversión</app-button>
-    <app-table id="tabla"></app-table>
-    <inversion-modal id="inversion-modal"></inversion-modal>`;
-    this.querySelector('#add').onclick = () => this.openModal();
+    this.innerHTML = '';
+
+    const layout = document.createElement('page-section-layout');
+
+    // Toolbar: action button on the right
+    const addBtn = document.createElement('app-button');
+    addBtn.id = 'add';
+    addBtn.setAttribute('aria-label', 'Agregar inversión');
+    addBtn.textContent = 'Agregar inversión';
+    addBtn.onclick = () => this.openModal();
+    layout.toolbarEnd = addBtn;
+
+    // Content: table + modals
+    const contentSlot = document.createElement('div');
+    const tabla = document.createElement('app-table');
+    tabla.id = 'tabla';
+    contentSlot.appendChild(tabla);
+
+    const inversionModal = document.createElement('inversion-modal');
+    inversionModal.id = 'inversion-modal';
+    contentSlot.appendChild(inversionModal);
+
+    layout.content = contentSlot;
+    this.appendChild(layout);
+
     await this.renderTable();
   }
 
