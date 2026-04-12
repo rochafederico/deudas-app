@@ -145,8 +145,8 @@ export class FeedbackModal extends HTMLElement {
 
         // Move the actions div into the modal footer
         const actionsEl = this.querySelector('#feedback-actions');
-        const footerEl = this.querySelector('.modal-footer');
-        if (actionsEl && footerEl) footerEl.appendChild(actionsEl);
+        const ui = this.querySelector('ui-modal');
+        if (actionsEl && ui) ui.addFooter(actionsEl);
 
         // Live update: rebuild URLs and toggle send button on every change
         this._tipoEl?.addEventListener('change', () => this._updateLinks());

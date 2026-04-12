@@ -36,6 +36,17 @@ export class UiModal extends HTMLElement {
         if (this._bodyEl) this._bodyEl.innerHTML = '';
     }
 
+    addFooter(el) {
+        if (!el) return;
+        if (!this._footerEl) {
+            this._footerEl = document.createElement('div');
+            this._footerEl.className = 'modal-footer';
+            const content = this._modalEl?.querySelector('.modal-content');
+            if (content) content.appendChild(this._footerEl);
+        }
+        this._footerEl.appendChild(el);
+    }
+
     setTitle(text) {
         if (this._titleEl) this._titleEl.textContent = text;
     }
@@ -114,7 +125,6 @@ export class UiModal extends HTMLElement {
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body"></div>
-                    <div class="modal-footer"></div>
                 </div>
             </div>
         </div>
