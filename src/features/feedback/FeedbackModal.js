@@ -90,14 +90,13 @@ export class FeedbackModal extends HTMLElement {
                         </div>
                     </div>
 
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <div class="alert alert-warning fade show" role="alert">
                         <p class="small mb-1">
                             💡 Si tenés imagen o video, adjuntalo luego en la plataforma.
                         </p>
                         <p class="small mb-0">
                             ⚠️ Evitá incluir datos sensibles como montos u otros datos personales.
                         </p>
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                     </div>
                 </form>
                 <div id="feedback-actions" class="btn-group w-100">
