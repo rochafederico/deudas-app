@@ -1,5 +1,3 @@
-import StatsIndicators from '../features/stats/components/StatsIndicators.js';
-
 function navigate(path) {
   if (path !== window.location.pathname) {
     window.history.pushState({}, '', path);
@@ -11,7 +9,16 @@ export default function Home() {
   const container = document.createElement('div');
   container.className = 'd-flex flex-column gap-3';
 
-  container.appendChild(StatsIndicators());
+  const statsSlot = document.createElement('div');
+  container.appendChild(statsSlot);
+
+  import('../features/stats/components/StatsIndicators.js')
+    .then(({ default: StatsIndicators }) => {
+      statsSlot.appendChild(StatsIndicators());
+    })
+    .catch(() => {
+      statsSlot.innerHTML = '<p class="text-muted small">No se pudieron cargar los indicadores.</p>';
+    });
 
   const card = document.createElement('div');
   card.className = 'card';
