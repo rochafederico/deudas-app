@@ -2,7 +2,6 @@ import '../features/deudas/components/DebtModal.js';
 import '../features/deudas/components/DebtDetailModal.js';
 import '../shared/components/AppInput.js';
 import '../shared/components/AppButton.js';
-import './HeaderBar.js';
 import './PageSectionLayout.js';
 import { groupOptions } from '../shared/config/tables/groupOptions.js';
 import { getSelectedMonth } from '../shared/MonthFilter.js';

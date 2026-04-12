@@ -1,8 +1,9 @@
 // src/layout/ResumenHeader.js
 // Global page header: page title + global month selector + subtitle
 import './MonthSelector.js';
+import { DEFAULT_SUBTITLE } from './navConfig.js';
 
-export default function ResumenHeader({ title = 'Panorama financiero', subtitle = 'Gestioná y visualizá la información del período seleccionado.' } = {}) {
+export default function ResumenHeader({ title = 'Panorama financiero', subtitle = DEFAULT_SUBTITLE } = {}) {
     const el = document.createElement('div');
     el.className = 'mb-3';
     el.id = 'resumen-header';

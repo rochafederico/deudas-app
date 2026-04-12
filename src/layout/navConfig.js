@@ -1,5 +1,5 @@
 // Shared navigation items used by the desktop menu (Menu.js) and mobile bottom navbar (BottomNav.js)
-const DEFAULT_SUBTITLE = 'Gestioná y visualizá la información del período seleccionado.';
+export const DEFAULT_SUBTITLE = 'Gestioná y visualizá la información del período seleccionado.';
 
 export const navItems = [
   { label: 'Inicio', icon: 'bi-house', path: '/', key: 'inicio', title: 'Panorama financiero', subtitle: DEFAULT_SUBTITLE },

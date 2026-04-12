@@ -1,10 +1,11 @@
 // test/layout.test.js
 // Tests for layout standardization: ResumenHeader dynamic updates,
 // PageSectionLayout structure, and navConfig route metadata.
+// 16 test cases covering navConfig, ResumenHeader, and PageSectionLayout.
 import { assert } from './setup.js';
 import ResumenHeader from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
-import { navItems } from '../src/layout/navConfig.js';
+import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 
 export const tests = [
 
@@ -18,7 +19,7 @@ export const tests = [
             const item = navItems.find(i => i.path === path);
             assert(item !== undefined, `navConfig debe tener ruta ${path}`);
             assert(typeof item.title === 'string' && item.title.length > 0, `ruta ${path} debe tener title`);
-            assert(typeof item.subtitle === 'string' && item.subtitle.length > 0, `ruta ${path} debe tener subtitle`);
+            assert(item.subtitle === DEFAULT_SUBTITLE, `ruta ${path} debe usar DEFAULT_SUBTITLE`);
         }
     },
 
@@ -27,6 +28,14 @@ export const tests = [
         const titles = navItems.map(i => i.title);
         const unique = new Set(titles);
         assert(unique.size === titles.length, 'cada ruta debe tener un título único');
+    },
+
+    async function navConfig_sharedSubtitleConstant() {
+        console.log('  navConfig: DEFAULT_SUBTITLE is exported and used by all routes');
+        assert(typeof DEFAULT_SUBTITLE === 'string' && DEFAULT_SUBTITLE.length > 0, 'DEFAULT_SUBTITLE debe ser un string no vacío');
+        for (const item of navItems) {
+            assert(item.subtitle === DEFAULT_SUBTITLE, `ruta ${item.path} debe usar DEFAULT_SUBTITLE`);
+        }
     },
 
     async function navConfig_homeTitle() {
@@ -201,6 +210,84 @@ export const tests = [
 
         document.body.removeChild(layout);
     },
+
+    async function resumenHeader_defaultSubtitleMatchesNavConfig() {
+        console.log('  ResumenHeader: default subtitle matches navConfig DEFAULT_SUBTITLE');
+        const header = ResumenHeader();
+        document.body.appendChild(header);
+
+        const subtitleEl = header.querySelector('#resumen-header-subtitle');
+        assert(subtitleEl.textContent === DEFAULT_SUBTITLE, 'El subtítulo por defecto debe coincidir con DEFAULT_SUBTITLE');
+
+        document.body.removeChild(header);
+    },
+
+    async function resumenHeader_updateOnlySubtitle() {
+        console.log('  ResumenHeader: update() with only subtitle does not change title');
+        const header = ResumenHeader({ title: 'Título fijo', subtitle: 'Sub original.' });
+        document.body.appendChild(header);
+
+        header.update({ subtitle: 'Sub nuevo.' });
+
+        const titleEl = header.querySelector('#resumen-header-title');
+        assert(titleEl.textContent === 'Título fijo', 'update() no debe cambiar el título si no se pasa');
+
+        const subtitleEl = header.querySelector('#resumen-header-subtitle');
+        assert(subtitleEl.textContent === 'Sub nuevo.', 'update() debe cambiar el subtítulo');
+
+        document.body.removeChild(header);
+    },
+
+    async function pageSectionLayout_getContentSlot() {
+        console.log('  PageSectionLayout: getContentSlot() returns the content div');
+        const layout = document.createElement('page-section-layout');
+        document.body.appendChild(layout);
+
+        const slot = layout.getContentSlot();
+        assert(slot !== null, 'getContentSlot() debe devolver el slot de contenido');
+        assert(slot.classList.contains('psl-content'), 'El slot de contenido debe tener clase psl-content');
+
+        document.body.removeChild(layout);
+    },
+
+    async function pageSectionLayout_replacesToolbarEnd() {
+        console.log('  PageSectionLayout: setting toolbarEnd twice replaces the previous element');
+        const layout = document.createElement('page-section-layout');
+        document.body.appendChild(layout);
+
+        const btn1 = document.createElement('button');
+        btn1.id = 'btn1';
+        layout.toolbarEnd = btn1;
+
+        const btn2 = document.createElement('button');
+        btn2.id = 'btn2';
+        layout.toolbarEnd = btn2;
+
+        assert(layout.querySelector('#btn1') === null, 'El primer botón debe ser reemplazado');
+        assert(layout.querySelector('#btn2') !== null, 'El segundo botón debe estar presente');
+
+        document.body.removeChild(layout);
+    },
+
+    async function pageSectionLayout_replacesContent() {
+        console.log('  PageSectionLayout: setting content twice replaces the previous element');
+        const layout = document.createElement('page-section-layout');
+        document.body.appendChild(layout);
+
+        const div1 = document.createElement('div');
+        div1.id = 'content1';
+        layout.content = div1;
+
+        const div2 = document.createElement('div');
+        div2.id = 'content2';
+        layout.content = div2;
+
+        assert(layout.querySelector('#content1') === null, 'El primer contenido debe ser reemplazado');
+        assert(layout.querySelector('#content2') !== null, 'El segundo contenido debe estar presente');
+
+        document.body.removeChild(layout);
+    },
+
 
     async function pageSectionLayout_toolbarIsHorizontal() {
         console.log('  PageSectionLayout: toolbar is flexbox with space-between');
