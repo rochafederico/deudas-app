@@ -9,6 +9,7 @@ export class AppForm extends HTMLElement {
         this._initialValues = {};
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
+        this._hideButtons = false;
         this._boundHandleSubmit = this.handleSubmit.bind(this);
         this._boundCancelClick = () => {
             this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
@@ -38,6 +39,13 @@ export class AppForm extends HTMLElement {
     set cancelText(text) {
         this._cancelText = text;
         this.render();
+    }
+    set hideButtons(val) {
+        this._hideButtons = !!val;
+        this.render();
+    }
+    get hideButtons() {
+        return this._hideButtons;
     }
 
     connectedCallback() {
@@ -128,29 +136,42 @@ export class AppForm extends HTMLElement {
         form.noValidate = true;
         inputs.forEach(input => form.appendChild(input));
 
-        // Buttons
-        const btnRow = document.createElement('div');
-        btnRow.className = 'd-flex justify-content-end gap-2 mt-2';
+        if (!this._hideButtons) {
+            // Buttons
+            const btnRow = document.createElement('div');
+            btnRow.className = 'd-flex justify-content-end gap-2 mt-2';
 
-        const cancelBtn = document.createElement('button');
-        cancelBtn.type = 'button';
-        cancelBtn.id = 'cancelBtn';
-        cancelBtn.className = 'btn btn-primary btn-sm';
-        cancelBtn.setAttribute('aria-label', 'Cancelar formulario');
-        cancelBtn.textContent = this._cancelText;
+            const cancelBtn = document.createElement('button');
+            cancelBtn.type = 'button';
+            cancelBtn.id = 'cancelBtn';
+            cancelBtn.className = 'btn btn-primary btn-sm';
+            cancelBtn.setAttribute('aria-label', 'Cancelar formulario');
+            cancelBtn.textContent = this._cancelText;
 
-        const submitBtn = document.createElement('button');
-        submitBtn.type = 'submit';
-        submitBtn.className = 'btn btn-success btn-sm';
-        submitBtn.setAttribute('aria-label', 'Guardar formulario');
-        submitBtn.textContent = this._submitText;
+            const submitBtn = document.createElement('button');
+            submitBtn.type = 'submit';
+            submitBtn.className = 'btn btn-success btn-sm';
+            submitBtn.setAttribute('aria-label', 'Guardar formulario');
+            submitBtn.textContent = this._submitText;
 
-        btnRow.appendChild(cancelBtn);
-        btnRow.appendChild(submitBtn);
-        form.appendChild(btnRow);
+            btnRow.appendChild(cancelBtn);
+            btnRow.appendChild(submitBtn);
+            form.appendChild(btnRow);
+        }
 
         this.appendChild(form);
         this._setupListeners();
+    }
+
+    triggerSubmit() {
+        const formEl = this.querySelector('form');
+        if (formEl) {
+            formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        }
+    }
+
+    triggerCancel() {
+        this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     }
 
     handleSubmit(e) {
