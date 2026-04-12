@@ -23,7 +23,7 @@ export class FeedbackFab extends HTMLElement {
                 aria-label="Enviar feedback"
                 title="Enviar feedback"
             >
-                💬
+                <i class="bi bi-chat-dots" aria-hidden="true"></i>
             </button>
             <feedback-modal></feedback-modal>
         `;
