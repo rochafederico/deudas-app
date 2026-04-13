@@ -44,7 +44,7 @@ export const tourSteps = [
     {
         id: 'bienvenida',
         title: 'Bienvenida',
-        text: 'Organizá tus deudas y gastos fijos en un solo lugar',
+        text: 'Organizá tus compromisos financieros en un solo lugar.',
         getTarget: () => findTourTarget([
             { selector: 'app-header' },
             { selector: '[data-tour-step="bienvenida"]' }
@@ -68,7 +68,7 @@ export const tourSteps = [
     {
         id: 'nueva-deuda',
         title: 'Nueva deuda',
-        text: 'Cargá tus deudas: tarjeta, alquiler, préstamos, servicios',
+        text: 'Cargá tus egresos: tarjeta, alquiler, préstamos y servicios.',
         getTarget: () => findTourTarget([
             { selector: 'app-shell' },
             { selector: 'header-bar' },
@@ -79,7 +79,7 @@ export const tourSteps = [
     {
         id: 'datos-backup',
         title: 'Exportar e importar datos',
-        text: 'Desde Ajustes podés hacer un backup de tu información o restaurarla desde un archivo JSON',
+        text: 'Desde Ajustes podés hacer una copia de seguridad o restaurar tus datos.',
         getTarget: () =>
             findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
             findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),

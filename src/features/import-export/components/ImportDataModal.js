@@ -72,7 +72,7 @@ export class ImportDataModal extends HTMLElement {
             // Validar estructura del archivo
             if (!this.#validateImportData(data)) {
                 trackFlowError('import_data', { step: 'file_validation', reason: 'invalid_structure' });
-                this.#showError('❌ Archivo JSON no válido. Asegúrate de que sea un backup de DeudasApp.');
+                this.#showError('❌ El archivo no es válido. Asegurate de usar una copia de seguridad de Nivva.');
                 return;
             }
 
@@ -83,7 +83,7 @@ export class ImportDataModal extends HTMLElement {
         } catch (error) {
             console.error('Error al leer archivo:', error);
             trackFlowError('import_data', { step: 'file_read', reason: 'invalid_json' });
-            this.#showError('❌ Error al leer el archivo. Asegúrate de que sea un JSON válido.');
+            this.#showError('❌ El archivo no es un JSON válido. Asegurate de que no esté dañado.');
         }
     }
 
@@ -288,8 +288,8 @@ export class ImportDataModal extends HTMLElement {
         } catch (error) {
             console.error('Error en importación:', error);
             trackFlowError('import_data', { step: 'import', reason: error.message });
-            this.#showError('❌ Error durante la importación');
-            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error durante la importación', type: 'danger' } }));
+            this.#showError('❌ No pudimos importar. Revisá el archivo e intentá de nuevo.');
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ No pudimos importar. Revisá el archivo e intentá de nuevo.', type: 'danger' } }));
         }
     }
 
@@ -336,7 +336,7 @@ export class ImportDataModal extends HTMLElement {
             <ui-modal id="importModal">
                 <div class="p-3 d-grid gap-3">
                     <div class="file-selector text-center p-4 border border-2 border-secondary border-opacity-25 rounded">
-                        <p class="mb-3">📁 Selecciona un archivo JSON de backup para importar</p>
+                        <p class="mb-3">📁 Seleccioná un archivo de copia de seguridad para importar</p>
                         <app-button id="select-file-btn" variant="primary">
                             Seleccionar archivo
                         </app-button>
@@ -344,7 +344,7 @@ export class ImportDataModal extends HTMLElement {
                     <div class="import-warning alert alert-warning mb-0 py-2" role="alert">
                         <p class="mb-1"><strong>⚠️ Importante:</strong></p>
                         <ul class="mb-0 small ps-3">
-                            <li>Añade datos sin borrar los existentes.</li>
+                            <li>Agregá datos sin borrar los existentes.</li>
                             <li>Fusión automática: mismo Acreedor + Tipo de Deuda → los montos se agrupan.</li>
                             <li>Duplicados ignorados si coinciden monto, moneda y periodo.</li>
                         </ul>

@@ -22,7 +22,7 @@ export class FeedbackModal extends HTMLElement {
         this._contexto = getContext();
         if (!this._rendered) this.render();
         const ui = this.querySelector('ui-modal');
-        ui.setTitle('Enviar feedback');
+        ui.setTitle('Enviar comentario');
         this._resetForm();
         document.body.classList.add('feedback-modal-open');
         ui.open();

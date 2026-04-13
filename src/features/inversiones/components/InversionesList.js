@@ -54,8 +54,8 @@ export class InversionesList extends HTMLElement {
         const accionesContainer = document.createElement('div');
         accionesContainer.className = 'd-flex gap-2 align-items-center justify-content-center';
         const btn = document.createElement('app-button');
-        btn.textContent = 'Nuevo valor';
-        btn.setAttribute('aria-label', 'Nuevo valor');
+        btn.textContent = 'Agregar valor';
+        btn.setAttribute('aria-label', 'Agregar valor');
         btn.onclick = () => this.addValueToInversion(inv);
         accionesContainer.appendChild(btn);
         const deleteBtn = el('app-button', {
@@ -66,7 +66,7 @@ export class InversionesList extends HTMLElement {
           text: 'Eliminar',
           on: {
             click: async () => {
-              if (confirm(`¿Está seguro de que desea eliminar la inversión "${inv.nombre}"?`)) {
+              if (confirm(`Vas a eliminar la inversión "${inv.nombre}". Esta acción no se puede deshacer. ¿Continuás?`)) {
                 await deleteInversion(inv.id);
                 await this.renderTable();
               }

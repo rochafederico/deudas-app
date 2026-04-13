@@ -58,9 +58,9 @@ export class AppShell extends HTMLElement {
         // Toolbar end: add debt button
         const addDebtBtn = document.createElement('app-button');
         addDebtBtn.id = 'add-debt';
-        addDebtBtn.setAttribute('aria-label', 'Agregar deuda');
+        addDebtBtn.setAttribute('aria-label', 'Agregar egreso');
         addDebtBtn.setAttribute('data-tour-step', 'nueva-deuda');
-        addDebtBtn.textContent = 'Nueva deuda';
+        addDebtBtn.textContent = 'Agregar egreso';
         addDebtBtn.addEventListener('click', (e) => {
             e.preventDefault();
             const modal = this.querySelector('#debtModal');
