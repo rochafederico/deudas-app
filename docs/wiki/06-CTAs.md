@@ -13,7 +13,7 @@
 
 - El verbo define la acción.
 - El objeto especifica qué se acciona (puede omitirse si el contexto es claro).
-- Primera letra del primer palabra en mayúscula, resto en minúsculas.
+- Primera letra de la primera palabra en mayúscula, resto en minúsculas.
 
 ```
 Agregar egreso        ← verbo + objeto
