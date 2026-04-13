@@ -1,11 +1,12 @@
 // test/layout.test.js
 // Tests for layout standardization: ResumenHeader dynamic updates,
-// PageSectionLayout structure, and navConfig route metadata.
-// 16 test cases covering navConfig, ResumenHeader, and PageSectionLayout.
+// PageSectionLayout structure, navConfig route metadata, and Home quick actions.
 import { assert } from './setup.js';
 import ResumenHeader from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
+import Home from '../src/pages/Home.js';
+import HomeQuickActions from '../src/pages/HomeQuickActions.js';
 
 export const tests = [
 
@@ -301,6 +302,77 @@ export const tests = [
         );
 
         document.body.removeChild(layout);
+    },
+
+    // ===================================================================
+    // UC Home: Home quick-actions use Bootstrap Icons and approved CTAs
+    // ===================================================================
+    async function home_quickActions_usesBootstrapIconsInTitle() {
+        console.log('  Home: título Acciones rápidas usa Bootstrap Icon (bi-lightning-charge)');
+        const container = Home();
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const title = card.querySelector('h5.card-title');
+        assert(title !== null, 'El card de Acciones rápidas debe tener un h5.card-title');
+        const icon = title.querySelector('i.bi.bi-lightning-charge');
+        assert(icon !== null, 'El título debe tener <i class="bi bi-lightning-charge">');
+    },
+
+    async function home_quickActions_ctaAgregarIngreso() {
+        console.log('  Home: CTA "Agregar ingreso" apunta a /ingresos con Bootstrap Icon');
+        const container = Home();
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const ingreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/ingresos');
+        assert(ingreso !== null, 'Debe existir un enlace a /ingresos');
+        assert(ingreso.textContent.includes('Agregar ingreso'), 'CTA debe decir "Agregar ingreso"');
+        assert(ingreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA ingreso debe tener bi-plus-circle');
+    },
+
+    async function home_quickActions_ctaAgregarEgreso() {
+        console.log('  Home: CTA "Agregar egreso" apunta a /gastos con Bootstrap Icon');
+        const container = Home();
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const egreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/gastos');
+        assert(egreso !== null, 'Debe existir un enlace a /gastos');
+        assert(egreso.textContent.includes('Agregar egreso'), 'CTA debe decir "Agregar egreso"');
+        assert(egreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA egreso debe tener bi-plus-circle');
+    },
+
+    async function home_quickActions_ctaVerInversiones() {
+        console.log('  Home: CTA "Ver inversiones" apunta a /inversiones con Bootstrap Icon');
+        const container = Home();
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const inv = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/inversiones');
+        assert(inv !== null, 'Debe existir un enlace a /inversiones');
+        assert(inv.textContent.includes('Ver inversiones'), 'CTA debe decir "Ver inversiones"');
+        assert(inv.querySelector('i.bi.bi-graph-up') !== null, 'CTA inversiones debe tener bi-graph-up');
+    },
+
+    // ===================================================================
+    // UC HomeQuickActions: componente independiente devuelve la misma estructura
+    // ===================================================================
+    async function homeQuickActions_isStandaloneComponent() {
+        console.log('  HomeQuickActions: devuelve .card con título y tres CTAs independientemente de Home');
+        const card = HomeQuickActions();
+        assert(card.classList.contains('card'), 'HomeQuickActions debe devolver un elemento con clase .card');
+        assert(card.querySelector('i.bi.bi-lightning-charge') !== null, 'Debe tener bi-lightning-charge en el título');
+        const links = card.querySelectorAll('a[href]');
+        assert(links.length === 3, 'Debe tener exactamente 3 CTAs');
     },
 
 ];
