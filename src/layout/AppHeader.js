@@ -87,7 +87,11 @@ export class AppHeader extends HTMLElement {
       trigger: 'click',
       placement: 'bottom',
       container: 'body',
-      sanitize: false,
+      allowList: {
+        ...window.bootstrap.Popover.Default.allowList,
+        button: ['type', 'class', 'aria-label', 'data-notif-close'],
+        a: [...(window.bootstrap.Popover.Default.allowList.a || []), 'data-notif-navigate'],
+      },
       popperConfig(defaultConfig) {
         defaultConfig.placement = 'bottom-end';
         return defaultConfig;
