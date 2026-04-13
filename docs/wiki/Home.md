@@ -44,7 +44,7 @@ Una herramienta de registro personal para que la persona tenga claridad sobre su
 ## 📝 Convenciones de esta Wiki
 
 - **Registro:** vos (rioplatense) + cercanía sin condescendencia.
-- **Naming de páginas:** `NN-Nombre-en-kebab-case`.
+- **Naming de páginas:** `NN-Titulo-Separado-Por-Guiones` (respetando el uso de mayúsculas tal como está en esta wiki).
 - **Estado de página:** ✅ v1 publicada / 🚧 en progreso / ⏳ pendiente.
 - **Checklist QA:** cada página tiene su checklist embebido al final.
 
