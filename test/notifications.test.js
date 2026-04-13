@@ -536,13 +536,13 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     // Mock bootstrap.Popover to capture the options without needing a real DOM render
     let capturedTitle = null;
     const originalBootstrap = window.bootstrap;
-    window.bootstrap = {
-        Popover: class {
-            constructor(_el, opts) { capturedTitle = opts?.title ?? null; }
-            dispose() {}
-            hide() {}
-        },
+    const MockPopover = class {
+        constructor(_el, opts) { capturedTitle = opts?.title ?? null; }
+        dispose() {}
+        hide() {}
     };
+    MockPopover.Default = { allowList: { '*': ['class', 'dir', 'id', 'lang', 'role'], a: ['target', 'href', 'title', 'rel'] } };
+    window.bootstrap = { Popover: MockPopover };
 
     // Dynamically import AppHeader (registers 'app-header' custom element)
     await import('../src/layout/AppHeader.js');
