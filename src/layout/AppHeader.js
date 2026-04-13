@@ -1,7 +1,5 @@
-import './Menu.js';
 import './DarkToggle.js';
 import '../shared/components/AppToast.js';
-import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
 import { trackEvent } from '../shared/observability/index.js';
 
 export class AppHeader extends HTMLElement {
@@ -35,26 +33,8 @@ export class AppHeader extends HTMLElement {
         this._popover?.hide();
       }
     };
-    this._onDesktopExportClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'header' });
-      openExportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
-    };
-    this._onDesktopImportClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'import_data', location: 'header' });
-      openImportModal(this.querySelector('#desktop-datos-toggle') || document.activeElement);
-    };
-    this._onDesktopDeleteClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'header' });
-      deleteAllData();
-    };
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
-    this.querySelector('#desktop-export')?.addEventListener('click', this._onDesktopExportClick);
-    this.querySelector('#desktop-import')?.addEventListener('click', this._onDesktopImportClick);
-    this.querySelector('#desktop-delete')?.addEventListener('click', this._onDesktopDeleteClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.addEventListener('click', this._onNotifPopoverClick);
@@ -63,9 +43,6 @@ export class AppHeader extends HTMLElement {
   disconnectedCallback() {
     this.querySelector('.navbar-brand')?.removeEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
-    this.querySelector('#desktop-export')?.removeEventListener('click', this._onDesktopExportClick);
-    this.querySelector('#desktop-import')?.removeEventListener('click', this._onDesktopImportClick);
-    this.querySelector('#desktop-delete')?.removeEventListener('click', this._onDesktopDeleteClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     document.removeEventListener('click', this._onNotifPopoverClick);
@@ -111,18 +88,6 @@ export class AppHeader extends HTMLElement {
         <div class="container-fluid">
           <a class="navbar-brand fw-bold" href="/" aria-label="Inicio" data-tour-step="bienvenida">Nivva</a>
           <div class="ms-auto d-flex align-items-center gap-2">
-            <div class="dropdown">
-              <button id="desktop-datos-toggle" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3"
-                type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Ajustes" aria-label="Ajustes" data-tour-step="config">
-                <i class="bi bi-gear" aria-hidden="true"></i>
-              </button>
-              <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#" id="desktop-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
-                <li><a class="dropdown-item" href="#" id="desktop-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" href="#" id="desktop-delete"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo</a></li>
-              </ul>
-            </div>
             <button id="notifications-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3 position-relative"
               type="button" title="Vencimientos próximos" aria-label="Ver vencimientos próximos">
               <i class="bi bi-bell" aria-hidden="true"></i>
