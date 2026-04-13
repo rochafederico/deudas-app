@@ -105,7 +105,7 @@ export class FeedbackModal extends HTMLElement {
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
                         disabled>
-                        Enviar
+                        Enviar por…
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>

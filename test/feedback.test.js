@@ -187,8 +187,8 @@ export const tests = [
         document.body.appendChild(modal);
         modal.render();
         const sendBtn = modal._sendBtn;
-        assert(sendBtn !== null && sendBtn !== undefined, 'Debe existir el botón Enviar');
-        assert(sendBtn.disabled || sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar desactivado al inicio');
+        assert(sendBtn !== null && sendBtn !== undefined, 'Debe existir el botón Enviar por…');
+        assert(sendBtn.disabled || sendBtn.hasAttribute('disabled'), 'Botón Enviar por… debe estar desactivado al inicio');
         document.body.removeChild(modal);
     },
 
@@ -205,7 +205,7 @@ export const tests = [
         modal._tipoEl.dispatchEvent(new Event('change'));
         modal._comentarioEl.dispatchEvent(new Event('input'));
 
-        assert(!modal._sendBtn.disabled && !modal._sendBtn.hasAttribute('disabled'), 'Botón Enviar debe estar activado con formulario válido');
+        assert(!modal._sendBtn.disabled && !modal._sendBtn.hasAttribute('disabled'), 'Botón Enviar por… debe estar activado con formulario válido');
         document.body.removeChild(modal);
     },
 
