@@ -21,7 +21,7 @@
 | **Ítem de navegación (nav label)** | 10 caracteres | 15 caracteres | Ej: "Inversiones" = 11 chars ✅ |
 | **Título de tarjeta (StatsCard)** | 12 caracteres | 20 caracteres | Ej: "Pendientes" = 10 chars ✅ |
 | **Nombre de acreedor (campo libre)** | — | 50 caracteres | Recomendación de UX, no validación estricta |
-| **Notas (textarea)** | — | 500 caracteres | Campo libre con limit visual recomendado |
+| **Notas (textarea)** | — | 500 caracteres | Campo libre con límite visual recomendado |
 | **Comentario de feedback** | — | 1000 caracteres (actual) | Ya implementado con counter visible |
 
 ---
