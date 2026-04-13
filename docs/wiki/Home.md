@@ -18,7 +18,7 @@
 | 06 | [CTAs](https://github.com/rochafederico/deudas-app/wiki/06-CTAs) | Convención de verbos y ejemplos por contexto | ✅ v1 |
 | 07 | [Plantillas de mensajes](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | Estructura éxito / error / vacío / ayuda | ✅ v1 |
 | 08 | [Textos breves + overflow](https://github.com/rochafederico/deudas-app/wiki/08-Textos-breves-overflow) | Límites de caracteres y comportamiento overflow | ✅ v1 |
-| QA | [Checklist QA](https://github.com/rochafederico/deudas-app/wiki/QA-Checklist) | Checklist de validación por documento | ✅ v1 |
+
 
 ---
 

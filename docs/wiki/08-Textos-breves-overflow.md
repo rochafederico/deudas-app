@@ -1,7 +1,7 @@
 # 08 — Textos breves + Overflow
 
 > **Objetivo:** definir los límites de caracteres por tipo de elemento y el comportamiento ante overflow.  
-> **Links:** [← 07 Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | [QA →](https://github.com/rochafederico/deudas-app/wiki/QA-Checklist)
+> **Links:** [← 07 Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | [← Home](https://github.com/rochafederico/deudas-app/wiki)
 
 ---
 
@@ -141,4 +141,4 @@
 
 ---
 
-*← [07 — Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | [QA →](https://github.com/rochafederico/deudas-app/wiki/QA-Checklist)*
+*← [07 — Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | [← Home](https://github.com/rochafederico/deudas-app/wiki)*
