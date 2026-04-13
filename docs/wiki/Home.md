@@ -18,6 +18,7 @@
 | 06 | [CTAs](https://github.com/rochafederico/deudas-app/wiki/06-CTAs) | Convención de verbos y ejemplos por contexto | ✅ v1 |
 | 07 | [Plantillas de mensajes](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | Estructura éxito / error / vacío / ayuda | ✅ v1 |
 | 08 | [Textos breves + overflow](https://github.com/rochafederico/deudas-app/wiki/08-Textos-breves-overflow) | Límites de caracteres y comportamiento overflow | ✅ v1 |
+| 09 | [Personas](https://github.com/rochafederico/deudas-app/wiki/09-Personas) · [fuente](../docs/wiki/09-Personas.md) | 3 personas basadas en encuestas (N=54) | ✅ v1 |
 
 
 ---

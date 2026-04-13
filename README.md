@@ -17,6 +17,7 @@ Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript p
 | [06 — CTAs](https://github.com/rochafederico/deudas-app/wiki/06-CTAs) | Convención de verbos y ejemplos |
 | [07 — Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | Estructura éxito / error / vacío / ayuda |
 | [08 — Textos breves](https://github.com/rochafederico/deudas-app/wiki/08-Textos-breves-overflow) | Límites de caracteres y overflow |
+| [09 — Personas](https://github.com/rochafederico/deudas-app/wiki/09-Personas) | 3 personas basadas en encuestas (N=54) |
 
 
 ## Características
