@@ -87,6 +87,10 @@ export class AppHeader extends HTMLElement {
       trigger: 'click',
       placement: 'bottom',
       container: 'body',
+      popperConfig(defaultConfig) {
+        defaultConfig.placement = 'bottom-end';
+        return defaultConfig;
+      },
     });
     let badge = btn.querySelector('.notif-badge');
     if (!badge) {
