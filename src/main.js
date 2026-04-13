@@ -3,6 +3,7 @@ import { initDB } from './shared/database/initDB.js';
 import routes from './routes.js';
 import AppHeader from './layout/AppHeader.js';
 import BottomNav from './layout/BottomNav.js';
+import Sidebar from './layout/Sidebar.js';
 import ResumenHeader from './layout/ResumenHeader.js';
 import { navItems } from './layout/navConfig.js';
 import { TourManager } from './features/tour/TourManager.js';
@@ -15,6 +16,18 @@ document.body.appendChild(AppHeader());
 document.body.classList.add('bg-body-tertiary');
 // Add bottom padding on mobile so content is not hidden behind the fixed bottom nav
 document.body.classList.add('pb-5', 'pb-lg-0');
+
+// Layout container: flex row for sidebar (desktop) + main content
+const layoutContainer = document.createElement('div');
+layoutContainer.id = 'app-layout';
+layoutContainer.className = 'd-lg-flex min-vh-100';
+
+// Sidebar (visible only on desktop)
+layoutContainer.appendChild(Sidebar());
+
+// Main content area
+const mainArea = document.createElement('main');
+mainArea.className = 'flex-grow-1';
 
 const wrapper = document.createElement('div');
 wrapper.id = 'app-wrapper';
@@ -30,8 +43,10 @@ app.id = 'app';
 app.className = 'mt-3';
 wrapper.appendChild(app);
 
+mainArea.appendChild(wrapper);
+layoutContainer.appendChild(mainArea);
 
-document.body.appendChild(wrapper);
+document.body.appendChild(layoutContainer);
 document.body.appendChild(BottomNav());
 document.body.appendChild(FeedbackFabComponent());
 

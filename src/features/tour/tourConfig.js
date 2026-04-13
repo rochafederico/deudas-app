@@ -82,7 +82,8 @@ export const tourSteps = [
         text: 'Desde Ajustes podés hacer una copia de seguridad o restaurar tus datos.',
         getTarget: () =>
             findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="config"]' }]) ||
-            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]),
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="config"]' }]) ||
+            findVisibleTourTarget([{ selector: 'app-sidebar' }, { selector: '[data-tour-step="config"]' }]),
         position: 'bottom'
     },
     {
@@ -91,7 +92,8 @@ export const tourSteps = [
         text: 'Explorá las distintas secciones desde acá',
         getTarget: () =>
             findVisibleTourTarget([{ selector: 'app-header' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
-            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
+            findVisibleTourTarget([{ selector: 'bottom-nav' }, { selector: '[data-tour-step="menu-navegacion"]' }]) ||
+            findVisibleTourTarget([{ selector: 'app-sidebar' }, { selector: '[data-tour-step="menu-navegacion"]' }]),
         position: 'bottom'
     },
     {

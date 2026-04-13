@@ -63,3 +63,15 @@ $info:      #0dcaf0;
 body.feedback-modal-open .feedback-fab {
     display: none !important;
 }
+
+// Sidebar width for desktop navigation (no Bootstrap utility provides a fixed px width).
+// position: sticky + top: 0 keeps it in view while the main content scrolls.
+// overflow-y: auto handles overflow if more nav items are added.
+app-sidebar {
+    width: 220px;
+    min-width: 220px;
+    max-height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+}
