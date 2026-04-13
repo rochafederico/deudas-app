@@ -20,7 +20,7 @@ document.body.classList.add('pb-5', 'pb-lg-0');
 // Layout container: flex row for sidebar (desktop) + main content
 const layoutContainer = document.createElement('div');
 layoutContainer.id = 'app-layout';
-layoutContainer.className = 'd-lg-flex';
+layoutContainer.className = 'd-lg-flex min-vh-100';
 
 // Sidebar (visible only on desktop)
 layoutContainer.appendChild(Sidebar());

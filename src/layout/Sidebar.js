@@ -7,6 +7,7 @@ import { trackEvent } from '../shared/observability/index.js';
 
 export class AppSidebar extends HTMLElement {
   connectedCallback() {
+    this.classList.add('d-none', 'd-lg-flex', 'flex-column', 'h-100');
     this.render();
     this._onNavClick = (e) => {
       const link = e.target.closest('[data-path]');
@@ -82,29 +83,27 @@ export class AppSidebar extends HTMLElement {
     }).join('');
 
     this.innerHTML = `
-      <div class="d-flex flex-column h-100">
-        <nav id="sidebar-nav" class="flex-grow-1 py-3 px-2"
-          aria-label="Navegación principal" data-tour-step="menu-navegacion">
-          <ul class="nav flex-column gap-1 list-unstyled mb-0">
-            ${navHtml}
+      <nav id="sidebar-nav" class="flex-grow-1 py-3 px-2"
+        aria-label="Navegación principal" data-tour-step="menu-navegacion">
+        <ul class="nav flex-column gap-1 list-unstyled mb-0">
+          ${navHtml}
+        </ul>
+      </nav>
+      <div class="border-top px-2 py-3">
+        <div class="dropdown dropup">
+          <button id="sidebar-ajustes-toggle"
+            class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-body w-100 bg-transparent border-0"
+            type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            data-tour-step="config" aria-label="Ajustes">
+            <i class="bi bi-gear fs-5" aria-hidden="true"></i>
+            <span>Ajustes</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" id="sidebar-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
+            <li><a class="dropdown-item" href="#" id="sidebar-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="#" id="sidebar-delete"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo</a></li>
           </ul>
-        </nav>
-        <div class="border-top px-2 py-3">
-          <div class="dropdown dropup">
-            <button id="sidebar-ajustes-toggle"
-              class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-body w-100 bg-transparent border-0"
-              type="button" data-bs-toggle="dropdown" aria-expanded="false"
-              data-tour-step="config" aria-label="Ajustes">
-              <i class="bi bi-gear fs-5" aria-hidden="true"></i>
-              <span>Ajustes</span>
-            </button>
-            <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="#" id="sidebar-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
-              <li><a class="dropdown-item" href="#" id="sidebar-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="#" id="sidebar-delete"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo</a></li>
-            </ul>
-          </div>
         </div>
       </div>
     `;

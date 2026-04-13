@@ -63,13 +63,11 @@ body.feedback-modal-open .feedback-fab {
 }
 
 // Sidebar width for desktop navigation (no Bootstrap utility provides a fixed px width).
-// height: calc(100vh - 3.5rem) keeps the sidebar exactly the remaining viewport height below
-// the Bootstrap navbar (3.5rem ≈ 56px default), so h-100 inside always reaches the bottom.
 // position: sticky + top: 0 keeps it in view while the main content scrolls.
+// overflow-y: auto handles overflow if more nav items are added.
 app-sidebar {
     width: 220px;
     min-width: 220px;
-    height: calc(100vh - 3.5rem);
     position: sticky;
     top: 0;
     overflow-y: auto;
