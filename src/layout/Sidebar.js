@@ -65,16 +65,21 @@ export class AppSidebar extends HTMLElement {
   }
 
   render() {
-    const navHtml = navItems.map(item => `
+    const currentPath = window.location.pathname;
+    const navHtml = navItems.map(item => {
+      const isActive = item.path === currentPath;
+      return `
       <li>
         <a href="${item.path}"
-          class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-body"
-          data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}">
+          class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-body${isActive ? ' active' : ''}"
+          data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}"
+          ${isActive ? 'aria-current="page"' : ''}>
           <i class="bi ${item.icon} fs-5" aria-hidden="true"></i>
           <span>${item.label}</span>
         </a>
       </li>
-    `).join('');
+    `;
+    }).join('');
 
     this.innerHTML = `
       <div class="d-flex flex-column h-100">
