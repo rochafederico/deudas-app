@@ -58,18 +58,25 @@ export class BottomNav extends HTMLElement {
       const itemPath = item.dataset.path;
       const isActive = itemPath === path;
       item.classList.toggle('active', isActive);
+      item.classList.toggle('text-white', isActive);
+      item.classList.toggle('text-white-50', !isActive);
       item.setAttribute('aria-current', isActive ? 'page' : 'false');
     });
   }
 
   render() {
-    const navItemsHtml = navItems.map(item => `
-      <button type="button" class="btn btn-link text-white text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center"
-        data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}">
+    const currentPath = window.location.pathname;
+    const navItemsHtml = navItems.map(item => {
+      const isActive = item.path === currentPath;
+      return `
+      <button type="button" class="btn btn-link text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center ${isActive ? 'text-white active' : 'text-white-50'}"
+        data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}"
+        ${isActive ? 'aria-current="page"' : 'aria-current="false"'}>
         <i class="bi ${item.icon} fs-5 lh-1" aria-hidden="true"></i>
         <small class="d-block lh-1 mt-1">${item.label}</small>
       </button>
-    `).join('');
+    `;
+    }).join('');
 
     this.innerHTML = `
       <nav class="navbar fixed-bottom bg-primary d-lg-none py-0 border-top border-primary-subtle shadow"
