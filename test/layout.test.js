@@ -1,12 +1,13 @@
 // test/layout.test.js
 // Tests for layout standardization: ResumenHeader dynamic updates,
 // PageSectionLayout structure, navConfig route metadata, and Home quick actions.
-// 19 test cases covering navConfig, ResumenHeader, PageSectionLayout, and Home.
+// 20 test cases covering navConfig, ResumenHeader, PageSectionLayout, Home, and HomeQuickActions.
 import { assert } from './setup.js';
 import ResumenHeader from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
 import Home from '../src/pages/Home.js';
+import HomeQuickActions from '../src/pages/HomeQuickActions.js';
 
 export const tests = [
 
@@ -344,6 +345,18 @@ export const tests = [
         assert(inv !== null, 'Debe existir un enlace a /inversiones');
         assert(inv.textContent.includes('Ver inversiones'), 'CTA debe decir "Ver inversiones"');
         assert(inv.querySelector('i.bi.bi-graph-up') !== null, 'CTA inversiones debe tener bi-graph-up');
+    },
+
+    // ===================================================================
+    // UC HomeQuickActions: componente independiente devuelve la misma estructura
+    // ===================================================================
+    async function homeQuickActions_isStandaloneComponent() {
+        console.log('  HomeQuickActions: devuelve .card con título y tres CTAs independientemente de Home');
+        const card = HomeQuickActions();
+        assert(card.classList.contains('card'), 'HomeQuickActions debe devolver un elemento con clase .card');
+        assert(card.querySelector('i.bi.bi-lightning-charge') !== null, 'Debe tener bi-lightning-charge en el título');
+        const links = card.querySelectorAll('a[href]');
+        assert(links.length === 3, 'Debe tener exactamente 3 CTAs');
     },
 
 ];
