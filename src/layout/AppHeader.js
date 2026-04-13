@@ -85,14 +85,8 @@ export class AppHeader extends HTMLElement {
         '</div>',
       content: html,
       trigger: 'click',
-      placement: 'bottom',
+      placement: 'bottom-end',
       container: 'body',
-      customClass: 'notif-popover',
-      popperConfig: {
-        modifiers: [
-          { name: 'preventOverflow', options: { altAxis: true, padding: 8 } },
-        ],
-      },
     });
     let badge = btn.querySelector('.notif-badge');
     if (!badge) {
