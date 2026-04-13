@@ -6,40 +6,41 @@
 
 ---
 
-## 🗺️ Mapa de flujos (Mermaid)
+## 🗺️ Mapa del sitio
 
 ```mermaid
 flowchart TD
-    A([Inicio — /]) --> B[StatsIndicators\nIngresos · Gastos · Balance · Pendientes]
-    A --> C[DebtList\nLista de cuotas del mes]
-    C --> D[DebtModal — Agregar deuda]
-    C --> E[DebtDetailModal — Detalle de deuda]
-    E --> D
-    D --> F[DebtForm\nAcreedor · Tipo · Notas · Montos]
-    F --> G[MontoForm\nMonto · Moneda · Vencimiento]
-    G --> F
+    NAV([Navegación]) --> A
+    NAV --> B
+    NAV --> C
+    NAV --> D
 
-    NAV[Navegación] --> A
-    NAV --> H([Ingresos — /ingresos])
-    NAV --> I([Gastos — /gastos])
-    NAV --> J([Inversiones — /inversiones])
+    A["🏠 Inicio (/)
+    Resumen mensual"]
+    B["💸 Egresos (/egresos)
+    Lista de cuotas del mes"]
+    C["💰 Ingresos (/ingresos)
+    Ingresos del mes"]
+    D["📈 Inversiones (/inversiones)
+    Seguimiento de inversiones"]
 
-    H --> K[IngresoModal\nAgregar ingreso]
-    K --> L[IngresoForm\nFecha · Descripción · Monto · Moneda]
+    B --> B1[Agregar egreso]
+    B --> B2[Detalle de egreso]
+    B2 --> B1
 
-    J --> M[InversionesList]
-    M --> N[InversionModal\nAgregar inversión]
-    M --> O[valorInversionModal\nNuevo valor]
+    C --> C1[Agregar ingreso]
 
-    HEADER[AppHeader / BottomNav] --> P[Ajustes dropdown]
-    P --> Q[ExportDataModal]
-    P --> R[ImportDataModal]
-    P --> S[Eliminar todo — confirm]
+    D --> D1[Agregar inversión]
+    D --> D2[Registrar nuevo valor]
 
-    HEADER --> T[Notificaciones\nVencimientos próximos]
-    HEADER --> U[Tour guiado\n7 pasos]
+    NAV --> E[Ajustes]
+    E --> E1[Exportar datos]
+    E --> E2[Importar datos]
+    E --> E3[Eliminar todos los datos]
 
-    FAB[FeedbackFab] --> V[FeedbackModal\nEnviar feedback]
+    NAV --> F[Vencimientos próximos]
+    NAV --> G[Tour guiado]
+    NAV --> H[Enviar comentario]
 ```
 
 ---
