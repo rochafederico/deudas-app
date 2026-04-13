@@ -1,7 +1,6 @@
 // test/layout.test.js
 // Tests for layout standardization: ResumenHeader dynamic updates,
 // PageSectionLayout structure, navConfig route metadata, and Home quick actions.
-// 20 test cases covering navConfig, ResumenHeader, PageSectionLayout, Home, and HomeQuickActions.
 import { assert } from './setup.js';
 import ResumenHeader from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
@@ -311,17 +310,26 @@ export const tests = [
     async function home_quickActions_usesBootstrapIconsInTitle() {
         console.log('  Home: título Acciones rápidas usa Bootstrap Icon (bi-lightning-charge)');
         const container = Home();
-        const card = container.querySelector('.card');
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
         assert(card !== null, 'Home debe tener un card de Acciones rápidas');
-        const icon = card.querySelector('i.bi.bi-lightning-charge');
+        const title = card.querySelector('h5.card-title');
+        assert(title !== null, 'El card de Acciones rápidas debe tener un h5.card-title');
+        const icon = title.querySelector('i.bi.bi-lightning-charge');
         assert(icon !== null, 'El título debe tener <i class="bi bi-lightning-charge">');
     },
 
     async function home_quickActions_ctaAgregarIngreso() {
         console.log('  Home: CTA "Agregar ingreso" apunta a /ingresos con Bootstrap Icon');
         const container = Home();
-        const links = container.querySelectorAll('.card a[href]');
-        const ingreso = Array.from(links).find(l => l.getAttribute('href') === '/ingresos');
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const ingreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/ingresos');
         assert(ingreso !== null, 'Debe existir un enlace a /ingresos');
         assert(ingreso.textContent.includes('Agregar ingreso'), 'CTA debe decir "Agregar ingreso"');
         assert(ingreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA ingreso debe tener bi-plus-circle');
@@ -330,8 +338,12 @@ export const tests = [
     async function home_quickActions_ctaAgregarEgreso() {
         console.log('  Home: CTA "Agregar egreso" apunta a /gastos con Bootstrap Icon');
         const container = Home();
-        const links = container.querySelectorAll('.card a[href]');
-        const egreso = Array.from(links).find(l => l.getAttribute('href') === '/gastos');
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const egreso = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/gastos');
         assert(egreso !== null, 'Debe existir un enlace a /gastos');
         assert(egreso.textContent.includes('Agregar egreso'), 'CTA debe decir "Agregar egreso"');
         assert(egreso.querySelector('i.bi.bi-plus-circle') !== null, 'CTA egreso debe tener bi-plus-circle');
@@ -340,8 +352,12 @@ export const tests = [
     async function home_quickActions_ctaVerInversiones() {
         console.log('  Home: CTA "Ver inversiones" apunta a /inversiones con Bootstrap Icon');
         const container = Home();
-        const links = container.querySelectorAll('.card a[href]');
-        const inv = Array.from(links).find(l => l.getAttribute('href') === '/inversiones');
+        const card = Array.from(container.querySelectorAll('.card')).find(c => {
+            const title = c.querySelector('h5.card-title');
+            return title !== null && title.textContent.includes('Acciones rápidas');
+        });
+        assert(card !== null, 'Home debe tener un card de Acciones rápidas');
+        const inv = Array.from(card.querySelectorAll('a[href]')).find(l => l.getAttribute('href') === '/inversiones');
         assert(inv !== null, 'Debe existir un enlace a /inversiones');
         assert(inv.textContent.includes('Ver inversiones'), 'CTA debe decir "Ver inversiones"');
         assert(inv.querySelector('i.bi.bi-graph-up') !== null, 'CTA inversiones debe tener bi-graph-up');
