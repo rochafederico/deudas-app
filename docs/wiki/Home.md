@@ -9,8 +9,8 @@
 
 | # | Página | Descripción | Estado |
 |---|--------|-------------|--------|
-| 00 | [Marca](https://github.com/rochafederico/deudas-app/wiki/00-Marca) | Propósito, personalidad, atributos y anti-atributos | ✅ v1 |
-| 01 | [Competencia](https://github.com/rochafederico/deudas-app/wiki/01-competencia) | Análisis de 5 competidores | ✅ v1 |
+| 00 | [Marca](https://github.com/rochafederico/deudas-app/wiki/00-Marca) · [fuente](../docs/wiki/00-Marca.md) | Propósito, personalidad, paleta de colores, objetivos del usuario | ✅ v1 |
+| 01 | [Competencia](https://github.com/rochafederico/deudas-app/wiki/01-Competencia) · [fuente](../docs/wiki/01-Competencia.md) | Análisis de 5 competidores + aprendizajes de microcopy | ✅ v1 |
 | 02 | [Relevamiento de lo hecho](https://github.com/rochafederico/deudas-app/wiki/02-Relevamiento) | Inventario de textos actuales de la app | ✅ v1 |
 | 03 | [Manual UI + Copy Guidelines](https://github.com/rochafederico/deudas-app/wiki/03-Manual-UI-Copy-Guidelines) | Guía por componente Bootstrap | ✅ v1 |
 | 04 | [Voz y tono](https://github.com/rochafederico/deudas-app/wiki/04-Voz-y-tono) | Registro, formalidad, estilo, do/don't | ✅ v1 |

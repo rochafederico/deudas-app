@@ -18,20 +18,21 @@
 ## 📋 Checklist por página
 
 ### 00 — Marca
-- [ ] Propósito de la marca definido
-- [ ] Personalidad de la marca (atributos)
-- [ ] Anti-atributos ("lo que no es")
-- [ ] Personas objetivo (mínimo 2) documentadas
-- [ ] Brief de cliente/usuario incluido o en página propia
+- [x] Propósito de la marca definido
+- [x] Personalidad de la marca (atributos)
+- [x] Anti-atributos ("lo que no es")
+- [x] Objetivos del usuario documentados (mínimo 2)
+- [x] Paleta de colores con hex definida
+- [x] Tagline y nombre de marca documentados
 
 ### 01 — Competencia
 - [x] 5 competidores presentes: Mobills, Monefy, Deudores - Control de Deudas, Money Lover, Spendee
 - [x] Tabla comparativa publicada
-- [ ] Análisis de microcopy y aprendizajes accionables incluidos (v1 iterativa — puede mejorarse)
+- [x] Análisis de microcopy y aprendizajes accionables incluidos (5 aprendizajes)
 
 ### 02 — Relevamiento
 - [x] Mapa de flujos (Mermaid) renderiza correctamente
-- [x] Cubre las 3 rutas: `/`, `/ingresos`, `/inversiones`
+- [x] Cubre las 4 rutas: `/`, `/egresos`, `/ingresos`, `/inversiones`
 - [x] Cubre acciones secundarias: Ajustes, Tour, Notificaciones, Feedback
 - [x] Cubre estados vacíos, errores, éxito, loading
 - [x] Identifica tecnicismos y textos en inglés expuestos al usuario
@@ -105,15 +106,15 @@
 - [x] Las plantillas de 07 aplican las reglas de 04 (qué pasó + próximo paso, vos, voz activa)
 - [x] Los límites de 08 son consistentes con los ejemplos en 04 y 07
 - [x] Los problemas de P-01, P-02, P-03 (tuteo) están documentados en 02 y tienen regla en 04
-- [ ] 00-Marca referencia a 04-Voz y tono (pendiente de expansión de 00-Marca)
-- [ ] 01-Competencia tiene aprendizajes de microcopy accionables (v1 iterativa)
+- [x] 00-Marca referencia a 04-Voz y tono (ver sección "Relación con el sistema de copy")
+- [x] 01-Competencia tiene aprendizajes de microcopy accionables (5 ítems)
 
 ---
 
 ## 📋 Checklist de no regresión
 
-- [x] Contenido de `00-Marca` preservado (imagen original + estructura)
-- [x] Contenido de `01-competencia` preservado (5 competidores)
+- [x] Contenido de `00-Marca` completo (paleta, personalidad, atributos, objetivos del usuario)
+- [x] Contenido de `01-Competencia` completo (5 competidores + aprendizajes de microcopy)
 - [x] 0 cambios en código fuente de la app (`src/`) — solo Wiki + README
 - [x] Cada página tiene su checklist QA embebido
 
@@ -127,7 +128,7 @@
 | HP-02 | Auditoría de microcopy completada (3 rutas + acciones) | ✅ |
 | HP-03 | Mapa de pantallas y flujos (Mermaid) | ✅ |
 | HP-04 | Plantillas reutilizables creadas | ✅ |
-| HP-05 | Marca documentada como resumen operativo | ⚠️ v1 existente — pendiente expansión |
+| HP-05 | Marca documentada: paleta, personalidad, tagline, objetivos del usuario | ✅ |
 | HP-06 | Voz y tono con do/don't (mín. 5 pares) | ✅ |
 | HP-07 | Glosario con términos clave | ✅ |
 | HP-08 | CTAs: patrón + lista de verbos + cross-reference | ✅ |
@@ -142,8 +143,8 @@
 
 | ID | Ítem | Prioridad |
 |---|---|---|
-| PD-01 | Expandir 00-Marca con Personas (mín. 2) y Brief de usuario | Alta |
-| PD-02 | Expandir 01-Competencia con análisis de microcopy accionable | Media |
+| PD-01 | ~~Expandir 00-Marca con Personas (mín. 2) y Brief de usuario~~ — Resuelto en esta versión | ✅ |
+| PD-02 | ~~Expandir 01-Competencia con análisis de microcopy accionable~~ — Resuelto en esta versión | ✅ |
 | PD-03 | Implementar correcciones de tuteo (P-01, P-02, P-03) en código | Alta |
 | PD-04 | Implementar término "Egreso" en lugar de "deuda" en UI (P-06 del glosario) | Media |
 | PD-05 | Agregar `maxlength` con feedback visual a campos de formulario | Media |
