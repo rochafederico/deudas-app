@@ -57,6 +57,7 @@ export class AppSidebar extends HTMLElement {
     this.querySelectorAll('[data-path]').forEach(item => {
       const isActive = item.dataset.path === path;
       item.classList.toggle('active', isActive);
+      item.classList.toggle('text-body', !isActive);
       if (isActive) {
         item.setAttribute('aria-current', 'page');
       } else {
@@ -72,7 +73,7 @@ export class AppSidebar extends HTMLElement {
       return `
       <li class="nav-item">
         <a href="${item.path}"
-          class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3 text-body${isActive ? ' active' : ''}"
+          class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-3${isActive ? ' active' : ' text-body'}"
           data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}"
           ${isActive ? 'aria-current="page"' : ''}>
           <i class="bi ${item.icon} fs-5" aria-hidden="true"></i>
