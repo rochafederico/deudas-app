@@ -87,6 +87,7 @@ export class AppHeader extends HTMLElement {
       trigger: 'click',
       placement: 'bottom',
       container: 'body',
+      sanitize: false,
       popperConfig(defaultConfig) {
         defaultConfig.placement = 'bottom-end';
         return defaultConfig;
