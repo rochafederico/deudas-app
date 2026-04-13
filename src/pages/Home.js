@@ -24,12 +24,12 @@ export default function Home() {
   card.className = 'card';
   card.innerHTML = `
     <div class="card-body">
-      <h5 class="card-title">⚡ Acciones rápidas</h5>
-      <p class="card-text">Elegí qué querés hacer hoy</p>
+      <h5 class="card-title"><i class="bi bi-lightning-charge" aria-hidden="true"></i> Acciones rápidas</h5>
+      <p class="card-text text-body-secondary">Elegí qué querés hacer hoy</p>
       <div class="d-flex justify-content-start flex-wrap gap-3 mt-3">
-        <a href="/ingresos" class="btn btn-outline-primary">💰 Registrar ingresos</a>
-        <a href="/gastos" class="btn btn-outline-primary">💳 Gestionar egresos</a>
-        <a href="/inversiones" class="btn btn-outline-primary">📈 Seguimiento de inversiones</a>
+        <a href="/ingresos" class="btn btn-outline-success"><i class="bi bi-plus-circle" aria-hidden="true"></i> Agregar ingreso</a>
+        <a href="/gastos" class="btn btn-outline-danger"><i class="bi bi-plus-circle" aria-hidden="true"></i> Agregar egreso</a>
+        <a href="/inversiones" class="btn btn-outline-primary"><i class="bi bi-graph-up" aria-hidden="true"></i> Ver inversiones</a>
       </div>
     </div>
   `;
