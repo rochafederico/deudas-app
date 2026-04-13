@@ -99,7 +99,7 @@ export class AppSidebar extends HTMLElement {
             <i class="bi bi-gear fs-5" aria-hidden="true"></i>
             <span>Ajustes</span>
           </button>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu" aria-labelledby="sidebar-ajustes-toggle">
             <li><a class="dropdown-item" href="#" id="sidebar-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
             <li><a class="dropdown-item" href="#" id="sidebar-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
             <li><hr class="dropdown-divider"></li>

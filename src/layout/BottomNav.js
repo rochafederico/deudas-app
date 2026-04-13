@@ -90,7 +90,7 @@ export class BottomNav extends HTMLElement {
               <i class="bi bi-gear fs-5 lh-1" aria-hidden="true"></i>
               <small class="d-block lh-1 mt-1">Ajustes</small>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bottom-nav-ajustes-toggle">
               <li><a class="dropdown-item" href="#" id="bottom-nav-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
               <li><a class="dropdown-item" href="#" id="bottom-nav-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
               <li><hr class="dropdown-divider"></li>
