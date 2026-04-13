@@ -1,6 +1,23 @@
-# Registro de Deudas
+# Registro de Deudas — Nivva
 
 Aplicación web para gestionar deudas, montos y vencimientos usando JavaScript puro, Web Components y IndexedDB.
+
+## 📚 Documentación de marca y copy
+
+> Toda la documentación de marca, voz/tono, glosario y copy de Nivva está en la **[Wiki del repositorio](https://github.com/rochafederico/deudas-app/wiki)**.  
+> Los archivos fuente de la wiki también están disponibles en [`docs/wiki/`](./docs/wiki/).
+
+| Página | Descripción |
+|--------|-------------|
+| [Home / Índice](https://github.com/rochafederico/deudas-app/wiki) | Tabla de contenidos del sistema de marca |
+| [02 — Relevamiento](https://github.com/rochafederico/deudas-app/wiki/02-Relevamiento) | Inventario de microcopy actual + mapa de flujos |
+| [03 — Manual UI](https://github.com/rochafederico/deudas-app/wiki/03-Manual-UI-Copy-Guidelines) | Guía por componente Bootstrap |
+| [04 — Voz y tono](https://github.com/rochafederico/deudas-app/wiki/04-Voz-y-tono) | Registro "vos", reglas y ejemplos do/don't |
+| [05 — Glosario](https://github.com/rochafederico/deudas-app/wiki/05-Glosario) | Términos aprobados y prohibidos |
+| [06 — CTAs](https://github.com/rochafederico/deudas-app/wiki/06-CTAs) | Convención de verbos y ejemplos |
+| [07 — Plantillas](https://github.com/rochafederico/deudas-app/wiki/07-Plantillas-de-mensajes) | Estructura éxito / error / vacío / ayuda |
+| [08 — Textos breves](https://github.com/rochafederico/deudas-app/wiki/08-Textos-breves-overflow) | Límites de caracteres y overflow |
+| [QA — Checklist](https://github.com/rochafederico/deudas-app/wiki/QA-Checklist) | Validación de consistencia y cobertura |
 
 ## Características
 - **Frontend moderno:** HTML5, CSS y JavaScript sin frameworks.
