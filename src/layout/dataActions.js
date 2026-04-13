@@ -22,7 +22,7 @@ export function openImportModal(returnFocus) {
 }
 
 export async function deleteAllData() {
-  const confirmed = confirm('¿Estás seguro de que deseas eliminar todos los datos? Esta acción no se puede deshacer.');
+  const confirmed = confirm('Vas a eliminar todos tus egresos, ingresos e inversiones. Esta acción no se puede deshacer. ¿Continuás?');
   if (!confirmed) return;
 
   let stores;
@@ -37,7 +37,7 @@ export async function deleteAllData() {
     ];
   } catch (error) {
     console.error('Error al cargar módulos de datos:', error);
-    window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al cargar los módulos de datos.', type: 'danger' } }));
+    window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ No pudimos cargar tus datos. Intentá de nuevo.', type: 'danger' } }));
     return;
   }
 

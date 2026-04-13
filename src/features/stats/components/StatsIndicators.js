@@ -49,7 +49,7 @@ export default function StatsIndicators({ mes } = {}) {
       container.innerHTML = '';
       const errEl = document.createElement('div');
       errEl.className = 'col-12 text-danger px-2';
-      errEl.textContent = 'Error cargando resumen';
+      errEl.textContent = 'No pudimos cargar el resumen. Actualizá la página.';
       container.appendChild(errEl);
       console.error('Error getMonthlySummary', err);
     }

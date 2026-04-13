@@ -90,11 +90,11 @@ export class ExportDataModal extends HTMLElement {
                 ingresos: ingresos.length,
                 inversiones: inversionesMapped.length
             });
-            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Exportación exitosa. El archivo se descargó.', type: 'success' } }));
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '✅ Datos exportados.', type: 'success' } }));
         } catch (error) {
             console.error('Error al exportar:', error);
             trackFlowError('export_data', { step: 'export', reason: error.message });
-            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ Error al exportar los datos', type: 'danger' } }));
+            window.dispatchEvent(new CustomEvent('app:notify', { detail: { message: '❌ No pudimos exportar tus datos. Intentá de nuevo.', type: 'danger' } }));
             this.close();
         }
     }

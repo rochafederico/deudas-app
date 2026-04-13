@@ -82,7 +82,7 @@ export class DebtForm extends HTMLElement {
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'tipoDeuda', type: 'text', label: 'Tipo de Deuda' },
+            { name: 'tipoDeuda', type: 'text', label: 'Tipo de deuda' },
             { name: 'notas', type: 'textarea', label: 'Notas' }
         ];
         form.submitText = 'Guardar';
