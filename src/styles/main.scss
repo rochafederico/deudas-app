@@ -61,3 +61,10 @@ $info:      #0dcaf0;
 body.feedback-modal-open .feedback-fab {
     display: none !important;
 }
+
+// Sidebar width for desktop navigation (no Bootstrap utility provides a fixed px width)
+app-sidebar {
+    width: 220px;
+    min-width: 220px;
+    min-height: 100vh;
+}
