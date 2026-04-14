@@ -221,10 +221,10 @@ async function testCheckAndNotifySendsOverdueNotifications() {
 }
 
 // ===================================================================
-// UC7: checkAndNotify – does nothing when Notification not supported and no payments
+// UC7: checkAndNotify – always shows panel but skips native notifications when Notification not supported
 // ===================================================================
 async function testCheckAndNotifyUnsupported() {
-    console.log('  UC7: checkAndNotify does nothing when Notification API is not supported and deudas is empty');
+    console.log('  UC7: checkAndNotify always shows panel; skips native notifications when API is not supported');
 
     const originalNotification = global.Notification;
     delete global.Notification;
@@ -243,7 +243,8 @@ async function testCheckAndNotifyUnsupported() {
         threw = true;
     }
     assert(!threw, 'checkAndNotify no debe lanzar error cuando API no está soportada');
-    assert(events.length === 0, 'Sin deudas no se despachan eventos app:upcoming-panel');
+    assert(events.length === 1, 'Siempre se despacha el evento app:upcoming-panel para inicializar el popover');
+    assert(events[0].html.includes('No hay vencimientos próximos'), 'El panel muestra el estado vacío');
 
     window.removeEventListener('app:upcoming-panel', handler);
     global.Notification = originalNotification;
@@ -570,6 +571,42 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     window.bootstrap = originalBootstrap;
 }
 
+// ===================================================================
+// UC15: buildUpcomingPaymentsHTML – estado vacío sin pagos
+// ===================================================================
+async function testBuildUpcomingPaymentsHTMLEmpty() {
+    console.log('  UC15: buildUpcomingPaymentsHTML muestra mensaje de estado vacío cuando no hay pagos');
+
+    const { html, todayCount, overdueCount } = buildUpcomingPaymentsHTML([], localDate(2026, 4, 3));
+
+    assert(html.includes('No hay vencimientos próximos'), 'Incluye mensaje de estado vacío');
+    assert(html.includes('Buen momento para revisar el mes'), 'Incluye mensaje positivo de estado vacío');
+    assert(todayCount === 0, 'todayCount es 0');
+    assert(overdueCount === 0, 'overdueCount es 0');
+}
+
+// ===================================================================
+// UC16: checkAndNotify – siempre inicializa el popover aunque no haya pagos
+// ===================================================================
+async function testCheckAndNotifyEmptyAlwaysShowsPanel() {
+    console.log('  UC16: checkAndNotify despacha app:upcoming-panel incluso sin pagos próximos');
+
+    const panelEvents = [];
+    const handler = (e) => panelEvents.push(e.detail);
+    window.addEventListener('app:upcoming-panel', handler);
+
+    const { checkAndNotify: can } = await import('../src/features/notifications/NotificationService.js');
+
+    await can([], localDate(2026, 4, 3));
+
+    assert(panelEvents.length === 1, 'Se despacha el evento app:upcoming-panel aunque no haya pagos');
+    assert(panelEvents[0].html.includes('No hay vencimientos próximos'), 'El HTML contiene el mensaje de estado vacío');
+    assert(panelEvents[0].todayCount === 0, 'todayCount es 0');
+    assert(panelEvents[0].overdueCount === 0, 'overdueCount es 0');
+
+    window.removeEventListener('app:upcoming-panel', handler);
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -588,4 +625,6 @@ export const tests = [
     testBuildUpcomingPaymentsHTMLMultiCurrencyTotals,
     testCheckAndNotifyDeduplication,
     testNotificationPopoverCloseButtonAndBadge,
+    testBuildUpcomingPaymentsHTMLEmpty,
+    testCheckAndNotifyEmptyAlwaysShowsPanel,
 ];
