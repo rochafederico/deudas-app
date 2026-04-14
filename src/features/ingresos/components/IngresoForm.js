@@ -65,7 +65,7 @@ export class IngresoForm extends HTMLElement {
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },
             { name: 'descripcion', label: 'Descripción', type: 'text' },
             { name: 'monto', label: 'Monto', type: 'number', required: true, min: 0.01, minMessage: 'Ingresá un monto mayor a 0.' },
-            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, requiredMessage: 'Seleccioná una moneda.' },
+            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, placeholder: 'Seleccioná una moneda…', requiredMessage: 'Seleccioná una moneda.' },
         ];
         this.innerHTML = '';
         const form = document.createElement('app-form');

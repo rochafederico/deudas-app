@@ -137,7 +137,6 @@ export class AppForm extends HTMLElement {
                 input.name = name;
                 if (required) input.required = true;
                 if (value !== '' && value != null) input.value = value;
-                if (field.type === 'number') input.step = field.step || '0.01';
             }
 
             input.dataset.label = label || name;
@@ -147,7 +146,7 @@ export class AppForm extends HTMLElement {
             if (field.placeholder && field.type !== 'select') input.placeholder = field.placeholder;
             if (field.min !== undefined) input.min = String(field.min);
             if (field.max !== undefined) input.max = String(field.max);
-            if (field.step !== undefined && field.type === 'number') input.step = String(field.step);
+            if (field.type === 'number') input.step = String(field.step || '0.01');
 
             wrapper.appendChild(input);
 
