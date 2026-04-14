@@ -128,6 +128,10 @@ export class DebtForm extends HTMLElement {
                             ]
                         })
                     ]
+                }),
+                el('div', {
+                    attrs: { id: 'form-error' },
+                    className: 'text-danger mt-2'
                 })
             ]
         });
@@ -423,15 +427,8 @@ export class DebtForm extends HTMLElement {
     }
 
     showFormError(msg) {
-        let err = this.querySelector('#form-error');
-        if (!err) {
-            err = el('div', {
-                attrs: { id: 'form-error' },
-                className: 'text-danger mb-2'
-            });
-            const montosList = this.querySelector('.montos-list');
-            if (montosList) montosList.parentNode.insertBefore(err, montosList);
-        }
+        const err = this.querySelector('#form-error');
+        if (!err) return;
         err.textContent = msg;
     }
 

@@ -706,11 +706,9 @@ async function testShowFormErrorNearMontos() {
 
     const montosList = form.querySelector('.montos-list');
     assert(montosList !== null, 'Debe existir .montos-list');
-    // The error element must appear immediately before .montos-list in the DOM
-    assert(errEl.nextElementSibling === montosList, 'El error debe aparecer justo antes de .montos-list');
-    // The error must NOT appear before app-form (i.e. not at the top)
-    const appForm = form.querySelector('app-form');
-    assert(errEl.previousElementSibling === appForm, 'El error debe estar entre app-form y .montos-list');
+    assert(errEl.parentElement === montosList, 'El error debe renderizarse dentro del bloque de montos');
+    assert(errEl.previousElementSibling?.classList.contains('overflow-auto'), 'El error debe aparecer debajo de la tabla de montos');
+    assert(errEl === montosList.lastElementChild, 'El error debe quedar al final de la sección de montos');
 
     document.body.removeChild(form);
 }
