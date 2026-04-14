@@ -126,10 +126,11 @@ export function sendGroupedNotification(count) {
  */
 export async function checkAndNotify(deudas, now = new Date()) {
     const payments = getUpcomingPayments(deudas, DAYS_AHEAD, now);
-    if (payments.length === 0) return;
 
     // Always update the in-app panel so the bell popover is always initialized
     showInAppPanel(payments, now);
+
+    if (payments.length === 0) return;
 
     const notifiedKeys = getNotifiedKeys();
     const hasNew = payments.some(p => !notifiedKeys.has(paymentKey(p)));

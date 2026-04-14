@@ -155,6 +155,14 @@ function renderTotalsSection(overduePayments) {
  * @returns {string} HTML string for the alert body
  */
 export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
+    if (payments.length === 0) {
+        return {
+            html: '<p class="text-muted small mb-0">No hay vencimientos próximos. Buen momento para revisar el mes.</p>',
+            todayCount: 0,
+            overdueCount: 0,
+        };
+    }
+
     const todayUTC = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
     const overdue = [], today = [], tomorrow = [], rest = [];
 

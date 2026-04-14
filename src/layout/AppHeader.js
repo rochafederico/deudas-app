@@ -57,8 +57,8 @@ export class AppHeader extends HTMLElement {
     this._popover = new window.bootstrap.Popover(btn, {
       html: true,
       title: '<div class="d-flex justify-content-between align-items-center w-100">' +
-        '<strong>⚠️ Vencimientos próximos</strong>' +
-        '<button type="button" class="btn-close btn-sm ms-3" data-notif-close aria-label="Cerrar"></button>' +
+        '<strong class="text-nowrap me-3">⚠️ Vencimientos próximos</strong>' +
+        '<button type="button" class="btn-close btn-sm flex-shrink-0" data-notif-close aria-label="Cerrar"></button>' +
         '</div>',
       content: html,
       trigger: 'click',
@@ -83,10 +83,10 @@ export class AppHeader extends HTMLElement {
     }
     if (overdueCount > 0) {
       badge.textContent = overdueCount;
-      badge.style.padding = '';
+      badge.classList.remove('p-1');
     } else {
       badge.textContent = '';
-      badge.style.padding = '0.25em 0.4em';
+      badge.classList.add('p-1');
     }
   }
 
