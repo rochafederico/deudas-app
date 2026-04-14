@@ -44,12 +44,12 @@ export function validateFeedback(tipo, comentario) {
     const tiposValidos = ['sugerencia', 'problema', 'confusión'];
 
     if (!tipo || !tiposValidos.includes(tipo)) {
-        errors.tipo = 'El tipo es obligatorio.';
+        errors.tipo = 'Seleccioná un tipo.';
     }
 
     const trimmed = typeof comentario === 'string' ? comentario.trim() : '';
     if (!trimmed) {
-        errors.comentario = 'El comentario es obligatorio.';
+        errors.comentario = 'El campo Comentario es obligatorio.';
     } else if (trimmed.length > MAX_COMMENT_LENGTH) {
         errors.comentario = `El comentario no puede superar los ${MAX_COMMENT_LENGTH} caracteres.`;
     }

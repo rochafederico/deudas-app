@@ -1,6 +1,6 @@
 // src/components/AppForm.js
 // Formulario reutilizable que usa Bootstrap directamente (sin Shadow DOM)
-import { getFormValuesAndValidate } from '../utils/dom.js';
+import { getFormValuesAndValidate, validateFormControl } from '../utils/dom.js';
 
 export class AppForm extends HTMLElement {
     constructor() {
@@ -11,6 +11,7 @@ export class AppForm extends HTMLElement {
         this._cancelText = 'Cancelar';
         this._hideButtons = false;
         this._boundHandleSubmit = this.handleSubmit.bind(this);
+        this._boundFieldInteraction = this.handleFieldInteraction.bind(this);
         this._boundCancelClick = () => {
             this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
         };
@@ -58,6 +59,10 @@ export class AppForm extends HTMLElement {
         if (this.form) {
             this.form.removeEventListener('submit', this._boundHandleSubmit);
             this.form.addEventListener('submit', this._boundHandleSubmit);
+            this.form.removeEventListener('input', this._boundFieldInteraction);
+            this.form.removeEventListener('change', this._boundFieldInteraction);
+            this.form.addEventListener('input', this._boundFieldInteraction);
+            this.form.addEventListener('change', this._boundFieldInteraction);
         }
         const cancelBtn = this.querySelector('#cancelBtn');
         if (cancelBtn) {
@@ -69,7 +74,7 @@ export class AppForm extends HTMLElement {
     render() {
         this._rendered = true;
         this.innerHTML = '';
-        const inputs = this._fields.map(field => {
+        const inputs = this._fields.map((field, index) => {
             const wrapper = document.createElement('div');
             wrapper.className = 'mb-2';
             const name = field.name;
@@ -83,6 +88,13 @@ export class AppForm extends HTMLElement {
                 lbl.setAttribute('for', name);
                 lbl.className = 'form-label';
                 lbl.textContent = label;
+                if (required) {
+                    const requiredMark = document.createElement('span');
+                    requiredMark.className = 'text-danger ms-1';
+                    requiredMark.setAttribute('aria-hidden', 'true');
+                    requiredMark.textContent = '*';
+                    lbl.appendChild(requiredMark);
+                }
                 wrapper.appendChild(lbl);
             }
 
@@ -93,13 +105,21 @@ export class AppForm extends HTMLElement {
                 input.id = name;
                 input.name = name;
                 if (required) input.required = true;
-                input.textContent = value;
+                if (value !== '' && value != null) input.value = value;
             } else if (field.type === 'select') {
                 input = document.createElement('select');
                 input.className = 'form-select';
                 input.id = name;
                 input.name = name;
                 if (required) input.required = true;
+                if (field.placeholder) {
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.value = '';
+                    placeholderOption.textContent = field.placeholder;
+                    placeholderOption.disabled = false;
+                    placeholderOption.selected = value === '' || value == null;
+                    input.appendChild(placeholderOption);
+                }
                 if (field.options) {
                     field.options.forEach(opt => {
                         const option = document.createElement('option');
@@ -117,8 +137,17 @@ export class AppForm extends HTMLElement {
                 input.name = name;
                 if (required) input.required = true;
                 if (value !== '' && value != null) input.value = value;
-                if (field.type === 'number') input.step = '0.01';
+                if (field.type === 'number') input.step = field.step || '0.01';
             }
+
+            input.dataset.label = label || name;
+            if (field.requiredMessage) input.dataset.requiredMessage = field.requiredMessage;
+            if (field.numberMessage) input.dataset.numberMessage = field.numberMessage;
+            if (field.minMessage) input.dataset.minMessage = field.minMessage;
+            if (field.placeholder && field.type !== 'select') input.placeholder = field.placeholder;
+            if (field.min !== undefined) input.min = String(field.min);
+            if (field.max !== undefined) input.max = String(field.max);
+            if (field.step !== undefined && field.type === 'number') input.step = String(field.step);
 
             wrapper.appendChild(input);
 
@@ -126,6 +155,8 @@ export class AppForm extends HTMLElement {
             const errDiv = document.createElement('div');
             errDiv.className = 'invalid-feedback';
             errDiv.dataset.errorFor = name;
+            errDiv.id = `${name}-error-${index}`;
+            input.setAttribute('aria-describedby', errDiv.id);
             wrapper.appendChild(errDiv);
 
             return wrapper;
@@ -174,29 +205,61 @@ export class AppForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     }
 
+    clearFieldError(input) {
+        if (!input) return;
+        input.classList.remove('is-invalid');
+        input.removeAttribute('aria-invalid');
+        const errDiv = this.form?.querySelector(`[data-error-for="${input.name}"]`);
+        if (errDiv) {
+            errDiv.textContent = '';
+            errDiv.classList.remove('d-block');
+        }
+    }
+
+    showFieldError(input, message) {
+        if (!input) return;
+        input.classList.add('is-invalid');
+        input.setAttribute('aria-invalid', 'true');
+        const errDiv = this.form?.querySelector(`[data-error-for="${input.name}"]`);
+        if (errDiv) {
+            errDiv.textContent = message;
+            errDiv.classList.add('d-block');
+        }
+    }
+
+    handleFieldInteraction(event) {
+        const input = event.target;
+        if (!input?.matches || !input.matches('input, select, textarea')) return;
+        if (!input.classList.contains('is-invalid')) return;
+
+        const { valid, error } = validateFormControl(input);
+        if (valid) {
+            this.clearFieldError(input);
+            return;
+        }
+        this.showFieldError(input, error);
+    }
+
     handleSubmit(e) {
         e.preventDefault();
         const { values, valid, errors } = getFormValuesAndValidate(this.form);
         // Clear previous errors
-        this.form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        this.form.querySelectorAll('.invalid-feedback').forEach(el => { el.textContent = ''; });
+        this.form.querySelectorAll('input, select, textarea').forEach(input => this.clearFieldError(input));
         if (!valid) {
             this.dispatchEvent(new CustomEvent('form:validation-error', {
                 detail: { values, errors },
                 bubbles: true,
                 composed: true
             }));
+            let firstInvalidInput = null;
             Object.entries(errors).forEach(([name, msg]) => {
                 const input = this.form.querySelector(`[name="${name}"]`);
                 if (input) {
-                    input.classList.add('is-invalid');
-                    const errDiv = this.form.querySelector(`[data-error-for="${name}"]`);
-                    if (errDiv) {
-                        errDiv.textContent = msg;
-                        errDiv.classList.add('d-block');
-                    }
+                    this.showFieldError(input, msg);
+                    if (!firstInvalidInput) firstInvalidInput = input;
                 }
             });
+            firstInvalidInput?.focus();
             return;
         }
         this.dispatchEvent(new CustomEvent('form:submit', {

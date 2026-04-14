@@ -20,9 +20,9 @@ export class InversionModal extends HTMLElement {
         // Campos: nombre, valor inicial, fecha compra
         const fields = [
             { name: 'nombre', label: 'Nombre', type: 'text', required: true },
-            { name: 'valorInicial', label: 'Valor Inicial', type: 'number', required: true },
-            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true },
-            { name: 'fechaCompra', label: 'Fecha Compra', type: 'date', required: true },
+            { name: 'valorInicial', label: 'Valor inicial', type: 'number', required: true, min: 0.01, minMessage: 'Ingresá un valor inicial mayor a 0.' },
+            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, placeholder: 'Seleccioná una moneda…', requiredMessage: 'Seleccioná una moneda.' },
+            { name: 'fechaCompra', label: 'Fecha de compra', type: 'date', required: true },
         ];
         this._form = document.createElement('app-form');
         this._form.fields = fields;

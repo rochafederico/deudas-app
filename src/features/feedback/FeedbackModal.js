@@ -38,6 +38,8 @@ export class FeedbackModal extends HTMLElement {
     _resetForm() {
         if (this._formEl) this._formEl.reset();
         if (this._counterEl) this._counterEl.textContent = '0';
+        this._clearFieldError('tipo');
+        this._clearFieldError('comentario');
         this._updateLinks();
     }
 
@@ -46,6 +48,38 @@ export class FeedbackModal extends HTMLElement {
             tipo: this._tipoEl?.value || '',
             comentario: this._comentarioEl?.value || '',
         };
+    }
+
+    _clearFieldError(fieldName) {
+        const field = fieldName === 'tipo' ? this._tipoEl : this._comentarioEl;
+        const errorEl = fieldName === 'tipo' ? this._tipoErrorEl : this._comentarioErrorEl;
+        field?.classList.remove('is-invalid');
+        field?.removeAttribute('aria-invalid');
+        if (errorEl) {
+            errorEl.textContent = '';
+            errorEl.classList.remove('d-block');
+        }
+    }
+
+    _showFieldError(fieldName, message) {
+        const field = fieldName === 'tipo' ? this._tipoEl : this._comentarioEl;
+        const errorEl = fieldName === 'tipo' ? this._tipoErrorEl : this._comentarioErrorEl;
+        field?.classList.add('is-invalid');
+        field?.setAttribute('aria-invalid', 'true');
+        if (errorEl) {
+            errorEl.textContent = message;
+            errorEl.classList.add('d-block');
+        }
+    }
+
+    _syncFieldValidation(fieldName) {
+        const { errors } = validateFeedback(this._tipoEl?.value || '', this._comentarioEl?.value || '');
+        const message = errors[fieldName];
+        if (message) {
+            this._showFieldError(fieldName, message);
+            return;
+        }
+        this._clearFieldError(fieldName);
     }
 
     /** Rebuilds the dropdown hrefs and toggles the send button disabled state live. */
@@ -78,6 +112,7 @@ export class FeedbackModal extends HTMLElement {
                             <option value="problema">🐛 Problema</option>
                             <option value="confusión">❓ Confusión</option>
                         </select>
+                        <div id="feedback-tipo-error" class="invalid-feedback"></div>
                     </div>
 
                     <div class="mb-3">
@@ -85,6 +120,7 @@ export class FeedbackModal extends HTMLElement {
                         <textarea id="feedback-comentario" class="form-control" rows="4"
                             placeholder="Describí tu sugerencia, problema o confusión…"
                             maxlength="1000" aria-required="true"></textarea>
+                        <div id="feedback-comentario-error" class="invalid-feedback"></div>
                         <div class="form-text text-end">
                             <span id="feedback-char-count">0</span>/1000
                         </div>
@@ -130,6 +166,8 @@ export class FeedbackModal extends HTMLElement {
         this._formEl = this.querySelector('#feedback-form');
         this._tipoEl = this.querySelector('#feedback-tipo');
         this._comentarioEl = this.querySelector('#feedback-comentario');
+        this._tipoErrorEl = this.querySelector('#feedback-tipo-error');
+        this._comentarioErrorEl = this.querySelector('#feedback-comentario-error');
         this._counterEl = this.querySelector('#feedback-char-count');
         this._sendBtn = this.querySelector('#feedback-send-btn');
         this._githubLinkEl = this.querySelector('#feedback-link-github');
@@ -149,11 +187,17 @@ export class FeedbackModal extends HTMLElement {
         if (actionsEl && ui) ui.addFooter(actionsEl);
 
         // Live update: rebuild URLs and toggle send button on every change
-        this._tipoEl?.addEventListener('change', () => this._updateLinks());
-        this._comentarioEl?.addEventListener('input', () => {
-            if (this._counterEl) this._counterEl.textContent = this._comentarioEl.value.length;
+        this._tipoEl?.addEventListener('change', () => {
+            this._syncFieldValidation('tipo');
             this._updateLinks();
         });
+        this._tipoEl?.addEventListener('blur', () => this._syncFieldValidation('tipo'));
+        this._comentarioEl?.addEventListener('input', () => {
+            if (this._counterEl) this._counterEl.textContent = this._comentarioEl.value.length;
+            this._syncFieldValidation('comentario');
+            this._updateLinks();
+        });
+        this._comentarioEl?.addEventListener('blur', () => this._syncFieldValidation('comentario'));
 
         // Close modal after a send link is followed
         this._githubLinkEl?.addEventListener('click', () => this.close());
