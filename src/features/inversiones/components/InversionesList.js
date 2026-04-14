@@ -86,8 +86,8 @@ export class InversionesList extends HTMLElement {
 
   openModal() {
     const modal = this.querySelector('#inversion-modal');
+    modal.onsave = () => this.renderTable();
     const uiModal = modal.querySelector('ui-modal')
-    uiModal.onsave = () => this.renderTable();
     uiModal.open();
   }
 
@@ -98,9 +98,9 @@ export class InversionesList extends HTMLElement {
       this.appendChild(modal);
     }
     modal.setIdInversion(inv.id);
+    modal.onsave = () => this.renderTable();
     const uiModal = modal.querySelector('ui-modal')
     uiModal.setTitle(inv.nombre);
-    uiModal.onsave = () => this.renderTable();
     modal.resetValues();
     uiModal.open();
   }
