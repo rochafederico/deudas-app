@@ -96,13 +96,12 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
-            className: 'montos-list mt-3',
+            className: 'montos-list mb-3',
             children: [
                 el('div', {
-                    className: 'd-flex align-items-center justify-content-between mb-2',
+                    className: 'mb-2',
                     children: [
-                        el('strong', { text: 'Montos' }),
-                        el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
+                        el('strong', { text: 'Montos' })
                     ]
                 }),
                 el('div', {
@@ -132,12 +131,33 @@ export class DebtForm extends HTMLElement {
                 el('div', {
                     attrs: { id: 'form-error' },
                     className: 'text-danger mt-2'
+                }),
+                el('div', {
+                    className: 'mt-2',
+                    children: [
+                        el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
+                    ]
                 })
             ]
         });
         this.innerHTML = '';
         this.appendChild(form);
+        this._applyMobileFirstLayout(form, montosList);
+    }
+
+    _applyMobileFirstLayout(appForm, montosList) {
+        this.querySelectorAll(':scope > [data-field-name="acreedor"]').forEach(node => node.remove());
+        const acreedorField = appForm.querySelector('[data-field-name="acreedor"]');
+        if (!acreedorField) {
+            this.appendChild(appForm);
+            this.appendChild(montosList);
+            return;
+        }
+        acreedorField.classList.remove('mb-2');
+        acreedorField.classList.add('mb-3');
+        this.appendChild(acreedorField);
         this.appendChild(montosList);
+        this.appendChild(appForm);
     }
 
     // Open inline form to add a new monto at the bottom of the table.
@@ -363,6 +383,7 @@ export class DebtForm extends HTMLElement {
                 tipoDeuda: deuda.tipoDeuda || '',
                 notas: deuda.notas || ''
             };
+            this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
     }
 
@@ -379,7 +400,10 @@ export class DebtForm extends HTMLElement {
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
         const form = this.querySelector('app-form');
-        if (form) form.initialValues = {};
+        if (form) {
+            form.initialValues = {};
+            this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
+        }
         this.renderMontosList();
         // Cerrar el modal de deuda si está abierto
         if (this.parentNode && this.parentNode.tagName === 'UI-MODAL' && typeof this.parentNode.close === 'function') {

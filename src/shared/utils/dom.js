@@ -40,7 +40,7 @@ export function appendCells(row, cells) {
  * @returns {Object}
  */
 export function getFormValues(form) {
-    const inputs = Array.from(form.querySelectorAll('input, select, textarea'));
+    const inputs = Array.from(form.elements || []).filter(input => input.matches && input.matches('input, select, textarea'));
     const values = {};
     inputs.forEach(input => {
         const name = input.getAttribute('name');

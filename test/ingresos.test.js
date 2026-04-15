@@ -109,6 +109,30 @@ async function testCancelarIngresoForm() {
     await cleanup();
 }
 
+async function testIngresoFormLayoutMobileFirst() {
+    console.log('  UC2b: IngresoForm ordena Descripción, Monto+Moneda y Fecha para mobile');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const appForm = ingresoForm.querySelector('app-form');
+    const formEl = appForm.querySelector('form');
+    const descripcionField = appForm.querySelector('[data-field-name="descripcion"]');
+    const fechaField = appForm.querySelector('[data-field-name="fecha"]');
+    const montoRow = appForm.querySelector('.ingreso-monto-row');
+    const montoField = appForm.querySelector('[data-field-name="monto"]');
+    const monedaField = appForm.querySelector('[data-field-name="moneda"]');
+
+    assert(formEl.children[0] === descripcionField, 'Descripción debe ser el primer campo visible');
+    assert(montoRow !== null, 'Monto y Moneda deben renderizarse en una misma fila Bootstrap');
+    assert(formEl.children[1] === montoRow, 'La fila Monto+Moneda debe ir después de Descripción');
+    assert(formEl.children[2] === fechaField, 'Fecha debe ir después del grupo Monto+Moneda');
+    assert(montoField.classList.contains('col-8'), 'Monto debe priorizar mayor ancho');
+    assert(monedaField.classList.contains('col-4'), 'Moneda debe ocupar menor ancho');
+
+    document.body.removeChild(ingresoForm);
+}
+
 // ===================================================================
 // UC3: Multiples ingresos en el mismo mes y filtrado por periodo
 // Flujo: usuario agrega 3 ingresos en distintos meses, luego filtra
@@ -307,6 +331,7 @@ async function testIngresoModelCalculaPeriodo() {
 export const tests = [
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
+    testIngresoFormLayoutMobileFirst,
     testMultiplesIngresosFiltradoPorMes,
     testTotalesIngresosPorMoneda,
     testFlujoCompletoIngresosUI,

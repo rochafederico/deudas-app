@@ -79,5 +79,30 @@ export const tests = [
         assert(submitEvent.detail.moneda === 'ARS', 'Debe incluir moneda en el payload');
 
         document.body.removeChild(appForm);
+    },
+
+    async function appForm_hiddenButtonsCanStillSubmitValidForm() {
+        console.log('  AppForm: triggerSubmit works when buttons are hidden');
+        const appForm = document.createElement('app-form');
+        appForm.fields = [
+            { name: 'acreedor', type: 'text', label: 'Acreedor', required: true }
+        ];
+        appForm.hideButtons = true;
+        document.body.appendChild(appForm);
+
+        const input = appForm.querySelector('input[name="acreedor"]');
+        const hiddenSubmit = appForm.querySelector('[data-programmatic-submit="true"]');
+        let submitEvent = null;
+        appForm.addEventListener('form:submit', e => { submitEvent = e; });
+
+        assert(hiddenSubmit !== null, 'Debe renderizar un submit programático oculto cuando hideButtons=true');
+
+        input.value = 'Banco Galicia';
+        appForm.triggerSubmit();
+
+        assert(submitEvent !== null, 'Debe emitir form:submit aunque los botones visibles estén ocultos');
+        assert(submitEvent.detail.acreedor === 'Banco Galicia', 'Debe incluir el valor del campo asociado al formulario');
+
+        document.body.removeChild(appForm);
     }
 ];

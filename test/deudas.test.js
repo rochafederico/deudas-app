@@ -684,7 +684,29 @@ async function testDebtFormHideButtons() {
     assert(appForm !== null, 'Debe existir app-form dentro de debt-form');
     assert(appForm.hideButtons === true, 'AppForm debe tener hideButtons=true');
     assert(appForm.querySelector('#cancelBtn') === null, 'No debe haber botón cancelar dentro de app-form');
-    assert(appForm.querySelector('button[type="submit"]') === null, 'No debe haber botón submit dentro de app-form');
+    assert(appForm.querySelector('[data-programmatic-submit="true"]') !== null, 'Debe existir un submit programático oculto para el footer del modal');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormLayoutMobileFirst() {
+    console.log('  UC15b: DebtForm prioriza Acreedor y Montos antes de Tipo y Notas');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    const acreedorField = form.querySelector('[data-field-name="acreedor"]');
+    const montosList = form.querySelector('.montos-list');
+    const appForm = form.querySelector('app-form');
+    const tipoField = appForm.querySelector('[data-field-name="tipoDeuda"]');
+    const notasField = appForm.querySelector('[data-field-name="notas"]');
+    const addMontoBtn = montosList.querySelector('#add-monto');
+
+    assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de montos');
+    assert(acreedorField.nextElementSibling === montosList, 'Montos debe ir después de Acreedor');
+    assert(form.lastElementChild === appForm, 'Los campos secundarios deben quedar después del bloque de montos');
+    assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo dentro de app-form');
+    assert(addMontoBtn.parentElement === montosList.lastElementChild, 'Agregar monto debe quedar como acción secundaria al final del bloque');
 
     document.body.removeChild(form);
 }
@@ -708,7 +730,7 @@ async function testShowFormErrorNearMontos() {
     assert(montosList !== null, 'Debe existir .montos-list');
     assert(errEl.parentElement === montosList, 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.previousElementSibling?.classList.contains('overflow-auto'), 'El error debe aparecer debajo de la tabla de montos');
-    assert(errEl === montosList.lastElementChild, 'El error debe quedar al final de la sección de montos');
+    assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
 
     document.body.removeChild(form);
 }
@@ -755,6 +777,7 @@ export const tests = [
     testDuplicarMontoInline,
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,
+    testDebtFormLayoutMobileFirst,
     testShowFormErrorNearMontos,
     testDebtModalCancelClosesModal
 ];

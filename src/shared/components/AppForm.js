@@ -10,6 +10,7 @@ export class AppForm extends HTMLElement {
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
         this._hideButtons = false;
+        this._formId = `app-form-${Math.random().toString(36).slice(2, 10)}`;
         this._boundHandleSubmit = this.handleSubmit.bind(this);
         this._boundHandleInvalid = this.handleInvalid.bind(this);
         this._boundCancelClick = () => {
@@ -75,6 +76,7 @@ export class AppForm extends HTMLElement {
         const inputs = this._fields.map(field => {
             const wrapper = document.createElement('div');
             wrapper.className = 'mb-2';
+            wrapper.dataset.fieldName = field.name;
             const name = field.name;
             const label = field.label || '';
             const required = field.required;
@@ -141,6 +143,7 @@ export class AppForm extends HTMLElement {
             if (field.min !== undefined) input.min = String(field.min);
             if (field.max !== undefined) input.max = String(field.max);
             if (field.type === 'number') input.step = String(field.step || '0.01');
+            input.setAttribute('form', this._formId);
 
             wrapper.appendChild(input);
 
@@ -148,6 +151,7 @@ export class AppForm extends HTMLElement {
         });
 
         const form = document.createElement('form');
+        form.id = this._formId;
         form.className = 'd-flex flex-column gap-2';
         inputs.forEach(input => form.appendChild(input));
 
@@ -172,6 +176,14 @@ export class AppForm extends HTMLElement {
             btnRow.appendChild(cancelBtn);
             btnRow.appendChild(submitBtn);
             form.appendChild(btnRow);
+        } else {
+            const hiddenSubmitBtn = document.createElement('button');
+            hiddenSubmitBtn.type = 'submit';
+            hiddenSubmitBtn.className = 'd-none';
+            hiddenSubmitBtn.tabIndex = -1;
+            hiddenSubmitBtn.setAttribute('aria-hidden', 'true');
+            hiddenSubmitBtn.dataset.programmaticSubmit = 'true';
+            form.appendChild(hiddenSubmitBtn);
         }
 
         this.appendChild(form);
@@ -181,13 +193,18 @@ export class AppForm extends HTMLElement {
     triggerSubmit() {
         const formEl = this.querySelector('form');
         if (formEl) {
-            if (typeof formEl.requestSubmit === 'function') {
-                formEl.requestSubmit();
+            const hiddenSubmitBtn = formEl.querySelector('[data-programmatic-submit="true"]');
+            if (hiddenSubmitBtn) {
+                hiddenSubmitBtn.click();
                 return;
             }
             const submitBtn = formEl.querySelector('button[type="submit"]');
             if (submitBtn) {
                 submitBtn.click();
+                return;
+            }
+            if (typeof formEl.requestSubmit === 'function') {
+                formEl.requestSubmit();
                 return;
             }
             formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
