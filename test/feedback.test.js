@@ -176,8 +176,6 @@ export const tests = [
         modal.render();
         assert(modal._tipoEl !== null && modal._tipoEl !== undefined, 'Debe existir referencia _tipoEl');
         assert(modal._comentarioEl !== null && modal._comentarioEl !== undefined, 'Debe existir referencia _comentarioEl');
-        assert(modal._tipoErrorEl !== null && modal._tipoErrorEl !== undefined, 'Debe existir contenedor de error para tipo');
-        assert(modal._comentarioErrorEl !== null && modal._comentarioErrorEl !== undefined, 'Debe existir contenedor de error para comentario');
         const alert = modal.querySelector('.alert.alert-warning');
         assert(alert !== null, 'Debe existir bloque alert-warning con los avisos');
         document.body.removeChild(modal);
@@ -230,29 +228,16 @@ export const tests = [
         document.body.removeChild(modal);
     },
 
-    async function feedbackModal_showsAndClearsInlineErrors() {
-        console.log('  FeedbackModal: shows inline errors and clears them when corrected');
+    async function feedbackModal_doesNotInjectInlineValidationErrors() {
+        console.log('  FeedbackModal: does not inject inline validation error containers');
         const modal = document.createElement('feedback-modal');
         document.body.appendChild(modal);
         modal.render();
 
-        modal._tipoEl.dispatchEvent(new Event('blur'));
-        modal._comentarioEl.dispatchEvent(new Event('blur'));
-
-        assert(modal._tipoEl.classList.contains('is-invalid'), 'Tipo debe marcarse inválido cuando falta');
-        assert(modal._comentarioEl.classList.contains('is-invalid'), 'Comentario debe marcarse inválido cuando falta');
-        assert(modal._tipoErrorEl.textContent === 'Seleccioná un tipo.', 'Debe mostrar mensaje inline para tipo');
-        assert(modal._comentarioErrorEl.textContent === 'El campo Comentario es obligatorio.', 'Debe mostrar mensaje inline para comentario');
-
-        modal._tipoEl.value = 'problema';
-        modal._tipoEl.dispatchEvent(new Event('change'));
-        modal._comentarioEl.value = 'Algo no funciona';
-        modal._comentarioEl.dispatchEvent(new Event('input'));
-
-        assert(!modal._tipoEl.classList.contains('is-invalid'), 'Tipo debe limpiar error al corregirse');
-        assert(!modal._comentarioEl.classList.contains('is-invalid'), 'Comentario debe limpiar error al corregirse');
-        assert(modal._tipoErrorEl.textContent === '', 'Debe limpiar mensaje de tipo');
-        assert(modal._comentarioErrorEl.textContent === '', 'Debe limpiar mensaje de comentario');
+        assert(modal.querySelector('#feedback-tipo-error') === null, 'No debe renderizar contenedor inline de error para tipo');
+        assert(modal.querySelector('#feedback-comentario-error') === null, 'No debe renderizar contenedor inline de error para comentario');
+        assert(!modal._tipoEl.classList.contains('is-invalid'), 'No debe agregar clases is-invalid al renderizar');
+        assert(!modal._comentarioEl.classList.contains('is-invalid'), 'No debe agregar clases is-invalid al renderizar');
 
         document.body.removeChild(modal);
     },

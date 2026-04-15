@@ -34,67 +34,18 @@ export function appendCells(row, cells) {
     cells.forEach(cellOpts => row.appendChild(el('td', cellOpts)));
 }
 
-function getFieldLabel(input) {
-    return input.dataset.label || input.getAttribute('name') || 'Este campo';
-}
-
-function getRequiredErrorMessage(input) {
-    if (input.dataset.requiredMessage) return input.dataset.requiredMessage;
-    return `El campo ${getFieldLabel(input)} es obligatorio.`;
-}
-
-function getNumberErrorMessage(input) {
-    if (input.dataset.numberMessage) return input.dataset.numberMessage;
-    return 'Ingresá un número válido.';
-}
-
-function getMinErrorMessage(input) {
-    if (input.dataset.minMessage) return input.dataset.minMessage;
-    const label = getFieldLabel(input).toLowerCase();
-    return `Ingresá un valor válido para ${label}.`;
-}
-
-export function validateFormControl(input) {
-    const value = input.value;
-
-    if (input.hasAttribute('required') && (value === '' || value == null)) {
-        return { valid: false, error: getRequiredErrorMessage(input) };
-    }
-
-    if (input.getAttribute('type') === 'number' && value !== '') {
-        const numberValue = Number(value);
-        if (Number.isNaN(numberValue)) {
-            return { valid: false, error: getNumberErrorMessage(input) };
-        }
-        const min = input.getAttribute('min');
-        if (min !== null && numberValue < Number(min)) {
-            return { valid: false, error: getMinErrorMessage(input) };
-        }
-    }
-
-    return { valid: true, error: '' };
-}
-
 /**
- * Obtiene los valores de todos los inputs nativos de un formulario y valida los campos requeridos.
+ * Obtiene los valores de todos los inputs nativos de un formulario.
  * @param {HTMLElement} form - El formulario o contenedor padre
- * @returns {{ values: Object, valid: boolean, errors: Object }}
+ * @returns {Object}
  */
-export function getFormValuesAndValidate(form) {
+export function getFormValues(form) {
     const inputs = Array.from(form.querySelectorAll('input, select, textarea'));
     const values = {};
-    const errors = {};
-    let valid = true;
     inputs.forEach(input => {
         const name = input.getAttribute('name');
         if (!name) return;
-        const value = input.value;
-        values[name] = value;
-        const result = validateFormControl(input);
-        if (!result.valid) {
-            valid = false;
-            errors[name] = result.error;
-        }
+        values[name] = input.value;
     });
-    return { values, valid, errors };
+    return values;
 }

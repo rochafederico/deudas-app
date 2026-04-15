@@ -1,12 +1,13 @@
 import { assert } from './setup.js';
 
 export const tests = [
-    async function appForm_rendersRequiredIndicatorsAndSelectPlaceholder() {
-        console.log('  AppForm: renders required indicators and select placeholders');
+    async function appForm_rendersRequiredIndicatorsAndNativeAttributes() {
+        console.log('  AppForm: renders required indicators and native validation attributes');
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…', requiredMessage: 'Seleccioná una moneda.' }
+            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' }
         ];
         document.body.appendChild(appForm);
 
@@ -15,77 +16,67 @@ export const tests = [
         assert(labels[0].querySelector('.text-danger') !== null, 'Debe mostrar asterisco en campo requerido');
 
         const select = appForm.querySelector('select[name="moneda"]');
+        const montoInput = appForm.querySelector('input[name="monto"]');
         assert(select !== null, 'Debe renderizar el select requerido');
         assert(select.options[0].value === '', 'El select requerido debe tener opción placeholder vacía');
         assert(select.options[0].textContent === 'Seleccioná una moneda…', 'El placeholder del select debe coincidir');
+        assert(montoInput.getAttribute('min') === '0.01', 'El input numérico debe exponer min nativo');
+        assert(montoInput.required === true, 'El input numérico debe usar required nativo');
 
         document.body.removeChild(appForm);
     },
 
-    async function appForm_submitInvalidShowsSpecificMessagesAndFocusesFirstError() {
-        console.log('  AppForm: invalid submit highlights fields, shows messages and focuses first error');
+    async function appForm_invalidSubmitUsesNativeHtmlValidation() {
+        console.log('  AppForm: invalid submit relies on native HTML validation');
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01, minMessage: 'Ingresá un monto mayor a 0.' },
-            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…', requiredMessage: 'Seleccioná una moneda.' }
+            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' }
         ];
         document.body.appendChild(appForm);
 
         const form = appForm.querySelector('form');
         const montoInput = appForm.querySelector('input[name="monto"]');
-        montoInput.value = '0';
-
-        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-
         const acreedorInput = appForm.querySelector('input[name="acreedor"]');
         const monedaSelect = appForm.querySelector('select[name="moneda"]');
-        const acreedorError = appForm.querySelector('[data-error-for="acreedor"]');
-        const montoError = appForm.querySelector('[data-error-for="monto"]');
-        const monedaError = appForm.querySelector('[data-error-for="moneda"]');
+        let submitEvent = null;
+        appForm.addEventListener('form:submit', e => { submitEvent = e; });
+        montoInput.value = '0';
 
-        assert(acreedorInput.classList.contains('is-invalid'), 'Acreedor debe quedar marcado como inválido');
-        assert(montoInput.classList.contains('is-invalid'), 'Monto debe quedar marcado como inválido');
-        assert(monedaSelect.classList.contains('is-invalid'), 'Moneda debe quedar marcada como inválida');
-        assert(acreedorError.textContent === 'El campo Acreedor es obligatorio.', 'Debe mostrar mensaje específico para campo requerido');
-        assert(montoError.textContent === 'Ingresá un monto mayor a 0.', 'Debe mostrar mensaje específico para monto > 0');
-        assert(monedaError.textContent === 'Seleccioná una moneda.', 'Debe mostrar mensaje específico para selección requerida');
-        assert(document.activeElement === acreedorInput, 'El foco debe moverse al primer campo con error');
+        appForm.triggerSubmit();
+
+        assert(submitEvent === null, 'No debe emitir form:submit si el formulario es inválido');
+        assert(form.classList.contains('was-validated'), 'El formulario debe usar la clase de Bootstrap tras un intento inválido');
+        assert(acreedorInput.validity.valueMissing === true, 'Acreedor debe quedar inválido por required nativo');
+        assert(montoInput.validity.rangeUnderflow === true, 'Monto debe quedar inválido por min nativo');
+        assert(monedaSelect.validity.valueMissing === true, 'Moneda debe quedar inválida por required nativo');
+        assert(!acreedorInput.classList.contains('is-invalid'), 'No debe inyectar clases is-invalid manuales');
 
         document.body.removeChild(appForm);
     },
 
-    async function appForm_clearsErrorsWhenFieldIsCorrected() {
-        console.log('  AppForm: clears field errors when corrected');
+    async function appForm_validSubmitEmitsFormSubmit() {
+        console.log('  AppForm: valid submit emits form:submit with values');
         const appForm = document.createElement('app-form');
         appForm.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01, minMessage: 'Ingresá un monto mayor a 0.' },
-            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…', requiredMessage: 'Seleccioná una moneda.' }
+            { name: 'moneda', type: 'select', label: 'Moneda', options: ['ARS', 'USD'], required: true, placeholder: 'Seleccioná una moneda…' }
         ];
         document.body.appendChild(appForm);
 
-        const form = appForm.querySelector('form');
         const acreedorInput = appForm.querySelector('input[name="acreedor"]');
-        const montoInput = appForm.querySelector('input[name="monto"]');
         const monedaSelect = appForm.querySelector('select[name="moneda"]');
-
-        montoInput.value = '0';
-        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+        let submitEvent = null;
+        appForm.addEventListener('form:submit', e => { submitEvent = e; });
 
         acreedorInput.value = 'Banco Galicia';
-        acreedorInput.dispatchEvent(new Event('input', { bubbles: true }));
-        montoInput.value = '1500';
-        montoInput.dispatchEvent(new Event('input', { bubbles: true }));
         monedaSelect.value = 'ARS';
-        monedaSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        appForm.triggerSubmit();
 
-        assert(!acreedorInput.classList.contains('is-invalid'), 'Acreedor debe limpiar el estado inválido al corregirse');
-        assert(!montoInput.classList.contains('is-invalid'), 'Monto debe limpiar el estado inválido al corregirse');
-        assert(!monedaSelect.classList.contains('is-invalid'), 'Moneda debe limpiar el estado inválido al corregirse');
-        assert(appForm.querySelector('[data-error-for="acreedor"]').textContent === '', 'Debe limpiar el mensaje de Acreedor');
-        assert(appForm.querySelector('[data-error-for="monto"]').textContent === '', 'Debe limpiar el mensaje de Monto');
-        assert(appForm.querySelector('[data-error-for="moneda"]').textContent === '', 'Debe limpiar el mensaje de Moneda');
+        assert(submitEvent !== null, 'Debe emitir form:submit cuando el formulario es válido');
+        assert(submitEvent.detail.acreedor === 'Banco Galicia', 'Debe incluir acreedor en el payload');
+        assert(submitEvent.detail.moneda === 'ARS', 'Debe incluir moneda en el payload');
 
         document.body.removeChild(appForm);
     }
