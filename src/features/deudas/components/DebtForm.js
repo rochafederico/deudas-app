@@ -162,6 +162,9 @@ export class DebtForm extends HTMLElement {
         acreedorInput.oninvalid = () => {
             acreedorField.classList.add('was-validated');
         };
+        acreedorInput.oninput = () => {
+            acreedorField.classList.toggle('was-validated', !acreedorInput.checkValidity());
+        };
         this.appendChild(acreedorField);
         this.appendChild(montosList);
         this.appendChild(appForm);

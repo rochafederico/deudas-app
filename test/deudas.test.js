@@ -734,6 +734,11 @@ async function testDebtFormCampoReordenadoMuestraEstadoInvalido() {
 
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor reordenado debe recibir estado visual inválido');
 
+    acreedorInput.value = 'Visa corregida';
+    acreedorInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    assert(!acreedorField.classList.contains('was-validated'), 'El estado visual inválido debe limpiarse al corregir Acreedor');
+
     document.body.removeChild(form);
 }
 
