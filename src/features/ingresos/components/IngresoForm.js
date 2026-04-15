@@ -65,7 +65,7 @@ export class IngresoForm extends HTMLElement {
     render() {
         // Campos: descripcion, monto, moneda, fecha
         const fields = [
-            { name: 'descripcion', label: 'Descripción', type: 'text' },
+            { name: 'descripcion', label: 'Descripción', type: 'text', required: true },
             { name: 'monto', label: 'Monto', type: 'number', required: true, min: 0.01 },
             { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },

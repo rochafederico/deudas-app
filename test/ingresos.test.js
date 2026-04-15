@@ -133,6 +133,23 @@ async function testIngresoFormLayoutMobileFirst() {
     document.body.removeChild(ingresoForm);
 }
 
+async function testIngresoFormDescripcionEsObligatoria() {
+    console.log('  UC2c: IngresoForm marca Descripción como obligatoria');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const descripcionInput = ingresoForm.querySelector('input[name="descripcion"]');
+    const descripcionField = ingresoForm.querySelector('[data-field-name="descripcion"]');
+    const requiredMark = descripcionField?.querySelector('.text-danger');
+
+    assert(descripcionInput !== null, 'Debe existir el input de descripción');
+    assert(descripcionInput.required === true, 'Descripción debe ser obligatoria en ingresos');
+    assert(requiredMark !== null, 'Descripción debe mostrar indicador visual de requerido');
+
+    document.body.removeChild(ingresoForm);
+}
+
 // ===================================================================
 // UC3: Multiples ingresos en el mismo mes y filtrado por periodo
 // Flujo: usuario agrega 3 ingresos en distintos meses, luego filtra
@@ -332,6 +349,7 @@ export const tests = [
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
     testIngresoFormLayoutMobileFirst,
+    testIngresoFormDescripcionEsObligatoria,
     testMultiplesIngresosFiltradoPorMes,
     testTotalesIngresosPorMoneda,
     testFlujoCompletoIngresosUI,

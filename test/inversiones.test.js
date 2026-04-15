@@ -78,6 +78,25 @@ async function testAgregarInversionDesdeModal() {
     await cleanup();
 }
 
+async function testInversionModalNombreEsObligatorio() {
+    console.log('  UC1b: InversionModal mantiene obligatorio el campo descriptivo');
+    await cleanup();
+
+    const modal = document.createElement('inversion-modal');
+    document.body.appendChild(modal);
+
+    const nombreInput = modal.querySelector('input[name="nombre"]');
+    const nombreField = modal.querySelector('[data-field-name="nombre"]');
+    const requiredMark = nombreField?.querySelector('.text-danger');
+
+    assert(nombreInput !== null, 'Debe existir el input de nombre');
+    assert(nombreInput.required === true, 'El campo descriptivo de inversiones debe seguir siendo obligatorio');
+    assert(requiredMark !== null, 'El campo descriptivo debe mostrar indicador visual de requerido');
+
+    document.body.removeChild(modal);
+    await cleanup();
+}
+
 // ===================================================================
 // UC2: Agregar valor a inversion existente y verificar historial
 // Flujo: usuario tiene una inversion, abre ValorInversionModal,
@@ -288,6 +307,7 @@ async function testInversionEntityConId() {
 
 export const tests = [
     testAgregarInversionDesdeModal,
+    testInversionModalNombreEsObligatorio,
     testAgregarValorAInversion,
     testListarInversiones,
     testEliminarInversion,
