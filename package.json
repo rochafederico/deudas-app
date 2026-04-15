@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "build:css": "sass --load-path=node_modules --silence-deprecation=import,global-builtin,color-functions,if-function src/styles/main.scss src/styles/bootstrap.css --no-source-map --style=compressed && cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2 src/styles/fonts/ && cp node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff src/styles/fonts/",
+    "generate:icons": "node scripts/generate-icons.js",
     "test": "node --import ./test/globals.js ./test/run-repo-tests.js",
     "lint": "eslint src test --ext .js"
   },
