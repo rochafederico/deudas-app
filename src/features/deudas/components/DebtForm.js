@@ -146,7 +146,9 @@ export class DebtForm extends HTMLElement {
     }
 
     _applyMobileFirstLayout(appForm, montosList) {
-        this.querySelectorAll(':scope > [data-field-name="acreedor"]').forEach(node => node.remove());
+        // app-form re-renderiza cuando cambian initialValues; removemos la copia externa
+        // anterior de Acreedor antes de volver a mover el wrapper actualizado.
+        this.querySelectorAll(':scope > [data-debt-form-field="acreedor"]').forEach(node => node.remove());
         const acreedorField = appForm.querySelector('[data-field-name="acreedor"]');
         if (!acreedorField) {
             this.appendChild(appForm);
@@ -155,6 +157,7 @@ export class DebtForm extends HTMLElement {
         }
         acreedorField.classList.remove('mb-2');
         acreedorField.classList.add('mb-3');
+        acreedorField.dataset.debtFormField = 'acreedor';
         this.appendChild(acreedorField);
         this.appendChild(montosList);
         this.appendChild(appForm);

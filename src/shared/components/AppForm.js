@@ -3,6 +3,8 @@
 import { getFormValues } from '../utils/dom.js';
 
 export class AppForm extends HTMLElement {
+    static nextFormId = 0;
+
     constructor() {
         super();
         this._fields = [];
@@ -10,7 +12,8 @@ export class AppForm extends HTMLElement {
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
         this._hideButtons = false;
-        this._formId = `app-form-${Math.random().toString(36).slice(2, 10)}`;
+        AppForm.nextFormId += 1;
+        this._formId = `app-form-${AppForm.nextFormId}`;
         this._boundHandleSubmit = this.handleSubmit.bind(this);
         this._boundHandleInvalid = this.handleInvalid.bind(this);
         this._boundCancelClick = () => {

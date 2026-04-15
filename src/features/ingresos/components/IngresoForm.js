@@ -86,8 +86,8 @@ export class IngresoForm extends HTMLElement {
         const montoField = appForm.querySelector('[data-field-name="monto"]');
         const monedaField = appForm.querySelector('[data-field-name="moneda"]');
         const fechaField = appForm.querySelector('[data-field-name="fecha"]');
-        const actionsRow = formEl?.lastElementChild;
-        if (!formEl || !descripcionField || !montoField || !monedaField || !fechaField || !actionsRow) return;
+        const submitControls = formEl?.lastElementChild;
+        if (!formEl || !descripcionField || !montoField || !monedaField || !fechaField || !submitControls) return;
 
         const amountRow = document.createElement('div');
         amountRow.className = 'row g-2 align-items-end ingreso-monto-row';
@@ -96,11 +96,12 @@ export class IngresoForm extends HTMLElement {
         amountRow.appendChild(montoField);
         amountRow.appendChild(monedaField);
 
-        formEl.innerHTML = '';
-        formEl.appendChild(descripcionField);
-        formEl.appendChild(amountRow);
-        formEl.appendChild(fechaField);
-        formEl.appendChild(actionsRow);
+        formEl.replaceChildren(
+            descripcionField,
+            amountRow,
+            fechaField,
+            submitControls
+        );
     }
 }
 
