@@ -742,6 +742,35 @@ async function testDebtFormCampoReordenadoMuestraEstadoInvalido() {
     document.body.removeChild(form);
 }
 
+async function testDebtFormTipoDeudaEsObligatorio() {
+    console.log('  UC15d: DebtForm requiere Tipo de deuda con validación nativa');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
+
+    const appForm = form.querySelector('app-form');
+    const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
+    const tipoInput = appForm.querySelector('input[name="tipoDeuda"]');
+    const nativeForm = appForm.querySelector('form');
+
+    let debtSubmitCount = 0;
+    appForm.addEventListener('deuda:submit', () => {
+        debtSubmitCount += 1;
+    });
+
+    acreedorInput.value = 'Visa';
+    tipoInput.value = '';
+    appForm.triggerSubmit();
+
+    assert(tipoInput.required === true, 'Tipo de deuda debe ser required');
+    assert(nativeForm.classList.contains('was-validated'), 'El formulario debe marcarse como validado en submit inválido');
+    assert(debtSubmitCount === 0, 'No debe emitirse deuda:submit cuando Tipo de deuda está vacío');
+
+    document.body.removeChild(form);
+}
+
 // ===================================================================
 // UC16: showFormError muestra el error cerca de la sección de Montos
 // ===================================================================
@@ -810,6 +839,7 @@ export const tests = [
     testDebtFormHideButtons,
     testDebtFormLayoutMobileFirst,
     testDebtFormCampoReordenadoMuestraEstadoInvalido,
+    testDebtFormTipoDeudaEsObligatorio,
     testShowFormErrorNearMontos,
     testDebtModalCancelClosesModal
 ];
