@@ -148,7 +148,10 @@ export class DebtForm extends HTMLElement {
     _applyMobileFirstLayout(appForm, montosList) {
         // app-form re-renderiza cuando cambian initialValues; removemos la copia externa
         // anterior de Acreedor antes de volver a mover el wrapper actualizado.
-        this.querySelectorAll(':scope > [data-debt-form-field="acreedor"]').forEach(node => node.remove());
+        this.querySelectorAll(':scope > [data-debt-form-field="acreedor"]').forEach(node => {
+            node._validationController?.abort();
+            node.remove();
+        });
         const acreedorField = appForm.querySelector('[data-field-name="acreedor"]');
         if (!acreedorField) {
             this.appendChild(appForm);
@@ -159,12 +162,14 @@ export class DebtForm extends HTMLElement {
         acreedorField.classList.add('mb-3');
         acreedorField.dataset.debtFormField = 'acreedor';
         const acreedorInput = acreedorField.querySelector('input[name="acreedor"]');
-        acreedorInput.oninvalid = () => {
+        const validationController = new AbortController();
+        acreedorField._validationController = validationController;
+        acreedorInput?.addEventListener('invalid', () => {
             acreedorField.classList.add('was-validated');
-        };
-        acreedorInput.oninput = () => {
+        }, { signal: validationController.signal });
+        acreedorInput?.addEventListener('input', () => {
             acreedorField.classList.toggle('was-validated', !acreedorInput.checkValidity());
-        };
+        }, { signal: validationController.signal });
         this.appendChild(acreedorField);
         this.appendChild(montosList);
         this.appendChild(appForm);
