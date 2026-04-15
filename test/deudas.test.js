@@ -711,6 +711,32 @@ async function testDebtFormLayoutMobileFirst() {
     document.body.removeChild(form);
 }
 
+async function testDebtFormCampoReordenadoMuestraEstadoInvalido() {
+    console.log('  UC15c: DebtForm muestra estado inválido en Acreedor reordenado');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.load({
+        id: 1,
+        acreedor: 'Visa',
+        tipoDeuda: 'Tarjeta',
+        notas: '',
+        montos: [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }]
+    });
+
+    const appForm = form.querySelector('app-form');
+    const acreedorField = form.querySelector('[data-field-name="acreedor"]');
+    const acreedorInput = acreedorField.querySelector('input[name="acreedor"]');
+
+    acreedorInput.value = '';
+    appForm.triggerSubmit();
+
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor reordenado debe recibir estado visual inválido');
+
+    document.body.removeChild(form);
+}
+
 // ===================================================================
 // UC16: showFormError muestra el error cerca de la sección de Montos
 // ===================================================================
@@ -778,6 +804,7 @@ export const tests = [
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,
     testDebtFormLayoutMobileFirst,
+    testDebtFormCampoReordenadoMuestraEstadoInvalido,
     testShowFormErrorNearMontos,
     testDebtModalCancelClosesModal
 ];

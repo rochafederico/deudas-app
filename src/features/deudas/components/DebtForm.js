@@ -158,6 +158,10 @@ export class DebtForm extends HTMLElement {
         acreedorField.classList.remove('mb-2');
         acreedorField.classList.add('mb-3');
         acreedorField.dataset.debtFormField = 'acreedor';
+        const acreedorInput = acreedorField.querySelector('input[name="acreedor"]');
+        acreedorInput?.addEventListener('invalid', () => {
+            acreedorField.classList.add('was-validated');
+        });
         this.appendChild(acreedorField);
         this.appendChild(montosList);
         this.appendChild(appForm);
