@@ -791,6 +791,29 @@ async function testShowFormErrorNearMontos() {
     assert(errEl.parentElement === montosList, 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.previousElementSibling?.classList.contains('overflow-auto'), 'El error debe aparecer debajo de la tabla de montos');
     assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
+    assert(montosList.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente como inválida');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormRequiereMontosAlEnviar() {
+    console.log('  UC16b: DebtForm marca error visible si se envía sin montos');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    const appForm = form.querySelector('app-form');
+    const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
+    const tipoInput = appForm.querySelector('input[name="tipoDeuda"]');
+    const montosList = form.querySelector('.montos-list');
+    const errEl = form.querySelector('#form-error');
+
+    acreedorInput.value = 'Visa';
+    tipoInput.value = 'Tarjeta';
+    appForm.triggerSubmit();
+
+    assert(errEl.textContent === 'Debe agregar al menos un monto antes de guardar.', 'Debe mostrar error cuando faltan montos');
+    assert(montosList.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente al enviar sin montos');
 
     document.body.removeChild(form);
 }
@@ -865,6 +888,7 @@ export const tests = [
     testDebtFormCampoReordenadoMuestraEstadoInvalido,
     testDebtFormTipoDeudaEsObligatorio,
     testShowFormErrorNearMontos,
+    testDebtFormRequiereMontosAlEnviar,
     testDebtModalCancelClosesModal,
     testDebtModalFooterUxValidacionConsistente
 ];

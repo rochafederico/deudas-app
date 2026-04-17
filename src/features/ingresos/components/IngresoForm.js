@@ -57,7 +57,7 @@ export class IngresoForm extends HTMLElement {
     reset() {
         const form = this.querySelector('app-form');
         if (form) {
-            form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
+            form.initialValues = { moneda: 'ARS' };
             this._applyMobileFirstLayout(form);
         }
     }
@@ -75,7 +75,7 @@ export class IngresoForm extends HTMLElement {
         form.fields = fields;
         form.submitText = 'Agregar ingreso';
         form.cancelText = 'Cancelar';
-        form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
+        form.initialValues = { moneda: 'ARS' };
         this.appendChild(form);
         this._applyMobileFirstLayout(form);
     }

@@ -160,15 +160,18 @@ async function testIngresoFormUxValidacionConsistente() {
     const formEl = appForm.querySelector('form');
     const submitBtn = formEl.querySelector('button[type="submit"]');
     const descripcionInput = ingresoForm.querySelector('input[name="descripcion"]');
+    const fechaInput = ingresoForm.querySelector('input[name="fecha"]');
 
     assert(submitBtn !== null, 'Debe existir botón submit visible en ingresos');
     assert(submitBtn.disabled === false, 'El botón submit de ingresos debe iniciar habilitado');
     assert(!formEl.classList.contains('was-validated'), 'No debe mostrar estado inválido antes del primer envío');
+    assert(fechaInput.value === '', 'Fecha no debe iniciar con valor por defecto');
 
     appForm.triggerSubmit();
 
     assert(formEl.classList.contains('was-validated'), 'Debe mostrar validación recién al intentar enviar');
     assert(descripcionInput.validity.valueMissing === true, 'Descripción debe quedar inválida por required al enviar vacío');
+    assert(fechaInput.validity.valueMissing === true, 'Fecha debe quedar inválida por required al enviar vacío');
 
     document.body.removeChild(ingresoForm);
 }

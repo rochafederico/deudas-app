@@ -467,13 +467,19 @@ export class DebtForm extends HTMLElement {
 
     showFormError(msg) {
         const err = this.querySelector('#form-error');
-        if (!err) return;
+        const montosList = this.querySelector('.montos-list');
+        if (!err || !montosList) return;
         err.textContent = msg;
+        montosList.classList.add('border', 'border-danger', 'rounded', 'p-2');
     }
 
     clearFormError() {
         const err = this.querySelector('#form-error');
+        const montosList = this.querySelector('.montos-list');
         if (err) err.textContent = '';
+        if (montosList) {
+            montosList.classList.remove('border', 'border-danger', 'rounded', 'p-2');
+        }
     }
 
     startAnalyticsFlow(flowName, metadata = {}) {
