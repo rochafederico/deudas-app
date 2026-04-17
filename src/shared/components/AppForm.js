@@ -222,7 +222,7 @@ export class AppForm extends HTMLElement {
         this.form?.classList.add('was-validated');
         const invalidField = e?.target;
         if (!invalidField || invalidField === this.form) return;
-        const fieldName = invalidField.name || invalidField.id || 'form';
+        const fieldName = invalidField.name || invalidField.id || 'unknown_field';
         this.dispatchEvent(new CustomEvent('form:validation-error', {
             detail: {
                 errors: {

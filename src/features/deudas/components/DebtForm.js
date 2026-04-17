@@ -51,7 +51,7 @@ export class DebtForm extends HTMLElement {
             const flowName = this._analyticsFlow || this._getFlowName();
             this.startAnalyticsFlow(flowName, { step: this._analyticsStep });
             const errors = { ...(event.detail?.errors || {}) };
-            if (!this.montos || this.montos.length === 0) {
+            if (!this.hasMontosAdded()) {
                 const montosError = this.getMontosRequiredError();
                 this.showFormError(montosError);
                 errors.montos = montosError;
@@ -181,6 +181,10 @@ export class DebtForm extends HTMLElement {
         this.appendChild(acreedorField);
         this.appendChild(montosList);
         this.appendChild(appForm);
+    }
+
+    hasMontosAdded() {
+        return Array.isArray(this.montos) && this.montos.length > 0;
     }
 
     // Open inline form to add a new monto at the bottom of the table.
@@ -320,7 +324,7 @@ export class DebtForm extends HTMLElement {
         // Ordenar montos por fecha de vencimiento ascendente
         this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
-        if (this.montos.length > 0) {
+        if (this.hasMontosAdded()) {
             this.clearFormError();
         }
         this.montos.forEach((monto, idx) => {
@@ -444,7 +448,7 @@ export class DebtForm extends HTMLElement {
         // Los datos del formulario ya están validados por AppForm
         const values = e.detail;
         // Validar que haya al menos un monto
-        if (!this.montos || this.montos.length === 0) {
+        if (!this.hasMontosAdded()) {
             const montosError = this.getMontosRequiredError();
             this.showFormError(montosError);
             trackFlowError(flowName, {
