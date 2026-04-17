@@ -189,7 +189,13 @@ export class DebtForm extends HTMLElement {
 
     clearValidationState() {
         this.querySelector('app-form')?.clearValidationState();
-        this.querySelector('[data-debt-form-field="acreedor"]')?.classList.remove('was-validated');
+        this.querySelectorAll('[data-debt-form-field].was-validated').forEach(field => {
+            field.classList.remove('was-validated');
+        });
+    }
+
+    clearErrorState() {
+        this.clearValidationState();
         this.clearFormError();
     }
 
@@ -421,7 +427,7 @@ export class DebtForm extends HTMLElement {
             };
             this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
-        this.clearValidationState();
+        this.clearErrorState();
     }
 
     reset(options = {}) {
@@ -442,7 +448,7 @@ export class DebtForm extends HTMLElement {
             this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
         this.renderMontosList();
-        this.clearValidationState();
+        this.clearErrorState();
         // Cerrar el modal de deuda si está abierto
         if (this.parentNode && this.parentNode.tagName === 'UI-MODAL' && typeof this.parentNode.close === 'function') {
             this.parentNode.close();
