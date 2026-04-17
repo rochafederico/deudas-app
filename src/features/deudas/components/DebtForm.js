@@ -50,9 +50,17 @@ export class DebtForm extends HTMLElement {
         this._onValidationError = (event) => {
             const flowName = this._analyticsFlow || this._getFlowName();
             this.startAnalyticsFlow(flowName, { step: this._analyticsStep });
+            const errors = { ...(event.detail?.errors || {}) };
+            if (!this.montos || this.montos.length === 0) {
+                const montosError = this.getMontosRequiredError();
+                this.showFormError(montosError);
+                errors.montos = montosError;
+            } else {
+                this.clearFormError();
+            }
             trackFlowError(flowName, {
                 step: this._analyticsStep,
-                errors: event.detail.errors
+                errors
             });
         };
         this._onInteraction = () => this.startAnalyticsFlow(this._getFlowName(), { step: this._analyticsStep });
@@ -312,6 +320,9 @@ export class DebtForm extends HTMLElement {
         // Ordenar montos por fecha de vencimiento ascendente
         this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
+        if (this.montos.length > 0) {
+            this.clearFormError();
+        }
         this.montos.forEach((monto, idx) => {
             if (this._inlineEditRef !== null && monto === this._inlineEditRef) {
                 // Render inline edit row for this existing monto
@@ -434,10 +445,11 @@ export class DebtForm extends HTMLElement {
         const values = e.detail;
         // Validar que haya al menos un monto
         if (!this.montos || this.montos.length === 0) {
-            this.showFormError('Debe agregar al menos un monto antes de guardar.');
+            const montosError = this.getMontosRequiredError();
+            this.showFormError(montosError);
             trackFlowError(flowName, {
                 step: 'submit',
-                errors: { montos: 'Debe agregar al menos un monto antes de guardar.' }
+                errors: { montos: montosError }
             });
             return;
         }
@@ -471,6 +483,10 @@ export class DebtForm extends HTMLElement {
         if (!err || !montosList) return;
         err.textContent = msg;
         montosList.classList.add('border', 'border-danger', 'rounded', 'p-2');
+    }
+
+    getMontosRequiredError() {
+        return 'Debe agregar al menos un monto antes de guardar.';
     }
 
     clearFormError() {

@@ -780,11 +780,11 @@ async function testShowFormErrorNearMontos() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.showFormError('Debe agregar al menos un monto antes de guardar.');
+    form.showFormError(form.getMontosRequiredError());
 
     const errEl = form.querySelector('#form-error');
     assert(errEl !== null, 'Debe existir el elemento #form-error');
-    assert(errEl.textContent === 'Debe agregar al menos un monto antes de guardar.', 'El mensaje de error debe ser correcto');
+    assert(errEl.textContent === form.getMontosRequiredError(), 'El mensaje de error debe ser correcto');
 
     const montosList = form.querySelector('.montos-list');
     assert(montosList !== null, 'Debe existir .montos-list');
@@ -812,7 +812,7 @@ async function testDebtFormRequiereMontosAlEnviar() {
     tipoInput.value = 'Tarjeta';
     appForm.triggerSubmit();
 
-    assert(errEl.textContent === 'Debe agregar al menos un monto antes de guardar.', 'Debe mostrar error cuando faltan montos');
+    assert(errEl.textContent === form.getMontosRequiredError(), 'Debe mostrar error cuando faltan montos');
     assert(montosList.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente al enviar sin montos');
 
     document.body.removeChild(form);
@@ -854,6 +854,8 @@ async function testDebtModalFooterUxValidacionConsistente() {
     const appForm = modal.querySelector('app-form');
     const nativeForm = appForm.querySelector('form');
     const acreedorField = modal.querySelector('[data-field-name="acreedor"]');
+    const montosList = modal.querySelector('.montos-list');
+    const formError = modal.querySelector('#form-error');
     const saveBtn = modal.querySelector('.modal-footer .btn.btn-success');
 
     assert(saveBtn !== null, 'Debe existir botón Guardar en el footer del modal de deuda');
@@ -864,6 +866,8 @@ async function testDebtModalFooterUxValidacionConsistente() {
 
     assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el formulario al intentar guardar vacío desde el footer');
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe mostrar el estado inválido recién después del envío');
+    assert(formError.textContent === modal.querySelector('debt-form').getMontosRequiredError(), 'Montos debe mostrar error también cuando el formulario está vacío');
+    assert(montosList.classList.contains('border-danger'), 'Montos debe marcarse visualmente cuando se intenta guardar vacío');
 
     document.body.removeChild(modal);
 }

@@ -218,8 +218,20 @@ export class AppForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     }
 
-    handleInvalid() {
+    handleInvalid(e) {
         this.form?.classList.add('was-validated');
+        const invalidField = e?.target;
+        if (!invalidField || invalidField === this.form) return;
+        const fieldName = invalidField.name || invalidField.id || 'form';
+        this.dispatchEvent(new CustomEvent('form:validation-error', {
+            detail: {
+                errors: {
+                    [fieldName]: invalidField.validationMessage || 'Campo inválido'
+                }
+            },
+            bubbles: true,
+            composed: true
+        }));
     }
 
     handleSubmit(e) {
