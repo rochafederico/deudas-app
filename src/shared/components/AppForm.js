@@ -218,6 +218,13 @@ export class AppForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     }
 
+    clearValidationState() {
+        this.querySelector('form')?.classList.remove('was-validated');
+        this.querySelectorAll('[data-field-name].was-validated').forEach(field => {
+            field.classList.remove('was-validated');
+        });
+    }
+
     handleInvalid(e) {
         this.form?.classList.add('was-validated');
         const invalidField = e?.target;

@@ -187,6 +187,12 @@ export class DebtForm extends HTMLElement {
         return Array.isArray(this.montos) && this.montos.length > 0;
     }
 
+    clearValidationState() {
+        this.querySelector('app-form')?.clearValidationState();
+        this.querySelector('[data-debt-form-field="acreedor"]')?.classList.remove('was-validated');
+        this.clearFormError();
+    }
+
     // Open inline form to add a new monto at the bottom of the table.
     // Rule: only 1 inline open at a time; if one is already open, ask user via confirm().
     openInlineAdd() {
@@ -415,6 +421,7 @@ export class DebtForm extends HTMLElement {
             };
             this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
+        this.clearValidationState();
     }
 
     reset(options = {}) {
@@ -435,6 +442,7 @@ export class DebtForm extends HTMLElement {
             this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
         this.renderMontosList();
+        this.clearValidationState();
         // Cerrar el modal de deuda si está abierto
         if (this.parentNode && this.parentNode.tagName === 'UI-MODAL' && typeof this.parentNode.close === 'function') {
             this.parentNode.close();

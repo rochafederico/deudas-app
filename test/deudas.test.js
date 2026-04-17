@@ -872,6 +872,44 @@ async function testDebtModalFooterUxValidacionConsistente() {
     document.body.removeChild(modal);
 }
 
+async function testDebtModalReopenClearsValidationState() {
+    console.log('  UC19: DebtModal limpia estados inválidos al reabrirse');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const debtForm = modal.form;
+    const appForm = debtForm.querySelector('app-form');
+    appForm.triggerSubmit();
+
+    let nativeForm = debtForm.querySelector('app-form form');
+    let acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
+    let montosList = debtForm.querySelector('.montos-list');
+    let formError = debtForm.querySelector('#form-error');
+
+    assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el form inválido antes de reabrir');
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe marcarse inválido antes de reabrir');
+    assert(montosList.classList.contains('border-danger'), 'Montos debe marcarse inválido antes de reabrir');
+    assert(formError.textContent === debtForm.getMontosRequiredError(), 'Debe existir error de montos antes de reabrir');
+
+    modal.close();
+    modal.openCreate();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    nativeForm = debtForm.querySelector('app-form form');
+    acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
+    montosList = debtForm.querySelector('.montos-list');
+    formError = debtForm.querySelector('#form-error');
+
+    assert(!nativeForm.classList.contains('was-validated'), 'No debe persistir was-validated al reabrir el modal');
+    assert(!acreedorField.classList.contains('was-validated'), 'Acreedor no debe conservar estado inválido al reabrir');
+    assert(!montosList.classList.contains('border-danger'), 'Montos no debe conservar borde de error al reabrir');
+    assert(formError.textContent === '', 'El error de montos debe limpiarse al reabrir');
+
+    document.body.removeChild(modal);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -894,5 +932,6 @@ export const tests = [
     testShowFormErrorNearMontos,
     testDebtFormRequiereMontosAlEnviar,
     testDebtModalCancelClosesModal,
-    testDebtModalFooterUxValidacionConsistente
+    testDebtModalFooterUxValidacionConsistente,
+    testDebtModalReopenClearsValidationState
 ];

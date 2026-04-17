@@ -104,5 +104,24 @@ export const tests = [
         assert(submitEvent.detail.acreedor === 'Banco Galicia', 'Debe incluir el valor del campo asociado al formulario');
 
         document.body.removeChild(appForm);
+    },
+
+    async function appForm_clearValidationStateRemovesBootstrapValidationClass() {
+        console.log('  AppForm: clearValidationState removes stale Bootstrap validation state');
+        const appForm = document.createElement('app-form');
+        appForm.fields = [
+            { name: 'acreedor', type: 'text', label: 'Acreedor', required: true }
+        ];
+        document.body.appendChild(appForm);
+
+        const form = appForm.querySelector('form');
+        appForm.triggerSubmit();
+        assert(form.classList.contains('was-validated'), 'El formulario debe quedar validado tras un envío inválido');
+
+        appForm.clearValidationState();
+
+        assert(!form.classList.contains('was-validated'), 'clearValidationState debe limpiar la clase was-validated');
+
+        document.body.removeChild(appForm);
     }
 ];

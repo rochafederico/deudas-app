@@ -11,6 +11,7 @@ export class InversionModal extends HTMLElement {
     _form;
     resetValues() {
         this._form.form.reset();
+        this._form.clearValidationState();
     }
 
     render() {

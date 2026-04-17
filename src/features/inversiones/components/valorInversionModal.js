@@ -12,6 +12,7 @@ export class ValorInversionModal extends HTMLElement {
     }
     resetValues() {
         this._form.form.reset();
+        this._form.clearValidationState();
     }
     render() {
         if (this._rendered) return;

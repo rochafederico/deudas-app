@@ -59,6 +59,7 @@ export class IngresoForm extends HTMLElement {
         if (form) {
             form.initialValues = { moneda: 'ARS' };
             this._applyMobileFirstLayout(form);
+            form.clearValidationState();
         }
     }
 
