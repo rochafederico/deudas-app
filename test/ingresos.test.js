@@ -150,6 +150,29 @@ async function testIngresoFormDescripcionEsObligatoria() {
     document.body.removeChild(ingresoForm);
 }
 
+async function testIngresoFormUxValidacionConsistente() {
+    console.log('  UC2d: IngresoForm mantiene submit habilitado y errores solo al enviar');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const appForm = ingresoForm.querySelector('app-form');
+    const formEl = appForm.querySelector('form');
+    const submitBtn = formEl.querySelector('button[type="submit"]');
+    const descripcionInput = ingresoForm.querySelector('input[name="descripcion"]');
+
+    assert(submitBtn !== null, 'Debe existir botón submit visible en ingresos');
+    assert(submitBtn.disabled === false, 'El botón submit de ingresos debe iniciar habilitado');
+    assert(!formEl.classList.contains('was-validated'), 'No debe mostrar estado inválido antes del primer envío');
+
+    appForm.triggerSubmit();
+
+    assert(formEl.classList.contains('was-validated'), 'Debe mostrar validación recién al intentar enviar');
+    assert(descripcionInput.validity.valueMissing === true, 'Descripción debe quedar inválida por required al enviar vacío');
+
+    document.body.removeChild(ingresoForm);
+}
+
 // ===================================================================
 // UC3: Multiples ingresos en el mismo mes y filtrado por periodo
 // Flujo: usuario agrega 3 ingresos en distintos meses, luego filtra
@@ -350,6 +373,7 @@ export const tests = [
     testCancelarIngresoForm,
     testIngresoFormLayoutMobileFirst,
     testIngresoFormDescripcionEsObligatoria,
+    testIngresoFormUxValidacionConsistente,
     testMultiplesIngresosFiltradoPorMes,
     testTotalesIngresosPorMoneda,
     testFlujoCompletoIngresosUI,

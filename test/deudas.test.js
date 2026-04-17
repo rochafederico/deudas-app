@@ -821,6 +821,30 @@ async function testDebtModalCancelClosesModal() {
     document.body.removeChild(modal);
 }
 
+async function testDebtModalFooterUxValidacionConsistente() {
+    console.log('  UC18: DebtModal mantiene Guardar habilitado y valida al enviar desde el footer');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const appForm = modal.querySelector('app-form');
+    const nativeForm = appForm.querySelector('form');
+    const acreedorField = modal.querySelector('[data-field-name="acreedor"]');
+    const saveBtn = modal.querySelector('.modal-footer .btn.btn-success');
+
+    assert(saveBtn !== null, 'Debe existir botón Guardar en el footer del modal de deuda');
+    assert(saveBtn.disabled === false, 'El botón Guardar de deuda debe iniciar habilitado');
+    assert(!nativeForm.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en deuda');
+
+    saveBtn.click();
+
+    assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el formulario al intentar guardar vacío desde el footer');
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe mostrar el estado inválido recién después del envío');
+
+    document.body.removeChild(modal);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -841,5 +865,6 @@ export const tests = [
     testDebtFormCampoReordenadoMuestraEstadoInvalido,
     testDebtFormTipoDeudaEsObligatorio,
     testShowFormErrorNearMontos,
-    testDebtModalCancelClosesModal
+    testDebtModalCancelClosesModal,
+    testDebtModalFooterUxValidacionConsistente
 ];

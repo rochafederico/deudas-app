@@ -97,6 +97,51 @@ async function testInversionModalNombreEsObligatorio() {
     await cleanup();
 }
 
+async function testInversionModalsUxValidacionConsistente() {
+    console.log('  UC1c: Modales de inversiones mantienen submit habilitado y validan al enviar');
+    await cleanup();
+
+    const inversionModal = document.createElement('inversion-modal');
+    document.body.appendChild(inversionModal);
+
+    const inversionAppForm = inversionModal.querySelector('app-form');
+    const inversionFormEl = inversionAppForm.querySelector('form');
+    const inversionSubmitBtn = inversionFormEl.querySelector('button[type="submit"]');
+    const nombreInput = inversionModal.querySelector('input[name="nombre"]');
+
+    assert(inversionSubmitBtn !== null, 'Debe existir botón submit visible en alta de inversión');
+    assert(inversionSubmitBtn.disabled === false, 'El botón submit de inversión debe iniciar habilitado');
+    assert(!inversionFormEl.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en inversión');
+
+    inversionAppForm.triggerSubmit();
+
+    assert(inversionFormEl.classList.contains('was-validated'), 'Debe mostrar errores sólo al intentar guardar la inversión');
+    assert(nombreInput.validity.valueMissing === true, 'Nombre debe quedar inválido por required al enviar vacío');
+
+    document.body.removeChild(inversionModal);
+
+    const valorModal = document.createElement('valor-modal');
+    document.body.appendChild(valorModal);
+    valorModal.setIdInversion(1);
+
+    const valorAppForm = valorModal.querySelector('app-form');
+    const valorFormEl = valorAppForm.querySelector('form');
+    const valorSubmitBtn = valorFormEl.querySelector('button[type="submit"]');
+    const valorInput = valorModal.querySelector('input[name="valor"]');
+
+    assert(valorSubmitBtn !== null, 'Debe existir botón submit visible en valor de inversión');
+    assert(valorSubmitBtn.disabled === false, 'El botón submit de valor de inversión debe iniciar habilitado');
+    assert(!valorFormEl.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en valor de inversión');
+
+    valorAppForm.triggerSubmit();
+
+    assert(valorFormEl.classList.contains('was-validated'), 'Debe mostrar errores sólo al intentar guardar el valor');
+    assert(valorInput.validity.valueMissing === true, 'Valor debe quedar inválido por required al enviar vacío');
+
+    document.body.removeChild(valorModal);
+    await cleanup();
+}
+
 // ===================================================================
 // UC2: Agregar valor a inversion existente y verificar historial
 // Flujo: usuario tiene una inversion, abre ValorInversionModal,
@@ -308,6 +353,7 @@ async function testInversionEntityConId() {
 export const tests = [
     testAgregarInversionDesdeModal,
     testInversionModalNombreEsObligatorio,
+    testInversionModalsUxValidacionConsistente,
     testAgregarValorAInversion,
     testListarInversiones,
     testEliminarInversion,

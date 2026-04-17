@@ -252,6 +252,50 @@ async function testCancelarFormularios() {
     await cleanup();
 }
 
+async function testMontosFormsUxValidacionConsistente() {
+    console.log('  UC4b: Formularios de montos mantienen submit habilitado y validan al enviar');
+    await cleanup();
+
+    const montoForm = document.createElement('monto-form');
+    document.body.appendChild(montoForm);
+
+    const montoAppForm = montoForm.querySelector('app-form');
+    const montoFormEl = montoAppForm.querySelector('form');
+    const montoSubmitBtn = montoFormEl.querySelector('button[type="submit"]');
+    const montoInput = montoForm.querySelector('input[name="monto"]');
+
+    assert(montoSubmitBtn !== null, 'Debe existir botón submit visible en MontoForm');
+    assert(montoSubmitBtn.disabled === false, 'El botón submit de MontoForm debe iniciar habilitado');
+    assert(!montoFormEl.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en MontoForm');
+
+    montoAppForm.triggerSubmit();
+
+    assert(montoFormEl.classList.contains('was-validated'), 'Debe mostrar errores sólo al intentar guardar el monto');
+    assert(montoInput.validity.valueMissing === true, 'Monto debe quedar inválido por required al enviar vacío');
+
+    document.body.removeChild(montoForm);
+
+    const dupModal = document.createElement('duplicate-monto-modal');
+    document.body.appendChild(dupModal);
+
+    const dupAppForm = dupModal.querySelector('app-form');
+    const dupFormEl = dupAppForm.querySelector('form');
+    const dupSubmitBtn = dupFormEl.querySelector('button[type="submit"]');
+    const vencimientoInput = dupModal.querySelector('input[name="vencimiento"]');
+
+    assert(dupSubmitBtn !== null, 'Debe existir botón submit visible en DuplicateMontoModal');
+    assert(dupSubmitBtn.disabled === false, 'El botón submit de DuplicateMontoModal debe iniciar habilitado');
+    assert(!dupFormEl.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en duplicar monto');
+
+    dupAppForm.triggerSubmit();
+
+    assert(dupFormEl.classList.contains('was-validated'), 'Debe mostrar errores sólo al intentar duplicar');
+    assert(vencimientoInput.validity.valueMissing === true, 'Vencimiento debe quedar inválido por required al enviar vacío');
+
+    document.body.removeChild(dupModal);
+    await cleanup();
+}
+
 // ===================================================================
 // UC5: Flujo completo — crear deuda con montos via DebtForm, listar
 // por mes, marcar pagado, verificar totales, eliminar monto individual
@@ -385,6 +429,7 @@ export const tests = [
     testEditarMontoDesdeMontoForm,
     testDuplicarMontoDesdeModal,
     testCancelarFormularios,
+    testMontosFormsUxValidacionConsistente,
     testFlujoCompletoMontosViaDebtForm,
     testTotalesMixtosPorMoneda
 ];
