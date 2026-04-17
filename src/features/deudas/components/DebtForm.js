@@ -107,10 +107,8 @@ export class DebtForm extends HTMLElement {
             className: 'montos-list mb-3',
             children: [
                 el('div', {
-                    className: 'mb-2',
-                    children: [
-                        el('strong', { text: 'Montos' })
-                    ]
+                    className: 'form-label mb-2',
+                    text: 'Montos'
                 }),
                 el('div', {
                     className: 'overflow-auto',
@@ -155,32 +153,52 @@ export class DebtForm extends HTMLElement {
 
     _applyMobileFirstLayout(appForm, montosList) {
         // app-form re-renderiza cuando cambian initialValues; removemos la copia externa
-        // anterior de Acreedor antes de volver a mover el wrapper actualizado.
-        this.querySelectorAll(':scope > [data-debt-form-field="acreedor"]').forEach(node => {
+        // anterior de los campos reordenados antes de volver a mover los wrappers actualizados.
+        this.querySelectorAll(':scope > [data-debt-form-field]').forEach(node => {
             node._validationController?.abort();
             node.remove();
         });
         const acreedorField = appForm.querySelector('[data-field-name="acreedor"]');
-        if (!acreedorField) {
+        const tipoField = appForm.querySelector('[data-field-name="tipoDeuda"]');
+        if (!acreedorField || !tipoField) {
             this.appendChild(appForm);
             this.appendChild(montosList);
             return;
         }
-        acreedorField.classList.remove('mb-2');
-        acreedorField.classList.add('mb-3');
-        acreedorField.dataset.debtFormField = 'acreedor';
-        const acreedorInput = acreedorField.querySelector('input[name="acreedor"]');
-        const validationController = new AbortController();
-        acreedorField._validationController = validationController;
-        acreedorInput?.addEventListener('invalid', () => {
-            acreedorField.classList.add('was-validated');
-        }, { signal: validationController.signal });
-        acreedorInput?.addEventListener('input', () => {
-            acreedorField.classList.toggle('was-validated', !acreedorInput.checkValidity());
-        }, { signal: validationController.signal });
+
+        this._prepareReorderedField(acreedorField, 'acreedor');
+        this._prepareReorderedField(tipoField, 'tipoDeuda');
+
         this.appendChild(acreedorField);
+        this.appendChild(tipoField);
         this.appendChild(montosList);
         this.appendChild(appForm);
+    }
+
+    _prepareReorderedField(fieldWrapper, fieldName) {
+        fieldWrapper.classList.remove('mb-2');
+        fieldWrapper.classList.add('mb-3');
+        fieldWrapper.dataset.debtFormField = fieldName;
+        const input = fieldWrapper.querySelector(`[name="${fieldName}"]`);
+        const validationController = new AbortController();
+        fieldWrapper._validationController = validationController;
+        input?.addEventListener('invalid', () => {
+            const appForm = this.querySelector('app-form');
+            appForm?.querySelector('form')?.classList.add('was-validated');
+            fieldWrapper.classList.add('was-validated');
+            appForm?.dispatchEvent(new CustomEvent('form:validation-error', {
+                detail: {
+                    errors: {
+                        [fieldName]: input.validationMessage || 'Campo inválido'
+                    }
+                },
+                bubbles: true,
+                composed: true
+            }));
+        }, { signal: validationController.signal });
+        input?.addEventListener('input', () => {
+            fieldWrapper.classList.toggle('was-validated', !input.checkValidity());
+        }, { signal: validationController.signal });
     }
 
     hasMontosAdded() {

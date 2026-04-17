@@ -690,23 +690,27 @@ async function testDebtFormHideButtons() {
 }
 
 async function testDebtFormLayoutMobileFirst() {
-    console.log('  UC15b: DebtForm prioriza Acreedor y Montos antes de Tipo y Notas');
+    console.log('  UC15b: DebtForm ordena Acreedor, Tipo, Montos y Notas');
 
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
     const acreedorField = form.querySelector('[data-field-name="acreedor"]');
+    const tipoField = form.querySelector('[data-field-name="tipoDeuda"]');
     const montosList = form.querySelector('.montos-list');
     const appForm = form.querySelector('app-form');
-    const tipoField = appForm.querySelector('[data-field-name="tipoDeuda"]');
     const notasField = appForm.querySelector('[data-field-name="notas"]');
     const addMontoBtn = montosList.querySelector('#add-monto');
+    const montosLabel = montosList.querySelector('.form-label');
 
     assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de montos');
-    assert(acreedorField.nextElementSibling === montosList, 'Montos debe ir después de Acreedor');
-    assert(form.lastElementChild === appForm, 'Los campos secundarios deben quedar después del bloque de montos');
-    assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo dentro de app-form');
+    assert(acreedorField.nextElementSibling === tipoField, 'Tipo de deuda debe ir después de Acreedor');
+    assert(tipoField.nextElementSibling === montosList, 'Montos debe ir después de Tipo de deuda');
+    assert(form.lastElementChild === appForm, 'Notas debe quedar después del bloque de montos');
+    assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo');
     assert(addMontoBtn.parentElement === montosList.lastElementChild, 'Agregar monto debe quedar como acción secundaria al final del bloque');
+    assert(montosLabel?.textContent === 'Montos', 'Montos debe tener label visible');
+    assert(montosLabel?.classList.contains('form-label'), 'El label de Montos debe usar el mismo estilo base del formulario');
 
     document.body.removeChild(form);
 }
@@ -752,7 +756,8 @@ async function testDebtFormTipoDeudaEsObligatorio() {
 
     const appForm = form.querySelector('app-form');
     const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
-    const tipoInput = appForm.querySelector('input[name="tipoDeuda"]');
+    const tipoField = form.querySelector('[data-field-name="tipoDeuda"]');
+    const tipoInput = tipoField.querySelector('input[name="tipoDeuda"]');
     const nativeForm = appForm.querySelector('form');
 
     let debtSubmitCount = 0;
@@ -766,6 +771,7 @@ async function testDebtFormTipoDeudaEsObligatorio() {
 
     assert(tipoInput.required === true, 'Tipo de deuda debe ser required');
     assert(nativeForm.classList.contains('was-validated'), 'El formulario debe marcarse como validado en submit inválido');
+    assert(tipoField.classList.contains('was-validated'), 'Tipo de deuda reordenado debe recibir estado visual inválido');
     assert(debtSubmitCount === 0, 'No debe emitirse deuda:submit cuando Tipo de deuda está vacío');
 
     document.body.removeChild(form);
@@ -804,7 +810,7 @@ async function testDebtFormRequiereMontosAlEnviar() {
 
     const appForm = form.querySelector('app-form');
     const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
-    const tipoInput = appForm.querySelector('input[name="tipoDeuda"]');
+    const tipoInput = form.querySelector('[data-field-name="tipoDeuda"] input[name="tipoDeuda"]');
     const montosList = form.querySelector('.montos-list');
     const errEl = form.querySelector('#form-error');
 
