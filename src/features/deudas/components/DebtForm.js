@@ -194,6 +194,7 @@ export class DebtForm extends HTMLElement {
         });
     }
 
+    // Restablece el formulario a un estado visual limpio al reabrirlo.
     clearErrorState() {
         this.clearValidationState();
         this.clearFormError();
