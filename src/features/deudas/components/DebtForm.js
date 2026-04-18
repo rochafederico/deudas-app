@@ -104,44 +104,72 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
-            className: 'montos-list mb-3',
+            className: 'montos-list card mb-3',
+            attrs: {
+                role: 'group',
+                'aria-labelledby': 'montos-label',
+                'aria-describedby': 'form-error'
+            },
             children: [
                 el('div', {
-                    className: 'form-label mb-2',
-                    text: 'Montos'
+                    className: 'card-header bg-body d-flex justify-content-between align-items-start gap-2 py-3',
+                    children: [
+                        el('div', {
+                            className: 'form-label mb-0',
+                            text: 'Montos',
+                            attrs: { id: 'montos-label' }
+                        }),
+                        el('span', {
+                            className: 'bi bi-exclamation-circle-fill text-danger d-none',
+                            attrs: {
+                                id: 'montos-error-icon',
+                                'aria-hidden': 'true'
+                            }
+                        })
+                    ]
                 }),
                 el('div', {
-                    className: 'overflow-auto',
-                    style: 'min-height: 100px; max-height: 220px;',
+                    className: 'card-body p-3',
                     children: [
-                        el('table', {
-                            className: 'table table-sm w-100',
+                        el('div', {
+                            className: 'overflow-auto',
+                            style: 'min-height: 100px; max-height: 220px;',
                             children: [
-                                el('thead', {
+                                el('table', {
+                                    className: 'table table-sm w-100 mb-0',
                                     children: [
-                                        el('tr', {
+                                        el('thead', {
                                             children: [
-                                                el('th', { text: 'Monto' }),
-                                                el('th', { text: 'Moneda' }),
-                                                el('th', { text: 'Vencimiento' }),
-                                                el('th', { text: 'Acciones' })
+                                                el('tr', {
+                                                    children: [
+                                                        el('th', { text: 'Monto' }),
+                                                        el('th', { text: 'Moneda' }),
+                                                        el('th', { text: 'Vencimiento' }),
+                                                        el('th', { text: 'Acciones' })
+                                                    ]
+                                                })
                                             ]
-                                        })
+                                        }),
+                                        el('tbody', { attrs: { id: 'montos-tbody' } })
                                     ]
-                                }),
-                                el('tbody', { attrs: { id: 'montos-tbody' } })
+                                })
                             ]
                         })
                     ]
                 }),
                 el('div', {
-                    attrs: { id: 'form-error' },
-                    className: 'text-danger mt-2'
-                }),
-                el('div', {
-                    className: 'mt-2',
+                    className: 'card-footer bg-body border-0 px-3 pt-0 pb-3',
                     children: [
-                        el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
+                        el('div', {
+                            attrs: { id: 'form-error' },
+                            className: 'invalid-feedback d-block mt-0 d-none'
+                        }),
+                        el('div', {
+                            className: 'd-flex justify-content-end mt-2',
+                            children: [
+                                el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
+                            ]
+                        })
                     ]
                 })
             ]
@@ -179,6 +207,9 @@ export class DebtForm extends HTMLElement {
         fieldWrapper.classList.remove('mb-2');
         fieldWrapper.classList.add('mb-3');
         fieldWrapper.dataset.debtFormField = fieldName;
+        if (fieldName === 'tipoDeuda') {
+            this._decorateFieldAsPanel(fieldWrapper, fieldName);
+        }
         const input = fieldWrapper.querySelector(`[name="${fieldName}"]`);
         const validationController = new AbortController();
         fieldWrapper._validationController = validationController;
@@ -186,6 +217,9 @@ export class DebtForm extends HTMLElement {
             const appForm = this.querySelector('app-form');
             appForm?.querySelector('form')?.classList.add('was-validated');
             fieldWrapper.classList.add('was-validated');
+            if (fieldWrapper.dataset.debtFormPanel === 'true') {
+                this._showFieldPanelError(fieldWrapper, input.validationMessage || 'Campo inválido');
+            }
             appForm?.dispatchEvent(new CustomEvent('form:validation-error', {
                 detail: {
                     errors: {
@@ -198,7 +232,87 @@ export class DebtForm extends HTMLElement {
         }, { signal: validationController.signal });
         input?.addEventListener('input', () => {
             fieldWrapper.classList.toggle('was-validated', !input.checkValidity());
+            if (fieldWrapper.dataset.debtFormPanel === 'true') {
+                if (input.checkValidity()) {
+                    this._clearFieldPanelError(fieldWrapper);
+                } else {
+                    this._showFieldPanelError(fieldWrapper, input.validationMessage || 'Campo inválido');
+                }
+            }
         }, { signal: validationController.signal });
+    }
+
+    _decorateFieldAsPanel(fieldWrapper, fieldName) {
+        const label = fieldWrapper.querySelector(`label[for="${fieldName}"]`);
+        const input = fieldWrapper.querySelector(`[name="${fieldName}"]`);
+        if (!label || !input) return;
+
+        const errorId = `${fieldName}-error`;
+        const labelId = `${fieldName}-label`;
+        const iconId = `${fieldName}-error-icon`;
+        label.id = labelId;
+        label.className = 'form-label mb-0';
+        input.setAttribute('aria-describedby', errorId);
+
+        const header = el('div', {
+            className: 'card-header bg-body d-flex justify-content-between align-items-start gap-2 py-3',
+            children: [
+                label,
+                el('span', {
+                    className: 'bi bi-exclamation-circle-fill text-danger d-none',
+                    attrs: {
+                        id: iconId,
+                        'aria-hidden': 'true'
+                    }
+                })
+            ]
+        });
+        const body = el('div', {
+            className: 'card-body p-3',
+            children: [input]
+        });
+        const footer = el('div', {
+            className: 'card-footer bg-body border-0 px-3 pt-0 pb-3',
+            children: [
+                el('div', {
+                    attrs: { id: errorId },
+                    className: 'invalid-feedback d-block mt-0 d-none'
+                })
+            ]
+        });
+
+        fieldWrapper.innerHTML = '';
+        fieldWrapper.className = 'card mb-3';
+        fieldWrapper.dataset.debtFormField = fieldName;
+        fieldWrapper.dataset.debtFormPanel = 'true';
+        fieldWrapper.setAttribute('role', 'group');
+        fieldWrapper.setAttribute('aria-labelledby', labelId);
+        fieldWrapper.setAttribute('aria-describedby', errorId);
+        fieldWrapper.appendChild(header);
+        fieldWrapper.appendChild(body);
+        fieldWrapper.appendChild(footer);
+    }
+
+    _showFieldPanelError(fieldWrapper, message) {
+        const error = fieldWrapper.querySelector('.invalid-feedback');
+        const icon = fieldWrapper.querySelector('.bi');
+        if (error) {
+            error.textContent = message;
+            error.classList.remove('d-none');
+        }
+        fieldWrapper.classList.add('border-danger');
+        icon?.classList.remove('d-none');
+    }
+
+    _clearFieldPanelError(fieldWrapper) {
+        const error = fieldWrapper.querySelector('.invalid-feedback');
+        const icon = fieldWrapper.querySelector('.bi');
+        if (error) {
+            error.textContent = '';
+            error.classList.add('d-none');
+        }
+        fieldWrapper.classList.remove('border-danger');
+        icon?.classList.add('d-none');
     }
 
     hasMontosAdded() {
@@ -209,6 +323,9 @@ export class DebtForm extends HTMLElement {
         this.querySelector('app-form')?.clearValidationState();
         this.querySelectorAll('[data-debt-form-field].was-validated').forEach(field => {
             field.classList.remove('was-validated');
+        });
+        this.querySelectorAll('[data-debt-form-panel="true"]').forEach(field => {
+            this._clearFieldPanelError(field);
         });
     }
 
@@ -517,9 +634,12 @@ export class DebtForm extends HTMLElement {
     showFormError(msg) {
         const err = this.querySelector('#form-error');
         const montosList = this.querySelector('.montos-list');
+        const montosErrorIcon = this.querySelector('#montos-error-icon');
         if (!err || !montosList) return;
         err.textContent = msg;
-        montosList.classList.add('border', 'border-danger', 'rounded', 'p-2');
+        err.classList.remove('d-none');
+        montosList.classList.add('border-danger');
+        montosErrorIcon?.classList.remove('d-none');
     }
 
     getMontosRequiredError() {
@@ -529,10 +649,15 @@ export class DebtForm extends HTMLElement {
     clearFormError() {
         const err = this.querySelector('#form-error');
         const montosList = this.querySelector('.montos-list');
-        if (err) err.textContent = '';
-        if (montosList) {
-            montosList.classList.remove('border', 'border-danger', 'rounded', 'p-2');
+        const montosErrorIcon = this.querySelector('#montos-error-icon');
+        if (err) {
+            err.textContent = '';
+            err.classList.add('d-none');
         }
+        if (montosList) {
+            montosList.classList.remove('border-danger');
+        }
+        montosErrorIcon?.classList.add('d-none');
     }
 
     startAnalyticsFlow(flowName, metadata = {}) {
