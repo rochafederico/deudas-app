@@ -8,8 +8,8 @@
     <meta name="description" content="Nivva es una aplicación web para gestionar tus egresos e ingresos de manera sencilla y eficiente.">
     <meta name="keywords" content="Nivva, finanzas personales, gestión de dinero, egresos, ingresos, presupuesto, ahorro, control financiero">
     <meta name="theme-color" content="#3d7982">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/src/icons/icon-192.png">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./src/icons/icon-192.png">
     <link href="src/styles/bootstrap.css" rel="stylesheet">
 </head>
 
@@ -36,7 +36,7 @@
         // si SW no está soportado o falla el registro, la app sigue funcionando sin offline.
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(() => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {
                     // SW no disponible — la app funciona sin capacidad offline
                 });
             });

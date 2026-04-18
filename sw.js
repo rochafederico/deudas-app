@@ -6,24 +6,24 @@
 const CACHE_VERSION = 'nivva-v1';
 
 const APP_SHELL = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/src/icons/icon-192.png',
-    '/src/icons/icon-512.png',
-    '/src/styles/bootstrap.css',
-    '/src/main.js',
-    '/src/layout/AppShell.js',
+    './',
+    './index.html',
+    './manifest.json',
+    './src/icons/icon-192.png',
+    './src/icons/icon-512.png',
+    './src/styles/bootstrap.css',
+    './src/main.js',
+    './src/layout/AppShell.js',
 ];
 
 // ── Instalación: pre-cachea el app shell ──────────────────────────────────────
 self.addEventListener('install', event => {
     event.waitUntil(
-        caches.open(CACHE_VERSION)
-            .then(cache => cache.addAll(APP_SHELL))
-            // skipWaiting: activa este SW de inmediato, sin esperar a que
-            // las pestañas abiertas se cierren (auto-update).
-            .then(() => self.skipWaiting())
+        caches.open(CACHE_VERSION).then(cache =>
+            // Cachear cada recurso individualmente para que un fallo puntual
+            // no aborte toda la instalación del SW.
+            Promise.allSettled(APP_SHELL.map(url => cache.add(url)))
+        ).then(() => self.skipWaiting())
     );
 });
 
@@ -57,13 +57,13 @@ self.addEventListener('fetch', event => {
                     event.request.url.startsWith(self.location.origin)
                 ) {
                     const clone = response.clone();
-                caches.open(CACHE_VERSION).then(cache => cache.put(event.request, clone)).catch(() => {});
+                    caches.open(CACHE_VERSION).then(cache => cache.put(event.request, clone)).catch(() => {});
                 }
                 return response;
             }).catch(() => {
                 // Sin red y sin cache: devolver página raíz si es navegación HTML
                 if (event.request.destination === 'document') {
-                    return caches.match('/');
+                    return caches.match('./');
                 }
             });
         })
