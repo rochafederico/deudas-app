@@ -295,7 +295,7 @@ export class DebtForm extends HTMLElement {
 
     _showFieldPanelError(fieldWrapper, message) {
         const error = fieldWrapper.querySelector('.invalid-feedback');
-        const icon = fieldWrapper.querySelector('.bi');
+        const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = message;
             error.classList.remove('d-none');
@@ -306,7 +306,7 @@ export class DebtForm extends HTMLElement {
 
     _clearFieldPanelError(fieldWrapper) {
         const error = fieldWrapper.querySelector('.invalid-feedback');
-        const icon = fieldWrapper.querySelector('.bi');
+        const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = '';
             error.classList.add('d-none');
