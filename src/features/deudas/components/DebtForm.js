@@ -162,7 +162,7 @@ export class DebtForm extends HTMLElement {
                     children: [
                         el('div', {
                             attrs: { id: 'form-error' },
-                            className: 'invalid-feedback d-block mt-0 d-none'
+                            className: 'invalid-feedback mt-0 d-none'
                         }),
                         el('div', {
                             className: 'd-flex justify-content-end mt-2',
@@ -276,7 +276,7 @@ export class DebtForm extends HTMLElement {
             children: [
                 el('div', {
                     attrs: { id: errorId },
-                    className: 'invalid-feedback d-block mt-0 d-none'
+                    className: 'invalid-feedback mt-0 d-none'
                 })
             ]
         });
@@ -297,6 +297,7 @@ export class DebtForm extends HTMLElement {
         const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = message;
+            error.classList.add('d-block');
             error.classList.remove('d-none');
         }
         fieldWrapper.classList.add('border-danger');
@@ -308,6 +309,7 @@ export class DebtForm extends HTMLElement {
         const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = '';
+            error.classList.remove('d-block');
             error.classList.add('d-none');
         }
         fieldWrapper.classList.remove('border-danger');
@@ -636,6 +638,7 @@ export class DebtForm extends HTMLElement {
         const montosErrorIcon = this.querySelector('#montos-error-icon');
         if (!err || !montosList) return;
         err.textContent = msg;
+        err.classList.add('d-block');
         err.classList.remove('d-none');
         montosList.classList.add('border-danger');
         montosErrorIcon?.classList.remove('d-none');
@@ -651,6 +654,7 @@ export class DebtForm extends HTMLElement {
         const montosErrorIcon = this.querySelector('#montos-error-icon');
         if (err) {
             err.textContent = '';
+            err.classList.remove('d-block');
             err.classList.add('d-none');
         }
         if (montosList) {

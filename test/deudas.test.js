@@ -712,7 +712,8 @@ async function testDebtFormLayoutMobileFirst() {
     assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo');
     assert(tipoField.classList.contains('card'), 'Tipo de deuda debe renderizarse como panel/card');
     assert(montosList.classList.contains('card'), 'Montos debe renderizarse como panel/card');
-    assert(addMontoBtn.parentElement?.classList.contains('d-flex'), 'Agregar monto debe quedar alineado dentro del footer del panel');
+    assert(addMontoBtn.parentElement !== null, 'Agregar monto debe tener contenedor dentro del footer del panel');
+    assert(addMontoBtn.parentElement.classList.contains('d-flex'), 'Agregar monto debe quedar alineado dentro del footer del panel');
     assert(montosLabel?.textContent === 'Montos', 'Montos debe tener label visible');
     assert(montosLabel?.classList.contains('form-label'), 'El label de Montos debe usar el mismo estilo base del formulario');
     assert(tipoInput.getAttribute('aria-describedby') === 'tipoDeuda-error', 'Tipo de deuda debe asociar el mensaje de error con aria-describedby');
