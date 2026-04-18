@@ -806,9 +806,10 @@ async function testShowFormErrorNearMontos() {
 
     const montosList = form.querySelector('.montos-list');
     const montosErrorIcon = form.querySelector('#montos-error-icon');
+    const montosFooter = montosList.querySelector('.card-footer');
     assert(montosList !== null, 'Debe existir .montos-list');
     assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
-    assert(errEl.parentElement?.classList.contains('card-footer'), 'El error debe renderizarse en el footer del panel');
+    assert(errEl.parentElement === montosFooter, 'El error debe renderizarse exactamente en el footer del panel');
     assert(errEl.parentElement?.previousElementSibling?.classList.contains('card-body'), 'El error debe aparecer debajo del contenido del panel');
     assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
     assert(montosList.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente como inválida');

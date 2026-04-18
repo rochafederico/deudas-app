@@ -281,9 +281,7 @@ export class DebtForm extends HTMLElement {
             ]
         });
 
-        while (fieldWrapper.firstChild) {
-            fieldWrapper.removeChild(fieldWrapper.firstChild);
-        }
+        fieldWrapper.replaceChildren();
         fieldWrapper.className = 'card mb-3';
         fieldWrapper.dataset.debtFormPanel = 'true';
         fieldWrapper.setAttribute('role', 'group');
