@@ -985,6 +985,38 @@ async function testDebtEntityShellRenderConEntidades() {
 }
 
 // ===================================================================
+// UC-DS4: DebtEntityShell – formato de columna Cuotas pendientes/total
+// ===================================================================
+async function testDebtEntityShellCuotasFormato() {
+    console.log('  DebtEntityShell: columna Cuotas muestra formato pendientes/total');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [
+        { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
+        { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
+    ];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    const row = container.querySelector('tbody tr');
+    assert(row !== null, 'Debe haber una fila en la tabla');
+    // The cuotas cell is the 3rd <td> (index 2)
+    const cuotasCell = row.querySelectorAll('td')[2];
+    assert(cuotasCell !== null, 'Debe existir la celda de Cuotas');
+    assert(cuotasCell.textContent.trim() === '1/2', `Cuotas debe mostrar "1/2" (1 pendiente, 2 total), obtuvo "${cuotasCell.textContent.trim()}"`);
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
 // UC-DS3: DebtEntityShell – recarga al evento deuda:saved
 // ===================================================================
 async function testDebtEntityShellRecargaAlGuardar() {
@@ -1045,5 +1077,6 @@ export const tests = [
     testDebtModalReopenClearsValidationState,
     testDebtEntityShellRenderVacio,
     testDebtEntityShellRenderConEntidades,
-    testDebtEntityShellRecargaAlGuardar
+    testDebtEntityShellRecargaAlGuardar,
+    testDebtEntityShellCuotasFormato
 ];

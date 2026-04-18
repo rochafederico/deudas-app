@@ -81,15 +81,18 @@ export class DebtEntityShell extends HTMLElement {
 
         const rows = this.entities.map(deuda => {
             const pendiente = this.computePendiente(deuda.montos);
-            const cuotas = (deuda.montos || []).length;
+            const montos = deuda.montos || [];
+            const total = montos.length;
+            const pendientesCount = montos.filter(m => !m.pagado).length;
+            const cuotasStr = total > 0 ? `${pendientesCount}/${total}` : '0/0';
             const pendienteStr = Object.keys(pendiente).length
-                ? Object.entries(pendiente).map(([moneda, total]) => this.fmtMoneda(moneda, total)).join(' | ')
+                ? Object.entries(pendiente).map(([moneda, tot]) => this.fmtMoneda(moneda, tot)).join(' | ')
                 : '—';
             return `
                 <tr>
                     <td>${escapeHtml(deuda.acreedor)}</td>
                     <td>${escapeHtml(deuda.tipoDeuda || '—')}</td>
-                    <td class="text-center">${cuotas}</td>
+                    <td class="text-center">${cuotasStr}</td>
                     <td>${escapeHtml(pendienteStr)}</td>
                     <td class="text-end text-nowrap">
                         <button type="button" class="btn btn-sm btn-outline-secondary me-1"
