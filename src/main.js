@@ -101,7 +101,7 @@ function renderRoute(path) {
   // Update page header using navItem if available, otherwise use route meta (e.g. /gastos/mensual)
   const navItem = navItems.find(item => item.path === route.path) || route;
   if (navItem && pageHeader.update) {
-    pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle });
+    pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle, hideMonthSelector: !!navItem.hideMonthSelector });
   }
   const Component = route.component;
   const node = typeof Component === 'function' ? Component() : Component;

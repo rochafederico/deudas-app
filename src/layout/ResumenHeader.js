@@ -28,12 +28,15 @@ export default function ResumenHeader({ title = 'Panorama financiero', subtitle 
     el.appendChild(topRow);
     el.appendChild(subtitleEl);
 
-    el.update = ({ title: newTitle, subtitle: newSubtitle } = {}) => {
+    el.update = ({ title: newTitle, subtitle: newSubtitle, hideMonthSelector } = {}) => {
         if (newTitle !== undefined) {
             el.querySelector('#resumen-header-title').textContent = newTitle;
         }
         if (newSubtitle !== undefined) {
             el.querySelector('#resumen-header-subtitle').textContent = newSubtitle;
+        }
+        if (hideMonthSelector !== undefined) {
+            monthSelector.classList.toggle('d-none', !!hideMonthSelector);
         }
     };
 
