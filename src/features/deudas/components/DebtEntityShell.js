@@ -35,7 +35,7 @@ export class DebtEntityShell extends HTMLElement {
         this.loadEntities();
         this._onLoad = () => this.loadEntities();
         this._onEdit = (e) => this.editDebt(e.detail);
-        window.addEventListener('deuda:added', this._onLoad);
+        window.addEventListener('deuda:saved', this._onLoad);
         window.addEventListener('deuda:updated', this._onLoad);
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
@@ -43,7 +43,7 @@ export class DebtEntityShell extends HTMLElement {
     }
 
     disconnectedCallback() {
-        window.removeEventListener('deuda:added', this._onLoad);
+        window.removeEventListener('deuda:saved', this._onLoad);
         window.removeEventListener('deuda:updated', this._onLoad);
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
@@ -143,7 +143,12 @@ export class DebtEntityShell extends HTMLElement {
             btn.addEventListener('click', () => {
                 const id = Number(btn.dataset.editId);
                 const deuda = this.entities.find(d => d.id === id);
-                if (deuda) this.editDebt(deuda);
+                if (!deuda) return;
+                const modal = this.querySelector('#debtModal');
+                if (modal?.attachOpener) {
+                    modal.attachOpener(btn);
+                }
+                this.editDebt(deuda);
             });
         });
 
@@ -165,7 +170,6 @@ export class DebtEntityShell extends HTMLElement {
         const modal = this.querySelector('#debtModal');
         if (!modal || !deuda) return;
         modal.openEdit(deuda);
-        modal.attachOpener();
     }
 
     render() {

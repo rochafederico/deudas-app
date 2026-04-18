@@ -13,7 +13,7 @@ export default function GastosMensual() {
   const backBtn = document.createElement('a');
   backBtn.href = '/gastos';
   backBtn.className = 'btn btn-outline-secondary btn-sm mb-3';
-  backBtn.setAttribute('data-back-to-gastos', '');
+  backBtn.setAttribute('data-back-to-deudas', '');
   backBtn.innerHTML = '<i class="bi bi-arrow-left" aria-hidden="true"></i> Volver a Deudas';
   backBtn.addEventListener('click', (e) => {
     e.preventDefault();
