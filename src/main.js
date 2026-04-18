@@ -98,9 +98,8 @@ function renderRoute(path) {
     || routes.find(r => r.path === '/')
     || routes[0];
 
-  // Update page header based on the resolved route instead of navItems order
-  const navItem = navItems.find(item => item.path === route.path)
-    || navItems.find(item => item.path === '/');
+  // Update page header using navItem if available, otherwise use route meta (e.g. /gastos/mensual)
+  const navItem = navItems.find(item => item.path === route.path) || route;
   if (navItem && pageHeader.update) {
     pageHeader.update({ title: navItem.title, subtitle: navItem.subtitle });
   }
