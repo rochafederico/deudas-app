@@ -281,9 +281,10 @@ export class DebtForm extends HTMLElement {
             ]
         });
 
-        fieldWrapper.innerHTML = '';
+        while (fieldWrapper.firstChild) {
+            fieldWrapper.removeChild(fieldWrapper.firstChild);
+        }
         fieldWrapper.className = 'card mb-3';
-        fieldWrapper.dataset.debtFormField = fieldName;
         fieldWrapper.dataset.debtFormPanel = 'true';
         fieldWrapper.setAttribute('role', 'group');
         fieldWrapper.setAttribute('aria-labelledby', labelId);
