@@ -108,11 +108,18 @@ export class DebtForm extends HTMLElement {
             children: [
                 el('div', {
                     className: 'form-label mb-2',
-                    text: 'Montos',
-                    attrs: { id: 'montos-label' }
+                    attrs: { id: 'montos-label' },
+                    children: [
+                        el('span', { text: 'Montos' }),
+                        el('span', {
+                            className: 'text-danger ms-1',
+                            text: '*',
+                            attrs: { 'aria-hidden': 'true' }
+                        })
+                    ]
                 }),
                 el('div', {
-                    className: 'border rounded p-3 bg-body',
+                    className: 'bg-body',
                     attrs: {
                         id: 'montos-field',
                         role: 'group',
@@ -120,25 +127,31 @@ export class DebtForm extends HTMLElement {
                     },
                     children: [
                         el('div', {
-                            className: 'overflow-auto',
-                            style: 'min-height: 100px; max-height: 220px;',
+                            className: 'border rounded p-3',
+                            attrs: { id: 'montos-table-wrapper' },
                             children: [
-                                el('table', {
-                                    className: 'table table-sm w-100',
+                                el('div', {
+                                    className: 'overflow-auto',
+                                    style: 'min-height: 100px; max-height: 220px;',
                                     children: [
-                                        el('thead', {
+                                        el('table', {
+                                            className: 'table table-sm w-100 mb-0',
                                             children: [
-                                                el('tr', {
+                                                el('thead', {
                                                     children: [
-                                                        el('th', { text: 'Monto' }),
-                                                        el('th', { text: 'Moneda' }),
-                                                        el('th', { text: 'Vencimiento' }),
-                                                        el('th', { text: 'Acciones' })
+                                                        el('tr', {
+                                                            children: [
+                                                                el('th', { text: 'Monto' }),
+                                                                el('th', { text: 'Moneda' }),
+                                                                el('th', { text: 'Vencimiento' }),
+                                                                el('th', { text: 'Acciones' })
+                                                            ]
+                                                        })
                                                     ]
-                                                })
+                                                }),
+                                                el('tbody', { attrs: { id: 'montos-tbody' } })
                                             ]
-                                        }),
-                                        el('tbody', { attrs: { id: 'montos-tbody' } })
+                                        })
                                     ]
                                 })
                             ]
@@ -527,13 +540,13 @@ export class DebtForm extends HTMLElement {
 
     showFormError(msg) {
         const err = this.querySelector('#form-error');
-        const montosField = this.querySelector('#montos-field');
-        if (!err || !montosField) return;
+        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
+        if (!err || !montosTableWrapper) return;
         err.textContent = msg;
         err.classList.add('d-block');
         err.classList.remove('d-none');
-        montosField.setAttribute('aria-describedby', 'form-error');
-        montosField.classList.add('border-danger');
+        montosTableWrapper.setAttribute('aria-describedby', 'form-error');
+        montosTableWrapper.classList.add('border-danger');
     }
 
     getMontosRequiredError() {
@@ -542,15 +555,15 @@ export class DebtForm extends HTMLElement {
 
     clearFormError() {
         const err = this.querySelector('#form-error');
-        const montosField = this.querySelector('#montos-field');
+        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
         if (err) {
             err.textContent = '';
             err.classList.remove('d-block');
             err.classList.add('d-none');
         }
-        if (montosField) {
-            montosField.removeAttribute('aria-describedby');
-            montosField.classList.remove('border-danger');
+        if (montosTableWrapper) {
+            montosTableWrapper.removeAttribute('aria-describedby');
+            montosTableWrapper.classList.remove('border-danger');
         }
     }
 

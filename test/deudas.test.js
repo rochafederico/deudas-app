@@ -703,6 +703,8 @@ async function testDebtFormLayoutMobileFirst() {
     const addMontoBtn = montosList.querySelector('#add-monto');
     const montosLabel = montosList.querySelector('#montos-label');
     const montosFieldContainer = montosList.querySelector('#montos-field');
+    const montosTableWrapper = montosList.querySelector('#montos-table-wrapper');
+    const montosRequiredMark = montosLabel?.querySelector('.text-danger');
     const tipoInput = tipoField.querySelector('input[name="tipoDeuda"]');
 
     assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de montos');
@@ -712,12 +714,14 @@ async function testDebtFormLayoutMobileFirst() {
     assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo');
     assert(!tipoField.classList.contains('card'), 'Tipo de deuda debe mantenerse como campo normal del formulario');
     assert(montosFieldContainer !== null, 'Montos debe tener un contenedor principal propio');
-    assert(montosFieldContainer.classList.contains('border'), 'Montos debe usar borde Bootstrap como campo compuesto');
-    assert(montosFieldContainer.classList.contains('rounded'), 'Montos debe usar el mismo criterio de radio que el formulario');
+    assert(montosTableWrapper !== null, 'Montos debe tener un wrapper específico para la tabla');
+    assert(montosTableWrapper.classList.contains('border'), 'La tabla de Montos debe usar borde Bootstrap como campo compuesto');
+    assert(montosTableWrapper.classList.contains('rounded'), 'La tabla de Montos debe usar el mismo criterio de radio que el formulario');
     assert(addMontoBtn.parentElement !== null, 'Agregar monto debe tener contenedor dentro del footer del panel');
     assert(addMontoBtn.parentElement.classList.contains('d-flex'), 'Agregar monto debe quedar alineado dentro del footer del panel');
-    assert(montosLabel?.textContent === 'Montos', 'Montos debe tener label visible');
+    assert(montosLabel?.textContent.includes('Montos'), 'Montos debe tener label visible');
     assert(montosLabel?.classList.contains('form-label'), 'El label de Montos debe usar el mismo estilo base del formulario');
+    assert(montosRequiredMark?.textContent === '*', 'Montos debe mostrar asterisco de campo obligatorio');
     assert(tipoInput.getAttribute('aria-describedby') !== 'tipoDeuda-error', 'Tipo de deuda no debe renderizarse como panel con error custom');
 
     document.body.removeChild(form);
@@ -803,12 +807,14 @@ async function testShowFormErrorNearMontos() {
 
     const montosList = form.querySelector('.montos-list');
     const montosFieldContainer = form.querySelector('#montos-field');
+    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
     assert(montosList !== null, 'Debe existir .montos-list');
     assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
     assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
-    assert(errEl.previousElementSibling?.classList.contains('overflow-auto'), 'El error debe aparecer debajo de la tabla de montos');
+    assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
     assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
-    assert(montosFieldContainer.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente como inválida');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
+    assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
     assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
 
     document.body.removeChild(form);
@@ -824,6 +830,7 @@ async function testDebtFormRequiereMontosAlEnviar() {
     const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
     const tipoInput = form.querySelector('[data-field-name="tipoDeuda"] input[name="tipoDeuda"]');
     const montosFieldContainer = form.querySelector('#montos-field');
+    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
     const errEl = form.querySelector('#form-error');
 
     acreedorInput.value = 'Visa';
@@ -831,7 +838,8 @@ async function testDebtFormRequiereMontosAlEnviar() {
     appForm.triggerSubmit();
 
     assert(errEl.textContent === form.getMontosRequiredError(), 'Debe mostrar error cuando faltan montos');
-    assert(montosFieldContainer.classList.contains('border-danger'), 'La sección Montos debe marcarse visualmente al enviar sin montos');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente al enviar sin montos');
+    assert(!montosFieldContainer.classList.contains('border-danger'), 'El bloque general de Montos no debe quedar en rojo al enviar sin montos');
 
     document.body.removeChild(form);
 }
@@ -872,7 +880,7 @@ async function testDebtModalFooterUxValidacionConsistente() {
     const appForm = modal.querySelector('app-form');
     const nativeForm = appForm.querySelector('form');
     const acreedorField = modal.querySelector('[data-field-name="acreedor"]');
-    const montosFieldContainer = modal.querySelector('#montos-field');
+    const montosTableWrapper = modal.querySelector('#montos-table-wrapper');
     const formError = modal.querySelector('#form-error');
     const saveBtn = modal.querySelector('.modal-footer .btn.btn-success');
 
@@ -885,7 +893,7 @@ async function testDebtModalFooterUxValidacionConsistente() {
     assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el formulario al intentar guardar vacío desde el footer');
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe mostrar el estado inválido recién después del envío');
     assert(formError.textContent === modal.querySelector('debt-form').getMontosRequiredError(), 'Montos debe mostrar error también cuando el formulario está vacío');
-    assert(montosFieldContainer.classList.contains('border-danger'), 'Montos debe marcarse visualmente cuando se intenta guardar vacío');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente cuando se intenta guardar vacío');
 
     document.body.removeChild(modal);
 }
@@ -903,12 +911,12 @@ async function testDebtModalReopenClearsValidationState() {
 
     let nativeForm = debtForm.querySelector('app-form form');
     let acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
-    let montosFieldContainer = debtForm.querySelector('#montos-field');
+    let montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
     let formError = debtForm.querySelector('#form-error');
 
     assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el form inválido antes de reabrir');
     assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe marcarse inválido antes de reabrir');
-    assert(montosFieldContainer.classList.contains('border-danger'), 'Montos debe marcarse inválido antes de reabrir');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse inválida antes de reabrir');
     assert(formError.textContent === debtForm.getMontosRequiredError(), 'Debe existir error de montos antes de reabrir');
 
     modal.close();
@@ -917,12 +925,12 @@ async function testDebtModalReopenClearsValidationState() {
 
     nativeForm = debtForm.querySelector('app-form form');
     acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
-    montosFieldContainer = debtForm.querySelector('#montos-field');
+    montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
     formError = debtForm.querySelector('#form-error');
 
     assert(!nativeForm.classList.contains('was-validated'), 'No debe persistir was-validated al reabrir el modal');
     assert(!acreedorField.classList.contains('was-validated'), 'Acreedor no debe conservar estado inválido al reabrir');
-    assert(!montosFieldContainer.classList.contains('border-danger'), 'Montos no debe conservar borde de error al reabrir');
+    assert(!montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos no debe conservar borde de error al reabrir');
     assert(formError.textContent === '', 'El error de montos debe limpiarse al reabrir');
 
     document.body.removeChild(modal);
