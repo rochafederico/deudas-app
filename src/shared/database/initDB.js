@@ -1,5 +1,6 @@
 // src/database/initDB.js
 import { DEUDAS_STORE, MONTOS_STORE, INGRESOS_STORE, INVERSIONES_STORE, DB_NAME, VERSION } from './schema.js';
+import { FakeIDB } from './localStorageFallback.js';
 
 let db;
 
@@ -8,8 +9,18 @@ export function getDB() {
 }
 
 export function initDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, VERSION);
+    return new Promise((resolve) => {
+        let request;
+        try {
+            // indexedDB puede no estar definido (browsers sin soporte) o lanzar
+            // SecurityError/NotSupportedError en algunos contextos restringidos.
+            request = indexedDB.open(DB_NAME, VERSION);
+        } catch {
+            db = new FakeIDB();
+            resolve(db);
+            return;
+        }
+
         request.onupgradeneeded = (event) => {
             db = event.target.result;
             if (!db.objectStoreNames.contains(DEUDAS_STORE)) {
@@ -35,8 +46,10 @@ export function initDB() {
             db = event.target.result;
             resolve(db);
         };
-        request.onerror = (event) => {
-            reject(new Error('Error opening database: ' + event.target.errorCode));
+        request.onerror = () => {
+            // IDB bloqueada (ej. Safari en modo privado) — usar fallback localStorage/memoria
+            db = new FakeIDB();
+            resolve(db);
         };
     });
 }
