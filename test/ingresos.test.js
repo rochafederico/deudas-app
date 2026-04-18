@@ -109,6 +109,73 @@ async function testCancelarIngresoForm() {
     await cleanup();
 }
 
+async function testIngresoFormLayoutMobileFirst() {
+    console.log('  UC2b: IngresoForm ordena Descripción, Monto+Moneda y Fecha para mobile');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const appForm = ingresoForm.querySelector('app-form');
+    const formEl = appForm.querySelector('form');
+    const descripcionField = appForm.querySelector('[data-field-name="descripcion"]');
+    const fechaField = appForm.querySelector('[data-field-name="fecha"]');
+    const montoRow = appForm.querySelector('.ingreso-monto-row');
+    const montoField = appForm.querySelector('[data-field-name="monto"]');
+    const monedaField = appForm.querySelector('[data-field-name="moneda"]');
+
+    assert(formEl.children[0] === descripcionField, 'Descripción debe ser el primer campo visible');
+    assert(montoRow !== null, 'Monto y Moneda deben renderizarse en una misma fila Bootstrap');
+    assert(formEl.children[1] === montoRow, 'La fila Monto+Moneda debe ir después de Descripción');
+    assert(formEl.children[2] === fechaField, 'Fecha debe ir después del grupo Monto+Moneda');
+    assert(montoField.classList.contains('col-8'), 'Monto debe priorizar mayor ancho');
+    assert(monedaField.classList.contains('col-4'), 'Moneda debe ocupar menor ancho');
+
+    document.body.removeChild(ingresoForm);
+}
+
+async function testIngresoFormDescripcionEsObligatoria() {
+    console.log('  UC2c: IngresoForm marca Descripción como obligatoria');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const descripcionInput = ingresoForm.querySelector('input[name="descripcion"]');
+    const descripcionField = ingresoForm.querySelector('[data-field-name="descripcion"]');
+    const requiredMark = descripcionField?.querySelector('.text-danger');
+
+    assert(descripcionInput !== null, 'Debe existir el input de descripción');
+    assert(descripcionInput.required === true, 'Descripción debe ser obligatoria en ingresos');
+    assert(requiredMark !== null, 'Descripción debe mostrar indicador visual de requerido');
+
+    document.body.removeChild(ingresoForm);
+}
+
+async function testIngresoFormUxValidacionConsistente() {
+    console.log('  UC2d: IngresoForm mantiene submit habilitado y errores solo al enviar');
+
+    const ingresoForm = document.createElement('ingreso-form');
+    document.body.appendChild(ingresoForm);
+
+    const appForm = ingresoForm.querySelector('app-form');
+    const formEl = appForm.querySelector('form');
+    const submitBtn = formEl.querySelector('button[type="submit"]');
+    const descripcionInput = ingresoForm.querySelector('input[name="descripcion"]');
+    const fechaInput = ingresoForm.querySelector('input[name="fecha"]');
+
+    assert(submitBtn !== null, 'Debe existir botón submit visible en ingresos');
+    assert(submitBtn.disabled === false, 'El botón submit de ingresos debe iniciar habilitado');
+    assert(!formEl.classList.contains('was-validated'), 'No debe mostrar estado inválido antes del primer envío');
+    assert(fechaInput.value === '', 'Fecha no debe iniciar con valor por defecto');
+
+    appForm.triggerSubmit();
+
+    assert(formEl.classList.contains('was-validated'), 'Debe mostrar validación recién al intentar enviar');
+    assert(descripcionInput.validity.valueMissing === true, 'Descripción debe quedar inválida por required al enviar vacío');
+    assert(fechaInput.validity.valueMissing === true, 'Fecha debe quedar inválida por required al enviar vacío');
+
+    document.body.removeChild(ingresoForm);
+}
+
 // ===================================================================
 // UC3: Multiples ingresos en el mismo mes y filtrado por periodo
 // Flujo: usuario agrega 3 ingresos en distintos meses, luego filtra
@@ -307,6 +374,9 @@ async function testIngresoModelCalculaPeriodo() {
 export const tests = [
     testAgregarIngresoDesdeForm,
     testCancelarIngresoForm,
+    testIngresoFormLayoutMobileFirst,
+    testIngresoFormDescripcionEsObligatoria,
+    testIngresoFormUxValidacionConsistente,
     testMultiplesIngresosFiltradoPorMes,
     testTotalesIngresosPorMoneda,
     testFlujoCompletoIngresosUI,

@@ -684,7 +684,108 @@ async function testDebtFormHideButtons() {
     assert(appForm !== null, 'Debe existir app-form dentro de debt-form');
     assert(appForm.hideButtons === true, 'AppForm debe tener hideButtons=true');
     assert(appForm.querySelector('#cancelBtn') === null, 'No debe haber botón cancelar dentro de app-form');
-    assert(appForm.querySelector('button[type="submit"]') === null, 'No debe haber botón submit dentro de app-form');
+    assert(appForm.querySelector('[data-programmatic-submit="true"]') !== null, 'Debe existir un submit programático oculto para el footer del modal');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormLayoutMobileFirst() {
+    console.log('  UC15b: DebtForm ordena Acreedor, Tipo, Montos y Notas');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    const acreedorField = form.querySelector('[data-field-name="acreedor"]');
+    const tipoField = form.querySelector('[data-field-name="tipoDeuda"]');
+    const montosList = form.querySelector('.montos-list');
+    const appForm = form.querySelector('app-form');
+    const notasField = appForm.querySelector('[data-field-name="notas"]');
+    const addMontoBtn = montosList.querySelector('#add-monto');
+    const montosLabel = montosList.querySelector('#montos-label');
+    const montosFieldContainer = montosList.querySelector('#montos-field');
+    const montosTableWrapper = montosList.querySelector('#montos-table-wrapper');
+    const montosRequiredMark = montosLabel?.querySelector('.text-danger');
+    const tipoInput = tipoField.querySelector('input[name="tipoDeuda"]');
+
+    assert(form.firstElementChild === acreedorField, 'Acreedor debe quedar antes del bloque de montos');
+    assert(acreedorField.nextElementSibling === tipoField, 'Tipo de deuda debe ir después de Acreedor');
+    assert(tipoField.nextElementSibling === montosList, 'Montos debe ir después de Tipo de deuda');
+    assert(form.lastElementChild === appForm, 'Notas debe quedar después del bloque de montos');
+    assert(tipoField !== null && notasField !== null, 'Tipo y Notas deben seguir existiendo');
+    assert(!tipoField.classList.contains('card'), 'Tipo de deuda debe mantenerse como campo normal del formulario');
+    assert(montosFieldContainer !== null, 'Montos debe tener un contenedor principal propio');
+    assert(montosTableWrapper !== null, 'Montos debe tener un wrapper específico para la tabla');
+    assert(montosTableWrapper.classList.contains('border'), 'La tabla de Montos debe usar borde Bootstrap como campo compuesto');
+    assert(montosTableWrapper.classList.contains('rounded'), 'La tabla de Montos debe usar el mismo criterio de radio que el formulario');
+    assert(addMontoBtn.parentElement !== null, 'Agregar monto debe tener contenedor dentro del footer del panel');
+    assert(addMontoBtn.parentElement.classList.contains('d-flex'), 'Agregar monto debe quedar alineado dentro del footer del panel');
+    assert(montosLabel?.textContent.includes('Montos'), 'Montos debe tener label visible');
+    assert(montosLabel?.classList.contains('form-label'), 'El label de Montos debe usar el mismo estilo base del formulario');
+    assert(montosRequiredMark?.textContent === '*', 'Montos debe mostrar asterisco de campo obligatorio');
+    assert(tipoInput.getAttribute('aria-describedby') !== 'tipoDeuda-error', 'Tipo de deuda no debe renderizarse como panel con error custom');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormCampoReordenadoMuestraEstadoInvalido() {
+    console.log('  UC15c: DebtForm muestra estado inválido en Acreedor reordenado');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.load({
+        id: 1,
+        acreedor: 'Visa',
+        tipoDeuda: 'Tarjeta',
+        notas: '',
+        montos: [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }]
+    });
+
+    const appForm = form.querySelector('app-form');
+    const acreedorField = form.querySelector('[data-field-name="acreedor"]');
+    const acreedorInput = acreedorField.querySelector('input[name="acreedor"]');
+
+    acreedorInput.value = '';
+    appForm.triggerSubmit();
+
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor reordenado debe recibir estado visual inválido');
+
+    acreedorInput.value = 'Visa corregida';
+    acreedorInput.dispatchEvent(new Event('input', { bubbles: true }));
+
+    assert(!acreedorField.classList.contains('was-validated'), 'El estado visual inválido debe limpiarse al corregir Acreedor');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormTipoDeudaEsObligatorio() {
+    console.log('  UC15d: DebtForm requiere Tipo de deuda con validación nativa');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [{ monto: 1000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
+
+    const appForm = form.querySelector('app-form');
+    const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
+    const tipoField = form.querySelector('[data-field-name="tipoDeuda"]');
+    const tipoInput = tipoField.querySelector('input[name="tipoDeuda"]');
+    const nativeForm = appForm.querySelector('form');
+
+    let debtSubmitCount = 0;
+    appForm.addEventListener('deuda:submit', () => {
+        debtSubmitCount += 1;
+    });
+
+    acreedorInput.value = 'Visa';
+    tipoInput.value = '';
+    appForm.triggerSubmit();
+
+    assert(tipoInput.required === true, 'Tipo de deuda debe ser required');
+    assert(nativeForm.classList.contains('was-validated'), 'El formulario debe marcarse como validado en submit inválido');
+    assert(tipoField.classList.contains('was-validated'), 'Tipo de deuda reordenado debe recibir estado visual inválido');
+    assert(!tipoField.classList.contains('card'), 'Tipo de deuda debe seguir siendo un campo normal del formulario');
+    assert(debtSubmitCount === 0, 'No debe emitirse deuda:submit cuando Tipo de deuda está vacío');
 
     document.body.removeChild(form);
 }
@@ -698,19 +799,47 @@ async function testShowFormErrorNearMontos() {
     const form = document.createElement('debt-form');
     document.body.appendChild(form);
 
-    form.showFormError('Debe agregar al menos un monto antes de guardar.');
+    form.showFormError(form.getMontosRequiredError());
 
     const errEl = form.querySelector('#form-error');
     assert(errEl !== null, 'Debe existir el elemento #form-error');
-    assert(errEl.textContent === 'Debe agregar al menos un monto antes de guardar.', 'El mensaje de error debe ser correcto');
+    assert(errEl.textContent === form.getMontosRequiredError(), 'El mensaje de error debe ser correcto');
 
     const montosList = form.querySelector('.montos-list');
+    const montosFieldContainer = form.querySelector('#montos-field');
+    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
     assert(montosList !== null, 'Debe existir .montos-list');
-    // The error element must appear immediately before .montos-list in the DOM
-    assert(errEl.nextElementSibling === montosList, 'El error debe aparecer justo antes de .montos-list');
-    // The error must NOT appear before app-form (i.e. not at the top)
+    assert(montosList.contains(errEl), 'El error debe renderizarse dentro del bloque de montos');
+    assert(errEl.parentElement === montosFieldContainer, 'El error debe renderizarse dentro del contenedor principal de Montos');
+    assert(errEl.previousElementSibling === montosTableWrapper, 'El error debe aparecer debajo del wrapper de la tabla de montos');
+    assert(errEl.nextElementSibling?.querySelector('#add-monto') !== null, 'El botón Agregar monto debe quedar debajo del mensaje de error');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'Solo la tabla de Montos debe marcarse visualmente como inválida');
+    assert(!montosFieldContainer.classList.contains('border-danger'), 'El contenedor general de Montos no debe marcarse en rojo');
+    assert(!errEl.classList.contains('d-none'), 'El mensaje de error de montos debe hacerse visible');
+
+    document.body.removeChild(form);
+}
+
+async function testDebtFormRequiereMontosAlEnviar() {
+    console.log('  UC16b: DebtForm marca error visible si se envía sin montos');
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
     const appForm = form.querySelector('app-form');
-    assert(errEl.previousElementSibling === appForm, 'El error debe estar entre app-form y .montos-list');
+    const acreedorInput = form.querySelector('[data-field-name="acreedor"] input[name="acreedor"]');
+    const tipoInput = form.querySelector('[data-field-name="tipoDeuda"] input[name="tipoDeuda"]');
+    const montosFieldContainer = form.querySelector('#montos-field');
+    const montosTableWrapper = form.querySelector('#montos-table-wrapper');
+    const errEl = form.querySelector('#form-error');
+
+    acreedorInput.value = 'Visa';
+    tipoInput.value = 'Tarjeta';
+    appForm.triggerSubmit();
+
+    assert(errEl.textContent === form.getMontosRequiredError(), 'Debe mostrar error cuando faltan montos');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente al enviar sin montos');
+    assert(!montosFieldContainer.classList.contains('border-danger'), 'El bloque general de Montos no debe quedar en rojo al enviar sin montos');
 
     document.body.removeChild(form);
 }
@@ -741,6 +870,72 @@ async function testDebtModalCancelClosesModal() {
     document.body.removeChild(modal);
 }
 
+async function testDebtModalFooterUxValidacionConsistente() {
+    console.log('  UC18: DebtModal mantiene Guardar habilitado y valida al enviar desde el footer');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const appForm = modal.querySelector('app-form');
+    const nativeForm = appForm.querySelector('form');
+    const acreedorField = modal.querySelector('[data-field-name="acreedor"]');
+    const montosTableWrapper = modal.querySelector('#montos-table-wrapper');
+    const formError = modal.querySelector('#form-error');
+    const saveBtn = modal.querySelector('.modal-footer .btn.btn-success');
+
+    assert(saveBtn !== null, 'Debe existir botón Guardar en el footer del modal de deuda');
+    assert(saveBtn.disabled === false, 'El botón Guardar de deuda debe iniciar habilitado');
+    assert(!nativeForm.classList.contains('was-validated'), 'No debe mostrar errores antes del primer envío en deuda');
+
+    saveBtn.click();
+
+    assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el formulario al intentar guardar vacío desde el footer');
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe mostrar el estado inválido recién después del envío');
+    assert(formError.textContent === modal.querySelector('debt-form').getMontosRequiredError(), 'Montos debe mostrar error también cuando el formulario está vacío');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse visualmente cuando se intenta guardar vacío');
+
+    document.body.removeChild(modal);
+}
+
+async function testDebtModalReopenClearsValidationState() {
+    console.log('  UC19: DebtModal limpia estados inválidos al reabrirse');
+
+    const modal = document.createElement('debt-modal');
+    document.body.appendChild(modal);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const debtForm = modal.form;
+    const appForm = debtForm.querySelector('app-form');
+    appForm.triggerSubmit();
+
+    let nativeForm = debtForm.querySelector('app-form form');
+    let acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
+    let montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
+    let formError = debtForm.querySelector('#form-error');
+
+    assert(nativeForm.classList.contains('was-validated'), 'Debe marcar el form inválido antes de reabrir');
+    assert(acreedorField.classList.contains('was-validated'), 'Acreedor debe marcarse inválido antes de reabrir');
+    assert(montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos debe marcarse inválida antes de reabrir');
+    assert(formError.textContent === debtForm.getMontosRequiredError(), 'Debe existir error de montos antes de reabrir');
+
+    modal.close();
+    modal.openCreate();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    nativeForm = debtForm.querySelector('app-form form');
+    acreedorField = debtForm.querySelector('[data-debt-form-field="acreedor"]');
+    montosTableWrapper = debtForm.querySelector('#montos-table-wrapper');
+    formError = debtForm.querySelector('#form-error');
+
+    assert(!nativeForm.classList.contains('was-validated'), 'No debe persistir was-validated al reabrir el modal');
+    assert(!acreedorField.classList.contains('was-validated'), 'Acreedor no debe conservar estado inválido al reabrir');
+    assert(!montosTableWrapper.classList.contains('border-danger'), 'La tabla de Montos no debe conservar borde de error al reabrir');
+    assert(formError.textContent === '', 'El error de montos debe limpiarse al reabrir');
+
+    document.body.removeChild(modal);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -757,6 +952,12 @@ export const tests = [
     testDuplicarMontoInline,
     testNoModalSecundarioEnDebtForm,
     testDebtFormHideButtons,
+    testDebtFormLayoutMobileFirst,
+    testDebtFormCampoReordenadoMuestraEstadoInvalido,
+    testDebtFormTipoDeudaEsObligatorio,
     testShowFormErrorNearMontos,
-    testDebtModalCancelClosesModal
+    testDebtFormRequiereMontosAlEnviar,
+    testDebtModalCancelClosesModal,
+    testDebtModalFooterUxValidacionConsistente,
+    testDebtModalReopenClearsValidationState
 ];

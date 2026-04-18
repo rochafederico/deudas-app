@@ -35,30 +35,17 @@ export function appendCells(row, cells) {
 }
 
 /**
- * Obtiene los valores de todos los inputs nativos de un formulario y valida los campos requeridos.
+ * Obtiene los valores de todos los inputs nativos de un formulario.
  * @param {HTMLElement} form - El formulario o contenedor padre
- * @returns {{ values: Object, valid: boolean, errors: Object }}
+ * @returns {Object}
  */
-export function getFormValuesAndValidate(form) {
-    const inputs = Array.from(form.querySelectorAll('input, select, textarea'));
+export function getFormValues(form) {
+    const inputs = Array.from(form.elements || []).filter(input => input.matches && input.matches('input, select, textarea'));
     const values = {};
-    const errors = {};
-    let valid = true;
     inputs.forEach(input => {
         const name = input.getAttribute('name');
         if (!name) return;
-        const value = input.value;
-        values[name] = value;
-        // Validación de campos requeridos
-        if (input.hasAttribute('required') && (value === '' || value == null)) {
-            valid = false;
-            errors[name] = 'Este campo es requerido';
-        }
-        // Validación de tipo number
-        if (input.getAttribute('type') === 'number' && value !== '' && isNaN(Number(value))) {
-            valid = false;
-            errors[name] = 'Debe ser un número válido';
-        }
+        values[name] = input.value;
     });
-    return { values, valid, errors };
+    return values;
 }

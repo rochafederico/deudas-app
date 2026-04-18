@@ -17,6 +17,7 @@ import { tests as monthFilterTests } from './month-filter.test.js';
 import { tests as analyticsTests } from './analytics.test.js';
 import { tests as feedbackTests } from './feedback.test.js';
 import { tests as layoutTests } from './layout.test.js';
+import { tests as appFormTests } from './app-form.test.js';
 
 async function run() {
     try {
@@ -58,6 +59,9 @@ async function run() {
 
         console.log('\n--- Feedback ---');
         for (const test of feedbackTests) { await test(); }
+
+        console.log('\n--- AppForm ---');
+        for (const test of appFormTests) { await test(); }
 
         console.log('\n--- Layout ---');
         for (const test of layoutTests) { await test(); }

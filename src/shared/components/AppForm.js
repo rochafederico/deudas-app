@@ -1,8 +1,10 @@
 // src/components/AppForm.js
 // Formulario reutilizable que usa Bootstrap directamente (sin Shadow DOM)
-import { getFormValuesAndValidate } from '../utils/dom.js';
+import { getFormValues } from '../utils/dom.js';
 
 export class AppForm extends HTMLElement {
+    static nextFormId = 0;
+
     constructor() {
         super();
         this._fields = [];
@@ -10,7 +12,10 @@ export class AppForm extends HTMLElement {
         this._submitText = 'Guardar';
         this._cancelText = 'Cancelar';
         this._hideButtons = false;
+        AppForm.nextFormId += 1;
+        this._formId = `app-form-${AppForm.nextFormId}`;
         this._boundHandleSubmit = this.handleSubmit.bind(this);
+        this._boundHandleInvalid = this.handleInvalid.bind(this);
         this._boundCancelClick = () => {
             this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
         };
@@ -58,6 +63,8 @@ export class AppForm extends HTMLElement {
         if (this.form) {
             this.form.removeEventListener('submit', this._boundHandleSubmit);
             this.form.addEventListener('submit', this._boundHandleSubmit);
+            this.form.removeEventListener('invalid', this._boundHandleInvalid, true);
+            this.form.addEventListener('invalid', this._boundHandleInvalid, true);
         }
         const cancelBtn = this.querySelector('#cancelBtn');
         if (cancelBtn) {
@@ -72,6 +79,7 @@ export class AppForm extends HTMLElement {
         const inputs = this._fields.map(field => {
             const wrapper = document.createElement('div');
             wrapper.className = 'mb-2';
+            wrapper.dataset.fieldName = field.name;
             const name = field.name;
             const label = field.label || '';
             const required = field.required;
@@ -83,6 +91,13 @@ export class AppForm extends HTMLElement {
                 lbl.setAttribute('for', name);
                 lbl.className = 'form-label';
                 lbl.textContent = label;
+                if (required) {
+                    const requiredMark = document.createElement('span');
+                    requiredMark.className = 'text-danger ms-1';
+                    requiredMark.setAttribute('aria-hidden', 'true');
+                    requiredMark.textContent = '*';
+                    lbl.appendChild(requiredMark);
+                }
                 wrapper.appendChild(lbl);
             }
 
@@ -93,13 +108,21 @@ export class AppForm extends HTMLElement {
                 input.id = name;
                 input.name = name;
                 if (required) input.required = true;
-                input.textContent = value;
+                if (value !== '' && value != null) input.value = value;
             } else if (field.type === 'select') {
                 input = document.createElement('select');
                 input.className = 'form-select';
                 input.id = name;
                 input.name = name;
                 if (required) input.required = true;
+                if (field.placeholder) {
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.value = '';
+                    placeholderOption.textContent = field.placeholder;
+                    placeholderOption.disabled = false;
+                    placeholderOption.selected = value === '' || value == null;
+                    input.appendChild(placeholderOption);
+                }
                 if (field.options) {
                     field.options.forEach(opt => {
                         const option = document.createElement('option');
@@ -117,23 +140,22 @@ export class AppForm extends HTMLElement {
                 input.name = name;
                 if (required) input.required = true;
                 if (value !== '' && value != null) input.value = value;
-                if (field.type === 'number') input.step = '0.01';
             }
 
-            wrapper.appendChild(input);
+            if (field.placeholder && field.type !== 'select') input.placeholder = field.placeholder;
+            if (field.min !== undefined) input.min = String(field.min);
+            if (field.max !== undefined) input.max = String(field.max);
+            if (field.type === 'number') input.step = String(field.step || '0.01');
+            input.setAttribute('form', this._formId);
 
-            // Error container
-            const errDiv = document.createElement('div');
-            errDiv.className = 'invalid-feedback';
-            errDiv.dataset.errorFor = name;
-            wrapper.appendChild(errDiv);
+            wrapper.appendChild(input);
 
             return wrapper;
         });
 
         const form = document.createElement('form');
+        form.id = this._formId;
         form.className = 'd-flex flex-column gap-2';
-        form.noValidate = true;
         inputs.forEach(input => form.appendChild(input));
 
         if (!this._hideButtons) {
@@ -157,6 +179,14 @@ export class AppForm extends HTMLElement {
             btnRow.appendChild(cancelBtn);
             btnRow.appendChild(submitBtn);
             form.appendChild(btnRow);
+        } else {
+            const hiddenSubmitBtn = document.createElement('button');
+            hiddenSubmitBtn.type = 'submit';
+            hiddenSubmitBtn.className = 'd-none';
+            hiddenSubmitBtn.tabIndex = -1;
+            hiddenSubmitBtn.setAttribute('aria-hidden', 'true');
+            hiddenSubmitBtn.dataset.programmaticSubmit = 'true';
+            form.appendChild(hiddenSubmitBtn);
         }
 
         this.appendChild(form);
@@ -166,6 +196,20 @@ export class AppForm extends HTMLElement {
     triggerSubmit() {
         const formEl = this.querySelector('form');
         if (formEl) {
+            const hiddenSubmitBtn = formEl.querySelector('[data-programmatic-submit="true"]');
+            if (hiddenSubmitBtn) {
+                hiddenSubmitBtn.click();
+                return;
+            }
+            const submitBtn = formEl.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.click();
+                return;
+            }
+            if (typeof formEl.requestSubmit === 'function') {
+                formEl.requestSubmit();
+                return;
+            }
             formEl.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         }
     }
@@ -174,31 +218,32 @@ export class AppForm extends HTMLElement {
         this.dispatchEvent(new CustomEvent('form:cancel', { bubbles: true, composed: true }));
     }
 
+    clearValidationState() {
+        this.querySelector('form')?.classList.remove('was-validated');
+        this.querySelectorAll('[data-field-name].was-validated').forEach(field => {
+            field.classList.remove('was-validated');
+        });
+    }
+
+    handleInvalid(e) {
+        this.form?.classList.add('was-validated');
+        const invalidField = e?.target;
+        if (!invalidField || invalidField === this.form) return;
+        const fieldName = invalidField.name || invalidField.id || 'unknown_field';
+        this.dispatchEvent(new CustomEvent('form:validation-error', {
+            detail: {
+                errors: {
+                    [fieldName]: invalidField.validationMessage || 'Campo inválido'
+                }
+            },
+            bubbles: true,
+            composed: true
+        }));
+    }
+
     handleSubmit(e) {
         e.preventDefault();
-        const { values, valid, errors } = getFormValuesAndValidate(this.form);
-        // Clear previous errors
-        this.form.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-        this.form.querySelectorAll('.invalid-feedback').forEach(el => { el.textContent = ''; });
-        if (!valid) {
-            this.dispatchEvent(new CustomEvent('form:validation-error', {
-                detail: { values, errors },
-                bubbles: true,
-                composed: true
-            }));
-            Object.entries(errors).forEach(([name, msg]) => {
-                const input = this.form.querySelector(`[name="${name}"]`);
-                if (input) {
-                    input.classList.add('is-invalid');
-                    const errDiv = this.form.querySelector(`[data-error-for="${name}"]`);
-                    if (errDiv) {
-                        errDiv.textContent = msg;
-                        errDiv.classList.add('d-block');
-                    }
-                }
-            });
-            return;
-        }
+        const values = getFormValues(this.form);
         this.dispatchEvent(new CustomEvent('form:submit', {
             detail: values,
             bubbles: true,

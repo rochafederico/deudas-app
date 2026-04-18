@@ -12,6 +12,7 @@ export class ValorInversionModal extends HTMLElement {
     }
     resetValues() {
         this._form.form.reset();
+        this._form.clearValidationState();
     }
     render() {
         if (this._rendered) return;
@@ -19,7 +20,7 @@ export class ValorInversionModal extends HTMLElement {
         this.innerHTML = '<ui-modal></ui-modal>';
         // Campos: nombre, valor inicial, fecha compra
         const fields = [
-            { name: 'valor', label: 'Valor', type: 'number', required: true },
+            { name: 'valor', label: 'Valor', type: 'number', required: true, min: 0.01 },
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },
         ];
         this._form = document.createElement('app-form');

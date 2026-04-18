@@ -228,4 +228,18 @@ export const tests = [
         document.body.removeChild(modal);
     },
 
+    async function feedbackModal_doesNotInjectInlineValidationErrors() {
+        console.log('  FeedbackModal: does not inject inline validation error containers');
+        const modal = document.createElement('feedback-modal');
+        document.body.appendChild(modal);
+        modal.render();
+
+        assert(modal.querySelector('#feedback-tipo-error') === null, 'No debe renderizar contenedor inline de error para tipo');
+        assert(modal.querySelector('#feedback-comentario-error') === null, 'No debe renderizar contenedor inline de error para comentario');
+        assert(!modal._tipoEl.classList.contains('is-invalid'), 'No debe agregar clases is-invalid al renderizar');
+        assert(!modal._comentarioEl.classList.contains('is-invalid'), 'No debe agregar clases is-invalid al renderizar');
+
+        document.body.removeChild(modal);
+    },
+
 ];

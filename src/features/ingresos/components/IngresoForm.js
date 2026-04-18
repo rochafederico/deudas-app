@@ -56,24 +56,53 @@ export class IngresoForm extends HTMLElement {
 
     reset() {
         const form = this.querySelector('app-form');
-        if (form) form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
+        if (form) {
+            form.initialValues = { moneda: 'ARS' };
+            this._applyMobileFirstLayout(form);
+            form.clearValidationState();
+        }
     }
 
     render() {
-        // Campos: fecha, descripcion, monto, moneda
+        // Campos: descripcion, monto, moneda, fecha
         const fields = [
+            { name: 'descripcion', label: 'Descripción', type: 'text', required: true },
+            { name: 'monto', label: 'Monto', type: 'number', required: true, min: 0.01 },
+            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'fecha', label: 'Fecha', type: 'date', required: true },
-            { name: 'descripcion', label: 'Descripción', type: 'text' },
-            { name: 'monto', label: 'Monto', type: 'number', required: true },
-            { name: 'moneda', label: 'Moneda', type: 'select', options: monedas, required: true },
         ];
         this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = fields;
         form.submitText = 'Agregar ingreso';
         form.cancelText = 'Cancelar';
-        form.initialValues = { fecha: new Date().toISOString().slice(0,10), moneda: 'ARS' };
+        form.initialValues = { moneda: 'ARS' };
         this.appendChild(form);
+        this._applyMobileFirstLayout(form);
+    }
+
+    _applyMobileFirstLayout(appForm) {
+        const formEl = appForm.querySelector('form');
+        const descripcionField = appForm.querySelector('[data-field-name="descripcion"]');
+        const montoField = appForm.querySelector('[data-field-name="monto"]');
+        const monedaField = appForm.querySelector('[data-field-name="moneda"]');
+        const fechaField = appForm.querySelector('[data-field-name="fecha"]');
+        const submitControls = formEl?.lastElementChild;
+        if (!formEl || !descripcionField || !montoField || !monedaField || !fechaField || !submitControls) return;
+
+        const amountRow = document.createElement('div');
+        amountRow.className = 'row g-2 align-items-end ingreso-monto-row';
+        montoField.className = 'mb-0 col-8';
+        monedaField.className = 'mb-0 col-4';
+        amountRow.appendChild(montoField);
+        amountRow.appendChild(monedaField);
+
+        formEl.replaceChildren(
+            descripcionField,
+            amountRow,
+            fechaField,
+            submitControls
+        );
     }
 }
 

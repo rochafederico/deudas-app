@@ -50,9 +50,17 @@ export class DebtForm extends HTMLElement {
         this._onValidationError = (event) => {
             const flowName = this._analyticsFlow || this._getFlowName();
             this.startAnalyticsFlow(flowName, { step: this._analyticsStep });
+            const errors = { ...(event.detail?.errors || {}) };
+            if (!this.hasMontosAdded()) {
+                const montosError = this.getMontosRequiredError();
+                this.showFormError(montosError);
+                errors.montos = montosError;
+            } else {
+                this.clearFormError();
+            }
             trackFlowError(flowName, {
                 step: this._analyticsStep,
-                errors: event.detail.errors
+                errors
             });
         };
         this._onInteraction = () => this.startAnalyticsFlow(this._getFlowName(), { step: this._analyticsStep });
@@ -82,7 +90,7 @@ export class DebtForm extends HTMLElement {
         const form = document.createElement('app-form');
         form.fields = [
             { name: 'acreedor', type: 'text', label: 'Acreedor', required: true },
-            { name: 'tipoDeuda', type: 'text', label: 'Tipo de deuda' },
+            { name: 'tipoDeuda', type: 'text', label: 'Tipo de deuda', required: true },
             { name: 'notas', type: 'textarea', label: 'Notas' }
         ];
         form.submitText = 'Guardar';
@@ -96,35 +104,66 @@ export class DebtForm extends HTMLElement {
         form.addEventListener('form:cancel', () => this.reset());
         // Lista de montos y botón para agregar
         const montosList = el('div', {
-            className: 'montos-list mt-3',
+            className: 'montos-list mb-3',
             children: [
                 el('div', {
-                    className: 'd-flex align-items-center justify-content-between mb-2',
+                    className: 'form-label mb-2',
+                    attrs: { id: 'montos-label' },
                     children: [
-                        el('strong', { text: 'Montos' }),
-                        el('app-button', { attrs: { id: 'add-monto' }, text: 'Agregar monto' })
+                        el('span', { text: 'Montos' }),
+                        el('span', {
+                            className: 'text-danger ms-1',
+                            text: '*',
+                            attrs: { 'aria-hidden': 'true' }
+                        })
                     ]
                 }),
                 el('div', {
-                    className: 'overflow-auto',
-                    style: 'min-height: 100px; max-height: 220px;',
+                    className: 'bg-body',
+                    attrs: {
+                        id: 'montos-field',
+                        role: 'group',
+                        'aria-labelledby': 'montos-label'
+                    },
                     children: [
-                        el('table', {
-                            className: 'table table-sm w-100',
+                        el('div', {
+                            className: 'border rounded p-3',
+                            attrs: { id: 'montos-table-wrapper' },
                             children: [
-                                el('thead', {
+                                el('div', {
+                                    className: 'overflow-auto',
+                                    style: 'min-height: 100px; max-height: 220px;',
                                     children: [
-                                        el('tr', {
+                                        el('table', {
+                                            className: 'table table-sm w-100 mb-0',
                                             children: [
-                                                el('th', { text: 'Monto' }),
-                                                el('th', { text: 'Moneda' }),
-                                                el('th', { text: 'Vencimiento' }),
-                                                el('th', { text: 'Acciones' })
+                                                el('thead', {
+                                                    children: [
+                                                        el('tr', {
+                                                            children: [
+                                                                el('th', { text: 'Monto' }),
+                                                                el('th', { text: 'Moneda' }),
+                                                                el('th', { text: 'Vencimiento' }),
+                                                                el('th', { text: 'Acciones' })
+                                                            ]
+                                                        })
+                                                    ]
+                                                }),
+                                                el('tbody', { attrs: { id: 'montos-tbody' } })
                                             ]
                                         })
                                     ]
-                                }),
-                                el('tbody', { attrs: { id: 'montos-tbody' } })
+                                })
+                            ]
+                        }),
+                        el('div', {
+                            attrs: { id: 'form-error' },
+                            className: 'invalid-feedback mt-2 d-none'
+                        }),
+                        el('div', {
+                            className: 'd-flex justify-content-end mt-3',
+                            children: [
+                                el('app-button', { attrs: { id: 'add-monto', variant: 'secondary' }, text: 'Agregar monto' })
                             ]
                         })
                     ]
@@ -133,7 +172,74 @@ export class DebtForm extends HTMLElement {
         });
         this.innerHTML = '';
         this.appendChild(form);
+        this._applyMobileFirstLayout(form, montosList);
+    }
+
+    _applyMobileFirstLayout(appForm, montosList) {
+        // app-form re-renderiza cuando cambian initialValues; removemos la copia externa
+        // anterior de los campos reordenados antes de volver a mover los wrappers actualizados.
+        this.querySelectorAll(':scope > [data-debt-form-field]').forEach(node => {
+            node._validationController?.abort();
+            node.remove();
+        });
+        const acreedorField = appForm.querySelector('[data-field-name="acreedor"]');
+        const tipoField = appForm.querySelector('[data-field-name="tipoDeuda"]');
+        if (!acreedorField || !tipoField) {
+            this.appendChild(appForm);
+            this.appendChild(montosList);
+            return;
+        }
+
+        this._prepareReorderedField(acreedorField, 'acreedor');
+        this._prepareReorderedField(tipoField, 'tipoDeuda');
+
+        this.appendChild(acreedorField);
+        this.appendChild(tipoField);
         this.appendChild(montosList);
+        this.appendChild(appForm);
+    }
+
+    _prepareReorderedField(fieldWrapper, fieldName) {
+        fieldWrapper.classList.remove('mb-2');
+        fieldWrapper.classList.add('mb-3');
+        fieldWrapper.dataset.debtFormField = fieldName;
+        const input = fieldWrapper.querySelector(`[name="${fieldName}"]`);
+        const validationController = new AbortController();
+        fieldWrapper._validationController = validationController;
+        input?.addEventListener('invalid', () => {
+            const appForm = this.querySelector('app-form');
+            appForm?.querySelector('form')?.classList.add('was-validated');
+            fieldWrapper.classList.add('was-validated');
+            appForm?.dispatchEvent(new CustomEvent('form:validation-error', {
+                detail: {
+                    errors: {
+                        [fieldName]: input.validationMessage || 'Campo inválido'
+                    }
+                },
+                bubbles: true,
+                composed: true
+            }));
+        }, { signal: validationController.signal });
+        input?.addEventListener('input', () => {
+            fieldWrapper.classList.toggle('was-validated', !input.checkValidity());
+        }, { signal: validationController.signal });
+    }
+
+    hasMontosAdded() {
+        return Array.isArray(this.montos) && this.montos.length > 0;
+    }
+
+    clearValidationState() {
+        this.querySelector('app-form')?.clearValidationState();
+        this.querySelectorAll('[data-debt-form-field].was-validated').forEach(field => {
+            field.classList.remove('was-validated');
+        });
+    }
+
+    // Restablece el formulario a un estado visual limpio al reabrirlo.
+    clearErrorState() {
+        this.clearValidationState();
+        this.clearFormError();
     }
 
     // Open inline form to add a new monto at the bottom of the table.
@@ -273,6 +379,9 @@ export class DebtForm extends HTMLElement {
         // Ordenar montos por fecha de vencimiento ascendente
         this.montos.sort((a, b) => new Date(a.vencimiento) - new Date(b.vencimiento));
         this.montosTbody.innerHTML = '';
+        if (this.hasMontosAdded()) {
+            this.clearFormError();
+        }
         this.montos.forEach((monto, idx) => {
             if (this._inlineEditRef !== null && monto === this._inlineEditRef) {
                 // Render inline edit row for this existing monto
@@ -359,7 +468,9 @@ export class DebtForm extends HTMLElement {
                 tipoDeuda: deuda.tipoDeuda || '',
                 notas: deuda.notas || ''
             };
+            this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
         }
+        this.clearErrorState();
     }
 
     reset(options = {}) {
@@ -375,8 +486,12 @@ export class DebtForm extends HTMLElement {
         this._inlineEditIdx = null;
         this._inlineEditRef = null;
         const form = this.querySelector('app-form');
-        if (form) form.initialValues = {};
+        if (form) {
+            form.initialValues = {};
+            this._applyMobileFirstLayout(form, this.querySelector('.montos-list'));
+        }
         this.renderMontosList();
+        this.clearErrorState();
         // Cerrar el modal de deuda si está abierto
         if (this.parentNode && this.parentNode.tagName === 'UI-MODAL' && typeof this.parentNode.close === 'function') {
             this.parentNode.close();
@@ -390,11 +505,12 @@ export class DebtForm extends HTMLElement {
         // Los datos del formulario ya están validados por AppForm
         const values = e.detail;
         // Validar que haya al menos un monto
-        if (!this.montos || this.montos.length === 0) {
-            this.showFormError('Debe agregar al menos un monto antes de guardar.');
+        if (!this.hasMontosAdded()) {
+            const montosError = this.getMontosRequiredError();
+            this.showFormError(montosError);
             trackFlowError(flowName, {
                 step: 'submit',
-                errors: { montos: 'Debe agregar al menos un monto antes de guardar.' }
+                errors: { montos: montosError }
             });
             return;
         }
@@ -423,21 +539,32 @@ export class DebtForm extends HTMLElement {
     }
 
     showFormError(msg) {
-        let err = this.querySelector('#form-error');
-        if (!err) {
-            err = el('div', {
-                attrs: { id: 'form-error' },
-                className: 'text-danger mb-2'
-            });
-            const montosList = this.querySelector('.montos-list');
-            if (montosList) montosList.parentNode.insertBefore(err, montosList);
-        }
+        const err = this.querySelector('#form-error');
+        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
+        if (!err || !montosTableWrapper) return;
         err.textContent = msg;
+        err.classList.add('d-block');
+        err.classList.remove('d-none');
+        montosTableWrapper.setAttribute('aria-describedby', 'form-error');
+        montosTableWrapper.classList.add('border-danger');
+    }
+
+    getMontosRequiredError() {
+        return 'Debe agregar al menos un monto antes de guardar.';
     }
 
     clearFormError() {
         const err = this.querySelector('#form-error');
-        if (err) err.textContent = '';
+        const montosTableWrapper = this.querySelector('#montos-table-wrapper');
+        if (err) {
+            err.textContent = '';
+            err.classList.remove('d-block');
+            err.classList.add('d-none');
+        }
+        if (montosTableWrapper) {
+            montosTableWrapper.removeAttribute('aria-describedby');
+            montosTableWrapper.classList.remove('border-danger');
+        }
     }
 
     startAnalyticsFlow(flowName, metadata = {}) {

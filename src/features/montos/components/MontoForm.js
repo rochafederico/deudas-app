@@ -38,8 +38,8 @@ export class MontoForm extends HTMLElement {
         this.innerHTML = '';
         const form = document.createElement('app-form');
         form.fields = [
-            { name: 'monto', type: 'number', label: 'Monto', required: true },
-            { name: 'moneda', type: 'select', label: 'Moneda', options: monedas, required: true },
+            { name: 'monto', type: 'number', label: 'Monto', required: true, min: 0.01 },
+            { name: 'moneda', type: 'select', label: 'Moneda', options: monedas, required: true, placeholder: 'Seleccioná una moneda…' },
             { name: 'vencimiento', type: 'date', label: 'Vencimiento', required: true }
         ];
         form.initialValues = this._monto || {};
