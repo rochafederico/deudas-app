@@ -107,8 +107,7 @@ export class DebtForm extends HTMLElement {
             className: 'montos-list card mb-3',
             attrs: {
                 role: 'group',
-                'aria-labelledby': 'montos-label',
-                'aria-describedby': 'form-error'
+                'aria-labelledby': 'montos-label'
             },
             children: [
                 el('div', {
@@ -136,7 +135,7 @@ export class DebtForm extends HTMLElement {
                             style: 'min-height: 100px; max-height: 220px;',
                             children: [
                                 el('table', {
-                                    className: 'table table-sm w-100 mb-0',
+                                    className: 'table table-sm w-100',
                                     children: [
                                         el('thead', {
                                             children: [
@@ -162,7 +161,7 @@ export class DebtForm extends HTMLElement {
                     children: [
                         el('div', {
                             attrs: { id: 'form-error' },
-                            className: 'invalid-feedback mt-0 d-none'
+                            className: 'text-danger small mt-0 d-none'
                         }),
                         el('div', {
                             className: 'd-flex justify-content-end mt-2',
@@ -276,7 +275,7 @@ export class DebtForm extends HTMLElement {
             children: [
                 el('div', {
                     attrs: { id: errorId },
-                    className: 'invalid-feedback mt-0 d-none'
+                    className: 'text-danger small mt-0 d-none'
                 })
             ]
         });
@@ -293,7 +292,7 @@ export class DebtForm extends HTMLElement {
     }
 
     _showFieldPanelError(fieldWrapper, message) {
-        const error = fieldWrapper.querySelector('.invalid-feedback');
+        const error = fieldWrapper.querySelector('[id$="-error"]');
         const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = message;
@@ -305,7 +304,7 @@ export class DebtForm extends HTMLElement {
     }
 
     _clearFieldPanelError(fieldWrapper) {
-        const error = fieldWrapper.querySelector('.invalid-feedback');
+        const error = fieldWrapper.querySelector('[id$="-error"]');
         const icon = fieldWrapper.querySelector('[id$="-error-icon"]');
         if (error) {
             error.textContent = '';
@@ -640,6 +639,7 @@ export class DebtForm extends HTMLElement {
         err.textContent = msg;
         err.classList.add('d-block');
         err.classList.remove('d-none');
+        montosList.setAttribute('aria-describedby', 'form-error');
         montosList.classList.add('border-danger');
         montosErrorIcon?.classList.remove('d-none');
     }
@@ -658,6 +658,7 @@ export class DebtForm extends HTMLElement {
             err.classList.add('d-none');
         }
         if (montosList) {
+            montosList.removeAttribute('aria-describedby');
             montosList.classList.remove('border-danger');
         }
         montosErrorIcon?.classList.add('d-none');
