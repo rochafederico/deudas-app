@@ -93,7 +93,7 @@ export class UserMenuButton extends HTMLElement {
   render() {
     this.innerHTML = `
       <button id="user-menu-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3"
-        type="button" title="Menú de usuario" aria-label="Abrir menú de usuario">
+        type="button" aria-label="Abrir menú de usuario">
         <i class="bi bi-person-circle" aria-hidden="true"></i>
       </button>
     `;
