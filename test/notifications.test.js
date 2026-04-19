@@ -591,9 +591,9 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     settingsAction.click();
 
     assert(userPopover.hideCalls === 1, 'Al elegir Configuración, el popover de usuario se cierra');
-    assert(document.querySelector('#settings-data-modal') !== null, 'Al elegir Configuración, se abre el modal de ajustes');
-
-    document.querySelector('settings-data-modal')?.remove();
+    const settingsModal = document.querySelector('#settings-data-modal');
+    assert(settingsModal !== null, 'Al elegir Configuración, se abre el modal de ajustes');
+    settingsModal?.parentElement?.remove();
     document.body.removeChild(settingsAction);
     document.body.removeChild(header);
     window.bootstrap = originalBootstrap;
