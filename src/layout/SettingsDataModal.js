@@ -79,4 +79,3 @@ export function openSettingsDataModal(options) {
   }
   _settingsModal.open(options);
 }
-
