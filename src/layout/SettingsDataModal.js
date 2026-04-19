@@ -7,6 +7,7 @@ let _settingsModal = null;
 export class SettingsDataModal extends HTMLElement {
   constructor() {
     super();
+    this._rendered = false;
     this._callbacks = { onExport: null, onImport: null, onDelete: null };
   }
 
@@ -85,6 +86,8 @@ export class SettingsDataModal extends HTMLElement {
   }
 }
 
+customElements.define('settings-data-modal', SettingsDataModal);
+
 export function openSettingsDataModal(options) {
   if (!_settingsModal?.isConnected) {
     _settingsModal = document.createElement('settings-data-modal');
@@ -92,5 +95,3 @@ export function openSettingsDataModal(options) {
   }
   _settingsModal.open(options);
 }
-
-customElements.define('settings-data-modal', SettingsDataModal);
