@@ -1,7 +1,7 @@
 import './DarkToggle.js';
+import './UserMenuButton.js';
 import '../shared/components/AppToast.js';
 import { trackEvent } from '../shared/observability/index.js';
-import { openSettingsModal } from './dataActions.js';
 
 export class AppHeader extends HTMLElement {
   connectedCallback() {
@@ -34,16 +34,6 @@ export class AppHeader extends HTMLElement {
         this._notificationsPopover?.hide();
         return;
       }
-      if (e.target.closest('[data-user-close]')) {
-        this._userMenuPopover?.hide();
-        return;
-      }
-      if (e.target.closest('[data-user-settings]')) {
-        e.preventDefault();
-        this._userMenuPopover?.hide();
-        trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'open_settings', location: 'header' });
-        openSettingsModal(this.querySelector('#user-menu-btn') || document.activeElement);
-      }
     };
     this.querySelector('.navbar-brand').addEventListener('click', this._onBrandClick);
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
@@ -60,8 +50,6 @@ export class AppHeader extends HTMLElement {
     document.removeEventListener('click', this._onPopoverClick);
     this._notificationsPopover?.dispose();
     this._notificationsPopover = null;
-    this._userMenuPopover?.dispose();
-    this._userMenuPopover = null;
   }
 
   _updateNotificationPopover(html, _todayCount = 0, overdueCount = 0) {
@@ -111,26 +99,6 @@ export class AppHeader extends HTMLElement {
     });
   }
 
-  _updateUserMenuPopover() {
-    const btn = this.querySelector('#user-menu-btn');
-    if (!btn || !window.bootstrap?.Popover) return;
-    if (this._userMenuPopover) this._userMenuPopover.dispose();
-    this._userMenuPopover = this._createPopover(btn, {
-      html: true,
-      title: '<div class="d-flex justify-content-between align-items-center w-100">' +
-        '<strong class="text-nowrap me-3">👤 Usuario</strong>' +
-        '<button type="button" class="btn-close btn-sm flex-shrink-0" data-user-close aria-label="Cerrar"></button>' +
-        '</div>',
-      content: '<div class="list-group list-group-flush">' +
-        '<button type="button" class="list-group-item list-group-item-action" data-user-settings>Configuración</button>' +
-        '</div>',
-      allowList: {
-        ...window.bootstrap.Popover.Default.allowList,
-        button: ['type', 'class', 'aria-label', 'data-user-close', 'data-user-settings'],
-      },
-    });
-  }
-
   render() {
     this.innerHTML = `
       <app-toast></app-toast>
@@ -146,15 +114,11 @@ export class AppHeader extends HTMLElement {
               type="button" title="Abrir guía rápida" aria-label="Abrir guía rápida">
               <i class="bi bi-question-circle" aria-hidden="true"></i>
             </button>
-            <button id="user-menu-btn" class="btn btn-primary d-inline-flex align-items-center justify-content-center p-2 rounded-3"
-              type="button" title="Menú de usuario" aria-label="Abrir menú de usuario">
-              <i class="bi bi-person-circle" aria-hidden="true"></i>
-            </button>
+            <user-menu-button></user-menu-button>
           </div>
         </div>
       </nav>
     `;
-    this._updateUserMenuPopover();
   }
 }
 customElements.define('app-header', AppHeader);

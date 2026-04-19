@@ -562,7 +562,7 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     const userBtn = header.querySelector('#user-menu-btn');
     assert(actions !== null, 'El header renderiza el contenedor de acciones del navbar');
     assert(userBtn !== null, 'El header renderiza el ícono de usuario');
-    assert(actions.lastElementChild?.id === 'user-menu-btn', 'El ícono de usuario es el último ítem del navbar');
+    assert(actions.lastElementChild?.tagName === 'USER-MENU-BUTTON', 'El menú de usuario es el último ítem del navbar');
 
     const userPopover = popoversById.get('user-menu-btn');
     assert(userPopover !== undefined, 'El botón de usuario inicializa un popover de Bootstrap');
