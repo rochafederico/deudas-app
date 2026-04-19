@@ -587,16 +587,16 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     assert(badge !== null, 'El botón de notificaciones tiene badge');
     assert(badge.textContent === '3', 'El badge muestra el total de deudas vencidas (overdueCount)');
 
-    const settingsAction = document.createElement('button');
-    settingsAction.setAttribute('data-user-settings', '');
-    document.body.appendChild(settingsAction);
-    settingsAction.click();
+    const popoverContent = document.createElement('div');
+    popoverContent.innerHTML = userPopover.opts?.content || '';
+    document.body.appendChild(popoverContent);
+    popoverContent.querySelector('[data-user-settings]')?.click();
 
     assert(userPopover.hideCalls === 1, 'Al elegir Configuración, el popover de usuario se cierra');
     const settingsModal = document.querySelector('#settings-data-modal');
     assert(settingsModal !== null, 'Al elegir Configuración, se abre el modal de ajustes');
     settingsModal?.parentElement?.remove();
-    document.body.removeChild(settingsAction);
+    document.body.removeChild(popoverContent);
     document.body.removeChild(header);
     window.bootstrap = originalBootstrap;
 }
