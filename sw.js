@@ -12,6 +12,7 @@ const APP_SHELL = [
     './src/icons/icon-192.png',
     './src/icons/icon-512.png',
     './src/styles/bootstrap.css',
+    './src/styles/mobile-pwa.css',
     './src/main.js',
     './src/layout/AppShell.js',
 ];
