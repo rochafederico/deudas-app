@@ -409,6 +409,115 @@ async function testAcreedorColumnMobileRender() {
     const montoNodeSinVenc = montoCol.render(rowSinVenc);
     const vencBadgeSinVenc = montoNodeSinVenc.querySelector('span.d-md-none');
     assert(vencBadgeSinVenc === null, 'No debe renderizarse elemento de vencimiento cuando está vacío');
+
+    const today = new Date();
+    const yyyyMmDd = (date) => date.toISOString().slice(0, 10);
+    const yesterday = new Date(today);
+    yesterday.setDate(today.getDate() - 1);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+
+    const pagadoNode = montoCol.render({
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: yyyyMmDd(tomorrow),
+        pagado: true
+    });
+    const pagadoBadge = pagadoNode.querySelector('.badge.text-bg-success');
+    assert(pagadoBadge !== null, 'Debe renderizar badge verde cuando el monto está pagado');
+    assert(pagadoBadge.textContent === 'Pagado', 'Badge verde debe mostrar "Pagado"');
+
+    const vencidoNode = montoCol.render({
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: yyyyMmDd(yesterday),
+        pagado: false
+    });
+    const vencidoBadge = vencidoNode.querySelector('.badge.text-bg-danger');
+    assert(vencidoBadge !== null, 'Debe renderizar badge rojo cuando está vencido y pendiente');
+    assert(vencidoBadge.textContent === 'Vencido', 'Badge rojo debe mostrar "Vencido"');
+
+    const venceHoyNode = montoCol.render({
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: yyyyMmDd(today),
+        pagado: false
+    });
+    const venceHoyBadge = venceHoyNode.querySelector('.badge.text-bg-warning');
+    assert(venceHoyBadge !== null, 'Debe renderizar badge amarillo cuando vence hoy y está pendiente');
+    assert(venceHoyBadge.textContent === 'Vence hoy', 'Badge amarillo debe mostrar "Vence hoy"');
+
+    const pendienteNode = montoCol.render({
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: yyyyMmDd(tomorrow),
+        pagado: false
+    });
+    const pendienteBadge = pendienteNode.querySelector('.badge.text-bg-success, .badge.text-bg-danger, .badge.text-bg-warning');
+    assert(pendienteBadge === null, 'No debe renderizar badge para pendiente sin vencer');
+}
+
+// ===================================================================
+// UC7b: toggle pagado actualiza badge y muestra toast de feedback
+// ===================================================================
+async function testPagoToggleVisualFeedback() {
+    console.log('  UC7b: toggle pagado actualiza badge y muestra toast');
+    await cleanup();
+
+    const future = new Date();
+    future.setDate(future.getDate() + 2);
+    const futureYmd = future.toISOString().slice(0, 10);
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [{ monto: 999, moneda: 'ARS', vencimiento: futureYmd, pagado: false }];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Toggle Test', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const [monto] = await listMontos({ mes: futureYmd.slice(0, 7) });
+    assert(monto, 'Debe existir un monto para probar el toggle de pagado');
+
+    const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
+    const accionesCol = debtTableColumns.find(col => col.key === 'acciones');
+    const row = { ...monto };
+    let reloadCalls = 0;
+    row._reload = () => { reloadCalls += 1; };
+
+    const montoNode = montoCol.render(row);
+    const accionesNode = accionesCol.render(row);
+    document.body.appendChild(montoNode);
+    document.body.appendChild(accionesNode);
+
+    const notifications = [];
+    const onNotify = (event) => notifications.push(event.detail);
+    window.addEventListener('app:notify', onNotify);
+
+    try {
+        const input = accionesNode.querySelector('input[type="checkbox"]');
+        assert(input !== null, 'Debe existir switch de pago');
+
+        input.checked = true;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert(montoNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
+        assert(notifications.some(n => n.type === 'success'), 'Al marcar pago debe mostrarse toast verde');
+
+        input.checked = false;
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert(montoNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
+        const pendingStateBadge = montoNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
+        assert(pendingStateBadge === null, 'Pendiente sin vencer no debe mostrar badge');
+        assert(notifications.some(n => n.type === 'warning'), 'Al desmarcar pago debe mostrarse toast amarillo');
+        assert(reloadCalls >= 2, 'El toggle pagado debe disparar recarga luego de persistir cambios');
+    } finally {
+        window.removeEventListener('app:notify', onNotify);
+        if (montoNode.parentNode) document.body.removeChild(montoNode);
+        if (accionesNode.parentNode) document.body.removeChild(accionesNode);
+        await cleanup();
+    }
 }
 
 // ===================================================================
@@ -1110,6 +1219,7 @@ export const tests = [
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
     testAcreedorColumnMobileRender,
+    testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
     testCancelarAltaInline,
     testEdicionInlineGuardar,
