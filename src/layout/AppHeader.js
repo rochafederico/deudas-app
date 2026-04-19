@@ -18,6 +18,15 @@ export class AppHeader extends HTMLElement {
     };
     this._onDataImported = () => window.dispatchEvent(new CustomEvent('ui:refresh'));
     this._onUpcomingPanel = (e) => this._updateNotificationPopover(e.detail.html, e.detail.todayCount, e.detail.overdueCount);
+    this._onAnyPopoverShown = (e) => {
+      const id = e.target?.id;
+      if (id === 'notifications-btn') {
+        const userMenuBtn = this.querySelector('#user-menu-btn');
+        if (userMenuBtn) window.bootstrap?.Popover.getInstance(userMenuBtn)?.hide();
+      } else if (id === 'user-menu-btn') {
+        this._notificationsPopover?.hide();
+      }
+    };
     this._onPopoverClick = (e) => {
       const link = e.target.closest('[data-notif-navigate]');
       if (link) {
@@ -39,6 +48,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#tour-btn').addEventListener('click', this._onTourClick);
     window.addEventListener('data-imported', this._onDataImported);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
+    document.addEventListener('shown.bs.popover', this._onAnyPopoverShown);
     document.addEventListener('click', this._onPopoverClick);
   }
 
@@ -47,6 +57,7 @@ export class AppHeader extends HTMLElement {
     this.querySelector('#tour-btn')?.removeEventListener('click', this._onTourClick);
     window.removeEventListener('data-imported', this._onDataImported);
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
+    document.removeEventListener('shown.bs.popover', this._onAnyPopoverShown);
     document.removeEventListener('click', this._onPopoverClick);
     this._notificationsPopover?.dispose();
     this._notificationsPopover = null;

@@ -551,6 +551,7 @@ async function testNotificationPopoverCloseButtonAndBadge() {
         hide() { this.hideCalls += 1; }
     };
     MockPopover.Default = { allowList: { '*': ['class', 'dir', 'id', 'lang', 'role'], a: ['target', 'href', 'title', 'rel'] } };
+    MockPopover.getInstance = (el) => popoversById.get(el?.id);
     window.bootstrap = { Popover: MockPopover };
 
     // Dynamically import AppHeader (registers 'app-header' custom element)
@@ -606,6 +607,19 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     userBtn.removeAttribute('aria-describedby');
     settingsModal?.parentElement?.remove();
     document.body.removeChild(popoverContent);
+
+    // === Exclusión mutua entre popovers ===
+    // Abrir notificaciones debe cerrar el menú de usuario
+    const prevUserHideCalls = userPopover.hideCalls;
+    const notifBtn = header.querySelector('#notifications-btn');
+    notifBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert(userPopover.hideCalls === prevUserHideCalls + 1, 'Cuando se abre el popover de notificaciones, el de usuario debe cerrarse');
+
+    // Abrir menú de usuario debe cerrar notificaciones
+    const prevNotifHideCalls = notifPopover?.hideCalls ?? 0;
+    userBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert((notifPopover?.hideCalls ?? 0) === prevNotifHideCalls + 1, 'Cuando se abre el menú de usuario, el popover de notificaciones debe cerrarse');
+
     document.body.removeChild(header);
     window.bootstrap = originalBootstrap;
 }
