@@ -28,7 +28,8 @@ export function bindNavbarPopoverInteractions({ button, getPopover, onShown, onH
   const handleShown = () => onShown?.();
   const handleHidden = () => onHidden?.();
   const handleAnyPopoverShown = (e) => {
-    if (e.target?.id && e.target.id !== button.id) {
+    const target = e.target;
+    if (target && target !== button) {
       getPopover?.()?.hide();
     }
   };
