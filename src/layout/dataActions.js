@@ -1,6 +1,7 @@
 // Shared data action helpers — used by AppHeader (desktop) and BottomNav (mobile)
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
+import { openSettingsDataModal } from './SettingsDataModal.js';
 
 let _exportModal = null;
 let _importModal = null;
@@ -19,6 +20,15 @@ export function openImportModal(returnFocus) {
     document.body.appendChild(_importModal);
   }
   _importModal.open(returnFocus);
+}
+
+export function openSettingsModal(returnFocus) {
+  openSettingsDataModal({
+    returnFocus,
+    onExport: (opener) => openExportModal(opener),
+    onImport: (opener) => openImportModal(opener),
+    onDelete: () => deleteAllData(),
+  });
 }
 
 export async function deleteAllData() {

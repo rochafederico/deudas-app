@@ -2,7 +2,7 @@
 // Fixed bottom navigation bar for mobile screens (hidden on lg+)
 
 import { navItems } from './navConfig.js';
-import { openExportModal, openImportModal, deleteAllData } from './dataActions.js';
+import { openSettingsModal } from './dataActions.js';
 import { trackEvent } from '../shared/observability/index.js';
 
 export class BottomNav extends HTMLElement {
@@ -20,34 +20,20 @@ export class BottomNav extends HTMLElement {
       this._updateActive();
     };
     this._onPopState = () => this._updateActive();
-    this._onExportClick = (e) => {
+    this._onSettingsClick = (e) => {
       e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'export_data', location: 'bottom_nav' });
-      openExportModal(this.querySelector('#bottom-nav-ajustes-toggle') || document.activeElement);
-    };
-    this._onImportClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'import_data', location: 'bottom_nav' });
-      openImportModal(this.querySelector('#bottom-nav-ajustes-toggle') || document.activeElement);
-    };
-    this._onDeleteClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'delete_all_data', location: 'bottom_nav' });
-      deleteAllData();
+      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'open_settings', location: 'bottom_nav' });
+      openSettingsModal(this.querySelector('#bottom-nav-ajustes-toggle') || document.activeElement);
     };
     this.querySelector('#bottom-nav-list').addEventListener('click', this._onNavClick);
-    this.querySelector('#bottom-nav-export')?.addEventListener('click', this._onExportClick);
-    this.querySelector('#bottom-nav-import')?.addEventListener('click', this._onImportClick);
-    this.querySelector('#bottom-nav-delete')?.addEventListener('click', this._onDeleteClick);
+    this.querySelector('#bottom-nav-ajustes-toggle')?.addEventListener('click', this._onSettingsClick);
     window.addEventListener('popstate', this._onPopState);
     this._updateActive();
   }
 
   disconnectedCallback() {
     this.querySelector('#bottom-nav-list')?.removeEventListener('click', this._onNavClick);
-    this.querySelector('#bottom-nav-export')?.removeEventListener('click', this._onExportClick);
-    this.querySelector('#bottom-nav-import')?.removeEventListener('click', this._onImportClick);
-    this.querySelector('#bottom-nav-delete')?.removeEventListener('click', this._onDeleteClick);
+    this.querySelector('#bottom-nav-ajustes-toggle')?.removeEventListener('click', this._onSettingsClick);
     window.removeEventListener('popstate', this._onPopState);
   }
 
@@ -83,19 +69,13 @@ export class BottomNav extends HTMLElement {
         aria-label="Navegación móvil">
         <div id="bottom-nav-list" class="container-fluid justify-content-around px-0" data-tour-step="menu-navegacion">
           ${navItemsHtml}
-          <div class="dropdown dropup flex-fill d-flex justify-content-center">
+          <div class="flex-fill d-flex justify-content-center">
             <button id="bottom-nav-ajustes-toggle"
               class="btn btn-link text-white text-decoration-none text-center w-100 py-2 px-1 d-flex flex-column align-items-center"
-              type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Ajustes">
+              type="button" aria-label="Ajustes">
               <i class="bi bi-gear fs-5 lh-1" aria-hidden="true"></i>
               <small class="d-block lh-1 mt-1">Ajustes</small>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bottom-nav-ajustes-toggle">
-              <li><a class="dropdown-item" href="#" id="bottom-nav-export"><i class="bi bi-upload" aria-hidden="true"></i> Exportar datos</a></li>
-              <li><a class="dropdown-item" href="#" id="bottom-nav-import"><i class="bi bi-download" aria-hidden="true"></i> Importar datos</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="#" id="bottom-nav-delete"><i class="bi bi-trash" aria-hidden="true"></i> Eliminar todo</a></li>
-            </ul>
           </div>
         </div>
       </nav>
