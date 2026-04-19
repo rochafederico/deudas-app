@@ -589,8 +589,11 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     assert(badge.textContent === '3', 'El badge muestra el total de deudas vencidas (overdueCount)');
 
     const popoverContent = document.createElement('div');
+    popoverContent.id = `test-user-popover-${Date.now()}`;
     popoverContent.innerHTML = userPopover.opts?.content || '';
     document.body.appendChild(popoverContent);
+    userBtn.setAttribute('aria-describedby', popoverContent.id);
+    userBtn.dispatchEvent(new Event('shown.bs.popover'));
     const settingsOption = popoverContent.querySelector('[data-user-settings]');
     assert(settingsOption !== null, 'El contenido del popover incluye la acción Configuración');
     settingsOption.click();
@@ -598,6 +601,8 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     assert(userPopover.hideCalls === 1, 'Al elegir Configuración, el popover de usuario se cierra');
     const settingsModal = document.querySelector('#settings-data-modal');
     assert(settingsModal !== null, 'Al elegir Configuración, se abre el modal de ajustes');
+    userBtn.dispatchEvent(new Event('hidden.bs.popover'));
+    userBtn.removeAttribute('aria-describedby');
     settingsModal?.parentElement?.remove();
     document.body.removeChild(popoverContent);
     document.body.removeChild(header);

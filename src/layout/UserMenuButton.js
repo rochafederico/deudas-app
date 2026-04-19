@@ -4,6 +4,29 @@ import { trackEvent } from '../shared/observability/index.js';
 export class UserMenuButton extends HTMLElement {
   connectedCallback() {
     this.render();
+    const btn = this.querySelector('#user-menu-btn');
+    this._onPopoverShown = () => this._bindPopoverActions();
+    this._onPopoverHidden = () => this._unbindPopoverActions();
+    btn?.addEventListener('shown.bs.popover', this._onPopoverShown);
+    btn?.addEventListener('hidden.bs.popover', this._onPopoverHidden);
+    this._updatePopover();
+  }
+
+  disconnectedCallback() {
+    const btn = this.querySelector('#user-menu-btn');
+    btn?.removeEventListener('shown.bs.popover', this._onPopoverShown);
+    btn?.removeEventListener('hidden.bs.popover', this._onPopoverHidden);
+    this._unbindPopoverActions();
+    this._popover?.dispose();
+    this._popover = null;
+  }
+
+  _bindPopoverActions() {
+    const btn = this.querySelector('#user-menu-btn');
+    const popoverId = btn?.getAttribute('aria-describedby');
+    const popoverElement = popoverId ? document.getElementById(popoverId) : null;
+    if (!popoverElement) return;
+    this._popoverElement = popoverElement;
     this._onPopoverClick = (e) => {
       if (e.target.closest('[data-user-close]')) {
         this._popover?.hide();
@@ -16,13 +39,15 @@ export class UserMenuButton extends HTMLElement {
         openSettingsModal(this.querySelector('#user-menu-btn') || document.activeElement);
       }
     };
-    document.addEventListener('click', this._onPopoverClick);
+    this._popoverElement.addEventListener('click', this._onPopoverClick);
   }
 
-  disconnectedCallback() {
-    document.removeEventListener('click', this._onPopoverClick);
-    this._popover?.dispose();
-    this._popover = null;
+  _unbindPopoverActions() {
+    if (this._popoverElement && this._onPopoverClick) {
+      this._popoverElement.removeEventListener('click', this._onPopoverClick);
+    }
+    this._popoverElement = null;
+    this._onPopoverClick = null;
   }
 
   _createPopover(btn, options) {
@@ -47,7 +72,7 @@ export class UserMenuButton extends HTMLElement {
       html: true,
       title: '<div class="d-flex justify-content-between align-items-center w-100">' +
         '<strong class="text-nowrap me-3">👤 Usuario</strong>' +
-        '<button type="button" class="btn-close btn-sm flex-shrink-0" data-user-close aria-label="Cerrar"></button>' +
+        '<button type="button" class="btn-close btn-sm flex-shrink-0" data-user-close aria-label="Cerrar" title="Cerrar"></button>' +
         '</div>',
       content: '<div class="list-group list-group-flush">' +
         '<button type="button" class="list-group-item list-group-item-action" data-user-settings>Configuración</button>' +
@@ -66,7 +91,6 @@ export class UserMenuButton extends HTMLElement {
         <i class="bi bi-person-circle" aria-hidden="true"></i>
       </button>
     `;
-    this._updatePopover();
   }
 }
 
