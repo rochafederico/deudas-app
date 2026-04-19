@@ -4,7 +4,10 @@
 import { assert } from './setup.js';
 import ResumenHeader from '../src/layout/ResumenHeader.js';
 import '../src/layout/PageSectionLayout.js';
+import '../src/layout/Sidebar.js';
+import '../src/layout/BottomNav.js';
 import { navItems, DEFAULT_SUBTITLE } from '../src/layout/navConfig.js';
+import { openSettingsModal } from '../src/layout/dataActions.js';
 import Home from '../src/pages/Home.js';
 import HomeQuickActions from '../src/pages/HomeQuickActions.js';
 
@@ -373,6 +376,49 @@ export const tests = [
         assert(card.querySelector('i.bi.bi-lightning-charge') !== null, 'Debe tener bi-lightning-charge en el título');
         const links = card.querySelectorAll('a[href]');
         assert(links.length === 3, 'Debe tener exactamente 3 CTAs');
+    },
+
+    async function settings_modal_isDedicatedSpaceWithListGroupAndDangerZone() {
+        console.log('  Layout: Ajustes abre Configuración dedicada con list-group y Zona peligrosa');
+        const opener = document.createElement('button');
+        document.body.appendChild(opener);
+
+        openSettingsModal(opener);
+        const modal = document.querySelector('#settings-data-modal');
+        const exportBtn = document.getElementById('settings-export');
+        const importBtn = document.getElementById('settings-import');
+        const dangerTitle = document.getElementById('settings-danger-zone-title');
+        const deleteBtn = document.getElementById('settings-delete');
+        assert(modal !== null, 'Debe existir el modal dedicado de Configuración');
+        assert(exportBtn !== null, 'Debe incluir opción Exportar datos');
+        assert(importBtn !== null, 'Debe incluir opción Importar datos');
+        assert(exportBtn.closest('.list-group') !== null, 'Configuración debe usar list-group');
+        assert(dangerTitle !== null, 'Debe incluir sección Zona peligrosa');
+        assert(deleteBtn !== null, 'Zona peligrosa debe incluir Eliminar todo');
+
+        modal.close();
+        document.body.removeChild(opener);
+    },
+
+    async function settings_actions_areNotMixedInSidebarAndBottomNav() {
+        console.log('  Layout: Sidebar y BottomNav no mezclan Exportar/Importar/Eliminar en menú de Ajustes');
+        const sidebar = document.createElement('app-sidebar');
+        const bottomNav = document.createElement('bottom-nav');
+        document.body.appendChild(sidebar);
+        document.body.appendChild(bottomNav);
+
+        assert(sidebar.querySelector('#sidebar-ajustes-toggle') !== null, 'Sidebar debe mantener el acceso a Ajustes');
+        assert(sidebar.querySelector('#sidebar-export') === null, 'Sidebar no debe mostrar Exportar en menú actual');
+        assert(sidebar.querySelector('#sidebar-import') === null, 'Sidebar no debe mostrar Importar en menú actual');
+        assert(sidebar.querySelector('#sidebar-delete') === null, 'Sidebar no debe mezclar Eliminar todo con acciones neutras');
+
+        assert(bottomNav.querySelector('#bottom-nav-ajustes-toggle') !== null, 'BottomNav debe mantener el acceso a Ajustes');
+        assert(bottomNav.querySelector('#bottom-nav-export') === null, 'BottomNav no debe mostrar Exportar en menú actual');
+        assert(bottomNav.querySelector('#bottom-nav-import') === null, 'BottomNav no debe mostrar Importar en menú actual');
+        assert(bottomNav.querySelector('#bottom-nav-delete') === null, 'BottomNav no debe mezclar Eliminar todo con acciones neutras');
+
+        document.body.removeChild(sidebar);
+        document.body.removeChild(bottomNav);
     },
 
 ];
