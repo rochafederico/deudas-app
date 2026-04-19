@@ -81,11 +81,12 @@ export class UserMenuButton extends HTMLElement {
     this._popover = this._createPopover(btn, {
       html: true,
       content: '<div class="list-group list-group-flush">' +
-        '<button type="button" class="list-group-item list-group-item-action" data-user-settings>Configuración</button>' +
+        '<button type="button" class="list-group-item list-group-item-action" data-user-settings><i class="bi bi-gear me-2" aria-hidden="true"></i>Configuración</button>' +
         '</div>',
       allowList: {
         ...window.bootstrap.Popover.Default.allowList,
         button: ['type', 'class', 'data-user-settings'],
+        i: ['class', 'aria-hidden'],
       },
     });
   }
