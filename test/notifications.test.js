@@ -15,7 +15,7 @@ import {
     buildUpcomingPaymentsHTML,
     showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
-import { bindNavbarPopoverInteractions, createNavbarPopover } from '../src/layout/navbarPopoversController.js';
+import { createNavbarPopover } from '../src/layout/navbarPopoversController.js';
 
 function localDate(year, month, day) {
     return new Date(year, month - 1, day, 12, 0, 0);
@@ -666,7 +666,7 @@ async function testCheckAndNotifyEmptyAlwaysShowsPanel() {
 // UC17: navbarPopoversController – wiring compartido de popovers
 // ===================================================================
 async function testNavbarPopoverControllerSharedWiring() {
-    console.log('  UC17: bindNavbarPopoverInteractions centraliza shown/hidden y exclusión mutua');
+    console.log('  UC17: NavbarPopoverController encapsula shown/hidden y exclusión mutua vía lifecycle');
 
     const hostBtn = document.createElement('button');
     hostBtn.id = 'host-popover-btn';
@@ -680,12 +680,12 @@ async function testNavbarPopoverControllerSharedWiring() {
     let shownCalls = 0;
     let hiddenCalls = 0;
 
-    const unbind = bindNavbarPopoverInteractions({
-        button: hostBtn,
-        getPopover: () => popover,
-        onShown: () => { shownCalls += 1; },
-        onHidden: () => { hiddenCalls += 1; }
-    });
+    const ctrl = document.createElement('navbar-popover-controller');
+    ctrl._button = hostBtn;
+    ctrl._getPopover = () => popover;
+    ctrl._onShown = () => { shownCalls += 1; };
+    ctrl._onHidden = () => { hiddenCalls += 1; };
+    document.body.appendChild(ctrl);
 
     hostBtn.dispatchEvent(new Event('shown.bs.popover'));
     assert(shownCalls === 1, 'Disparar shown.bs.popover en el botón host ejecuta onShown');
@@ -696,11 +696,13 @@ async function testNavbarPopoverControllerSharedWiring() {
     hostBtn.dispatchEvent(new Event('hidden.bs.popover'));
     assert(hiddenCalls === 1, 'Disparar hidden.bs.popover en el botón host ejecuta onHidden');
 
-    unbind();
+    ctrl.remove();
+    assert(hiddenCalls === 2, 'Remover el controlador llama onHidden como parte del lifecycle (disconnectedCallback)');
+
     hostBtn.dispatchEvent(new Event('shown.bs.popover'));
     otherBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
-    assert(shownCalls === 1, 'Luego de unbind, shown no vuelve a ejecutarse');
-    assert(popover.hideCallCount === 1, 'Luego de unbind, la exclusión mutua ya no dispara hide');
+    assert(shownCalls === 1, 'Luego de remover, shown no vuelve a ejecutarse');
+    assert(popover.hideCallCount === 1, 'Luego de remover, la exclusión mutua ya no dispara hide');
 
     document.body.removeChild(hostBtn);
     document.body.removeChild(otherBtn);

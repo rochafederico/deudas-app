@@ -1,22 +1,21 @@
-import { bindNavbarPopoverInteractions, createNavbarPopover } from './navbarPopoversController.js';
+import { createNavbarPopover } from './navbarPopoversController.js';
 import { openSettingsFrom } from './settingsShortcutAction.js';
 
 export class UserMenuButton extends HTMLElement {
   connectedCallback() {
     this.render();
     const btn = this.querySelector('#user-menu-btn');
-    this._unbindNavbarPopoverInteractions = bindNavbarPopoverInteractions({
-      button: btn,
-      getPopover: () => this._popover,
-      onShown: () => this._bindPopoverActions(),
-      onHidden: () => this._unbindPopoverActions(),
-    });
+    this._popoverController = document.createElement('navbar-popover-controller');
+    this._popoverController._button = btn;
+    this._popoverController._getPopover = () => this._popover;
+    this._popoverController._onShown = () => this._bindPopoverActions();
+    this._popoverController._onHidden = () => this._unbindPopoverActions();
+    this.appendChild(this._popoverController);
     this._updatePopover();
   }
 
   disconnectedCallback() {
-    this._unbindNavbarPopoverInteractions?.();
-    this._unbindNavbarPopoverInteractions = null;
+    this._popoverController = null;
     this._popover?.dispose();
     this._popover = null;
   }

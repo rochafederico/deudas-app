@@ -1,22 +1,21 @@
-import { bindNavbarPopoverInteractions, createNavbarPopover } from './navbarPopoversController.js';
+import { createNavbarPopover } from './navbarPopoversController.js';
 
 export class NotificationsButton extends HTMLElement {
   connectedCallback() {
     this.render();
     const btn = this.querySelector('#notifications-btn');
-    this._unbindNavbarPopoverInteractions = bindNavbarPopoverInteractions({
-      button: btn,
-      getPopover: () => this._popover,
-      onShown: () => this._bindPopoverActions(),
-      onHidden: () => this._unbindPopoverActions(),
-    });
+    this._popoverController = document.createElement('navbar-popover-controller');
+    this._popoverController._button = btn;
+    this._popoverController._getPopover = () => this._popover;
+    this._popoverController._onShown = () => this._bindPopoverActions();
+    this._popoverController._onHidden = () => this._unbindPopoverActions();
+    this.appendChild(this._popoverController);
     this._onUpcomingPanel = (e) => this._updatePopover(e.detail.html, e.detail.todayCount, e.detail.overdueCount);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
   }
 
   disconnectedCallback() {
-    this._unbindNavbarPopoverInteractions?.();
-    this._unbindNavbarPopoverInteractions = null;
+    this._popoverController = null;
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     this._popover?.dispose();
     this._popover = null;

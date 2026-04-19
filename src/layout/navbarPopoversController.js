@@ -23,23 +23,31 @@ export function createNavbarPopover(button, options) {
   });
 }
 
-export function bindNavbarPopoverInteractions({ button, getPopover, onShown, onHidden }) {
-  if (!button) return () => {};
-  const handleShown = () => onShown?.();
-  const handleHidden = () => onHidden?.();
-  const handleAnyPopoverShown = (e) => {
-    const target = e.target;
-    if (target && target !== button) {
-      getPopover?.()?.hide();
-    }
-  };
-  button.addEventListener('shown.bs.popover', handleShown);
-  button.addEventListener('hidden.bs.popover', handleHidden);
-  document.addEventListener('shown.bs.popover', handleAnyPopoverShown);
-  return () => {
-    button.removeEventListener('shown.bs.popover', handleShown);
-    button.removeEventListener('hidden.bs.popover', handleHidden);
-    document.removeEventListener('shown.bs.popover', handleAnyPopoverShown);
-    onHidden?.();
-  };
+export class NavbarPopoverController extends HTMLElement {
+  connectedCallback() {
+    if (!this._button) return;
+    this._handleShown = () => this._onShown?.();
+    this._handleHidden = () => this._onHidden?.();
+    this._handleAnyShown = (e) => {
+      const target = e.target;
+      if (target && target !== this._button) {
+        this._getPopover?.()?.hide();
+      }
+    };
+    this._button.addEventListener('shown.bs.popover', this._handleShown);
+    this._button.addEventListener('hidden.bs.popover', this._handleHidden);
+    document.addEventListener('shown.bs.popover', this._handleAnyShown);
+  }
+
+  disconnectedCallback() {
+    this._button?.removeEventListener('shown.bs.popover', this._handleShown);
+    this._button?.removeEventListener('hidden.bs.popover', this._handleHidden);
+    document.removeEventListener('shown.bs.popover', this._handleAnyShown);
+    this._onHidden?.();
+    this._handleShown = null;
+    this._handleHidden = null;
+    this._handleAnyShown = null;
+  }
 }
+
+customElements.define('navbar-popover-controller', NavbarPopoverController);
