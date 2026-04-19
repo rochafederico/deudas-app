@@ -2,8 +2,6 @@
 // Fixed bottom navigation bar for mobile screens (hidden on lg+)
 
 import { navItems } from './navConfig.js';
-import { openSettingsModal } from './dataActions.js';
-import { trackEvent } from '../shared/observability/index.js';
 
 export class BottomNav extends HTMLElement {
   connectedCallback() {
@@ -20,20 +18,13 @@ export class BottomNav extends HTMLElement {
       this._updateActive();
     };
     this._onPopState = () => this._updateActive();
-    this._onSettingsClick = (e) => {
-      e.preventDefault();
-      trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'open_settings', location: 'bottom_nav' });
-      openSettingsModal(this.querySelector('#bottom-nav-ajustes-toggle') || document.activeElement);
-    };
     this.querySelector('#bottom-nav-list').addEventListener('click', this._onNavClick);
-    this.querySelector('#bottom-nav-ajustes-toggle')?.addEventListener('click', this._onSettingsClick);
     window.addEventListener('popstate', this._onPopState);
     this._updateActive();
   }
 
   disconnectedCallback() {
     this.querySelector('#bottom-nav-list')?.removeEventListener('click', this._onNavClick);
-    this.querySelector('#bottom-nav-ajustes-toggle')?.removeEventListener('click', this._onSettingsClick);
     window.removeEventListener('popstate', this._onPopState);
   }
 
@@ -69,14 +60,6 @@ export class BottomNav extends HTMLElement {
         aria-label="Navegación móvil">
         <div id="bottom-nav-list" class="container-fluid justify-content-around px-0" data-tour-step="menu-navegacion">
           ${navItemsHtml}
-          <div class="flex-fill d-flex justify-content-center">
-            <button id="bottom-nav-ajustes-toggle"
-              class="btn btn-link text-white text-decoration-none text-center w-100 py-2 px-1 d-flex flex-column align-items-center"
-              type="button" aria-label="Ajustes">
-              <i class="bi bi-gear fs-5 lh-1" aria-hidden="true"></i>
-              <small class="d-block lh-1 mt-1">Ajustes</small>
-            </button>
-          </div>
         </div>
       </nav>
     `;
