@@ -186,7 +186,7 @@ export function buildUpcomingPaymentsHTML(payments, now = new Date()) {
             renderTomorrowSection(tomorrow),
             renderUpcomingSection(rest),
             renderTotalsSection(overdue),
-            `<div class="text-end mt-2"><a href="/gastos" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver cuotas del mes</a></div>`,
+            `<div class="text-end mt-2"><a href="/gastos/mensual" class="small link-secondary text-decoration-none" data-notif-navigate>📋 Ver cuotas del mes</a></div>`,
         ].join(''),
         todayCount: today.length,
         overdueCount: overdue.length,

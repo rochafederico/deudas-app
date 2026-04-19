@@ -1,6 +1,6 @@
 // src/features/deudas/components/DebtEntityShell.js
-// Web Component <debt-entity-shell> – vista unificada de deudas con toggle cuotas ↔ entidades
-// Ruta: /gastos
+// Web Component <debt-entity-shell> – vista de deudas con tabs Bootstrap
+// Rutas: /gastos (Deudas) y /gastos/mensual (Cuotas del mes)
 
 import '../../../shared/components/AppButton.js';
 import '../../../layout/PageSectionLayout.js';
@@ -18,16 +18,29 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
+function navigate(path) {
+    if (path !== window.location.pathname) {
+        window.history.pushState({}, '', path);
+        window.dispatchEvent(new PopStateEvent('popstate'));
+    }
+}
+
 export class DebtEntityShell extends HTMLElement {
     constructor() {
         super();
         this.entities = [];
-        this.currentView = 'cuotas'; // default: cuotas del mes
+        this.currentView = this._getViewFromPath();
+    }
+
+    _getViewFromPath() {
+        return window.location.pathname === '/gastos/mensual' ? 'cuotas' : 'deudas';
     }
 
     connectedCallback() {
+        this.currentView = this._getViewFromPath();
         this.classList.add('d-block');
         this.render();
+        if (this.currentView === 'deudas') this.loadEntities();
         this._onRefresh = () => this._refreshCurrentView();
         this._onEdit = (e) => this.editDebt(e.detail);
         window.addEventListener('deuda:saved', this._onRefresh);
@@ -51,17 +64,6 @@ export class DebtEntityShell extends HTMLElement {
         } else {
             window.dispatchEvent(new CustomEvent('ui:month', { detail: { mes: getSelectedMonth() } }));
         }
-    }
-
-    setView(view) {
-        if (this.currentView === view) return;
-        this.currentView = view;
-        this.render();
-        if (this.currentView === 'deudas') this.loadEntities();
-    }
-
-    toggleView() {
-        this.setView(this.currentView === 'cuotas' ? 'deudas' : 'cuotas');
     }
 
     async loadEntities() {
@@ -192,64 +194,75 @@ export class DebtEntityShell extends HTMLElement {
     render() {
         const layout = document.createElement('page-section-layout');
 
-        // Toolbar end: toggle button + CTA button
-        const toolbarEnd = document.createElement('div');
-        toolbarEnd.className = 'd-flex align-items-center gap-2 flex-wrap';
+        // Toolbar start: Bootstrap nav tabs (real links)
+        layout.toolbarStart = this._renderTabs();
 
-        // Toggle view button
-        const toggleBtn = document.createElement('button');
-        toggleBtn.type = 'button';
-        toggleBtn.className = 'btn btn-outline-secondary btn-sm';
-        toggleBtn.setAttribute('data-toggle-view', '');
-        if (this.currentView === 'cuotas') {
-            toggleBtn.innerHTML = '<i class="bi bi-list-ul" aria-hidden="true"></i> Ver deudas';
-            toggleBtn.setAttribute('aria-label', 'Cambiar a vista deudas');
-        } else {
-            toggleBtn.innerHTML = '<i class="bi bi-calendar-check" aria-hidden="true"></i> Ver cuotas';
-            toggleBtn.setAttribute('aria-label', 'Cambiar a vista cuotas');
-        }
-        toggleBtn.addEventListener('click', () => this.toggleView());
-        toolbarEnd.appendChild(toggleBtn);
-
-        // CTA button (dynamic per view)
+        // Toolbar end: CTA fixed to "Agregar deuda"
         const ctaBtn = document.createElement('app-button');
         ctaBtn.id = 'add-debt';
-        if (this.currentView === 'cuotas') {
-            ctaBtn.setAttribute('aria-label', 'Registrar pago');
-            ctaBtn.textContent = 'Registrar pago';
-        } else {
-            ctaBtn.setAttribute('aria-label', 'Agregar deuda');
-            ctaBtn.textContent = 'Agregar deuda';
-        }
+        ctaBtn.setAttribute('aria-label', 'Agregar deuda');
+        ctaBtn.textContent = 'Agregar deuda';
         ctaBtn.addEventListener('click', () => {
             const modal = this.querySelector('#debtModal');
             if (!modal) return;
             modal.openCreate();
             modal.attachOpener(ctaBtn);
         });
-        toolbarEnd.appendChild(ctaBtn);
+        layout.toolbarEnd = ctaBtn;
 
-        layout.toolbarEnd = toolbarEnd;
-
-        // Content: modals + dynamic view content
+        // Content: modals + view-specific content
         const contentDiv = document.createElement('div');
+
+        const debtModal = document.createElement('debt-modal');
+        debtModal.id = 'debtModal';
+        contentDiv.appendChild(debtModal);
+
+        const detailModal = document.createElement('debt-detail-modal');
+        detailModal.id = 'debtDetailModal';
+        contentDiv.appendChild(detailModal);
+
         if (this.currentView === 'cuotas') {
-            contentDiv.innerHTML = `
-                <debt-modal id="debtModal"></debt-modal>
-                <debt-detail-modal id="debtDetailModal"></debt-detail-modal>
-                <debt-list></debt-list>
-            `;
+            const debtList = document.createElement('debt-list');
+            debtList.setAttribute('exclude-columns', 'tipoDeuda');
+            contentDiv.appendChild(debtList);
         } else {
-            contentDiv.innerHTML = `
-                <debt-modal id="debtModal"></debt-modal>
-                <debt-detail-modal id="debtDetailModal"></debt-detail-modal>
-                <div id="entity-table-container"></div>
-            `;
+            const entityContainer = document.createElement('div');
+            entityContainer.id = 'entity-table-container';
+            contentDiv.appendChild(entityContainer);
         }
+
         layout.content = contentDiv;
 
         this.innerHTML = '';
         this.appendChild(layout);
+    }
+
+    _renderTabs() {
+        const nav = document.createElement('ul');
+        nav.className = 'nav nav-tabs border-0';
+        nav.setAttribute('role', 'tablist');
+        nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
+        nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos/mensual', this.currentView === 'cuotas'));
+        return nav;
+    }
+
+    _createTabItem(label, path, isActive) {
+        const li = document.createElement('li');
+        li.className = 'nav-item';
+        li.setAttribute('role', 'presentation');
+
+        const a = document.createElement('a');
+        a.className = `nav-link${isActive ? ' active' : ''}`;
+        a.href = path;
+        if (isActive) a.setAttribute('aria-current', 'page');
+        a.textContent = label;
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigate(path);
+        });
+
+        li.appendChild(a);
+        return li;
     }
 }
 

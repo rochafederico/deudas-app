@@ -14,6 +14,7 @@ export class DebtList extends HTMLElement {
 
     connectedCallback() {
         this.classList.add('d-block');
+        this._excludeColumns = (this.getAttribute('exclude-columns') || '').split(',').filter(Boolean);
         this.render();
         this.loadDebts();
         this.addEventListeners();
@@ -22,7 +23,7 @@ export class DebtList extends HTMLElement {
     disconnectedCallback() {
         window.removeEventListener('ui:month', this._onMonth);
         window.removeEventListener('ui:group', this._onGroup);
-        window.removeEventListener('deuda:added', this._onLoad);
+        window.removeEventListener('deuda:saved', this._onLoad);
         window.removeEventListener('deuda:updated', this._onLoad);
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
@@ -43,7 +44,7 @@ export class DebtList extends HTMLElement {
 
         window.addEventListener('ui:month', this._onMonth);
         window.addEventListener('ui:group', this._onGroup);
-        window.addEventListener('deuda:added', this._onLoad);
+        window.addEventListener('deuda:saved', this._onLoad);
         window.addEventListener('deuda:updated', this._onLoad);
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
@@ -117,6 +118,10 @@ export class DebtList extends HTMLElement {
                 hiddenKeys = ['acciones'];
             }
             columns = columns.filter(col => !hiddenKeys.includes(col.key));
+        }
+        // Filtrar columnas excluidas via atributo exclude-columns
+        if (this._excludeColumns && this._excludeColumns.length) {
+            columns = columns.filter(col => !this._excludeColumns.includes(col.key));
         }
 
         // Mapear datos de la tabla

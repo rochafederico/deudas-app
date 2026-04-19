@@ -946,7 +946,6 @@ async function testDebtEntityShellRenderVacio() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
-    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
@@ -973,7 +972,6 @@ async function testDebtEntityShellRenderConEntidades() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
-    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
@@ -1004,7 +1002,6 @@ async function testDebtEntityShellCuotasFormato() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
-    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
@@ -1028,7 +1025,6 @@ async function testDebtEntityShellRecargaAlGuardar() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
-    shell.setView('deudas');
     // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
     await shell.loadEntities();
 
@@ -1056,50 +1052,52 @@ async function testDebtEntityShellRecargaAlGuardar() {
 }
 
 // ===================================================================
-// UC-DS5: DebtEntityShell – vista por defecto es cuotas
+// UC-DS5: DebtEntityShell – renderiza tabs de navegación con links reales
 // ===================================================================
-async function testDebtEntityShellDefaultViewEsCuotas() {
-    console.log('  DebtEntityShell: la vista por defecto es "cuotas"');
+async function testDebtEntityShellNavTabsRender() {
+    console.log('  DebtEntityShell: renderiza tabs de navegación con links reales');
     await cleanup();
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
 
-    assert(shell.currentView === 'cuotas', 'La vista por defecto debe ser "cuotas"');
-    assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
-    assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
+    const tabs = shell.querySelector('.nav-tabs');
+    assert(tabs !== null, 'Debe existir .nav-tabs');
+
+    const tabLinks = shell.querySelectorAll('.nav-tabs .nav-link');
+    assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
+
+    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
+    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos"');
+
+    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/mensual');
+    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos/mensual"');
 
     document.body.removeChild(shell);
     await cleanup();
 }
 
 // ===================================================================
-// UC-DS6: DebtEntityShell – botón toggle cambia entre vistas
+// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos/mensual
 // ===================================================================
-async function testDebtEntityShellToggleView() {
-    console.log('  DebtEntityShell: el botón toggle alterna entre vistas cuotas y deudas');
+async function testDebtEntityShellCuotasView() {
+    console.log('  DebtEntityShell: la vista cuotas (path /gastos/mensual) muestra debt-list sin columna Tipo');
     await cleanup();
 
+    window.history.pushState({}, '', '/gastos/mensual');
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
 
-    // Default: cuotas
-    assert(shell.currentView === 'cuotas', 'Debe iniciar en vista cuotas');
-    const toggleBtn = shell.querySelector('[data-toggle-view]');
-    assert(toggleBtn !== null, 'Debe existir el botón toggle con [data-toggle-view]');
+    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos/mensual');
+    assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
+    assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
 
-    // Toggle → deudas
-    toggleBtn.click();
-    assert(shell.currentView === 'deudas', 'Después del click debe estar en vista deudas');
-    assert(shell.querySelector('#entity-table-container') !== null, 'En vista deudas debe existir #entity-table-container');
-
-    // Toggle → cuotas again
-    const toggleBtn2 = shell.querySelector('[data-toggle-view]');
-    toggleBtn2.click();
-    assert(shell.currentView === 'cuotas', 'Segundo click vuelve a vista cuotas');
-    assert(shell.querySelector('debt-list') !== null, 'En vista cuotas debe existir <debt-list>');
+    const debtList = shell.querySelector('debt-list');
+    assert(debtList !== null, 'debt-list debe existir');
+    assert(debtList.getAttribute('exclude-columns') === 'tipoDeuda', 'debt-list debe tener exclude-columns="tipoDeuda"');
 
     document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
     await cleanup();
 }
 
@@ -1131,6 +1129,6 @@ export const tests = [
     testDebtEntityShellRenderConEntidades,
     testDebtEntityShellRecargaAlGuardar,
     testDebtEntityShellCuotasFormato,
-    testDebtEntityShellDefaultViewEsCuotas,
-    testDebtEntityShellToggleView
+    testDebtEntityShellNavTabsRender,
+    testDebtEntityShellCuotasView
 ];
