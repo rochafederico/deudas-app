@@ -590,7 +590,7 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     assert(badge.textContent === '3', 'El badge muestra el total de deudas vencidas (overdueCount)');
 
     const popoverContent = document.createElement('div');
-    popoverContent.id = `test-user-popover-${++testPopoverIdCounter}`;
+    popoverContent.id = `test-user-popover-${testPopoverIdCounter++}`;
     popoverContent.innerHTML = userPopover.opts?.content || '';
     document.body.appendChild(popoverContent);
     userBtn.setAttribute('aria-describedby', popoverContent.id);

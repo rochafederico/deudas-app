@@ -1,6 +1,13 @@
 import { openSettingsModal } from './dataActions.js';
 import { trackEvent } from '../shared/observability/index.js';
 
+const HEADER_OPEN_SETTINGS_EVENT = {
+  flow: 'shortcut',
+  status: 'completed',
+  shortcut: 'open_settings',
+  location: 'header',
+};
+
 export class UserMenuButton extends HTMLElement {
   connectedCallback() {
     this.render();
@@ -35,7 +42,7 @@ export class UserMenuButton extends HTMLElement {
       if (e.target.closest('[data-user-settings]')) {
         e.preventDefault();
         this._popover?.hide();
-        trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'open_settings', location: 'header' });
+        trackEvent('shortcut_used', HEADER_OPEN_SETTINGS_EVENT);
         openSettingsModal(btn);
       }
     };
