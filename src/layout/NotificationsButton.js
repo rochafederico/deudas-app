@@ -1,28 +1,23 @@
+import { createNavbarPopover } from './navbarPopoversController.js';
+
 export class NotificationsButton extends HTMLElement {
   connectedCallback() {
     this.render();
     const btn = this.querySelector('#notifications-btn');
-    this._onPopoverShown = () => this._bindPopoverActions();
-    this._onPopoverHidden = () => this._unbindPopoverActions();
-    btn?.addEventListener('shown.bs.popover', this._onPopoverShown);
-    btn?.addEventListener('hidden.bs.popover', this._onPopoverHidden);
-    this._onAnyPopoverShown = (e) => {
-      if (e.target?.id && e.target.id !== 'notifications-btn') {
-        this._popover?.hide();
-      }
-    };
+    this._popoverController = document.createElement('navbar-popover-controller');
+    this._popoverController._button = btn;
+    this._popoverController._getPopover = () => this._popover;
+    this._popoverController._onShown = () => this._bindPopoverActions();
+    this._popoverController._onHidden = () => this._unbindPopoverActions();
+    this.appendChild(this._popoverController);
     this._onUpcomingPanel = (e) => this._updatePopover(e.detail.html, e.detail.todayCount, e.detail.overdueCount);
     window.addEventListener('app:upcoming-panel', this._onUpcomingPanel);
-    document.addEventListener('shown.bs.popover', this._onAnyPopoverShown);
   }
 
   disconnectedCallback() {
-    const btn = this.querySelector('#notifications-btn');
-    btn?.removeEventListener('shown.bs.popover', this._onPopoverShown);
-    btn?.removeEventListener('hidden.bs.popover', this._onPopoverHidden);
-    this._unbindPopoverActions();
+    this._popoverController?.remove();
+    this._popoverController = null;
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
-    document.removeEventListener('shown.bs.popover', this._onAnyPopoverShown);
     this._popover?.dispose();
     this._popover = null;
   }
@@ -60,25 +55,11 @@ export class NotificationsButton extends HTMLElement {
     this._onPopoverClick = null;
   }
 
-  _createPopover(btn, options) {
-    if (!window.bootstrap?.Popover) return null;
-    return new window.bootstrap.Popover(btn, {
-      trigger: 'click',
-      placement: 'bottom',
-      container: 'body',
-      popperConfig(defaultConfig) {
-        defaultConfig.placement = 'bottom-end';
-        return defaultConfig;
-      },
-      ...options,
-    });
-  }
-
   _updatePopover(html, _todayCount = 0, overdueCount = 0) {
     const btn = this.querySelector('#notifications-btn');
     if (!btn || !window.bootstrap?.Popover) return;
     if (this._popover) this._popover.dispose();
-    this._popover = this._createPopover(btn, {
+    this._popover = createNavbarPopover(btn, {
       html: true,
       title: '<div class="d-flex justify-content-between align-items-center w-100">' +
         '<strong class="text-nowrap me-3">⚠️ Vencimientos próximos</strong>' +
