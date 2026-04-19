@@ -412,12 +412,12 @@ export const tests = [
         document.body.appendChild(sidebar);
         document.body.appendChild(bottomNav);
 
-        assert(sidebar.querySelector('#sidebar-ajustes-toggle') !== null, 'Sidebar debe mantener el acceso a Ajustes');
+        assert(sidebar.querySelector('#sidebar-ajustes-toggle') === null, 'Sidebar no debe mostrar el botón Ajustes en el menú principal');
         assert(sidebar.querySelector('#sidebar-export') === null, 'Sidebar no debe mostrar Exportar en menú actual');
         assert(sidebar.querySelector('#sidebar-import') === null, 'Sidebar no debe mostrar Importar en menú actual');
         assert(sidebar.querySelector('#sidebar-delete') === null, 'Sidebar no debe mezclar Eliminar todo con acciones neutras');
 
-        assert(bottomNav.querySelector('#bottom-nav-ajustes-toggle') !== null, 'BottomNav debe mantener el acceso a Ajustes');
+        assert(bottomNav.querySelector('#bottom-nav-ajustes-toggle') === null, 'BottomNav no debe mostrar el botón Ajustes en el menú principal');
         assert(bottomNav.querySelector('#bottom-nav-export') === null, 'BottomNav no debe mostrar Exportar en menú actual');
         assert(bottomNav.querySelector('#bottom-nav-import') === null, 'BottomNav no debe mostrar Importar en menú actual');
         assert(bottomNav.querySelector('#bottom-nav-delete') === null, 'BottomNav no debe mezclar Eliminar todo con acciones neutras');

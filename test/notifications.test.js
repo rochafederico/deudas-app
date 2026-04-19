@@ -534,15 +534,24 @@ async function testCheckAndNotifyDeduplication() {
 async function testNotificationPopoverCloseButtonAndBadge() {
     console.log('  UC14: AppHeader crea el popover con btn-close y el badge muestra overdueCount');
 
-    // Mock bootstrap.Popover to capture the options without needing a real DOM render
-    let capturedTitle = null;
+    // Mock bootstrap.Popover to capture options without needing a real DOM render
+    const popoversById = new Map();
+    let popoverKeyCounter = 0;
+    let testPopoverIdCounter = 0;
     const originalBootstrap = window.bootstrap;
     const MockPopover = class {
-        constructor(_el, opts) { capturedTitle = opts?.title ?? null; }
+        constructor(el, opts) {
+            this.el = el;
+            this.opts = opts;
+            this.hideCalls = 0;
+            const key = el?.id || `popover-${++popoverKeyCounter}`;
+            popoversById.set(key, this);
+        }
         dispose() {}
-        hide() {}
+        hide() { this.hideCalls += 1; }
     };
     MockPopover.Default = { allowList: { '*': ['class', 'dir', 'id', 'lang', 'role'], a: ['target', 'href', 'title', 'rel'] } };
+    MockPopover.getInstance = (el) => popoversById.get(el?.id);
     window.bootstrap = { Popover: MockPopover };
 
     // Dynamically import AppHeader (registers 'app-header' custom element)
@@ -551,21 +560,66 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     const header = document.createElement('app-header');
     document.body.appendChild(header);
 
+    const actions = header.querySelector('.ms-auto.d-flex');
+    const userBtn = header.querySelector('#user-menu-btn');
+    assert(actions !== null, 'El header renderiza el contenedor de acciones del navbar');
+    assert(actions.firstElementChild?.tagName === 'NOTIFICATIONS-BUTTON', 'El botón de notificaciones es el primer ítem del navbar');
+    assert(userBtn !== null, 'El header renderiza el ícono de usuario');
+    assert(actions.lastElementChild?.tagName === 'USER-MENU-BUTTON', 'El menú de usuario es el último ítem del navbar');
+
+    const userPopover = popoversById.get('user-menu-btn');
+    assert(userPopover !== undefined, 'El botón de usuario inicializa un popover de Bootstrap');
+    assert(userPopover.opts?.content.includes('list-group'), 'El popover de usuario renderiza list-group');
+    assert(userPopover.opts?.content.includes('Configuración'), 'El popover de usuario incluye Configuración');
+    assert(userPopover.opts?.trigger === 'click', 'El popover de usuario usa trigger click');
+
     // Dispatch the panel event as the service would
     window.dispatchEvent(new CustomEvent('app:upcoming-panel', {
         detail: { html: '<p>test</p>', todayCount: 2, overdueCount: 3 },
     }));
 
     // Verify btn-close is in the popover title
-    assert(typeof capturedTitle === 'string', 'El popover recibió un título');
-    assert(capturedTitle.includes('btn-close'), 'El título del popover incluye btn-close');
-    assert(capturedTitle.includes('data-notif-close'), 'El título incluye data-notif-close para el handler de cierre');
+    const notifPopover = popoversById.get('notifications-btn');
+    const notifTitle = notifPopover?.opts?.title ?? '';
+    assert(typeof notifTitle === 'string', 'El popover recibió un título');
+    assert(notifTitle.includes('btn-close'), 'El título del popover incluye btn-close');
+    assert(notifTitle.includes('data-notif-close'), 'El título incluye data-notif-close para el handler de cierre');
 
     // Verify badge shows overdueCount (3), not todayCount (2)
     const btn = header.querySelector('#notifications-btn');
     const badge = btn?.querySelector('.notif-badge');
     assert(badge !== null, 'El botón de notificaciones tiene badge');
     assert(badge.textContent === '3', 'El badge muestra el total de deudas vencidas (overdueCount)');
+
+    const popoverContent = document.createElement('div');
+    popoverContent.id = `test-user-popover-${testPopoverIdCounter++}`;
+    popoverContent.innerHTML = userPopover.opts?.content || '';
+    document.body.appendChild(popoverContent);
+    userBtn.setAttribute('aria-describedby', popoverContent.id);
+    userBtn.dispatchEvent(new Event('shown.bs.popover'));
+    const settingsOption = popoverContent.querySelector('[data-user-settings]');
+    assert(settingsOption !== null, 'El contenido del popover incluye la acción Configuración');
+    settingsOption.click();
+
+    assert(userPopover.hideCalls === 1, 'Al elegir Configuración, el popover de usuario se cierra');
+    const settingsModal = document.querySelector('#settings-data-modal');
+    assert(settingsModal !== null, 'Al elegir Configuración, se abre el modal de ajustes');
+    userBtn.dispatchEvent(new Event('hidden.bs.popover'));
+    userBtn.removeAttribute('aria-describedby');
+    settingsModal?.parentElement?.remove();
+    document.body.removeChild(popoverContent);
+
+    // === Exclusión mutua entre popovers ===
+    // Abrir notificaciones debe cerrar el menú de usuario
+    const prevUserHideCalls = userPopover.hideCalls;
+    const notifBtn = header.querySelector('#notifications-btn');
+    notifBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert(userPopover.hideCalls === prevUserHideCalls + 1, 'Cuando se abre el popover de notificaciones, el de usuario debe cerrarse');
+
+    // Abrir menú de usuario debe cerrar notificaciones
+    const prevNotifHideCalls = notifPopover?.hideCalls ?? 0;
+    userBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert((notifPopover?.hideCalls ?? 0) === prevNotifHideCalls + 1, 'Cuando se abre el menú de usuario, el popover de notificaciones debe cerrarse');
 
     document.body.removeChild(header);
     window.bootstrap = originalBootstrap;
