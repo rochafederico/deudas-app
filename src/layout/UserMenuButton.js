@@ -42,10 +42,6 @@ export class UserMenuButton extends HTMLElement {
     if (!popoverElement) return;
     this._popoverElement = popoverElement;
     this._onPopoverClick = (e) => {
-      if (e.target.closest('[data-user-close]')) {
-        this._popover?.hide();
-        return;
-      }
       if (e.target.closest('[data-user-settings]')) {
         e.preventDefault();
         this._popover?.hide();
@@ -84,16 +80,12 @@ export class UserMenuButton extends HTMLElement {
     if (this._popover) this._popover.dispose();
     this._popover = this._createPopover(btn, {
       html: true,
-      title: '<div class="d-flex justify-content-between align-items-center w-100">' +
-        '<strong class="text-nowrap me-3">👤 Usuario</strong>' +
-        '<button type="button" class="btn-close btn-sm flex-shrink-0" data-user-close aria-label="Cerrar" title="Cerrar"></button>' +
-        '</div>',
       content: '<div class="list-group list-group-flush">' +
         '<button type="button" class="list-group-item list-group-item-action" data-user-settings>Configuración</button>' +
         '</div>',
       allowList: {
         ...window.bootstrap.Popover.Default.allowList,
-        button: ['type', 'class', 'aria-label', 'data-user-close', 'data-user-settings'],
+        button: ['type', 'class', 'data-user-settings'],
       },
     });
   }
