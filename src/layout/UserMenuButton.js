@@ -16,6 +16,12 @@ export class UserMenuButton extends HTMLElement {
     this._onPopoverHidden = () => this._unbindPopoverActions();
     btn?.addEventListener('shown.bs.popover', this._onPopoverShown);
     btn?.addEventListener('hidden.bs.popover', this._onPopoverHidden);
+    this._onAnyPopoverShown = (e) => {
+      if (e.target?.id && e.target.id !== 'user-menu-btn') {
+        this._popover?.hide();
+      }
+    };
+    document.addEventListener('shown.bs.popover', this._onAnyPopoverShown);
     this._updatePopover();
   }
 
@@ -24,6 +30,7 @@ export class UserMenuButton extends HTMLElement {
     btn?.removeEventListener('shown.bs.popover', this._onPopoverShown);
     btn?.removeEventListener('hidden.bs.popover', this._onPopoverHidden);
     this._unbindPopoverActions();
+    document.removeEventListener('shown.bs.popover', this._onAnyPopoverShown);
     this._popover?.dispose();
     this._popover = null;
   }
