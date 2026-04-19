@@ -13,7 +13,7 @@ import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
 
 function shouldRegisterServiceWorker() {
     const { protocol, hostname } = window.location;
-    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const isLocalhost = hostname === 'localhost' || hostname === '[::1]' || /^127\./.test(hostname);
     return protocol === 'https:' && !isLocalhost;
 }
 

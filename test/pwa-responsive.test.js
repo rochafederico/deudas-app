@@ -34,6 +34,8 @@ export const tests = [
         assert(mainJs.includes("navigator.serviceWorker.register('./sw.js')"), 'main.js debe registrar sw.js');
         assert(mainJs.includes("protocol === 'https:'"), 'main.js debe restringir registro SW a HTTPS');
         assert(mainJs.includes("hostname === 'localhost'"), 'main.js debe excluir localhost del registro SW');
+        assert(mainJs.includes("hostname === '[::1]'"), 'main.js debe excluir localhost IPv6 del registro SW');
+        assert(mainJs.includes("/^127\\./.test(hostname)"), 'main.js debe excluir rango loopback 127.* del registro SW');
     },
 
     async function pwa_mobileStylesEnforceTouchTargetsAndSmallScreens() {
