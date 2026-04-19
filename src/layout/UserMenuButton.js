@@ -36,7 +36,7 @@ export class UserMenuButton extends HTMLElement {
         e.preventDefault();
         this._popover?.hide();
         trackEvent('shortcut_used', { flow: 'shortcut', status: 'completed', shortcut: 'open_settings', location: 'header' });
-        openSettingsModal(this.querySelector('#user-menu-btn') || document.activeElement);
+        openSettingsModal(btn);
       }
     };
     this._popoverElement.addEventListener('click', this._onPopoverClick);
