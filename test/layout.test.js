@@ -397,6 +397,7 @@ export const tests = [
         assert(deleteBtn !== null, 'Zona peligrosa debe incluir Eliminar todo');
 
         modal.close();
+        modal.parentElement?.remove();
         document.body.removeChild(opener);
     },
 
