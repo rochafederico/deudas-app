@@ -1,11 +1,13 @@
 // src/features/deudas/components/DebtEntityShell.js
-// Web Component <debt-entity-shell> – listado de entidades de deuda (acreedor/tipo/cuotas/pendiente)
-// Ruta: /gastos  |  Vista mensual de montos: /gastos/mensual
+// Web Component <debt-entity-shell> – vista unificada de deudas con toggle cuotas ↔ entidades
+// Ruta: /gastos
 
 import '../../../shared/components/AppButton.js';
 import '../../../layout/PageSectionLayout.js';
 import './DebtModal.js';
 import './DebtDetailModal.js';
+import './DebtList.js';
+import { getSelectedMonth } from '../../../shared/MonthFilter.js';
 
 function escapeHtml(str) {
     return String(str)
@@ -16,38 +18,50 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
-function navigate(path) {
-    if (path !== window.location.pathname) {
-        window.history.pushState({}, '', path);
-        window.dispatchEvent(new PopStateEvent('popstate'));
-    }
-}
-
 export class DebtEntityShell extends HTMLElement {
     constructor() {
         super();
         this.entities = [];
+        this.currentView = 'cuotas'; // default: cuotas del mes
     }
 
     connectedCallback() {
         this.classList.add('d-block');
         this.render();
-        this.loadEntities();
-        this._onLoad = () => this.loadEntities();
+        this._onRefresh = () => this._refreshCurrentView();
         this._onEdit = (e) => this.editDebt(e.detail);
-        window.addEventListener('deuda:saved', this._onLoad);
-        window.addEventListener('deuda:updated', this._onLoad);
-        window.addEventListener('deuda:deleted', this._onLoad);
-        window.addEventListener('data-imported', this._onLoad);
+        window.addEventListener('deuda:saved', this._onRefresh);
+        window.addEventListener('deuda:updated', this._onRefresh);
+        window.addEventListener('deuda:deleted', this._onRefresh);
+        window.addEventListener('data-imported', this._onRefresh);
         window.addEventListener('deuda:edit', this._onEdit);
     }
 
     disconnectedCallback() {
-        window.removeEventListener('deuda:saved', this._onLoad);
-        window.removeEventListener('deuda:updated', this._onLoad);
-        window.removeEventListener('deuda:deleted', this._onLoad);
-        window.removeEventListener('data-imported', this._onLoad);
+        window.removeEventListener('deuda:saved', this._onRefresh);
+        window.removeEventListener('deuda:updated', this._onRefresh);
+        window.removeEventListener('deuda:deleted', this._onRefresh);
+        window.removeEventListener('data-imported', this._onRefresh);
         window.removeEventListener('deuda:edit', this._onEdit);
+    }
+
+    _refreshCurrentView() {
+        if (this.currentView === 'deudas') {
+            this.loadEntities();
+        } else {
+            window.dispatchEvent(new CustomEvent('ui:month', { detail: { mes: getSelectedMonth() } }));
+        }
+    }
+
+    setView(view) {
+        if (this.currentView === view) return;
+        this.currentView = view;
+        this.render();
+        if (this.currentView === 'deudas') this.loadEntities();
+    }
+
+    toggleView() {
+        this.setView(this.currentView === 'cuotas' ? 'deudas' : 'cuotas');
     }
 
     async loadEntities() {
@@ -131,7 +145,7 @@ export class DebtEntityShell extends HTMLElement {
         `;
 
         container.querySelectorAll('[data-detail-id]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', () => {
                 const id = Number(btn.dataset.detailId);
                 const deuda = this.entities.find(d => d.id === id);
                 if (!deuda) return;
@@ -178,42 +192,60 @@ export class DebtEntityShell extends HTMLElement {
     render() {
         const layout = document.createElement('page-section-layout');
 
-        // Toolbar end: "Ver cuotas del mes" link + "Agregar deuda" button
+        // Toolbar end: toggle button + CTA button
         const toolbarEnd = document.createElement('div');
         toolbarEnd.className = 'd-flex align-items-center gap-2 flex-wrap';
 
-        const mensualLink = document.createElement('a');
-        mensualLink.href = '/gastos/mensual';
-        mensualLink.className = 'btn btn-outline-secondary btn-sm';
-        mensualLink.setAttribute('data-mensual-link', '');
-        mensualLink.innerHTML = '<i class="bi bi-calendar3" aria-hidden="true"></i> Ver cuotas del mes';
-        mensualLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            navigate('/gastos/mensual');
-        });
-        toolbarEnd.appendChild(mensualLink);
+        // Toggle view button
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'btn btn-outline-secondary btn-sm';
+        toggleBtn.setAttribute('data-toggle-view', '');
+        if (this.currentView === 'cuotas') {
+            toggleBtn.innerHTML = '<i class="bi bi-list-ul" aria-hidden="true"></i> Ver deudas';
+            toggleBtn.setAttribute('aria-label', 'Cambiar a vista deudas');
+        } else {
+            toggleBtn.innerHTML = '<i class="bi bi-calendar-check" aria-hidden="true"></i> Ver cuotas';
+            toggleBtn.setAttribute('aria-label', 'Cambiar a vista cuotas');
+        }
+        toggleBtn.addEventListener('click', () => this.toggleView());
+        toolbarEnd.appendChild(toggleBtn);
 
-        const addDebtBtn = document.createElement('app-button');
-        addDebtBtn.id = 'add-debt';
-        addDebtBtn.setAttribute('aria-label', 'Agregar deuda');
-        addDebtBtn.textContent = 'Agregar deuda';
-        addDebtBtn.addEventListener('click', () => {
+        // CTA button (dynamic per view)
+        const ctaBtn = document.createElement('app-button');
+        ctaBtn.id = 'add-debt';
+        if (this.currentView === 'cuotas') {
+            ctaBtn.setAttribute('aria-label', 'Registrar pago');
+            ctaBtn.textContent = 'Registrar pago';
+        } else {
+            ctaBtn.setAttribute('aria-label', 'Agregar deuda');
+            ctaBtn.textContent = 'Agregar deuda';
+        }
+        ctaBtn.addEventListener('click', () => {
             const modal = this.querySelector('#debtModal');
             if (!modal) return;
             modal.openCreate();
-            modal.attachOpener(addDebtBtn);
+            modal.attachOpener(ctaBtn);
         });
-        toolbarEnd.appendChild(addDebtBtn);
+        toolbarEnd.appendChild(ctaBtn);
 
         layout.toolbarEnd = toolbarEnd;
 
-        // Content: modals + entity table
+        // Content: modals + dynamic view content
         const contentDiv = document.createElement('div');
-        contentDiv.innerHTML = `
-            <debt-modal id="debtModal"></debt-modal>
-            <debt-detail-modal id="debtDetailModal"></debt-detail-modal>
-            <div id="entity-table-container"></div>
-        `;
+        if (this.currentView === 'cuotas') {
+            contentDiv.innerHTML = `
+                <debt-modal id="debtModal"></debt-modal>
+                <debt-detail-modal id="debtDetailModal"></debt-detail-modal>
+                <debt-list></debt-list>
+            `;
+        } else {
+            contentDiv.innerHTML = `
+                <debt-modal id="debtModal"></debt-modal>
+                <debt-detail-modal id="debtDetailModal"></debt-detail-modal>
+                <div id="entity-table-container"></div>
+            `;
+        }
         layout.content = contentDiv;
 
         this.innerHTML = '';

@@ -946,10 +946,11 @@ async function testDebtEntityShellRenderVacio() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
+    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
-    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container');
+    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
     assert(container.textContent.includes('No hay deudas registradas'), 'Debe mostrar mensaje vacío cuando no hay deudas');
 
     document.body.removeChild(shell);
@@ -972,10 +973,11 @@ async function testDebtEntityShellRenderConEntidades() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
+    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
-    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container');
+    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
     const row = container.querySelector('tbody tr');
     assert(row !== null, 'Debe haber al menos una fila en la tabla');
     assert(row.textContent.includes('Banco Test'), 'La fila debe contener el acreedor');
@@ -1002,6 +1004,7 @@ async function testDebtEntityShellCuotasFormato() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
+    shell.setView('deudas');
     await shell.loadEntities();
 
     const container = shell.querySelector('#entity-table-container');
@@ -1017,7 +1020,7 @@ async function testDebtEntityShellCuotasFormato() {
 }
 
 // ===================================================================
-// UC-DS3: DebtEntityShell – recarga al evento deuda:saved
+// UC-DS3: DebtEntityShell – recarga al evento deuda:saved (vista deudas)
 // ===================================================================
 async function testDebtEntityShellRecargaAlGuardar() {
     console.log('  DebtEntityShell: recarga la tabla al recibir deuda:saved');
@@ -1025,6 +1028,7 @@ async function testDebtEntityShellRecargaAlGuardar() {
 
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
+    shell.setView('deudas');
     // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
     await shell.loadEntities();
 
@@ -1046,6 +1050,54 @@ async function testDebtEntityShellRecargaAlGuardar() {
     const row = container.querySelector('tbody tr');
     assert(row !== null, 'Debe recargar y mostrar la deuda nueva');
     assert(row.textContent.includes('Acreedor Nuevo'), 'La tabla debe contener el acreedor nuevo');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS5: DebtEntityShell – vista por defecto es cuotas
+// ===================================================================
+async function testDebtEntityShellDefaultViewEsCuotas() {
+    console.log('  DebtEntityShell: la vista por defecto es "cuotas"');
+    await cleanup();
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+
+    assert(shell.currentView === 'cuotas', 'La vista por defecto debe ser "cuotas"');
+    assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
+    assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS6: DebtEntityShell – botón toggle cambia entre vistas
+// ===================================================================
+async function testDebtEntityShellToggleView() {
+    console.log('  DebtEntityShell: el botón toggle alterna entre vistas cuotas y deudas');
+    await cleanup();
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+
+    // Default: cuotas
+    assert(shell.currentView === 'cuotas', 'Debe iniciar en vista cuotas');
+    const toggleBtn = shell.querySelector('[data-toggle-view]');
+    assert(toggleBtn !== null, 'Debe existir el botón toggle con [data-toggle-view]');
+
+    // Toggle → deudas
+    toggleBtn.click();
+    assert(shell.currentView === 'deudas', 'Después del click debe estar en vista deudas');
+    assert(shell.querySelector('#entity-table-container') !== null, 'En vista deudas debe existir #entity-table-container');
+
+    // Toggle → cuotas again
+    const toggleBtn2 = shell.querySelector('[data-toggle-view]');
+    toggleBtn2.click();
+    assert(shell.currentView === 'cuotas', 'Segundo click vuelve a vista cuotas');
+    assert(shell.querySelector('debt-list') !== null, 'En vista cuotas debe existir <debt-list>');
 
     document.body.removeChild(shell);
     await cleanup();
@@ -1078,5 +1130,7 @@ export const tests = [
     testDebtEntityShellRenderVacio,
     testDebtEntityShellRenderConEntidades,
     testDebtEntityShellRecargaAlGuardar,
-    testDebtEntityShellCuotasFormato
+    testDebtEntityShellCuotasFormato,
+    testDebtEntityShellDefaultViewEsCuotas,
+    testDebtEntityShellToggleView
 ];

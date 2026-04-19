@@ -76,6 +76,7 @@ export class DebtList extends HTMLElement {
         const deudas = [];
         for (const id of deudaIds) {
             const deuda = await getDeuda(id);
+            if (!deuda) continue;
             deuda.montos = montos.filter(m => m.deudaId === id);
             deudas.push(deuda);
         }
