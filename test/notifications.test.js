@@ -560,6 +560,7 @@ async function testNotificationPopoverCloseButtonAndBadge() {
 
     const actions = header.querySelector('.ms-auto.d-flex');
     const userBtn = header.querySelector('#user-menu-btn');
+    assert(actions !== null, 'El header renderiza el contenedor de acciones del navbar');
     assert(userBtn !== null, 'El header renderiza el ícono de usuario');
     assert(actions.lastElementChild?.id === 'user-menu-btn', 'El ícono de usuario es el último ítem del navbar');
 
@@ -590,7 +591,9 @@ async function testNotificationPopoverCloseButtonAndBadge() {
     const popoverContent = document.createElement('div');
     popoverContent.innerHTML = userPopover.opts?.content || '';
     document.body.appendChild(popoverContent);
-    popoverContent.querySelector('[data-user-settings]')?.click();
+    const settingsOption = popoverContent.querySelector('[data-user-settings]');
+    assert(settingsOption !== null, 'El contenido del popover incluye la acción Configuración');
+    settingsOption.click();
 
     assert(userPopover.hideCalls === 1, 'Al elegir Configuración, el popover de usuario se cierra');
     const settingsModal = document.querySelector('#settings-data-modal');
