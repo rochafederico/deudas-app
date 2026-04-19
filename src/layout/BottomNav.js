@@ -56,7 +56,7 @@ export class BottomNav extends HTMLElement {
     const items = this.querySelectorAll('[data-path]');
     items.forEach(item => {
       const itemPath = item.dataset.path;
-      const isActive = itemPath === path;
+      const isActive = path === itemPath || (itemPath !== '/' && path.startsWith(itemPath + '/'));
       item.classList.toggle('active', isActive);
       item.classList.toggle('text-white', isActive);
       item.classList.toggle('text-white-50', !isActive);
@@ -67,7 +67,7 @@ export class BottomNav extends HTMLElement {
   render() {
     const currentPath = window.location.pathname;
     const navItemsHtml = navItems.map(item => {
-      const isActive = item.path === currentPath;
+      const isActive = currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path + '/'));
       return `
       <button type="button" class="btn btn-link text-decoration-none text-center flex-fill py-2 px-1 d-flex flex-column align-items-center ${isActive ? 'text-white active' : 'text-white-50'}"
         data-path="${item.path}" data-key="${item.key}" aria-label="${item.label}"

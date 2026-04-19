@@ -10,6 +10,7 @@ import '../src/features/deudas/components/DebtDetailModal.js';
 import '../src/features/montos/components/DuplicateMontoModal.js';
 import '../src/features/deudas/components/DebtForm.js';
 import '../src/features/deudas/components/DebtModal.js';
+import '../src/features/deudas/components/DebtEntityShell.js';
 
 async function cleanup() {
     try { await deleteDeudas(); } catch (e) { /* ignore */ }
@@ -936,6 +937,170 @@ async function testDebtModalReopenClearsValidationState() {
     document.body.removeChild(modal);
 }
 
+// ===================================================================
+// UC-DS1: DebtEntityShell – render vacío
+// ===================================================================
+async function testDebtEntityShellRenderVacio() {
+    console.log('  DebtEntityShell: muestra mensaje cuando no hay deudas');
+    await cleanup();
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
+    assert(container.textContent.includes('No hay deudas registradas'), 'Debe mostrar mensaje vacío cuando no hay deudas');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS2: DebtEntityShell – render con entidades
+// ===================================================================
+async function testDebtEntityShellRenderConEntidades() {
+    console.log('  DebtEntityShell: muestra tabla con filas al haber deudas');
+    await cleanup();
+
+    // Crear una deuda directamente usando el formulario
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [{ monto: 10000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: false }];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Test', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    assert(container !== null, 'DebtEntityShell debe tener #entity-table-container en vista deudas');
+    const row = container.querySelector('tbody tr');
+    assert(row !== null, 'Debe haber al menos una fila en la tabla');
+    assert(row.textContent.includes('Banco Test'), 'La fila debe contener el acreedor');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS4: DebtEntityShell – formato de columna Cuotas pendientes/total
+// ===================================================================
+async function testDebtEntityShellCuotasFormato() {
+    console.log('  DebtEntityShell: columna Cuotas muestra formato pendientes/total');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [
+        { monto: 5000, moneda: 'ARS', vencimiento: '2026-03-01', pagado: true },
+        { monto: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }
+    ];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Test Cuotas', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    const row = container.querySelector('tbody tr');
+    assert(row !== null, 'Debe haber una fila en la tabla');
+    // The cuotas cell is the 3rd <td> (index 2)
+    const cuotasCell = row.querySelectorAll('td')[2];
+    assert(cuotasCell !== null, 'Debe existir la celda de Cuotas');
+    assert(cuotasCell.textContent.trim() === '1/2', `Cuotas debe mostrar "1/2" (1 pendiente, 2 total), obtuvo "${cuotasCell.textContent.trim()}"`);
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS3: DebtEntityShell – recarga al evento deuda:saved (vista deudas)
+// ===================================================================
+async function testDebtEntityShellRecargaAlGuardar() {
+    console.log('  DebtEntityShell: recarga la tabla al recibir deuda:saved');
+    await cleanup();
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    // Llamar loadEntities directamente para asegurar que el estado inicial es correcto
+    await shell.loadEntities();
+
+    // Inicialmente vacío
+    let container = shell.querySelector('#entity-table-container');
+    assert(container.textContent.includes('No hay deudas registradas'), 'Debe empezar vacío');
+
+    // Agregar una deuda y disparar el evento deuda:saved
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [{ monto: 5000, moneda: 'ARS', vencimiento: '2026-04-01', pagado: false }];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Acreedor Nuevo', tipoDeuda: 'Tarjeta', notas: '' } });
+    document.body.removeChild(form);
+
+    // Esperar a que loadEntities() complete tras el evento deuda:saved
+    await new Promise(resolve => setTimeout(resolve, 10));
+
+    container = shell.querySelector('#entity-table-container');
+    const row = container.querySelector('tbody tr');
+    assert(row !== null, 'Debe recargar y mostrar la deuda nueva');
+    assert(row.textContent.includes('Acreedor Nuevo'), 'La tabla debe contener el acreedor nuevo');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS5: DebtEntityShell – renderiza tabs de navegación con links reales
+// ===================================================================
+async function testDebtEntityShellNavTabsRender() {
+    console.log('  DebtEntityShell: renderiza tabs de navegación con links reales');
+    await cleanup();
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+
+    const tabs = shell.querySelector('.nav-underline');
+    assert(tabs !== null, 'Debe existir .nav-underline');
+
+    const tabLinks = shell.querySelectorAll('.nav-underline .nav-link');
+    assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
+
+    const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
+    assert(deudaTab !== null, 'Debe existir un tab con href="/gastos"');
+
+    const cuotasTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos/mensual');
+    assert(cuotasTab !== null, 'Debe existir un tab con href="/gastos/mensual"');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS6: DebtEntityShell – la vista cuotas se activa con path /gastos/mensual
+// ===================================================================
+async function testDebtEntityShellCuotasView() {
+    console.log('  DebtEntityShell: la vista cuotas (path /gastos/mensual) muestra debt-list sin columna Tipo');
+    await cleanup();
+
+    window.history.pushState({}, '', '/gastos/mensual');
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+
+    assert(shell.currentView === 'cuotas', 'currentView debe ser "cuotas" para path /gastos/mensual');
+    assert(shell.querySelector('debt-list') !== null, 'La vista cuotas debe incluir <debt-list>');
+    assert(shell.querySelector('#entity-table-container') === null, 'En vista cuotas no debe existir #entity-table-container');
+
+    const debtList = shell.querySelector('debt-list');
+    assert(debtList !== null, 'debt-list debe existir');
+    assert(debtList.getAttribute('exclude-columns') === 'tipoDeuda', 'debt-list debe tener exclude-columns="tipoDeuda"');
+
+    document.body.removeChild(shell);
+    window.history.pushState({}, '', '/');
+    await cleanup();
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -959,5 +1124,11 @@ export const tests = [
     testDebtFormRequiereMontosAlEnviar,
     testDebtModalCancelClosesModal,
     testDebtModalFooterUxValidacionConsistente,
-    testDebtModalReopenClearsValidationState
+    testDebtModalReopenClearsValidationState,
+    testDebtEntityShellRenderVacio,
+    testDebtEntityShellRenderConEntidades,
+    testDebtEntityShellRecargaAlGuardar,
+    testDebtEntityShellCuotasFormato,
+    testDebtEntityShellNavTabsRender,
+    testDebtEntityShellCuotasView
 ];

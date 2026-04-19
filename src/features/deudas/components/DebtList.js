@@ -14,6 +14,8 @@ export class DebtList extends HTMLElement {
 
     connectedCallback() {
         this.classList.add('d-block');
+        this._excludeColumns = (this.getAttribute('exclude-columns') || '').split(',').filter(Boolean);
+        this._showDetailAction = this.hasAttribute('show-detail-action');
         this.render();
         this.loadDebts();
         this.addEventListeners();
@@ -22,7 +24,7 @@ export class DebtList extends HTMLElement {
     disconnectedCallback() {
         window.removeEventListener('ui:month', this._onMonth);
         window.removeEventListener('ui:group', this._onGroup);
-        window.removeEventListener('deuda:added', this._onLoad);
+        window.removeEventListener('deuda:saved', this._onLoad);
         window.removeEventListener('deuda:updated', this._onLoad);
         window.removeEventListener('deuda:deleted', this._onLoad);
         window.removeEventListener('data-imported', this._onLoad);
@@ -43,7 +45,7 @@ export class DebtList extends HTMLElement {
 
         window.addEventListener('ui:month', this._onMonth);
         window.addEventListener('ui:group', this._onGroup);
-        window.addEventListener('deuda:added', this._onLoad);
+        window.addEventListener('deuda:saved', this._onLoad);
         window.addEventListener('deuda:updated', this._onLoad);
         window.addEventListener('deuda:deleted', this._onLoad);
         window.addEventListener('data-imported', this._onLoad);
@@ -76,6 +78,7 @@ export class DebtList extends HTMLElement {
         const deudas = [];
         for (const id of deudaIds) {
             const deuda = await getDeuda(id);
+            if (!deuda) continue;
             deuda.montos = montos.filter(m => m.deudaId === id);
             deudas.push(deuda);
         }
@@ -116,6 +119,32 @@ export class DebtList extends HTMLElement {
                 hiddenKeys = ['acciones'];
             }
             columns = columns.filter(col => !hiddenKeys.includes(col.key));
+        }
+        // Filtrar columnas excluidas via atributo exclude-columns
+        if (this._excludeColumns && this._excludeColumns.length) {
+            columns = columns.filter(col => !this._excludeColumns.includes(col.key));
+        }
+
+        // Agregar columna de acción "ver deuda" si se solicitó explícitamente
+        if (this._showDetailAction) {
+            columns = [...columns, {
+                key: 'ver-deuda',
+                label: '',
+                render: row => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'btn btn-sm btn-outline-secondary';
+                    btn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || ''}`);
+                    btn.innerHTML = '<i class="bi bi-eye" aria-hidden="true"></i>';
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (typeof row._onDetail === 'function') {
+                            row._onDetail(row, btn);
+                        }
+                    });
+                    return btn;
+                }
+            }];
         }
 
         // Mapear datos de la tabla

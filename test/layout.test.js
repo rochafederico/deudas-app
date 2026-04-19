@@ -46,9 +46,9 @@ export const tests = [
     },
 
     async function navConfig_gastosTitle() {
-        console.log('  navConfig: Gastos title is "Gastos del mes"');
+        console.log('  navConfig: Gastos title is "Deudas"');
         const gastos = navItems.find(i => i.path === '/gastos');
-        assert(gastos.title === 'Gastos del mes', 'Gastos debe tener título "Gastos del mes"');
+        assert(gastos.title === 'Deudas', 'Gastos debe tener título "Deudas"');
     },
 
     async function navConfig_ingresosTitle() {

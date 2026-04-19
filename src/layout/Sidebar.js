@@ -55,7 +55,8 @@ export class AppSidebar extends HTMLElement {
   _updateActive() {
     const path = window.location.pathname;
     this.querySelectorAll('[data-path]').forEach(item => {
-      const isActive = item.dataset.path === path;
+      const itemPath = item.dataset.path;
+      const isActive = path === itemPath || (itemPath !== '/' && path.startsWith(itemPath + '/'));
       item.classList.toggle('active', isActive);
       item.classList.toggle('text-body', !isActive);
       if (isActive) {
@@ -69,7 +70,7 @@ export class AppSidebar extends HTMLElement {
   render() {
     const currentPath = window.location.pathname;
     const navHtml = navItems.map(item => {
-      const isActive = item.path === currentPath;
+      const isActive = currentPath === item.path || (item.path !== '/' && currentPath.startsWith(item.path + '/'));
       return `
       <li class="nav-item">
         <a href="${item.path}"
