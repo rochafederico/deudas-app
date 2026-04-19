@@ -536,13 +536,15 @@ async function testNotificationPopoverCloseButtonAndBadge() {
 
     // Mock bootstrap.Popover to capture options without needing a real DOM render
     const popoversById = new Map();
+    let popoverKeyCounter = 0;
     const originalBootstrap = window.bootstrap;
     const MockPopover = class {
         constructor(el, opts) {
             this.el = el;
             this.opts = opts;
             this.hideCalls = 0;
-            popoversById.set(el?.id || `popover-${popoversById.size + 1}`, this);
+            const key = el?.id || `popover-${++popoverKeyCounter}`;
+            popoversById.set(key, this);
         }
         dispose() {}
         hide() { this.hideCalls += 1; }

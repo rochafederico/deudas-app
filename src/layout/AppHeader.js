@@ -75,17 +75,10 @@ export class AppHeader extends HTMLElement {
         '<button type="button" class="btn-close btn-sm flex-shrink-0" data-notif-close aria-label="Cerrar"></button>' +
         '</div>',
       content: html,
-      trigger: 'click',
-      placement: 'bottom',
-      container: 'body',
       allowList: {
         ...window.bootstrap.Popover.Default.allowList,
         button: ['type', 'class', 'aria-label', 'data-notif-close'],
         a: [...(window.bootstrap.Popover.Default.allowList.a || []), 'data-notif-navigate'],
-      },
-      popperConfig(defaultConfig) {
-        defaultConfig.placement = 'bottom-end';
-        return defaultConfig;
       },
     });
     let badge = btn.querySelector('.notif-badge');
