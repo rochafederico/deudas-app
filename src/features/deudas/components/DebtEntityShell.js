@@ -99,8 +99,8 @@ export class DebtEntityShell extends HTMLElement {
             const pendiente = this.computePendiente(deuda.montos);
             const montos = deuda.montos || [];
             const total = montos.length;
-            const pendientesCount = montos.filter(m => !m.pagado).length;
-            const cuotasStr = total > 0 ? `${pendientesCount}/${total}` : '0/0';
+            const pagadasCount = montos.filter(m => m.pagado).length;
+            const cuotasStr = total > 0 ? `${pagadasCount}/${total}` : '0/0';
             const pendienteStr = Object.keys(pendiente).length
                 ? Object.entries(pendiente).map(([moneda, tot]) => this.fmtMoneda(moneda, tot)).join(' | ')
                 : '—';
