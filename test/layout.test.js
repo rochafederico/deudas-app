@@ -379,22 +379,26 @@ export const tests = [
     },
 
     async function settings_modal_isDedicatedSpaceWithListGroupAndDangerZone() {
-        console.log('  Layout: Ajustes abre Configuración dedicada con list-group y Zona peligrosa');
+        console.log('  Layout: Ajustes abre Configuración dedicada con cards + list-group y Zona peligrosa');
         const opener = document.createElement('button');
         document.body.appendChild(opener);
 
         openSettingsModal(opener);
         const modal = document.querySelector('#settings-data-modal');
+        const cards = modal?.querySelectorAll('.card') || [];
         const exportBtn = document.getElementById('settings-export');
         const importBtn = document.getElementById('settings-import');
         const dangerTitle = document.getElementById('settings-danger-zone-title');
         const deleteBtn = document.getElementById('settings-delete');
         assert(modal !== null, 'Debe existir el modal dedicado de Configuración');
+        assert(cards.length === 2, 'Configuración debe separar acciones en 2 cards');
         assert(exportBtn !== null, 'Debe incluir opción Exportar datos');
         assert(importBtn !== null, 'Debe incluir opción Importar datos');
-        assert(exportBtn.closest('.list-group') !== null, 'Configuración debe usar list-group');
+        assert(exportBtn.closest('.card') !== null, 'Exportar debe estar dentro de card de datos');
+        assert(exportBtn.closest('.list-group') !== null, 'Card de datos debe usar list-group');
         assert(dangerTitle !== null, 'Debe incluir sección Zona peligrosa');
         assert(deleteBtn !== null, 'Zona peligrosa debe incluir Eliminar todo');
+        assert(deleteBtn.closest('.card') !== null, 'Eliminar todo debe estar en card separada');
 
         modal.close();
         modal.parentElement?.remove();
