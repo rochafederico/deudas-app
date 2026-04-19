@@ -192,10 +192,14 @@ export class DebtEntityShell extends HTMLElement {
     }
 
     render() {
-        const layout = document.createElement('page-section-layout');
+        this.innerHTML = '';
 
-        // Toolbar start: Bootstrap nav tabs (real links)
-        layout.toolbarStart = this._renderTabs();
+        // 1. Tabs outside the card (nav-underline), between subtitle and card
+        const tabsNav = this._renderTabs();
+        this.appendChild(tabsNav);
+
+        // 2. Card layout with CTA only in toolbar
+        const layout = document.createElement('page-section-layout');
 
         // Toolbar end: CTA fixed to "Agregar deuda"
         const ctaBtn = document.createElement('app-button');
@@ -224,6 +228,7 @@ export class DebtEntityShell extends HTMLElement {
         if (this.currentView === 'cuotas') {
             const debtList = document.createElement('debt-list');
             debtList.setAttribute('exclude-columns', 'tipoDeuda');
+            debtList.setAttribute('show-detail-action', '');
             contentDiv.appendChild(debtList);
         } else {
             const entityContainer = document.createElement('div');
@@ -232,14 +237,19 @@ export class DebtEntityShell extends HTMLElement {
         }
 
         layout.content = contentDiv;
-
-        this.innerHTML = '';
         this.appendChild(layout);
+
+        // 3. Remove default card-body padding so content breathes with external tabs
+        const cardBody = layout.querySelector('.card-body');
+        if (cardBody) {
+            cardBody.classList.remove('p-3');
+            cardBody.classList.add('p-0');
+        }
     }
 
     _renderTabs() {
         const nav = document.createElement('ul');
-        nav.className = 'nav nav-tabs border-0';
+        nav.className = 'nav nav-underline mb-3';
         nav.setAttribute('role', 'tablist');
         nav.appendChild(this._createTabItem('Deudas', '/gastos', this.currentView === 'deudas'));
         nav.appendChild(this._createTabItem('Cuotas del mes', '/gastos/mensual', this.currentView === 'cuotas'));

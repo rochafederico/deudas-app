@@ -1061,10 +1061,10 @@ async function testDebtEntityShellNavTabsRender() {
     const shell = document.createElement('debt-entity-shell');
     document.body.appendChild(shell);
 
-    const tabs = shell.querySelector('.nav-tabs');
-    assert(tabs !== null, 'Debe existir .nav-tabs');
+    const tabs = shell.querySelector('.nav-underline');
+    assert(tabs !== null, 'Debe existir .nav-underline');
 
-    const tabLinks = shell.querySelectorAll('.nav-tabs .nav-link');
+    const tabLinks = shell.querySelectorAll('.nav-underline .nav-link');
     assert(tabLinks.length === 2, 'Debe haber exactamente 2 tabs');
 
     const deudaTab = [...tabLinks].find(a => a.getAttribute('href') === '/gastos');
