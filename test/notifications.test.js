@@ -676,7 +676,7 @@ async function testNavbarPopoverControllerSharedWiring() {
     otherBtn.id = 'other-popover-btn';
     document.body.appendChild(otherBtn);
 
-    const popover = { hideCalls: 0, hide() { this.hideCalls += 1; } };
+    const popover = { hideCallCount: 0, hide() { this.hideCallCount += 1; } };
     let shownCalls = 0;
     let hiddenCalls = 0;
 
@@ -691,7 +691,7 @@ async function testNavbarPopoverControllerSharedWiring() {
     assert(shownCalls === 1, 'Disparar shown.bs.popover en el botón host ejecuta onShown');
 
     otherBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
-    assert(popover.hideCalls === 1, 'Abrir otro popover dispara exclusión mutua y oculta el popover host');
+    assert(popover.hideCallCount === 1, 'Abrir otro popover dispara exclusión mutua y oculta el popover host');
 
     hostBtn.dispatchEvent(new Event('hidden.bs.popover'));
     assert(hiddenCalls === 1, 'Disparar hidden.bs.popover en el botón host ejecuta onHidden');
@@ -700,7 +700,7 @@ async function testNavbarPopoverControllerSharedWiring() {
     hostBtn.dispatchEvent(new Event('shown.bs.popover'));
     otherBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
     assert(shownCalls === 1, 'Luego de unbind, shown no vuelve a ejecutarse');
-    assert(popover.hideCalls === 1, 'Luego de unbind, la exclusión mutua ya no dispara hide');
+    assert(popover.hideCallCount === 1, 'Luego de unbind, la exclusión mutua ya no dispara hide');
 
     document.body.removeChild(hostBtn);
     document.body.removeChild(otherBtn);
@@ -733,8 +733,15 @@ async function testNavbarPopoverControllerCreatePopoverFactory() {
     assert(capturedOptions?.placement === 'bottom', 'El placement base se mantiene en bottom');
     assert(capturedOptions?.html === true, 'Las opciones personalizadas se mantienen');
 
-    const popperConfigResult = capturedOptions?.popperConfig({ placement: 'bottom' });
+    const popperConfigInput = { placement: 'bottom', strategy: 'fixed', modifiers: [{ name: 'offset', options: { y: 8 } }] };
+    const popperConfigResult = capturedOptions?.popperConfig(popperConfigInput);
     assert(popperConfigResult?.placement === 'bottom-end', 'popperConfig ajusta el placement final a bottom-end');
+    assert(popperConfigResult?.strategy === 'fixed', 'popperConfig preserva strategy del config original');
+    assert(Array.isArray(popperConfigResult?.modifiers), 'popperConfig preserva modifiers del config original');
+    assert(popperConfigResult?.modifiers !== popperConfigInput.modifiers, 'popperConfig evita compartir referencia del array modifiers');
+    assert(popperConfigResult?.modifiers?.[0] !== popperConfigInput.modifiers[0], 'popperConfig clona cada modifier para evitar mutaciones cruzadas');
+    assert(popperConfigResult?.modifiers?.[0].options !== popperConfigInput.modifiers[0].options, 'popperConfig clona options para evitar referencias compartidas');
+    assert(popperConfigResult?.modifiers?.[0].options?.y === 8, 'popperConfig preserva el valor interno de options');
 
     window.bootstrap = originalBootstrap;
 }

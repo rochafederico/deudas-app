@@ -1,12 +1,23 @@
 export function createNavbarPopover(button, options) {
   if (!button || !window.bootstrap?.Popover) return null;
+  const cloneModifier = (modifier) => {
+    if (!modifier || typeof modifier !== 'object') return modifier;
+    return {
+      ...modifier,
+      options: modifier.options && typeof modifier.options === 'object'
+        ? { ...modifier.options }
+        : modifier.options,
+    };
+  };
   return new window.bootstrap.Popover(button, {
     trigger: 'click',
     placement: 'bottom',
     container: 'body',
     popperConfig(defaultConfig) {
-      defaultConfig.placement = 'bottom-end';
-      return defaultConfig;
+      const modifiers = Array.isArray(defaultConfig?.modifiers)
+        ? defaultConfig.modifiers.map(cloneModifier)
+        : defaultConfig?.modifiers;
+      return { ...defaultConfig, modifiers, placement: 'bottom-end' };
     },
     ...options,
   });
