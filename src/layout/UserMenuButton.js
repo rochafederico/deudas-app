@@ -15,6 +15,7 @@ export class UserMenuButton extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._popoverController?.remove();
     this._popoverController = null;
     this._popover?.dispose();
     this._popover = null;

@@ -15,6 +15,7 @@ export class NotificationsButton extends HTMLElement {
   }
 
   disconnectedCallback() {
+    this._popoverController?.remove();
     this._popoverController = null;
     window.removeEventListener('app:upcoming-panel', this._onUpcomingPanel);
     this._popover?.dispose();
