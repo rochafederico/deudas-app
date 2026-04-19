@@ -15,6 +15,7 @@ import {
     buildUpcomingPaymentsHTML,
     showInAppPanel
 } from '../src/features/notifications/NotificationService.js';
+import { bindNavbarPopoverInteractions, createNavbarPopover } from '../src/layout/navbarPopoversController.js';
 
 function localDate(year, month, day) {
     return new Date(year, month - 1, day, 12, 0, 0);
@@ -661,6 +662,83 @@ async function testCheckAndNotifyEmptyAlwaysShowsPanel() {
     window.removeEventListener('app:upcoming-panel', handler);
 }
 
+// ===================================================================
+// UC17: navbarPopoversController – wiring compartido de popovers
+// ===================================================================
+async function testNavbarPopoverControllerSharedWiring() {
+    console.log('  UC17: bindNavbarPopoverInteractions centraliza shown/hidden y exclusión mutua');
+
+    const hostBtn = document.createElement('button');
+    hostBtn.id = 'host-popover-btn';
+    document.body.appendChild(hostBtn);
+
+    const otherBtn = document.createElement('button');
+    otherBtn.id = 'other-popover-btn';
+    document.body.appendChild(otherBtn);
+
+    const popover = { hideCalls: 0, hide() { this.hideCalls += 1; } };
+    let shownCalls = 0;
+    let hiddenCalls = 0;
+
+    const unbind = bindNavbarPopoverInteractions({
+        button: hostBtn,
+        getPopover: () => popover,
+        onShown: () => { shownCalls += 1; },
+        onHidden: () => { hiddenCalls += 1; }
+    });
+
+    hostBtn.dispatchEvent(new Event('shown.bs.popover'));
+    assert(shownCalls === 1, 'Disparar shown.bs.popover en el botón host ejecuta onShown');
+
+    otherBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert(popover.hideCalls === 1, 'Abrir otro popover dispara exclusión mutua y oculta el popover host');
+
+    hostBtn.dispatchEvent(new Event('hidden.bs.popover'));
+    assert(hiddenCalls === 1, 'Disparar hidden.bs.popover en el botón host ejecuta onHidden');
+
+    unbind();
+    hostBtn.dispatchEvent(new Event('shown.bs.popover'));
+    otherBtn.dispatchEvent(new Event('shown.bs.popover', { bubbles: true }));
+    assert(shownCalls === 1, 'Luego de unbind, shown no vuelve a ejecutarse');
+    assert(popover.hideCalls === 1, 'Luego de unbind, la exclusión mutua ya no dispara hide');
+
+    document.body.removeChild(hostBtn);
+    document.body.removeChild(otherBtn);
+}
+
+// ===================================================================
+// UC18: navbarPopoversController – factory de popover de navbar
+// ===================================================================
+async function testNavbarPopoverControllerCreatePopoverFactory() {
+    console.log('  UC18: createNavbarPopover aplica defaults de navbar sin perder opciones');
+
+    const originalBootstrap = window.bootstrap;
+    let capturedButton = null;
+    let capturedOptions = null;
+    const MockPopover = class {
+        constructor(el, opts) {
+            capturedButton = el;
+            capturedOptions = opts;
+        }
+    };
+    window.bootstrap = { Popover: MockPopover };
+
+    const btn = document.createElement('button');
+    btn.id = 'factory-test-btn';
+    const popover = createNavbarPopover(btn, { html: true, content: '<p>ok</p>' });
+    assert(popover instanceof MockPopover, 'createNavbarPopover devuelve una instancia de bootstrap.Popover');
+    assert(capturedButton === btn, 'createNavbarPopover usa el botón recibido');
+    assert(capturedOptions?.trigger === 'click', 'El trigger por defecto se mantiene en click');
+    assert(capturedOptions?.container === 'body', 'El contenedor por defecto se mantiene en body');
+    assert(capturedOptions?.placement === 'bottom', 'El placement base se mantiene en bottom');
+    assert(capturedOptions?.html === true, 'Las opciones personalizadas se mantienen');
+
+    const popperConfigResult = capturedOptions?.popperConfig({ placement: 'bottom' });
+    assert(popperConfigResult?.placement === 'bottom-end', 'popperConfig ajusta el placement final a bottom-end');
+
+    window.bootstrap = originalBootstrap;
+}
+
 export const tests = [
     testGetUpcomingPayments,
     testGetUpcomingPaymentsShape,
@@ -681,4 +759,6 @@ export const tests = [
     testNotificationPopoverCloseButtonAndBadge,
     testBuildUpcomingPaymentsHTMLEmpty,
     testCheckAndNotifyEmptyAlwaysShowsPanel,
+    testNavbarPopoverControllerSharedWiring,
+    testNavbarPopoverControllerCreatePopoverFactory,
 ];
