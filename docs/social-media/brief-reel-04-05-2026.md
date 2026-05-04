@@ -53,6 +53,73 @@
 
 > **Total a pagar este mes: $ 130.900**
 
+#### JSON para importar en Nivva
+
+Copiá el bloque de abajo y guardalo como `datos-demo-reel.json`. Luego usá **Ajustes → Importar datos** en la app para cargarlo.
+
+```json
+{
+  "deudas": [
+    {
+      "acreedor": "Banco Nación",
+      "tipoDeuda": "Préstamo",
+      "notas": "Datos ficticios — demo reel 04/05",
+      "montos": [
+        {
+          "monto": 18500,
+          "moneda": "ARS",
+          "vencimiento": "2026-05-10",
+          "periodo": "2026-05",
+          "pagado": false
+        }
+      ]
+    },
+    {
+      "acreedor": "Expensas",
+      "tipoDeuda": "Servicio",
+      "notas": "Datos ficticios — demo reel 04/05",
+      "montos": [
+        {
+          "monto": 42000,
+          "moneda": "ARS",
+          "vencimiento": "2026-05-05",
+          "periodo": "2026-05",
+          "pagado": false
+        }
+      ]
+    },
+    {
+      "acreedor": "Tarjeta Visa",
+      "tipoDeuda": "Tarjeta de crédito",
+      "notas": "Datos ficticios — demo reel 04/05",
+      "montos": [
+        {
+          "monto": 67200,
+          "moneda": "ARS",
+          "vencimiento": "2026-05-15",
+          "periodo": "2026-05",
+          "pagado": false
+        }
+      ]
+    },
+    {
+      "acreedor": "Netflix",
+      "tipoDeuda": "Servicio",
+      "notas": "Datos ficticios — demo reel 04/05",
+      "montos": [
+        {
+          "monto": 3200,
+          "moneda": "ARS",
+          "vencimiento": "2026-05-08",
+          "periodo": "2026-05",
+          "pagado": false
+        }
+      ]
+    }
+  ]
+}
+```
+
 ---
 
 ## 🎨 Especificaciones visuales
