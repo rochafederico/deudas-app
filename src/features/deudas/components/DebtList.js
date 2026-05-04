@@ -229,11 +229,11 @@ export class DebtList extends HTMLElement {
         const fmt = (moneda, n) => this.fmtMoneda(moneda, n || 0);
 
         const pendienteItems = [...currencies]
-            .filter(m => Number(pendiente[m]) !== 0)
+            .filter(m => Number(pendiente[m]) > 0)
             .map(m => `<span class="badge text-bg-warning me-1">${fmt(m, pendiente[m])}</span>`)
             .join('');
         const pagadoItems = [...currencies]
-            .filter(m => Number(pagado[m]) !== 0)
+            .filter(m => Number(pagado[m]) > 0)
             .map(m => `<span class="badge text-bg-success me-1">${fmt(m, pagado[m])}</span>`)
             .join('');
 

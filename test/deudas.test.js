@@ -1211,6 +1211,204 @@ async function testDebtEntityShellCuotasView() {
     await cleanup();
 }
 
+// ===================================================================
+// UC-DL1: DebtList._renderTotals — barra con pendiente y pagado por moneda
+// ===================================================================
+async function testDebtListRenderTotalsPendienteYPagado() {
+    console.log('  DebtList._renderTotals: muestra badges de pendiente y pagado por moneda');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    list.totalesPendientes = { ARS: 15000, USD: 100 };
+    list.totalesPagados = { ARS: 5000 };
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('.debt-list-totals');
+    assert(totalsEl !== null, 'Debe existir .debt-list-totals');
+
+    const pendienteBadges = totalsEl.querySelectorAll('.badge.text-bg-warning');
+    assert(pendienteBadges.length === 2, 'Debe mostrar 2 badges de pendiente (ARS y USD)');
+
+    const pagadoBadges = totalsEl.querySelectorAll('.badge.text-bg-success');
+    assert(pagadoBadges.length === 1, 'Debe mostrar 1 badge de pagado (ARS)');
+
+    const pendienteLabel = totalsEl.querySelector('.text-muted.small');
+    assert(pendienteLabel !== null && pendienteLabel.textContent.includes('Pendiente'), 'Debe mostrar etiqueta Pendiente');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL2: DebtList._renderTotals — no renderiza barra cuando todos los totales son 0
+// ===================================================================
+async function testDebtListRenderTotalsVacioSiTodosCero() {
+    console.log('  DebtList._renderTotals: no renderiza barra cuando todos los totales son 0');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    // First confirm it renders when there is a non-zero value
+    list.totalesPendientes = { ARS: 500 };
+    list.totalesPagados = {};
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('.debt-list-totals');
+    assert(totalsEl.innerHTML.trim() !== '', 'Debe tener contenido cuando hay totales no-cero');
+
+    // All zero: bar must be cleared
+    list.totalesPendientes = { ARS: 0 };
+    list.totalesPagados = { ARS: 0 };
+    list._renderTotals();
+
+    assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando todos los totales son 0');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL3: DebtList._renderTotals — actualiza la barra al cambiar totales
+// ===================================================================
+async function testDebtListRenderTotalsActualizaTrasRefresh() {
+    console.log('  DebtList._renderTotals: actualiza la barra al setear nuevos totales');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    // Initial render: only pendiente USD
+    list.totalesPendientes = { USD: 200 };
+    list.totalesPagados = {};
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('.debt-list-totals');
+    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 1, 'Inicial: 1 badge pendiente');
+    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 0, 'Inicial: sin badges pagado');
+
+    // Update: two currencies pending, one pagado
+    list.totalesPendientes = { USD: 200, ARS: 8000 };
+    list.totalesPagados = { ARS: 3000 };
+    list._renderTotals();
+
+    assert(totalsEl.querySelectorAll('.badge.text-bg-warning').length === 2, 'Tras update: 2 badges pendiente');
+    assert(totalsEl.querySelectorAll('.badge.text-bg-success').length === 1, 'Tras update: 1 badge pagado');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DL4: DebtList._renderTotals — barra vacía cuando currencies están ausentes
+// ===================================================================
+async function testDebtListRenderTotalsNoCurrencies() {
+    console.log('  DebtList._renderTotals: no renderiza barra sin monedas');
+
+    const list = document.createElement('debt-list');
+    document.body.appendChild(list);
+    list.render();
+
+    list.totalesPendientes = {};
+    list.totalesPagados = {};
+    list._renderTotals();
+
+    const totalsEl = list.querySelector('.debt-list-totals');
+    assert(totalsEl.innerHTML.trim() === '', 'No debe renderizar barra cuando no hay monedas');
+
+    document.body.removeChild(list);
+}
+
+// ===================================================================
+// UC-DS7: DebtEntityShell._renderTotalesBar — agrega pendiente por moneda
+// ===================================================================
+async function testDebtEntityShellTotalesBarPorMoneda() {
+    console.log('  DebtEntityShell._renderTotalesBar: muestra pendiente total agregado por moneda');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [
+        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false },
+        { monto: 5000,  moneda: 'ARS', vencimiento: '2026-07-01', pagado: false },
+        { monto: 50,    moneda: 'USD', vencimiento: '2026-06-01', pagado: false }
+    ];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Multi', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    const badges = container.querySelectorAll('.badge.text-bg-warning');
+    assert(badges.length === 2, 'Debe mostrar 2 badges de pendiente (ARS y USD)');
+
+    const totalsBar = container.querySelector('.border-top');
+    assert(totalsBar !== null, 'Debe existir la barra de totales con borde superior');
+    assert(totalsBar.textContent.includes('Pendiente total'), 'Barra debe mostrar etiqueta "Pendiente total"');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS8: DebtEntityShell._renderTotalesBar — sin barra cuando todo está pagado
+// ===================================================================
+async function testDebtEntityShellTotalesBarSinPendiente() {
+    console.log('  DebtEntityShell._renderTotalesBar: no muestra barra cuando no hay pendiente');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+    form.montos = [
+        { monto: 10000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: true }
+    ];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Banco Pagado', tipoDeuda: 'Prestamo', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    const totalsBar = container.querySelector('.border-top');
+    assert(totalsBar === null, 'No debe mostrar barra de totales cuando todos los montos están pagados');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
+// ===================================================================
+// UC-DS9: DebtEntityShell._renderTotalesBar — varias entidades se agregan
+// ===================================================================
+async function testDebtEntityShellTotalesBarAgregaVariasEntidades() {
+    console.log('  DebtEntityShell._renderTotalesBar: agrega pendiente de varias entidades por moneda');
+    await cleanup();
+
+    const form = document.createElement('debt-form');
+    document.body.appendChild(form);
+
+    form.montos = [{ monto: 20000, moneda: 'ARS', vencimiento: '2026-06-01', pagado: false }];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad A', tipoDeuda: 'Prestamo', notas: '' } });
+    form.reset();
+
+    form.montos = [{ monto: 8000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false }];
+    await form.handleSubmit({ preventDefault: () => {}, detail: { acreedor: 'Entidad B', tipoDeuda: 'Tarjeta', notas: '' } });
+    document.body.removeChild(form);
+
+    const shell = document.createElement('debt-entity-shell');
+    document.body.appendChild(shell);
+    await shell.loadEntities();
+
+    const container = shell.querySelector('#entity-table-container');
+    // One ARS badge aggregating both entities (20000 + 8000 = 28000)
+    const badges = container.querySelectorAll('.badge.text-bg-warning');
+    assert(badges.length === 1, 'Debe mostrar 1 badge ARS aggregando ambas entidades');
+
+    document.body.removeChild(shell);
+    await cleanup();
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -1241,5 +1439,12 @@ export const tests = [
     testDebtEntityShellRecargaAlGuardar,
     testDebtEntityShellCuotasFormato,
     testDebtEntityShellNavTabsRender,
-    testDebtEntityShellCuotasView
+    testDebtEntityShellCuotasView,
+    testDebtListRenderTotalsPendienteYPagado,
+    testDebtListRenderTotalsVacioSiTodosCero,
+    testDebtListRenderTotalsActualizaTrasRefresh,
+    testDebtListRenderTotalsNoCurrencies,
+    testDebtEntityShellTotalesBarPorMoneda,
+    testDebtEntityShellTotalesBarSinPendiente,
+    testDebtEntityShellTotalesBarAgregaVariasEntidades
 ];
