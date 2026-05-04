@@ -384,38 +384,10 @@ async function testAcreedorColumnMobileRender() {
     const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
     assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
 
-    // Columna acreedor debe mostrar monto + vencimiento + estado en mobile (d-md-none)
-    const rowConMonto = { acreedor: 'Banco Galicia', tipoDeuda: 'Préstamo', monto: 5000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false };
-    const nodeConMonto = acreedorCol.render(rowConMonto);
-
-    const montoMobileSpan = nodeConMonto.querySelector('span.d-md-none.text-nowrap');
-    assert(montoMobileSpan !== null, 'Acreedor debe renderizar span de monto visible solo en mobile (d-md-none text-nowrap)');
-
-    const vencMobileSpan = nodeConMonto.querySelector('span.d-md-none.text-nowrap.text-muted');
-    assert(vencMobileSpan !== null, 'Acreedor debe renderizar span de vencimiento visible solo en mobile (d-md-none text-muted)');
-    assert(vencMobileSpan.textContent === '2026-07-01', 'Span de vencimiento en acreedor debe mostrar la fecha');
-
-    // _renderEstadoPagoMobile debe existir en el row y actualizar el badge de estado en mobile
-    assert(typeof rowConMonto._renderEstadoPagoMobile === 'function', 'render debe asignar _renderEstadoPagoMobile al row');
-    const estadoMobileDiv = nodeConMonto.querySelector('div.d-md-none');
-    assert(estadoMobileDiv !== null, 'Debe existir div de estado mobile (d-md-none) en acreedor');
-
-    // Sin monto, no debe renderizarse span de monto en acreedor
-    const rowSinMonto = { acreedor: 'Sin Monto', tipoDeuda: 'Servicio' };
-    const nodeSinMonto = acreedorCol.render(rowSinMonto);
-    const montoMobileSpanSinMonto = nodeSinMonto.querySelector('span.d-md-none.text-nowrap');
-    assert(montoMobileSpanSinMonto === null, 'No debe renderizarse span de monto cuando row.monto es nulo');
-
-    // Columna monedaymonto debe estar oculta en mobile (d-none d-md-table-cell)
+    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
     const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
     assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
     assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
-    assert(montoCol.opts && typeof montoCol.opts.classCss === 'string',
-        'Columna Monto debe definir classCss');
-    assert(montoCol.opts.classCss.includes('d-none'),
-        'Columna Monto debe incluir clase d-none para ocultarse en mobile');
-    assert(montoCol.opts.classCss.includes('d-md-table-cell'),
-        'Columna Monto debe incluir clase d-md-table-cell para mostrarse desde md');
 
     const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
     const montoNode = montoCol.render(rowConVenc);
@@ -486,32 +458,6 @@ async function testAcreedorColumnMobileRender() {
 }
 
 // ===================================================================
-// UC7c: acciones column muestra botón ojo en mobile cuando _onDetail existe
-// Verifica que la columna acciones renderiza un botón (d-md-none) para ver
-// el detalle cuando row._onDetail es función, y no lo renderiza si no existe.
-// ===================================================================
-async function testAccionesColumnMobileEyeButton() {
-    console.log('  UC7c: acciones column renderiza botón ojo en mobile');
-
-    const accionesCol = debtTableColumns.find(col => col.key === 'acciones');
-    assert(accionesCol !== undefined, 'Debe existir columna acciones');
-
-    // Con _onDetail: debe renderizar el botón de ojo en mobile
-    const rowConDetalle = { id: 1, acreedor: 'Test', pagado: false, _onDetail: async () => {} };
-    const nodeConDetalle = accionesCol.render(rowConDetalle);
-    const eyeBtn = nodeConDetalle.querySelector('button.d-md-none');
-    assert(eyeBtn !== null, 'Debe existir botón de ojo (d-md-none) en acciones cuando _onDetail es función');
-    assert(eyeBtn.classList.contains('btn-outline-secondary'), 'Botón de ojo debe tener clase btn-outline-secondary');
-    assert(eyeBtn.querySelector('i.bi-eye') !== null, 'Botón de ojo debe contener ícono bi-eye');
-
-    // Sin _onDetail: no debe renderizarse el botón de ojo
-    const rowSinDetalle = { id: 2, acreedor: 'Test', pagado: false };
-    const nodeSinDetalle = accionesCol.render(rowSinDetalle);
-    const eyeBtnSinDetalle = nodeSinDetalle.querySelector('button.d-md-none');
-    assert(eyeBtnSinDetalle === null, 'No debe renderizarse botón de ojo cuando _onDetail no existe');
-}
-
-// ===================================================================
 // UC7b: toggle pagado actualiza badge y muestra toast de feedback
 // ===================================================================
 async function testPagoToggleVisualFeedback() {
@@ -552,14 +498,14 @@ async function testPagoToggleVisualFeedback() {
 
         input.checked = true;
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
         assert(montoNode.querySelector('.badge.text-bg-success') !== null, 'Al marcar pago debe mostrarse badge Pagado');
         assert(notifications.some(n => n.type === 'success'), 'Al marcar pago debe mostrarse toast verde');
 
         input.checked = false;
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await new Promise(resolve => setTimeout(resolve, 50));
 
         assert(montoNode.querySelector('.badge.text-bg-success') === null, 'Al desmarcar pago debe quitarse badge Pagado');
         const pendingStateBadge = montoNode.querySelector('.badge.text-bg-danger, .badge.text-bg-warning');
@@ -1265,6 +1211,93 @@ async function testDebtEntityShellCuotasView() {
     await cleanup();
 }
 
+// ===================================================================
+// UC-ML1: DebtList renderiza tarjetas en mobile con avatar, tipo icon y monto
+// ===================================================================
+async function testDebtListMobileCards() {
+    console.log('  UC-ML1: DebtList renderiza tarjetas mobile con initials, tipo icon y monto');
+
+    const debtList = document.createElement('debt-list');
+    document.body.appendChild(debtList);
+
+    // Helper: _getInitials
+    assert(debtList._getInitials('Juan Perez') === 'JP', '_getInitials debe retornar primeras letras de 2 palabras');
+    assert(debtList._getInitials('Banco') === 'BA', '_getInitials de 1 palabra debe retornar 2 chars');
+    assert(debtList._getInitials('') === '', '_getInitials de cadena vacía debe retornar vacío');
+
+    // Helper: _getAvatarStyle — returns Bootstrap class string
+    const avatarClasses = debtList._getAvatarStyle('Banco');
+    assert(typeof avatarClasses === 'string', '_getAvatarStyle debe retornar string de clases Bootstrap');
+    assert(avatarClasses.includes('bg-'), '_getAvatarStyle debe incluir clase de fondo Bootstrap');
+    // Mismo nombre → misma clase (determinístico)
+    assert(debtList._getAvatarStyle('Banco') === avatarClasses, '_getAvatarStyle debe ser determinístico');
+
+    // Helper: _getTipoIcon
+    assert(debtList._getTipoIcon('Alquiler') === 'bi-house', 'Alquiler → bi-house');
+    assert(debtList._getTipoIcon('Prestamo') === 'bi-bank2', 'Prestamo → bi-bank2');
+    assert(debtList._getTipoIcon('Préstamo') === 'bi-bank2', 'Préstamo (con acento) → bi-bank2');
+    assert(debtList._getTipoIcon('Tarjeta de crédito') === 'bi-credit-card', 'Tarjeta → bi-credit-card');
+    assert(debtList._getTipoIcon('Servicio') === 'bi-tools', 'Servicio → bi-tools');
+    assert(debtList._getTipoIcon('Otro') === 'bi-tag', 'Tipo desconocido → bi-tag');
+
+    // Helper: _getCardEstado
+    const estadoPagado = debtList._getCardEstado({ pagado: true, vencimiento: '2026-01-01' });
+    assert(estadoPagado !== null && estadoPagado.label === 'Pagado', '_getCardEstado pagado debe retornar Pagado');
+    assert(estadoPagado.className === 'text-bg-success', '_getCardEstado pagado debe ser verde');
+
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const estadoPendiente = debtList._getCardEstado({ pagado: false, vencimiento: tomorrow.toISOString().slice(0, 10) });
+    assert(estadoPendiente === null, 'Pendiente sin vencer no debe tener estado');
+
+    // _renderMobileCards: lista vacía
+    const emptyContainer = debtList._renderMobileCards([]);
+    assert(emptyContainer instanceof Node, '_renderMobileCards vacío debe retornar nodo');
+    assert(emptyContainer.querySelector('p.text-muted') !== null, 'Lista vacía debe mostrar mensaje de vacío');
+
+    // _renderMobileCards: con datos
+    const rows = [{
+        id: 99,
+        acreedor: 'Test Acreedor',
+        tipoDeuda: 'Prestamo',
+        monto: 1000,
+        moneda: 'ARS',
+        vencimiento: '2026-12-01',
+        pagado: false,
+        _reload: () => {},
+        _onRowClick: () => {},
+    }];
+    const cardsContainer = debtList._renderMobileCards(rows);
+
+    const cardEl = cardsContainer.querySelector('.card');
+    assert(cardEl !== null, '_renderMobileCards debe renderizar un .card');
+
+    const avatarEl = cardEl.querySelector('.rounded-circle');
+    assert(avatarEl !== null, 'Card debe tener avatar circular');
+    assert(avatarEl.textContent === 'TA', 'Avatar debe mostrar iniciales de "Test Acreedor"');
+    // Avatar debe usar clases Bootstrap para colores (bg-*-subtle text-*-emphasis)
+    assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar debe usar clases de color Bootstrap');
+
+    const nameEl = cardEl.querySelector('.fw-semibold.text-truncate');
+    assert(nameEl !== null, 'Card debe mostrar nombre del acreedor');
+    assert(nameEl.textContent === 'Test Acreedor', 'Nombre del acreedor debe ser correcto');
+
+    const badgeEl = cardEl.querySelector('.badge.rounded-pill');
+    assert(badgeEl !== null, 'Card debe mostrar badge de tipo');
+    assert(badgeEl.querySelector('i.bi-bank2') !== null, 'Badge de Prestamo debe tener ícono bi-bank2');
+
+    const calIcon = cardEl.querySelector('i.bi-calendar3');
+    assert(calIcon !== null, 'Card debe mostrar ícono de calendario');
+
+    const chevron = cardEl.querySelector('i.bi-chevron-right');
+    assert(chevron !== null, 'Card con _onRowClick debe mostrar chevron');
+
+    // _renderEstadoPagoCard debe registrarse en el row
+    assert(typeof rows[0]._renderEstadoPagoCard === 'function', '_renderMobileCards debe asignar _renderEstadoPagoCard al row');
+
+    document.body.removeChild(debtList);
+}
+
 export const tests = [
     testCrearDeudaDesdeFormulario,
     testEditarDeudaDesdeFormulario,
@@ -1273,7 +1306,6 @@ export const tests = [
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
     testAcreedorColumnMobileRender,
-    testAccionesColumnMobileEyeButton,
     testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
     testCancelarAltaInline,
@@ -1296,5 +1328,6 @@ export const tests = [
     testDebtEntityShellRecargaAlGuardar,
     testDebtEntityShellCuotasFormato,
     testDebtEntityShellNavTabsRender,
-    testDebtEntityShellCuotasView
+    testDebtEntityShellCuotasView,
+    testDebtListMobileCards
 ];

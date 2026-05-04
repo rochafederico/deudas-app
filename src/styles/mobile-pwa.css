@@ -2,6 +2,17 @@
     --touch-target-size: 44px;
 }
 
+.debt-card-avatar {
+    width: var(--touch-target-size);
+    height: var(--touch-target-size);
+    min-width: var(--touch-target-size);
+    font-size: .875rem;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
 @media (pointer: coarse) {
     button,
     .btn,

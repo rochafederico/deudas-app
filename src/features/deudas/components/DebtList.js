@@ -1,5 +1,6 @@
 import '../../../shared/components/AppButton.js';
 import '../../../shared/components/AppTable.js';
+import '../../../shared/components/AppCheckbox.js';
 import { debtTableColumns } from '../../../shared/config/tables/debtTableColumns.js';
 import './DebtDetailModal.js';
 import { getSelectedMonth } from '../../../shared/MonthFilter.js';
@@ -130,7 +131,6 @@ export class DebtList extends HTMLElement {
             columns = [...columns, {
                 key: 'ver-deuda',
                 label: '',
-                opts: { classCss: 'd-none d-md-table-cell' },
                 render: row => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
@@ -173,11 +173,25 @@ export class DebtList extends HTMLElement {
             return entry;
         });
 
-        // Renderizar AppTable
-        let table = this.querySelector('app-table');
+        // Renderizar vista móvil (cards) y vista escritorio (tabla)
+        let mobileSection = this.querySelector('.debt-mobile-cards');
+        if (!mobileSection) {
+            mobileSection = document.createElement('div');
+            mobileSection.className = 'debt-mobile-cards d-md-none';
+            this.insertBefore(mobileSection, this.querySelector('.debt-table-wrapper'));
+        }
+        mobileSection.replaceChildren(this._renderMobileCards(tableData));
+
+        let tableWrapper = this.querySelector('.debt-table-wrapper');
+        let table = tableWrapper ? tableWrapper.querySelector('app-table') : null;
         if (!table) {
+            if (!tableWrapper) {
+                tableWrapper = document.createElement('div');
+                tableWrapper.className = 'debt-table-wrapper d-none d-md-block';
+                this.appendChild(tableWrapper);
+            }
             table = document.createElement('app-table');
-            this.appendChild(table);
+            tableWrapper.appendChild(table);
         }
         table.columnsConfig = columns;
         table.tableData = tableData;
@@ -214,8 +228,193 @@ export class DebtList extends HTMLElement {
 
     render() {
         this.innerHTML = `
-            <app-table></app-table>
+            <div class="debt-mobile-cards d-md-none"></div>
+            <div class="debt-table-wrapper d-none d-md-block"><app-table></app-table></div>
         `;
+    }
+
+    _getInitials(name) {
+        const parts = (name || '').trim().split(/\s+/).filter(p => p.length > 0);
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+        return '';
+    }
+
+    _getAvatarStyle(name) {
+        const palettes = [
+            'bg-danger-subtle text-danger-emphasis',
+            'bg-warning-subtle text-warning-emphasis',
+            'bg-success-subtle text-success-emphasis',
+            'bg-primary-subtle text-primary-emphasis',
+            'bg-info-subtle text-info-emphasis',
+            'bg-secondary-subtle text-secondary-emphasis',
+            'bg-dark-subtle text-dark-emphasis',
+        ];
+        return palettes[(name?.charCodeAt(0) || 0) % palettes.length];
+    }
+
+    _getTipoIcon(tipo) {
+        const t = (tipo || '').toLowerCase();
+        if (t.includes('alquiler')) return 'bi-house';
+        if (t.includes('préstamo') || t.includes('prestamo')) return 'bi-bank2';
+        if (t.includes('tarjeta')) return 'bi-credit-card';
+        if (t.includes('servicio')) return 'bi-tools';
+        return 'bi-tag';
+    }
+
+    _getCardEstado(row) {
+        if (row.pagado) return { label: 'Pagado', className: 'text-bg-success' };
+        const v = String(row.vencimiento ?? '').trim();
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+        const today = new Date().toISOString().slice(0, 10);
+        if (v < today) return { label: 'Vencido', className: 'text-bg-danger' };
+        if (v === today) return { label: 'Vence hoy', className: 'text-bg-warning' };
+        return null;
+    }
+
+    _renderMobileCards(tableData) {
+        const container = document.createElement('div');
+        container.className = 'd-flex flex-column gap-2';
+
+        if (tableData.length === 0) {
+            const empty = document.createElement('p');
+            empty.className = 'text-muted text-center py-4 mb-0';
+            empty.textContent = 'No hay cuotas para este mes.';
+            container.appendChild(empty);
+            return container;
+        }
+
+        tableData.forEach(row => {
+            const card = document.createElement('div');
+            card.className = 'card border-0 shadow-sm rounded-3';
+            if (typeof row._onRowClick === 'function') {
+                card.classList.add('cursor-pointer');
+                card.addEventListener('click', () => row._onRowClick(row, card));
+            }
+
+            const body = document.createElement('div');
+            body.className = 'card-body px-3 py-3';
+
+            const flex = document.createElement('div');
+            flex.className = 'd-flex align-items-center gap-3';
+
+            // Avatar
+            const avClasses = this._getAvatarStyle(row.acreedor);
+            const avatar = document.createElement('div');
+            avatar.className = `debt-card-avatar d-flex align-items-center justify-content-center rounded-circle flex-shrink-0 fw-semibold ${avClasses}`;
+            avatar.textContent = this._getInitials(row.acreedor);
+            flex.appendChild(avatar);
+
+            // Info column
+            const info = document.createElement('div');
+            info.className = 'flex-grow-1 min-w-0';
+
+            const nameLine = document.createElement('div');
+            nameLine.className = 'fw-semibold text-truncate';
+            nameLine.textContent = row.acreedor ?? '';
+            info.appendChild(nameLine);
+
+            const tipoDeuda = String(row.tipoDeuda ?? '').trim();
+            if (tipoDeuda) {
+                const tipoWrap = document.createElement('div');
+                tipoWrap.className = 'mt-1';
+                const tipoBadge = document.createElement('span');
+                tipoBadge.className = 'badge rounded-pill bg-light text-secondary border fw-normal';
+                tipoBadge.innerHTML = `<i class="bi ${this._getTipoIcon(tipoDeuda)} me-1" aria-hidden="true"></i>${tipoDeuda}`;
+                tipoWrap.appendChild(tipoBadge);
+                info.appendChild(tipoWrap);
+            }
+
+            const vencimiento = String(row.vencimiento ?? '').trim();
+            if (vencimiento) {
+                const vencLine = document.createElement('div');
+                vencLine.className = 'text-muted small mt-1';
+                vencLine.innerHTML = `<i class="bi bi-calendar3 me-1" aria-hidden="true"></i>${vencimiento}`;
+                info.appendChild(vencLine);
+            }
+
+            flex.appendChild(info);
+
+            // Right column: amount, estado badge, toggle, chevron
+            const rightCol = document.createElement('div');
+            rightCol.className = 'd-flex flex-column align-items-end flex-shrink-0 gap-1';
+            rightCol.addEventListener('click', e => e.stopPropagation());
+
+            const amountDiv = document.createElement('div');
+            amountDiv.className = 'fw-semibold text-nowrap';
+            amountDiv.textContent = this.fmtMoneda(row.moneda, row.monto);
+            rightCol.appendChild(amountDiv);
+
+            // Estado badge (keeps in sync with toggle)
+            const estadoDiv = document.createElement('div');
+            const renderEstadoCard = () => {
+                estadoDiv.innerHTML = '';
+                const estado = this._getCardEstado(row);
+                if (estado) {
+                    const badge = document.createElement('span');
+                    badge.className = `badge ${estado.className} text-nowrap`;
+                    badge.textContent = estado.label;
+                    estadoDiv.appendChild(badge);
+                }
+            };
+            row._renderEstadoPagoCard = renderEstadoCard;
+            renderEstadoCard();
+            rightCol.appendChild(estadoDiv);
+
+            // Toggle (app-checkbox)
+            const checkId = `card-cb-${row.id != null ? row.id : Math.random().toString(36).slice(2)}`;
+            const appCheckbox = document.createElement('app-checkbox');
+            appCheckbox.inputId = checkId;
+            appCheckbox.checked = !!row.pagado;
+            appCheckbox.title = 'Marcar como pagado';
+            appCheckbox.addEventListener('checkbox-change', async (e) => {
+                const { setPagado } = await import('../../montos/montoRepository.js');
+                const nextChecked = !!e.detail.checked;
+                const previousChecked = !!row.pagado;
+                row.pagado = nextChecked;
+                renderEstadoCard();
+                if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                try {
+                    await setPagado(row.id, nextChecked);
+                    window.dispatchEvent(new CustomEvent('app:notify', {
+                        detail: {
+                            message: nextChecked
+                                ? '✅ Cuota marcada como pagada.'
+                                : '⚠️ Cuota marcada como pendiente.',
+                            type: nextChecked ? 'success' : 'warning'
+                        }
+                    }));
+                    if (typeof row._reload === 'function') row._reload();
+                } catch {
+                    row.pagado = previousChecked;
+                    appCheckbox.checked = previousChecked;
+                    renderEstadoCard();
+                    if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                    window.dispatchEvent(new CustomEvent('app:notify', {
+                        detail: {
+                            message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',
+                            type: 'danger'
+                        }
+                    }));
+                }
+            });
+            rightCol.appendChild(appCheckbox);
+
+            // Chevron (visual affordance for detail navigation)
+            if (typeof row._onRowClick === 'function') {
+                const chevron = document.createElement('i');
+                chevron.className = 'bi bi-chevron-right text-muted small';
+                chevron.setAttribute('aria-hidden', 'true');
+                rightCol.appendChild(chevron);
+            }
+
+            flex.appendChild(rightCol);
+            body.appendChild(flex);
+            card.appendChild(body);
+            container.appendChild(card);
+        });
+
+        return container;
     }
 
     groupMontos(montos, groupBy) {
