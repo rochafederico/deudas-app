@@ -4,6 +4,7 @@ import { assert } from './setup.js';
 import { deleteDeudas, listDeudas, getDeuda, addOrMergeDeuda } from '../src/features/deudas/deudaRepository.js';
 import { listMontos } from '../src/features/montos/montoRepository.js';
 import { debtTableColumns } from '../src/shared/config/tables/debtTableColumns.js';
+import { getInitials, getAvatarClasses, getTipoIcon, getEstado } from '../src/features/deudas/components/DebtRowItem.js';
 
 // Import DebtDetailModal component
 import '../src/features/deudas/components/DebtDetailModal.js';
@@ -1212,51 +1213,39 @@ async function testDebtEntityShellCuotasView() {
 }
 
 // ===================================================================
-// UC-ML1: DebtList renderiza tarjetas en mobile con avatar, tipo icon y monto
+// UC-ML1: DebtRowItem Web Component — renderiza <tr> + <td> responsivos Bootstrap
 // ===================================================================
-async function testDebtListMobileCards() {
-    console.log('  UC-ML1: DebtList renderiza tarjetas mobile con initials, tipo icon y monto');
+async function testDebtRowItem() {
+    console.log('  UC-ML1: DebtRowItem renderiza tr+td con helpers Bootstrap');
 
-    const debtList = document.createElement('debt-list');
-    document.body.appendChild(debtList);
+    // Helpers de módulo (getInitials, getAvatarClasses, getTipoIcon, getEstado)
+    assert(getInitials('Juan Perez') === 'JP', 'getInitials: 2 palabras → primeras letras');
+    assert(getInitials('Banco') === 'BA', 'getInitials: 1 palabra → 2 chars');
+    assert(getInitials('') === '', 'getInitials: cadena vacía → vacío');
 
-    // Helper: _getInitials
-    assert(debtList._getInitials('Juan Perez') === 'JP', '_getInitials debe retornar primeras letras de 2 palabras');
-    assert(debtList._getInitials('Banco') === 'BA', '_getInitials de 1 palabra debe retornar 2 chars');
-    assert(debtList._getInitials('') === '', '_getInitials de cadena vacía debe retornar vacío');
+    const avClasses = getAvatarClasses('Banco');
+    assert(typeof avClasses === 'string', 'getAvatarClasses debe retornar string');
+    assert(avClasses.includes('bg-'), 'getAvatarClasses debe incluir clase de fondo Bootstrap');
+    assert(getAvatarClasses('Banco') === avClasses, 'getAvatarClasses debe ser determinístico');
 
-    // Helper: _getAvatarStyle — returns Bootstrap class string
-    const avatarClasses = debtList._getAvatarStyle('Banco');
-    assert(typeof avatarClasses === 'string', '_getAvatarStyle debe retornar string de clases Bootstrap');
-    assert(avatarClasses.includes('bg-'), '_getAvatarStyle debe incluir clase de fondo Bootstrap');
-    // Mismo nombre → misma clase (determinístico)
-    assert(debtList._getAvatarStyle('Banco') === avatarClasses, '_getAvatarStyle debe ser determinístico');
+    assert(getTipoIcon('Alquiler') === 'bi-house', 'Alquiler → bi-house');
+    assert(getTipoIcon('Prestamo') === 'bi-bank2', 'Prestamo → bi-bank2');
+    assert(getTipoIcon('Préstamo') === 'bi-bank2', 'Préstamo (con acento) → bi-bank2');
+    assert(getTipoIcon('Tarjeta de crédito') === 'bi-credit-card', 'Tarjeta → bi-credit-card');
+    assert(getTipoIcon('Servicio') === 'bi-tools', 'Servicio → bi-tools');
+    assert(getTipoIcon('Otro') === 'bi-tag', 'Tipo desconocido → bi-tag');
 
-    // Helper: _getTipoIcon
-    assert(debtList._getTipoIcon('Alquiler') === 'bi-house', 'Alquiler → bi-house');
-    assert(debtList._getTipoIcon('Prestamo') === 'bi-bank2', 'Prestamo → bi-bank2');
-    assert(debtList._getTipoIcon('Préstamo') === 'bi-bank2', 'Préstamo (con acento) → bi-bank2');
-    assert(debtList._getTipoIcon('Tarjeta de crédito') === 'bi-credit-card', 'Tarjeta → bi-credit-card');
-    assert(debtList._getTipoIcon('Servicio') === 'bi-tools', 'Servicio → bi-tools');
-    assert(debtList._getTipoIcon('Otro') === 'bi-tag', 'Tipo desconocido → bi-tag');
-
-    // Helper: _getCardEstado
-    const estadoPagado = debtList._getCardEstado({ pagado: true, vencimiento: '2026-01-01' });
-    assert(estadoPagado !== null && estadoPagado.label === 'Pagado', '_getCardEstado pagado debe retornar Pagado');
-    assert(estadoPagado.className === 'text-bg-success', '_getCardEstado pagado debe ser verde');
+    const estadoPagado = getEstado({ pagado: true, vencimiento: '2026-01-01' });
+    assert(estadoPagado !== null && estadoPagado.label === 'Pagado', 'getEstado pagado → Pagado');
+    assert(estadoPagado.className === 'text-bg-success', 'getEstado pagado → verde');
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const estadoPendiente = debtList._getCardEstado({ pagado: false, vencimiento: tomorrow.toISOString().slice(0, 10) });
-    assert(estadoPendiente === null, 'Pendiente sin vencer no debe tener estado');
+    const estadoPendiente = getEstado({ pagado: false, vencimiento: tomorrow.toISOString().slice(0, 10) });
+    assert(estadoPendiente === null, 'Pendiente sin vencer → null');
 
-    // _renderMobileCards: lista vacía
-    const emptyContainer = debtList._renderMobileCards([]);
-    assert(emptyContainer instanceof Node, '_renderMobileCards vacío debe retornar nodo');
-    assert(emptyContainer.querySelector('p.text-muted') !== null, 'Lista vacía debe mostrar mensaje de vacío');
-
-    // _renderMobileCards: con datos
-    const rows = [{
+    // DebtRowItem: renderiza <tr> con celdas mobile (d-table-cell d-md-none) y desktop (d-none d-md-table-cell)
+    const row = {
         id: 99,
         acreedor: 'Test Acreedor',
         tipoDeuda: 'Prestamo',
@@ -1266,36 +1255,59 @@ async function testDebtListMobileCards() {
         pagado: false,
         _reload: () => {},
         _onRowClick: () => {},
-    }];
-    const cardsContainer = debtList._renderMobileCards(rows);
+    };
 
-    const cardEl = cardsContainer.querySelector('.card');
-    assert(cardEl !== null, '_renderMobileCards debe renderizar un .card');
+    // Necesitamos un <table><tbody> para que el componente funcione correctamente
+    const table = document.createElement('table');
+    const tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+    document.body.appendChild(table);
 
-    const avatarEl = cardEl.querySelector('.rounded-circle');
-    assert(avatarEl !== null, 'Card debe tener avatar circular');
+    const rowItem = document.createElement('debt-row-item');
+    rowItem.excludeColumns = [];
+    rowItem.showDetailAction = false;
+    rowItem.rowData = row;
+    tbody.appendChild(rowItem); // connectedCallback → _render()
+
+    const tr = rowItem.querySelector('tr');
+    assert(tr !== null, 'DebtRowItem debe renderizar un <tr>');
+
+    // Celdas mobile (d-table-cell d-md-none)
+    const mobileCells = tr.querySelectorAll('td.d-table-cell.d-md-none');
+    assert(mobileCells.length >= 2, 'Debe haber al menos 2 celdas mobile (d-table-cell d-md-none)');
+
+    // Avatar circular con iniciales
+    const avatarEl = tr.querySelector('.debt-card-avatar.rounded-circle');
+    assert(avatarEl !== null, 'DebtRowItem debe tener avatar circular con clase .debt-card-avatar');
     assert(avatarEl.textContent === 'TA', 'Avatar debe mostrar iniciales de "Test Acreedor"');
-    // Avatar debe usar clases Bootstrap para colores (bg-*-subtle text-*-emphasis)
-    assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar debe usar clases de color Bootstrap');
+    assert(avatarEl.className.includes('bg-') && avatarEl.className.includes('text-'), 'Avatar usa clases de color Bootstrap');
 
-    const nameEl = cardEl.querySelector('.fw-semibold.text-truncate');
-    assert(nameEl !== null, 'Card debe mostrar nombre del acreedor');
-    assert(nameEl.textContent === 'Test Acreedor', 'Nombre del acreedor debe ser correcto');
+    // Nombre del acreedor en mobile
+    const nameEl = tr.querySelector('.fw-semibold.text-truncate');
+    assert(nameEl !== null && nameEl.textContent === 'Test Acreedor', 'Debe mostrar nombre del acreedor');
 
-    const badgeEl = cardEl.querySelector('.badge.rounded-pill');
-    assert(badgeEl !== null, 'Card debe mostrar badge de tipo');
-    assert(badgeEl.querySelector('i.bi-bank2') !== null, 'Badge de Prestamo debe tener ícono bi-bank2');
+    // Badge de tipo con ícono Bootstrap Icons
+    const tipoBadge = tr.querySelector('.badge.rounded-pill');
+    assert(tipoBadge !== null, 'Debe renderizar badge de tipo');
+    assert(tipoBadge.querySelector('i.bi-bank2') !== null, 'Badge Prestamo debe tener bi-bank2');
 
-    const calIcon = cardEl.querySelector('i.bi-calendar3');
-    assert(calIcon !== null, 'Card debe mostrar ícono de calendario');
+    // Fecha con ícono de calendario
+    const calIcon = tr.querySelector('i.bi-calendar3');
+    assert(calIcon !== null, 'Debe mostrar ícono de calendario');
 
-    const chevron = cardEl.querySelector('i.bi-chevron-right');
-    assert(chevron !== null, 'Card con _onRowClick debe mostrar chevron');
+    // Chevron (affordance de navegación)
+    const chevron = tr.querySelector('i.bi-chevron-right');
+    assert(chevron !== null, 'Con _onRowClick debe mostrar chevron');
 
-    // _renderEstadoPagoCard debe registrarse en el row
-    assert(typeof rows[0]._renderEstadoPagoCard === 'function', '_renderMobileCards debe asignar _renderEstadoPagoCard al row');
+    // Celdas desktop (d-none d-md-table-cell)
+    const desktopCells = tr.querySelectorAll('td.d-none.d-md-table-cell');
+    assert(desktopCells.length >= 4, 'Debe haber al menos 4 celdas desktop');
 
-    document.body.removeChild(debtList);
+    // _renderEstadoPago y _renderEstadoPagoCard deben quedar registrados en el row
+    assert(typeof row._renderEstadoPago === 'function', 'Debe exponer _renderEstadoPago en el row');
+    assert(typeof row._renderEstadoPagoCard === 'function', 'Debe exponer _renderEstadoPagoCard en el row');
+
+    document.body.removeChild(table);
 }
 
 export const tests = [
@@ -1329,5 +1341,5 @@ export const tests = [
     testDebtEntityShellCuotasFormato,
     testDebtEntityShellNavTabsRender,
     testDebtEntityShellCuotasView,
-    testDebtListMobileCards
+    testDebtRowItem
 ];
