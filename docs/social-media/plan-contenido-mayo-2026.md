@@ -202,7 +202,7 @@
 
 | Mes/Año | Semana | Fecha | Pilar | Formato | Persona objetivo |
 |---|---|---|---|---|---|
-| Mayo 2026 | Semana 1 | 04/05 | Presentación de marca | Reel (8–12 seg) | Ana / Claudia |
+| Mayo 2026 | Semana 1 | 04/05 | Presentación de marca | Reel | Ana / Claudia |
 | Mayo 2026 | Semana 1 | 06/05 | Funcionalidad destacada | Carrusel | Facundo |
 | Mayo 2026 | Semana 1 | 08/05 | Identificación con el usuario | Post estático | Facundo / Claudia |
 | Mayo 2026 | Semana 2 | 11/05 | Funcionalidad destacada | Reel | Ana / Facundo |
