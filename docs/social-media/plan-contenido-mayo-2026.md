@@ -165,7 +165,7 @@
 >
 > Registrá plazo fijo, cripto, dólares, acciones — lo que sea.
 >
-> Ve el total invertido por moneda y seguí cómo evoluciona con cada nuevo valor que cargás.
+> Mirá el total invertido por moneda y seguí cómo evoluciona con cada nuevo valor que cargás.
 >
 > `#Nivva #inversiones #finanzaspersonales #plazoFijo #Argentina #ahorro #cripto`
 
