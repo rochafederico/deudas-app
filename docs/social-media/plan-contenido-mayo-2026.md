@@ -139,7 +139,7 @@
 **Post 9 (23/05):**
 > Con Nivva, tus datos se guardan en tu dispositivo.
 >
-> Nada en la nube. Ningún servidor externo. Cero riesgo de que alguien más vea tu información.
+> Nada en la nube. Ningún servidor externo. Tu información no se sube ni se comparte con servidores externos.
 >
 > Vos controlás todo.
 >
