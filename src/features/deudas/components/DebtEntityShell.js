@@ -144,6 +144,7 @@ export class DebtEntityShell extends HTMLElement {
                     <tbody>${rows}</tbody>
                 </table>
             </div>
+            ${this._renderTotalesBar()}
         `;
 
         container.querySelectorAll('[data-detail-id]').forEach(btn => {
@@ -183,6 +184,28 @@ export class DebtEntityShell extends HTMLElement {
                 });
             });
         });
+    }
+
+    _renderTotalesBar() {
+        const totals = {};
+        this.entities.forEach(deuda => {
+            const pendientePorMoneda = this.computePendiente(deuda.montos || []);
+            Object.entries(pendientePorMoneda).forEach(([moneda, total]) => {
+                totals[moneda] = (totals[moneda] || 0) + Number(total);
+            });
+        });
+
+        if (Object.keys(totals).length === 0) return '';
+
+        const badges = Object.entries(totals)
+            .map(([moneda, total]) => `<span class="badge text-bg-warning me-1">${escapeHtml(this.fmtMoneda(moneda, total))}</span>`)
+            .join('');
+
+        return `
+            <div class="d-flex flex-wrap justify-content-end align-items-center gap-2 px-3 py-2 border-top text-end">
+                <span class="text-muted small me-1">Pendiente total:</span>${badges}
+            </div>
+        `;
     }
 
     async editDebt(deuda) {
