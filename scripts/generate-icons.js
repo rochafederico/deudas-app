@@ -5,7 +5,8 @@
  * Genera src/icons/icon-192.png y src/icons/icon-512.png con la marca Nivva.
  * Usa únicamente módulos built-in de Node.js — sin dependencias adicionales.
  *
- * Diseño: fondo teal Nivva rgb(61,121,130) + letra "N" blanca centrada.
+ * Diseño: fondo crema Nivva rgb(242,237,232) + isotipo V/chevron teal rgb(61,121,130),
+ * idéntico al estilo del favicon.ico existente.
  */
 
 import { deflateSync } from 'zlib';
@@ -17,8 +18,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'src', 'icons');
 mkdirSync(OUT_DIR, { recursive: true });
 
-const BG = [61, 121, 130];   // teal Nivva
-const FG = [255, 255, 255];  // blanco
+const BG = [242, 237, 232]; // crema Nivva (#F2EDE8) — mismo fondo que el favicon
+const FG = [61, 121, 130];   // teal Nivva (#3d7982)
 
 // ── CRC32 ────────────────────────────────────────────────────────────────────
 const CRC_TABLE = new Uint32Array(256);
@@ -82,35 +83,30 @@ function fillRect(rgb, W, x0, y0, x1, y1, r, g, b) {
 }
 
 /**
- * Dibuja una "N" estilizada compuesta por:
- *   • barra vertical izquierda
- *   • barra vertical derecha
- *   • banda diagonal de arriba-izquierda a abajo-derecha
+ * Dibuja el isotipo V/chevron de Nivva: dos brazos triangulares que convergen
+ * en un punto central inferior, formando el símbolo de escudo/V de la marca.
+ * Mismo diseño que el favicon.ico existente.
  */
-function drawN(rgb, W, H, [r, g, b]) {
-    const m   = Math.round(W * 0.15);   // margen lateral
-    const bw  = Math.round(W * 0.14);   // ancho de barra
-    const top = Math.round(H * 0.14);
-    const bot = Math.round(H * 0.86);
+function drawV(rgb, W, H, [r, g, b]) {
+    const topY   = Math.round(H * 0.08);  // borde superior del isotipo
+    const botY   = Math.round(H * 0.92);  // punta inferior
+    const tipX   = W >> 1;                // centro horizontal (punta del V)
+    const outerL = Math.round(W * 0.06);  // borde izquierdo del brazo izq.
+    const outerR = Math.round(W * 0.94);  // borde derecho del brazo der.
+    const sw     = Math.round(W * 0.19);  // ancho de cada brazo en la cima
 
-    // Barras verticales
-    fillRect(rgb, W, m,           top, m + bw,       bot, r, g, b);
-    fillRect(rgb, W, W - m - bw, top, W - m,         bot, r, g, b);
+    for (let y = topY; y <= botY; y++) {
+        const t = (y - topY) / (botY - topY); // 0 en cima → 1 en la punta
 
-    // Diagonal: de (m, top) a (W-m-bw, bot)
-    const dx = (W - m - bw) - m, dy = bot - top;
-    const len = Math.sqrt(dx * dx + dy * dy);
-    const ux = dx / len, uy = dy / len;
-    const halfBand = bw * 0.72;
+        // Brazo izquierdo: se estrecha linealmente hacia (tipX, botY)
+        const lx0 = Math.round(outerL        * (1 - t) + tipX * t);
+        const lx1 = Math.round((outerL + sw) * (1 - t) + tipX * t);
+        for (let x = lx0; x <= lx1; x++) setPixel(rgb, W, x, y, r, g, b);
 
-    for (let py = top; py < bot; py++) {
-        for (let px = m; px < W - m; px++) {
-            const ex = px - m, ey = py - top;
-            const cross = Math.abs(ex * uy - ey * ux);
-            const dot   = ex * ux + ey * uy;
-            if (cross < halfBand && dot >= 0 && dot <= len)
-                setPixel(rgb, W, px, py, r, g, b);
-        }
+        // Brazo derecho: se estrecha linealmente hacia (tipX, botY)
+        const rx0 = Math.round((outerR - sw) * (1 - t) + tipX * t);
+        const rx1 = Math.round(outerR        * (1 - t) + tipX * t);
+        for (let x = rx0; x <= rx1; x++) setPixel(rgb, W, x, y, r, g, b);
     }
 }
 
@@ -118,7 +114,7 @@ function drawN(rgb, W, H, [r, g, b]) {
 function generateIcon(size) {
     const rgb = new Uint8Array(size * size * 3);
     fillRect(rgb, size, 0, 0, size, size, ...BG);
-    drawN(rgb, size, size, FG);
+    drawV(rgb, size, size, FG);
     const png = encodePNG(size, size, rgb);
     const outPath = join(OUT_DIR, `icon-${size}.png`);
     writeFileSync(outPath, png);
