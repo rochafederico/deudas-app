@@ -37,7 +37,7 @@
 **Post 1 (05/05):**
 > Nivva es la app gratuita para registrar tus egresos, ingresos e inversiones — todo desde tu celular, sin que tus datos salgan de tu dispositivo.
 >
-> Sin suscripciones. Sin cuentas. Solo vos y tu plata.
+> Sin suscripciones. Sin cuentas. Solo vos y tus registros.
 >
 > Probala en el link de la bio 👇
 >
@@ -132,7 +132,7 @@
 >
 > Nivva la hace por vos.
 >
-> `#finanzaspersonales #balance #educacionfinanciera #Nivva #Argentina #plata`
+> `#finanzaspersonales #balance #educacionfinanciera #Nivva #Argentina #control`
 
 **Post 9 (23/05):**
 > Con Nivva, tus datos se guardan en tu dispositivo.
@@ -151,7 +151,7 @@
 | # | Fecha | Día | Pilar | Formato | Hook | CTA | Persona objetivo |
 |---|---|---|---|---|---|---|---|
 | 10 | 26/05 | Lunes | Funcionalidad destacada | Carrusel (3 slides) | ¿Invertís? Llevá el registro de todo en un solo lugar | ¿Ya usás la sección de inversiones? → link en bio | Ana |
-| 11 | 28/05 | Miércoles | Identificación con el usuario | Reel (15 seg) | '¿A dónde fue la plata?' — Historia universal | ¿Lo viviste? Dale ❤️ si te pasó | Facundo / Claudia |
+| 11 | 28/05 | Miércoles | Identificación con el usuario | Reel (15 seg) | '¿A dónde fueron tus gastos?' — Historia universal | ¿Lo viviste? Dale ❤️ si te pasó | Facundo / Claudia |
 | 12 | 30/05 | Viernes | Recap y CTA | Carrusel (4 slides) | Un mes de Nivva: todo lo que podés hacer, gratis | Probala gratis → link en bio | Ana / Facundo / Claudia |
 
 **Captions desarrollados:**
@@ -174,7 +174,7 @@
 >
 > Nivva es el primer paso para empezar a saber.
 >
-> `#Nivva #findemes #finanzaspersonales #Argentina #plata #gastosdelmes`
+> `#Nivva #findemes #finanzaspersonales #Argentina #gastosdelmes`
 
 **Post 12 (30/05) — Carrusel resumen:**
 > Registrá egresos y cuotas 📋
@@ -248,7 +248,7 @@
 | **Texto secundario** | Gris medio `#6B7280` — labels y metadatos |
 | **Tipografía** | Sans-serif bold para hooks; sans-serif regular para cuerpo |
 | **Logo** | Símbolo N+V (escudo teal) + wordmark NIVVA en negro |
-| **Tagline** | "Tu dinero, fácil y simple" |
+| **Tagline** | "Tus números, fácil y simple" |
 | **Registro** | Siempre "vos" (rioplatense). Nunca "tú". |
 
 ---
