@@ -10,7 +10,7 @@
 | Atributo | Valor |
 |---|---|
 | **Nombre de marca** | Nivva |
-| **Tagline** | Tu dinero, fácil y simple |
+| **Tagline** | Tus números, fácil y simple |
 | **Repositorio** | [rochafederico/deudas-app](https://github.com/rochafederico/deudas-app) |
 
 ---
@@ -52,7 +52,7 @@ El logotipo de Nivva combina un **símbolo** y un **wordmark**:
 
 No es un asesor financiero.  
 No es una app de presupuesto.  
-Es una herramienta de **registro y visibilidad** para quien quiere saber exactamente a dónde va su plata.
+Es una herramienta de **registro y visibilidad** para quien quiere saber exactamente a dónde van sus números.
 
 ---
 
