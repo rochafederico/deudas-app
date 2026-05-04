@@ -73,7 +73,7 @@
 ### Antes de editar
 - [ ] Guion grabado en ElevenLabs (voz rioplatense, tono tranquilo)
 - [ ] Capturas de pantalla tomadas con datos ficticios
-- [ ] Imágenes de "caos" seleccionadas (escena 1) — sin royalties
+- [ ] Imágenes de "caos" seleccionadas (escena 1) — con licencia verificada para uso comercial/promocional en redes, y requisitos de atribución/restricciones revisados
 - [ ] Logo Nivva exportado en PNG con fondo transparente
 
 ### Durante la edición
