@@ -3,7 +3,7 @@
 // Auto-actualización: skipWaiting + clients.claim garantizan activación inmediata
 // cuando hay nueva versión disponible e internet.
 
-const CACHE_VERSION = 'nivva-v1';
+const CACHE_VERSION = 'nivva-v2';
 
 const APP_SHELL = [
     './',
