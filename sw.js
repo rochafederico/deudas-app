@@ -3,7 +3,7 @@
 // Auto-actualización: skipWaiting + clients.claim garantizan activación inmediata
 // cuando hay nueva versión disponible e internet.
 
-const CACHE_VERSION = 'nivva-v1';
+const CACHE_VERSION = 'nivva-v2';
 
 const APP_SHELL = [
     './',
@@ -12,6 +12,7 @@ const APP_SHELL = [
     './src/icons/icon-192.png',
     './src/icons/icon-512.png',
     './src/styles/bootstrap.css',
+    './src/styles/mobile-pwa.css',
     './src/main.js',
     './src/layout/AppShell.js',
 ];

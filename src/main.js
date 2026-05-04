@@ -11,6 +11,20 @@ import { checkAndNotify } from './features/notifications/NotificationService.js'
 import { listDeudas } from './features/deudas/deudaRepository.js';
 import FeedbackFabComponent from './features/feedback/FeedbackFab.js';
 
+function shouldRegisterServiceWorker() {
+    const { protocol, hostname } = window.location;
+    const isLocalhost = hostname === 'localhost' || hostname === '[::1]' || /^127\./.test(hostname);
+    return protocol === 'https:' && !isLocalhost;
+}
+
+if ('serviceWorker' in navigator && shouldRegisterServiceWorker()) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {
+            // SW no disponible — la app funciona sin capacidad offline
+        });
+    }, { once: true });
+}
+
 // Wrapper para el contenido principal
 document.body.appendChild(AppHeader());
 document.body.classList.add('bg-body-tertiary');
