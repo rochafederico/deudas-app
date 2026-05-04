@@ -269,7 +269,7 @@ Basadas en el [Manual de Voz y Tono de Nivva (04-Voz-y-tono)](../wiki/04-Voz-y-t
 - ✅ Estructura: qué le da la app + próximo paso (CTA)
 - ✅ No se promete "libertad financiera" ni "control total"
 - ✅ Hashtags en español y neutros, con `#Argentina` para geolocalización
-- ✅ Emojis solo en posts relacionables/Reels; ausentes en posts de marca institucional
+- ✅ Emojis principalmente en posts relacionables/Reels; en posts institucionales, solo uso puntual y funcional (por ejemplo, para enfatizar o señalizar), evitando un tono recargado
 - ✅ CTA de feedback en posts de funcionalidad y cierre: invitar a reportar errores o dudas por DM ("Si algo no te sale, contanos — lo resolvemos")
 
 ---
