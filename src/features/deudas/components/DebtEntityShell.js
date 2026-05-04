@@ -189,10 +189,9 @@ export class DebtEntityShell extends HTMLElement {
     _renderTotalesBar() {
         const totals = {};
         this.entities.forEach(deuda => {
-            (deuda.montos || []).forEach(m => {
-                if (!m.pagado) {
-                    totals[m.moneda] = (totals[m.moneda] || 0) + Number(m.monto);
-                }
+            const pendientePorMoneda = this.computePendiente(deuda.montos || []);
+            Object.entries(pendientePorMoneda).forEach(([moneda, total]) => {
+                totals[moneda] = (totals[moneda] || 0) + Number(total);
             });
         });
 
