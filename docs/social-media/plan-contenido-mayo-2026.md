@@ -55,7 +55,7 @@
 **Post 3 (09/05):**
 > 'Sí, sí, me acuerdo que vencía el 10... o era el 15?' 🫠
 >
-> Si te pasó, no estás solo/a. El 27 % de las personas usa la memoria como único método de control financiero.
+> Si te pasó, no estás solo/a. Muchas personas usan la memoria como único método de control financiero.
 >
 > Nivva te avisa antes de que venza — para que no te agarre por sorpresa.
 >
