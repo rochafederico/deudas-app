@@ -4,7 +4,7 @@
 > **Plataforma objetivo:** Instagram (adaptable a otras redes)  
 > **Cadencia:** 3 publicaciones por semana (lunes, miércoles, viernes)  
 > **Total de publicaciones:** 12  
-> **Archivo CSV:** [`plan-contenido-mayo-2026.csv`](./plan-contenido-mayo-2026.csv)
+> **Archivo de planificación:** Gestionado en Google Drive
 
 ---
 
@@ -68,7 +68,7 @@
 
 | # | Fecha | Día | Pilar | Formato | Hook | CTA | Persona objetivo |
 |---|---|---|---|---|---|---|---|
-| 4 | 12/05 | Lunes | Funcionalidad destacada | Reel (15-30 seg) | Registrá una deuda en menos de 30 segundos | Probalo vos mismo → link en bio | Ana / Facundo |
+| 4 | 12/05 | Lunes | Funcionalidad destacada | Reel (15-30 seg) | Registrá una deuda en menos de 30 segundos | Probalo vos mismo → link en bio. ¿Algo no funciona como esperabas? Escribinos 💬 | Ana / Facundo |
 | 5 | 14/05 | Miércoles | Educación financiera simple | Carrusel (2 slides) | ¿Egreso fijo o variable? La diferencia cambia todo | Guardá para tenerlo de referencia 💡 | Ana / Claudia |
 | 6 | 16/05 | Viernes | Funcionalidad destacada | Post estático | Que el vencimiento no te agarre de sorpresa 🔔 | ¿Tenés activadas las notificaciones? → link en bio | Ana / Claudia |
 
@@ -82,6 +82,8 @@
 > ✔️ Cuántas cuotas quedan
 >
 > Sin complicaciones. Sin pasos de más.
+>
+> Si algo no te sale, contanos — lo resolvemos 💬
 >
 > `#Nivva #finanzas #deudas #ARS #USD #controldedeudas #Argentina`
 
@@ -112,7 +114,7 @@
 |---|---|---|---|---|---|---|---|
 | 7 | 19/05 | Lunes | Funcionalidad destacada | Carrusel (2 slides) | No solo lo que debés — también lo que ganás | ¿Registrás tus ingresos? Contanos cómo lo hacés 👇 | Ana / Facundo |
 | 8 | 21/05 | Miércoles | Educación financiera simple | Post estático | Ingresos − Egresos = lo que realmente te queda | Empezá a registrar hoy → link en bio | Facundo / Claudia |
-| 9 | 23/05 | Viernes | Privacidad y confianza | Post estático | Tus datos financieros no son de nadie más 🔐 | Compartilo con quien lo necesita 🔐 | Ana / Claudia / Facundo |
+| 9 | 23/05 | Viernes | Privacidad y confianza | Post estático | Tus datos financieros no son de nadie más 🔐 | ¿Tenés alguna duda o algo que no te queda claro? Escribinos por DM 💬 | Ana / Claudia / Facundo |
 
 **Captions desarrollados:**
 
@@ -140,6 +142,8 @@
 > Nada en la nube. Ningún servidor externo. Cero riesgo de que alguien más vea tu información.
 >
 > Vos controlás todo.
+>
+> ¿Algo no te queda claro o encontraste algo raro? Contanos por DM — estamos mejorando la app y tu feedback cuenta 🛠️
 >
 > `#Nivva #privacidad #seguridaddigital #finanzaspersonales #datos #Argentina`
 
@@ -187,6 +191,8 @@
 > Gratis. Sin cuenta. Sin suscripción.
 >
 > Empezá hoy → link en bio
+>
+> ¿Encontraste algo que no funciona como esperabas? Contanos por DM — tu reporte nos ayuda a mejorar 🛠️
 >
 > `#Nivva #finanzaspersonales #app #gratis #Argentina #controlfinanciero #balance`
 
@@ -264,12 +270,12 @@ Basadas en el [Manual de Voz y Tono de Nivva (04-Voz-y-tono)](../wiki/04-Voz-y-t
 - ✅ No se promete "libertad financiera" ni "control total"
 - ✅ Hashtags en español y neutros, con `#Argentina` para geolocalización
 - ✅ Emojis solo en posts relacionables/Reels; ausentes en posts de marca institucional
+- ✅ CTA de feedback en posts de funcionalidad y cierre: invitar a reportar errores o dudas por DM ("Si algo no te sale, contanos — lo resolvemos")
 
 ---
 
 ## 📎 Archivos relacionados
 
-- [`plan-contenido-mayo-2026.csv`](./plan-contenido-mayo-2026.csv) — Versión tabla completa para importar en planificadores
 - [`../wiki/00-Marca.md`](../wiki/00-Marca.md) — Identidad visual y propósito de Nivva
 - [`../wiki/04-Voz-y-tono.md`](../wiki/04-Voz-y-tono.md) — Reglas de registro y copy
 - [`../wiki/09-Personas.md`](../wiki/09-Personas.md) — Perfiles de usuario (Ana, Facundo, Claudia)
