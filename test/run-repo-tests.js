@@ -19,6 +19,7 @@ import { tests as feedbackTests } from './feedback.test.js';
 import { tests as layoutTests } from './layout.test.js';
 import { tests as appFormTests } from './app-form.test.js';
 import { tests as pwaResponsiveTests } from './pwa-responsive.test.js';
+import { tests as cloudBackupTests } from './cloud-backup.test.js';
 
 async function run() {
     try {
@@ -69,6 +70,9 @@ async function run() {
 
         console.log('\n--- PWA / Responsive ---');
         for (const test of pwaResponsiveTests) { await test(); }
+
+        console.log('\n--- Cloud Backup ---');
+        for (const test of cloudBackupTests) { await test(); }
 
         printResults();
         process.exit(0);

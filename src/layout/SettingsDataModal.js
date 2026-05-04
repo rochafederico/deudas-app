@@ -8,7 +8,7 @@ export class SettingsDataModal extends HTMLElement {
   constructor() {
     super();
     this._rendered = false;
-    this._callbacks = { onExport: null, onImport: null, onDelete: null };
+    this._callbacks = { onExport: null, onImport: null, onDelete: null, onCloudBackup: null };
   }
 
   connectedCallback() {
@@ -20,6 +20,7 @@ export class SettingsDataModal extends HTMLElement {
     this._exportBtn = this.querySelector('#settings-export');
     this._importBtn = this.querySelector('#settings-import');
     this._deleteBtn = this.querySelector('#settings-delete');
+    this._cloudBackupBtn = this.querySelector('#settings-cloud-backup');
 
     this._exportBtn?.addEventListener('click', (e) => {
       e.preventDefault();
@@ -38,12 +39,19 @@ export class SettingsDataModal extends HTMLElement {
       this._modal.close();
       await this._callbacks.onDelete?.(this._deleteBtn);
     });
+
+    this._cloudBackupBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this._modal.close();
+      this._callbacks.onCloudBackup?.(this._cloudBackupBtn);
+    });
   }
 
-  open({ returnFocus, onExport, onImport, onDelete }) {
+  open({ returnFocus, onExport, onImport, onDelete, onCloudBackup }) {
     this._callbacks.onExport = onExport;
     this._callbacks.onImport = onImport;
     this._callbacks.onDelete = onDelete;
+    this._callbacks.onCloudBackup = onCloudBackup ?? null;
     this._modal.setTitle(SETTINGS_MODAL_TITLE);
     this._modal.returnFocusTo(returnFocus);
     this._modal.open();
@@ -66,6 +74,18 @@ export class SettingsDataModal extends HTMLElement {
             <button type="button" id="settings-import" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
               <i class="bi bi-download" aria-hidden="true"></i>
               <span>Importar datos</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-header">
+            <h6 id="settings-privacy-title" class="mb-0">Privacidad y seguridad</h6>
+          </div>
+          <div class="list-group list-group-flush" role="group" aria-labelledby="settings-privacy-title">
+            <button type="button" id="settings-cloud-backup" class="list-group-item list-group-item-action d-flex align-items-center gap-2">
+              <i class="bi bi-cloud-upload" aria-hidden="true"></i>
+              <span>Subir backup ahora</span>
             </button>
           </div>
         </div>

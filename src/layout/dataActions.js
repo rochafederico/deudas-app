@@ -1,10 +1,12 @@
 // Shared data action helpers — used by AppHeader (desktop) and BottomNav (mobile)
 import '../features/import-export/components/ExportDataModal.js';
 import '../features/import-export/components/ImportDataModal.js';
+import '../features/import-export/components/CloudBackupModal.js';
 import { openSettingsDataModal } from './SettingsDataModal.js';
 
 let _exportModal = null;
 let _importModal = null;
+let _cloudBackupModal = null;
 
 export function openExportModal(returnFocus) {
   if (!_exportModal) {
@@ -22,12 +24,21 @@ export function openImportModal(returnFocus) {
   _importModal.open(returnFocus);
 }
 
+export function openCloudBackupModal(returnFocus) {
+  if (!_cloudBackupModal) {
+    _cloudBackupModal = document.createElement('cloud-backup-modal');
+    document.body.appendChild(_cloudBackupModal);
+  }
+  _cloudBackupModal.open(returnFocus);
+}
+
 export function openSettingsModal(returnFocus) {
   openSettingsDataModal({
     returnFocus,
     onExport: (opener) => openExportModal(opener),
     onImport: (opener) => openImportModal(opener),
     onDelete: () => deleteAllData(),
+    onCloudBackup: (opener) => openCloudBackupModal(opener),
   });
 }
 

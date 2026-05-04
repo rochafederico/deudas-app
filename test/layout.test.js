@@ -391,7 +391,7 @@ export const tests = [
         const dangerTitle = document.getElementById('settings-danger-zone-title');
         const deleteBtn = document.getElementById('settings-delete');
         assert(modal !== null, 'Debe existir el modal dedicado de Configuración');
-        assert(cards.length === 2, 'Configuración debe separar acciones en 2 cards');
+        assert(cards.length === 3, 'Configuración debe separar acciones en 3 cards (Datos, Privacidad, Zona peligrosa)');
         assert(exportBtn !== null, 'Debe incluir opción Exportar datos');
         assert(importBtn !== null, 'Debe incluir opción Importar datos');
         assert(exportBtn.closest('.card') !== null, 'Exportar debe estar dentro de card de datos');
