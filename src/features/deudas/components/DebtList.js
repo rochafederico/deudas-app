@@ -130,6 +130,7 @@ export class DebtList extends HTMLElement {
             columns = [...columns, {
                 key: 'ver-deuda',
                 label: '',
+                opts: { classCss: 'd-none d-md-table-cell' },
                 render: row => {
                     const btn = document.createElement('button');
                     btn.type = 'button';

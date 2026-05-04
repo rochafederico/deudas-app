@@ -50,6 +50,41 @@ export const debtTableColumns = [
                 wrapper.appendChild(badge);
             }
 
+            // Mobile-only: monto, vencimiento y estado de pago
+            if (row.monto != null) {
+                const montoMobileSpan = document.createElement('span');
+                montoMobileSpan.className = 'd-md-none text-nowrap mt-1';
+                montoMobileSpan.textContent = formatMoneda(row.monto, row.moneda);
+                wrapper.appendChild(montoMobileSpan);
+            }
+
+            const venc = String(row.vencimiento ?? '').trim();
+            if (venc !== '') {
+                const vencSpan = document.createElement('span');
+                vencSpan.className = 'text-muted fw-lighter d-md-none text-nowrap';
+                vencSpan.textContent = venc;
+                wrapper.appendChild(vencSpan);
+            }
+
+            const estadoMobileDiv = document.createElement('div');
+            estadoMobileDiv.className = 'd-md-none mt-1';
+            const renderEstadoPagoMobile = () => {
+                estadoMobileDiv.replaceChildren();
+                const estado = getMontoEstado(row);
+                if (!estado) {
+                    estadoMobileDiv.classList.add('d-none');
+                    return;
+                }
+                estadoMobileDiv.classList.remove('d-none');
+                const badge = document.createElement('span');
+                badge.className = `badge ${estado.className} text-nowrap`;
+                badge.textContent = estado.label;
+                estadoMobileDiv.appendChild(badge);
+            };
+            row._renderEstadoPagoMobile = renderEstadoPagoMobile;
+            renderEstadoPagoMobile();
+            wrapper.appendChild(estadoMobileDiv);
+
             return wrapper;
         }
     },
@@ -58,6 +93,7 @@ export const debtTableColumns = [
     {
         key: 'monedaymonto',
         label: 'Monto',
+        opts: { classCss: 'd-none d-md-table-cell' },
         render: row => {
             const wrapper = document.createElement('div');
             wrapper.className = 'd-flex flex-column align-items-start';
@@ -115,6 +151,7 @@ export const debtTableColumns = [
                 const previousChecked = !!row.pagado;
                 row.pagado = nextChecked;
                 if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                if (typeof row._renderEstadoPagoMobile === 'function') row._renderEstadoPagoMobile();
 
                 try {
                     await setPagado(row.id, nextChecked);
@@ -131,6 +168,7 @@ export const debtTableColumns = [
                     row.pagado = previousChecked;
                     appCheckbox.checked = previousChecked;
                     if (typeof row._renderEstadoPago === 'function') row._renderEstadoPago();
+                    if (typeof row._renderEstadoPagoMobile === 'function') row._renderEstadoPagoMobile();
                     window.dispatchEvent(new CustomEvent('app:notify', {
                         detail: {
                             message: '❌ No pudimos actualizar el estado de pago. Intentá de nuevo.',
@@ -142,9 +180,24 @@ export const debtTableColumns = [
 
             // Contenedor — stopPropagation para no activar el click de fila
             const container = document.createElement('div');
-            container.className = 'd-flex align-items-center justify-content-end';
+            container.className = 'd-flex flex-column align-items-end gap-1';
             container.addEventListener('click', e => e.stopPropagation());
             container.appendChild(appCheckbox);
+
+            // Mobile-only: botón de detalle cuando la acción está disponible
+            if (typeof row._onDetail === 'function') {
+                const eyeBtn = document.createElement('button');
+                eyeBtn.type = 'button';
+                eyeBtn.className = 'btn btn-sm btn-outline-secondary d-md-none';
+                eyeBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || ''}`);
+                eyeBtn.innerHTML = '<i class="bi bi-eye" aria-hidden="true"></i>';
+                eyeBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await row._onDetail(row, eyeBtn);
+                });
+                container.appendChild(eyeBtn);
+            }
+
             return container;
         }
     }
