@@ -67,6 +67,14 @@ Estos términos son nombres internos del código. No deben aparecer en la UI:
 - **"Monto"** es el término genérico para una cifra de pago. Puede ser una cuota de tarjeta, un alquiler mensual o un pago único.
 - **"Cuota"** es un término más específico (implica pagos en cuotas de crédito). No usar como sinónimo de monto en todos los contextos.
 
+### Plata / Dinero
+
+- Las palabras **"plata"** y **"dinero"** están prohibidas en toda la UI y el contenido de marca.
+- Nivva **no gestiona dinero** — gestiona **números que el usuario ingresa**. La app solo registra y visualiza; no interpreta si son fondos, deudas o activos reales.
+- En la UI, una cifra numérica es siempre un **"monto"** (nunca "plata" ni "dinero").
+- En copy de redes, onboarding y documentación de cara al usuario: usar **"números"**, **"registros"** o **"compromisos"** en lugar de cualquier equivalente monetario coloquial.
+- Nota: en este glosario "plata" y "dinero" aparecen únicamente en la columna **"Sinónimos prohibidos"** — su presencia ahí es intencional y documenta exactamente qué términos hay que evitar.
+
 ### Copia de seguridad
 - El sistema exporta un archivo `.json` con todos los datos.
 - En la UI: **"copia de seguridad"** (no "backup", no "exportación" como único término).
