@@ -28,7 +28,7 @@
 
 | # | Fecha | Día | Pilar | Formato | Hook | CTA | Persona objetivo |
 |---|---|---|---|---|---|---|---|
-| 1 | 04/05 | Lunes | Presentación de marca | Post estático | ¿Cuánto vas a pagar este mes? Si no lo sabés de memoria, Nivva te lo muestra. | Probala gratis → link en bio | Ana / Claudia |
+| 1 | 04/05 | Lunes | Presentación de marca | Reel (8–12 seg) | ¿Cuánto vas a pagar este mes? Si no lo sabés de memoria, Nivva te lo muestra. | Probala gratis → link en bio | Ana / Claudia |
 | 2 | 06/05 | Miércoles | Funcionalidad destacada | Carrusel (3 slides) | De 0 a 'sé exactamente lo que debo' en 3 pasos | Guardá este post para acordarte 💾 | Facundo |
 | 3 | 08/05 | Viernes | Identificación con el usuario | Post estático | Confiar en la memoria para recordar los vencimientos es como... 🫠 | ¿Te pasó? Contanos en los comentarios 👇 | Facundo / Claudia |
 
@@ -202,7 +202,7 @@
 
 | Mes/Año | Semana | Fecha | Pilar | Formato | Persona objetivo |
 |---|---|---|---|---|---|
-| Mayo 2026 | Semana 1 | 04/05 | Presentación de marca | Post estático | Ana / Claudia |
+| Mayo 2026 | Semana 1 | 04/05 | Presentación de marca | Reel (8–12 seg) | Ana / Claudia |
 | Mayo 2026 | Semana 1 | 06/05 | Funcionalidad destacada | Carrusel | Facundo |
 | Mayo 2026 | Semana 1 | 08/05 | Identificación con el usuario | Post estático | Facundo / Claudia |
 | Mayo 2026 | Semana 2 | 11/05 | Funcionalidad destacada | Reel | Ana / Facundo |
@@ -231,8 +231,8 @@
 | Formato | Cantidad |
 |---|---|
 | Carrusel | 5 |
-| Post estático | 5 |
-| Reel | 2 |
+| Post estático | 4 |
+| Reel | 3 |
 
 ### Distribución por persona objetivo — Mayo 2026
 
