@@ -22,8 +22,10 @@ export const tests = [
     async function pwa_indexLinksManifestAndMobileStyles() {
         console.log('  PWA: index referencia manifest y estilos mobile');
         const indexHtml = readRepoFile('index.html');
-        assert(indexHtml.includes('<link rel="manifest" href="./manifest.json">'), 'index debe vincular manifest.json');
-        assert(indexHtml.includes('<link href="src/styles/mobile-pwa.css" rel="stylesheet">'), 'index debe cargar estilos mobile/pwa');
+        const manifestLinkPattern = /<link\b(?=[^>]*\brel=["']manifest["'])(?=[^>]*\bhref=["']\.\/manifest\.json["'])[^>]*>/i;
+        const mobileStylesLinkPattern = /<link\b(?=[^>]*\brel=["']stylesheet["'])(?=[^>]*\bhref=["']src\/styles\/mobile-pwa\.css["'])[^>]*>/i;
+        assert(manifestLinkPattern.test(indexHtml), 'index debe vincular manifest.json');
+        assert(mobileStylesLinkPattern.test(indexHtml), 'index debe cargar estilos mobile/pwa');
     },
 
     async function pwa_serviceWorkerRegisteredFromMainOnlyInProduction() {
