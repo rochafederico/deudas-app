@@ -229,13 +229,18 @@ export class DebtList extends HTMLElement {
         const fmt = (moneda, n) => this.fmtMoneda(moneda, n || 0);
 
         const pendienteItems = [...currencies]
-            .filter(m => pendiente[m])
+            .filter(m => Number(pendiente[m]) !== 0)
             .map(m => `<span class="badge text-bg-warning me-1">${fmt(m, pendiente[m])}</span>`)
             .join('');
         const pagadoItems = [...currencies]
-            .filter(m => pagado[m])
+            .filter(m => Number(pagado[m]) !== 0)
             .map(m => `<span class="badge text-bg-success me-1">${fmt(m, pagado[m])}</span>`)
             .join('');
+
+        if (!pendienteItems && !pagadoItems) {
+            totalsEl.innerHTML = '';
+            return;
+        }
 
         totalsEl.innerHTML = `
             <div class="d-flex flex-wrap justify-content-end align-items-center gap-3 px-3 py-2 border-top text-end">
