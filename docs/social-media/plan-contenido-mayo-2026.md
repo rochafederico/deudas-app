@@ -90,7 +90,7 @@
 **Post 5 (14/05) — Carrusel:**
 > 📌 Egreso fijo: monto constante todos los meses. Alquiler, cuota del seguro, servicio de streaming.
 >
-> 📌 Egreso variable: monto que cambia. La boleta de luz, el super, salir a comer.
+> 📌 Egreso variable: monto que cambia. La boleta de luz, el súper, salir a comer.
 >
 > Registrar los fijos primero te da una base sólida para planificar. Nivva te ayuda a hacerlo.
 >
