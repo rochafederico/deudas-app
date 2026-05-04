@@ -2,22 +2,24 @@
     --touch-target-size: 44px;
 }
 
-button,
-.btn,
-.nav-link,
-.dropdown-item,
-input[type='button'],
-input[type='submit'],
-input[type='reset'],
-.form-control,
-.form-select {
-    min-height: var(--touch-target-size);
-}
+@media (pointer: coarse) {
+    button,
+    .btn,
+    .nav-link,
+    .dropdown-item,
+    input[type='button'],
+    input[type='submit'],
+    input[type='reset'],
+    .form-control,
+    .form-select {
+        min-height: var(--touch-target-size);
+    }
 
-.form-check {
-    min-height: var(--touch-target-size);
-    display: flex;
-    align-items: center;
+    .form-check {
+        min-height: var(--touch-target-size);
+        display: flex;
+        align-items: center;
+    }
 }
 
 @media (max-width: 479.98px) {
