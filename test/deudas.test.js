@@ -384,10 +384,38 @@ async function testAcreedorColumnMobileRender() {
     const badgeSinTipo = nodeSinTipo.querySelector('span.badge');
     assert(badgeSinTipo === null, 'No debe renderizarse badge cuando tipoDeuda está vacío');
 
-    // Columna monedaymonto debe mostrar badge de vencimiento en mobile
+    // Columna acreedor debe mostrar monto + vencimiento + estado en mobile (d-md-none)
+    const rowConMonto = { acreedor: 'Banco Galicia', tipoDeuda: 'Préstamo', monto: 5000, moneda: 'ARS', vencimiento: '2026-07-01', pagado: false };
+    const nodeConMonto = acreedorCol.render(rowConMonto);
+
+    const montoMobileSpan = nodeConMonto.querySelector('span.d-md-none.text-nowrap');
+    assert(montoMobileSpan !== null, 'Acreedor debe renderizar span de monto visible solo en mobile (d-md-none text-nowrap)');
+
+    const vencMobileSpan = nodeConMonto.querySelector('span.d-md-none.text-nowrap.text-muted');
+    assert(vencMobileSpan !== null, 'Acreedor debe renderizar span de vencimiento visible solo en mobile (d-md-none text-muted)');
+    assert(vencMobileSpan.textContent === '2026-07-01', 'Span de vencimiento en acreedor debe mostrar la fecha');
+
+    // _renderEstadoPagoMobile debe existir en el row y actualizar el badge de estado en mobile
+    assert(typeof rowConMonto._renderEstadoPagoMobile === 'function', 'render debe asignar _renderEstadoPagoMobile al row');
+    const estadoMobileDiv = nodeConMonto.querySelector('div.d-md-none');
+    assert(estadoMobileDiv !== null, 'Debe existir div de estado mobile (d-md-none) en acreedor');
+
+    // Sin monto, no debe renderizarse span de monto en acreedor
+    const rowSinMonto = { acreedor: 'Sin Monto', tipoDeuda: 'Servicio' };
+    const nodeSinMonto = acreedorCol.render(rowSinMonto);
+    const montoMobileSpanSinMonto = nodeSinMonto.querySelector('span.d-md-none.text-nowrap');
+    assert(montoMobileSpanSinMonto === null, 'No debe renderizarse span de monto cuando row.monto es nulo');
+
+    // Columna monedaymonto debe estar oculta en mobile (d-none d-md-table-cell)
     const montoCol = debtTableColumns.find(col => col.key === 'monedaymonto');
     assert(montoCol !== undefined, 'Debe existir columna monedaymonto');
     assert(typeof montoCol.render === 'function', 'Columna monedaymonto debe tener render function');
+    assert(montoCol.opts && typeof montoCol.opts.classCss === 'string',
+        'Columna Monto debe definir classCss');
+    assert(montoCol.opts.classCss.includes('d-none'),
+        'Columna Monto debe incluir clase d-none para ocultarse en mobile');
+    assert(montoCol.opts.classCss.includes('d-md-table-cell'),
+        'Columna Monto debe incluir clase d-md-table-cell para mostrarse desde md');
 
     const rowConVenc = { monto: 1000, moneda: 'ARS', vencimiento: '2026-06-01' };
     const montoNode = montoCol.render(rowConVenc);
@@ -455,6 +483,32 @@ async function testAcreedorColumnMobileRender() {
     });
     const pendienteBadge = pendienteNode.querySelector('.badge.text-bg-success, .badge.text-bg-danger, .badge.text-bg-warning');
     assert(pendienteBadge === null, 'No debe renderizar badge para pendiente sin vencer');
+}
+
+// ===================================================================
+// UC7c: acciones column muestra botón ojo en mobile cuando _onDetail existe
+// Verifica que la columna acciones renderiza un botón (d-md-none) para ver
+// el detalle cuando row._onDetail es función, y no lo renderiza si no existe.
+// ===================================================================
+async function testAccionesColumnMobileEyeButton() {
+    console.log('  UC7c: acciones column renderiza botón ojo en mobile');
+
+    const accionesCol = debtTableColumns.find(col => col.key === 'acciones');
+    assert(accionesCol !== undefined, 'Debe existir columna acciones');
+
+    // Con _onDetail: debe renderizar el botón de ojo en mobile
+    const rowConDetalle = { id: 1, acreedor: 'Test', pagado: false, _onDetail: async () => {} };
+    const nodeConDetalle = accionesCol.render(rowConDetalle);
+    const eyeBtn = nodeConDetalle.querySelector('button.d-md-none');
+    assert(eyeBtn !== null, 'Debe existir botón de ojo (d-md-none) en acciones cuando _onDetail es función');
+    assert(eyeBtn.classList.contains('btn-outline-secondary'), 'Botón de ojo debe tener clase btn-outline-secondary');
+    assert(eyeBtn.querySelector('i.bi-eye') !== null, 'Botón de ojo debe contener ícono bi-eye');
+
+    // Sin _onDetail: no debe renderizarse el botón de ojo
+    const rowSinDetalle = { id: 2, acreedor: 'Test', pagado: false };
+    const nodeSinDetalle = accionesCol.render(rowSinDetalle);
+    const eyeBtnSinDetalle = nodeSinDetalle.querySelector('button.d-md-none');
+    assert(eyeBtnSinDetalle === null, 'No debe renderizarse botón de ojo cuando _onDetail no existe');
 }
 
 // ===================================================================
@@ -1219,6 +1273,7 @@ export const tests = [
     testMultiplesDeudasMismoMes,
     testDebtDetailModal,
     testAcreedorColumnMobileRender,
+    testAccionesColumnMobileEyeButton,
     testPagoToggleVisualFeedback,
     testAltaInlineAgregarYGuardar,
     testCancelarAltaInline,
