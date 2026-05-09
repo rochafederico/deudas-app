@@ -45,7 +45,7 @@ export function getEstado(row) {
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     if (v < today) return { label: 'Vencido', className: 'text-bg-danger' };
     if (v === today) return { label: 'Vence hoy', className: 'text-bg-warning' };
-    return null;
+    return { label: 'Pendiente', className: 'text-bg-secondary' };
 }
 
 // ── Componente ────────────────────────────────────────────────────────────────
