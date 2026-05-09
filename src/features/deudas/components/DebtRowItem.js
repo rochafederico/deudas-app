@@ -175,7 +175,7 @@ export class DebtRowItem extends HTMLElement {
 
         // ── MOBILE COL 1: info (avatar + nombre + tipo + fecha) ───────
         const tdInfo = document.createElement('td');
-        tdInfo.className = 'd-table-cell d-md-none py-2';
+        tdInfo.className = 'd-table-cell d-md-none py-3';
 
         const infoFlex = document.createElement('div');
         infoFlex.className = 'd-flex align-items-center gap-3';
@@ -221,39 +221,43 @@ export class DebtRowItem extends HTMLElement {
         tdInfo.appendChild(infoFlex);
         tr.appendChild(tdInfo);
 
-        // ── MOBILE COL 2: acciones (monto + badge + toggle + chevron) ─
-        // Layout: [stack: monto · badge · toggle] + [chevron: centrado verticalmente]
+        // ── MOBILE COL 2: estado + switch + chevron ──────────────────
+        // 3 sub-columnas fijas independientes dentro del td:
+        //   [estado: flex-grow-1] · [switch: ancho fijo] · [chevron: ancho fijo]
+        // Los montos largos se expanden hacia la izquierda sin mover switch/chevron.
         const tdMActions = document.createElement('td');
-        tdMActions.className = 'd-table-cell d-md-none py-2 pe-0 align-middle';
-        // stopPropagation se aplica solo al checkbox (no a toda la celda)
+        tdMActions.className = 'd-table-cell d-md-none py-3 pe-1 align-middle';
 
         const mActWrap = document.createElement('div');
-        mActWrap.className = 'd-flex align-items-center justify-content-end gap-2';
+        mActWrap.className = 'd-flex align-items-center';
 
-        // Stack vertical: monto arriba · badge · toggle abajo
-        const mRightStack = document.createElement('div');
-        mRightStack.className = 'd-flex flex-column align-items-end gap-1';
+        // Col 3 — Estado: monto arriba, badge debajo (crece, no comprime a sus vecinos)
+        const estadoCol = document.createElement('div');
+        estadoCol.className = 'd-flex flex-column align-items-end flex-grow-1 me-1';
 
         const amountEl = document.createElement('div');
         amountEl.className = 'fw-semibold text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
-        mRightStack.appendChild(amountEl);
-        mRightStack.appendChild(mobileBadgeDiv);
+        estadoCol.appendChild(amountEl);
+        estadoCol.appendChild(mobileBadgeDiv);
+        mActWrap.appendChild(estadoCol);
 
-        // Checkbox: stopPropagation solo aquí para no bloquear el click de la fila
-        const cbWrap = document.createElement('div');
-        cbWrap.addEventListener('click', e => e.stopPropagation());
-        cbWrap.appendChild(cbMobile);
-        mRightStack.appendChild(cbWrap);
+        // Col 4 — Switch: columna de ancho fijo, centrada, independiente del estado
+        const switchCol = document.createElement('div');
+        switchCol.className = 'debt-col-switch d-flex align-items-center justify-content-center flex-shrink-0';
+        switchCol.addEventListener('click', e => e.stopPropagation());
+        switchCol.appendChild(cbMobile);
+        mActWrap.appendChild(switchCol);
 
-        mActWrap.appendChild(mRightStack);
-
-        // Chevron: alineado verticalmente al centro, pegado al borde derecho
+        // Col 5 — Chevron: columna de ancho fijo, centrada, siempre pegada al borde derecho
         if (typeof row._onRowClick === 'function') {
+            const chevronCol = document.createElement('div');
+            chevronCol.className = 'debt-col-chevron d-flex align-items-center justify-content-center flex-shrink-0';
             const chevron = document.createElement('i');
-            chevron.className = 'bi bi-chevron-right text-muted flex-shrink-0';
+            chevron.className = 'bi bi-chevron-right text-muted';
             chevron.setAttribute('aria-hidden', 'true');
-            mActWrap.appendChild(chevron);
+            chevronCol.appendChild(chevron);
+            mActWrap.appendChild(chevronCol);
         }
 
         tdMActions.appendChild(mActWrap);

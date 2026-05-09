@@ -28,6 +28,16 @@
 
 }
 
+.debt-col-switch {
+    width: 44px;
+    min-width: 44px;
+}
+
+.debt-col-chevron {
+    width: 20px;
+    min-width: 20px;
+}
+
 @media (max-width: 767.98px) {
     .debt-row-table {
         --bs-table-border-color: rgba(0, 0, 0, .07);
