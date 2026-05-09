@@ -252,14 +252,20 @@ export class DebtRowItem extends HTMLElement {
 
         // Col 5 — Chevron: columna de ancho fijo, centrada, siempre pegada al borde derecho
         if (typeof row._onRowClick === 'function') {
-            const chevronCol = document.createElement('div');
-            chevronCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0';
-            chevronCol.style.cssText = 'width:20px;min-width:20px';
+            const chevronBtn = document.createElement('button');
+            chevronBtn.type = 'button';
+            chevronBtn.className = 'btn btn-link p-0 text-muted d-flex align-items-center justify-content-center flex-shrink-0';
+            chevronBtn.style.cssText = 'width:20px;min-width:20px';
+            chevronBtn.setAttribute('aria-label', `Ver detalle de ${row.acreedor || 'esta deuda'}`);
+            chevronBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                row._onRowClick(row, chevronBtn);
+            });
             const chevron = document.createElement('i');
-            chevron.className = 'bi bi-chevron-right text-muted';
+            chevron.className = 'bi bi-chevron-right';
             chevron.setAttribute('aria-hidden', 'true');
-            chevronCol.appendChild(chevron);
-            mActWrap.appendChild(chevronCol);
+            chevronBtn.appendChild(chevron);
+            mActWrap.appendChild(chevronBtn);
         }
 
         tdMActions.appendChild(mActWrap);
