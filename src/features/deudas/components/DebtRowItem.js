@@ -244,7 +244,8 @@ export class DebtRowItem extends HTMLElement {
 
         // Col 4 — Switch: columna de ancho fijo, centrada, independiente del estado
         const switchCol = document.createElement('div');
-        switchCol.className = 'debt-col-switch d-flex align-items-center justify-content-center flex-shrink-0';
+        switchCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0';
+        switchCol.style.cssText = 'width:44px;min-width:44px';
         switchCol.addEventListener('click', e => e.stopPropagation());
         switchCol.appendChild(cbMobile);
         mActWrap.appendChild(switchCol);
@@ -252,7 +253,8 @@ export class DebtRowItem extends HTMLElement {
         // Col 5 — Chevron: columna de ancho fijo, centrada, siempre pegada al borde derecho
         if (typeof row._onRowClick === 'function') {
             const chevronCol = document.createElement('div');
-            chevronCol.className = 'debt-col-chevron d-flex align-items-center justify-content-center flex-shrink-0';
+            chevronCol.className = 'd-flex align-items-center justify-content-center flex-shrink-0';
+            chevronCol.style.cssText = 'width:20px;min-width:20px';
             const chevron = document.createElement('i');
             chevron.className = 'bi bi-chevron-right text-muted';
             chevron.setAttribute('aria-hidden', 'true');
