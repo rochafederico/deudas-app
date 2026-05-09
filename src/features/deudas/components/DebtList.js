@@ -171,7 +171,7 @@ export class DebtList extends HTMLElement {
             tableWrapper.className = 'table-responsive';
 
             const table = document.createElement('table');
-            table.className = 'table table-hover table-striped mb-0';
+            table.className = 'table table-hover table-striped debt-row-table mb-0';
 
             thead = document.createElement('thead');
             thead.className = 'table-light';

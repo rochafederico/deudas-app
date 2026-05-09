@@ -28,6 +28,14 @@
 
 }
 
+@media (max-width: 767.98px) {
+    .debt-row-table {
+        --bs-table-border-color: rgba(0, 0, 0, .07);
+        --bs-table-striped-bg: transparent;
+        --bs-table-hover-bg: rgba(0, 0, 0, .02);
+    }
+}
+
 @media (max-width: 479.98px) {
     html,
     body {

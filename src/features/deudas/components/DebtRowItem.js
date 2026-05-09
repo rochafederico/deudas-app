@@ -41,7 +41,8 @@ export function getEstado(row) {
     if (row?.pagado) return { label: 'Pagado', className: 'text-bg-success' };
     const v = String(row?.vencimiento ?? '').trim();
     if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     if (v < today) return { label: 'Vencido', className: 'text-bg-danger' };
     if (v === today) return { label: 'Vence hoy', className: 'text-bg-warning' };
     return null;
@@ -174,7 +175,7 @@ export class DebtRowItem extends HTMLElement {
 
         // ── MOBILE COL 1: info (avatar + nombre + tipo + fecha) ───────
         const tdInfo = document.createElement('td');
-        tdInfo.className = 'd-table-cell d-md-none py-3';
+        tdInfo.className = 'd-table-cell d-md-none py-2';
 
         const infoFlex = document.createElement('div');
         infoFlex.className = 'd-flex align-items-center gap-3';
@@ -196,7 +197,11 @@ export class DebtRowItem extends HTMLElement {
         if (tipo && !excl.includes('tipoDeuda')) {
             const tipoBadge = document.createElement('span');
             tipoBadge.className = 'badge rounded-pill bg-light text-secondary border fw-normal mt-1 d-inline-block';
-            tipoBadge.innerHTML = `<i class="bi ${getTipoIcon(tipo)} me-1" aria-hidden="true"></i>${tipo}`;
+            const tipoIcon = document.createElement('i');
+            tipoIcon.className = `bi ${getTipoIcon(tipo)} me-1`;
+            tipoIcon.setAttribute('aria-hidden', 'true');
+            tipoBadge.appendChild(tipoIcon);
+            tipoBadge.appendChild(document.createTextNode(tipo));
             nameBlock.appendChild(tipoBadge);
         }
 
@@ -204,7 +209,11 @@ export class DebtRowItem extends HTMLElement {
         if (venc) {
             const vencEl = document.createElement('div');
             vencEl.className = 'text-muted small mt-1';
-            vencEl.innerHTML = `<i class="bi bi-calendar3 me-1" aria-hidden="true"></i>${venc}`;
+            const calIcon = document.createElement('i');
+            calIcon.className = 'bi bi-calendar3 me-1';
+            calIcon.setAttribute('aria-hidden', 'true');
+            vencEl.appendChild(calIcon);
+            vencEl.appendChild(document.createTextNode(venc));
             nameBlock.appendChild(vencEl);
         }
 
@@ -213,23 +222,36 @@ export class DebtRowItem extends HTMLElement {
         tr.appendChild(tdInfo);
 
         // ── MOBILE COL 2: acciones (monto + badge + toggle + chevron) ─
+        // Layout: [stack: monto · badge · toggle] + [chevron: centrado verticalmente]
         const tdMActions = document.createElement('td');
-        tdMActions.className = 'd-table-cell d-md-none text-end align-top py-3';
-        tdMActions.addEventListener('click', e => e.stopPropagation());
+        tdMActions.className = 'd-table-cell d-md-none py-2 pe-0 align-middle';
+        // stopPropagation se aplica solo al checkbox (no a toda la celda)
 
         const mActWrap = document.createElement('div');
-        mActWrap.className = 'd-flex flex-column align-items-end gap-1';
+        mActWrap.className = 'd-flex align-items-center justify-content-end gap-2';
+
+        // Stack vertical: monto arriba · badge · toggle abajo
+        const mRightStack = document.createElement('div');
+        mRightStack.className = 'd-flex flex-column align-items-end gap-1';
 
         const amountEl = document.createElement('div');
         amountEl.className = 'fw-semibold text-nowrap';
         amountEl.textContent = formatMoneda(row.monto, row.moneda);
-        mActWrap.appendChild(amountEl);
-        mActWrap.appendChild(mobileBadgeDiv);
-        mActWrap.appendChild(cbMobile);
+        mRightStack.appendChild(amountEl);
+        mRightStack.appendChild(mobileBadgeDiv);
 
+        // Checkbox: stopPropagation solo aquí para no bloquear el click de la fila
+        const cbWrap = document.createElement('div');
+        cbWrap.addEventListener('click', e => e.stopPropagation());
+        cbWrap.appendChild(cbMobile);
+        mRightStack.appendChild(cbWrap);
+
+        mActWrap.appendChild(mRightStack);
+
+        // Chevron: alineado verticalmente al centro, pegado al borde derecho
         if (typeof row._onRowClick === 'function') {
             const chevron = document.createElement('i');
-            chevron.className = 'bi bi-chevron-right text-muted small';
+            chevron.className = 'bi bi-chevron-right text-muted flex-shrink-0';
             chevron.setAttribute('aria-hidden', 'true');
             mActWrap.appendChild(chevron);
         }

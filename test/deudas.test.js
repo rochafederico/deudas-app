@@ -1439,7 +1439,8 @@ async function testDebtRowItem() {
 
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
-    const estadoPendiente = getEstado({ pagado: false, vencimiento: tomorrow.toISOString().slice(0, 10) });
+    const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+    const estadoPendiente = getEstado({ pagado: false, vencimiento: tomorrowStr });
     assert(estadoPendiente === null, 'Pendiente sin vencer → null');
 
     // DebtRowItem: renderiza <tr> con celdas mobile (d-table-cell d-md-none) y desktop (d-none d-md-table-cell)
